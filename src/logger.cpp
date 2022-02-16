@@ -1,9 +1,28 @@
+#include <fstream>
 #include <stdio.h>
 #include <cstdarg>
+#include <filesystem>
+#include <string>
 #include <logger.hpp>
 #ifndef __linux
 #include <windows.h>
+#define PATHCHAR "\\"
+#else
+#define PATHCHAR "/"
 #endif
+
+FILE* Logger::LogStream;
+
+void Logger::Init(){
+  std::string ass = "." PATHCHAR "log.log";
+  LogStream = fopen(ass.c_str(), "w+");
+  //LogStream = std::ofstream(ass.c_str(), std::ofstream::trunc);
+}
+void Logger::End(){
+  
+  //LogStream.close();
+}
+
 
 #define RESET   "\033[0m"
 #define BLACK   "\033[30m"
@@ -23,6 +42,11 @@ enum LogType{
   Debug
 };
 
+void printt(const char* ass){
+  fprintf(stdout, ass);
+  fprintf(Logger::LogStream, ass);
+}
+
 void CommonLog(LogType col, va_list args, const char* msg...){
   #ifndef __linux
   HANDLE hConsoleOut;
@@ -36,7 +60,7 @@ void CommonLog(LogType col, va_list args, const char* msg...){
     #else
     SetConsoleTextAttribute(hConsoleOut, FOREGROUND_GREEN);
     #endif
-    printf("  [DEBUG]  | ");
+    printt("  [DEBUG]  | ");
     break;
     
     case Notice:
@@ -45,7 +69,7 @@ void CommonLog(LogType col, va_list args, const char* msg...){
     #else
     SetConsoleTextAttribute(hConsoleOut, 14);
     #endif
-    printf("  [NOTICE] | ");
+    printt("  [NOTICE] | ");
     break;
 
     case Error:
@@ -54,7 +78,7 @@ void CommonLog(LogType col, va_list args, const char* msg...){
     #else
     SetConsoleTextAttribute(hConsoleOut, FOREGROUND_RED);
     #endif
-    printf("  [ERROR]  | ");
+    printt("  [ERROR]  | ");
     break;
     
     case Critical:
@@ -63,7 +87,7 @@ void CommonLog(LogType col, va_list args, const char* msg...){
     #else
     SetConsoleTextAttribute(hConsoleOut, 13);
     #endif
-    printf("[CRITICAL] | ");
+    printt("[CRITICAL] | ");
     break;
 
     case Info:
@@ -72,10 +96,11 @@ void CommonLog(LogType col, va_list args, const char* msg...){
     #else
     SetConsoleTextAttribute(hConsoleOut, 15);
     #endif
-    printf("  [INFO]   | ");
+    printt("  [INFO]   | ");
     break;
   }
   vfprintf(stdout,msg, args);
+  vfprintf(Logger::LogStream,msg, args);
   #ifdef __linux
   printf(RESET);
   #else

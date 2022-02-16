@@ -8,6 +8,11 @@
 #include <string>
 #include <structs.hpp>
 
+#define INTRO "Source MDL v49 --> v53 converter\n"\
+              "Copyright 2022 MasterLiberty and headassbtw\n"\
+              "Do not distribute\n"
+
+
 template <class T> T ASS() {
   T rtn;
   std::cout << sizeof(T) << std::endl;
@@ -475,9 +480,9 @@ int NameCopy = Initial_Header->szanimblocknameindex + BytesAdded;
   int hbsidx2;
   Stream.Read(&hbsidx2);
   OutStream.seek(Dest_Header->hitboxsetindex + 44); OutStream.Write(hbsidx2 - TextureDiff);
-  Dest_Header->numlocalanim = Initial_Header->numlocalanim;
+  Dest_Header->numlocalanim = 0;//Initial_Header->numlocalanim;
   Dest_Header->localanimindex = ((Initial_Header->numanimblocks <= 0) ? Initial_Header->bodypartindex + BoneBytesAdded : Initial_Header->localanimindex + BoneBytesAdded);//- (20 * Initial_Header->numtextures);
-  Dest_Header->numlocalseq = Initial_Header->numlocalseq;
+  Dest_Header->numlocalseq = 0;//Initial_Header->numlocalseq;
   Dest_Header->localseqindex = ((Initial_Header->numanimblocks <= 0) ? Initial_Header->bodypartindex + BoneBytesAdded : Initial_Header->localseqindex + BoneBytesAdded);// - (20 * Initial_Header->numtextures);
   Dest_Header->activitylistversion = Initial_Header->activitylistversion;
   Dest_Header->eventsindexed = Initial_Header->eventsindexed;
@@ -662,14 +667,17 @@ int NameCopy = Initial_Header->szanimblocknameindex + BytesAdded;
 
   Logger::Notice("done\n");
   Logger::Info("Finished!\n");
+  Logger::End();
   return 0;
 }
 
 int main(int argc, char *argv[]) {
+  Logger::Init();
   if (argc < 2) {
     Logger::Critical("Invalid arguments\n");
     Logger::Info("Usage: %s <mdl file>\n", argv[0]);
     return 1;
   }
+  printf(INTRO);
   return ReadHeader(argv[1]);
 }

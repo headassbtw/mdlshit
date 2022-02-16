@@ -1,0 +1,10 @@
+.cache/
+build/
+winbuild/
+*.mdl
+*.vtx
+*.vvd
+*.phy
+*.log
+*.smd
+*.qc
