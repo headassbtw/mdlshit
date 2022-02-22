@@ -10,6 +10,7 @@ class BinaryReader{
   public:
   std::fstream Stream;
     BinaryReader(const char* filename);
+    BinaryReader(const BinaryReader&);
     ~BinaryReader();
     int size;
     void read(char* data, int size);
@@ -34,6 +35,7 @@ class BinaryWriter{
   public:
   std::fstream Stream;
     BinaryWriter(const char* filename);
+    BinaryWriter(const BinaryWriter&);
     ~BinaryWriter();
     int size;
     void write(const char* data, int size);

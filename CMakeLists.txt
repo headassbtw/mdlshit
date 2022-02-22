@@ -16,9 +16,9 @@ generate_product_version(
    ORIGINAL_FILENAME "mdlshit.exe"
    COMPANY_COPYRIGHT "MasterLiberty & headassbtw (C) Copyright 2087"
    INTERNAL_NAME "fucking bitch ass model converter"
-   VERSION_MAJOR 0
-   VERSION_MINOR 0
-   VERSION_PATCH 0
+   VERSION_MAJOR 4
+   VERSION_MINOR 20
+   VERSION_PATCH 69
 )
 
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden -Wall")
