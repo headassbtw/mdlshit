@@ -89,10 +89,10 @@ int ReadHeader(const char *mdlname) {
   string name = mdlname_.insert(mdlname_.find_last_of('.'),"_conv");
 
   BinaryWriter OutStream = BinaryWriter(name.c_str());
-  v53_Header *Dest_Header = new v53_Header();
-  v53_Header_Part2 *Dest_Header_Part2 = new v53_Header_Part2();
-  v49_Header *Initial_Header = new v49_Header();
-  v53_Header_Part2 *Initial_Header_Part2 = new v53_Header_Part2();
+  v53_Header*       Dest_Header = new v53_Header();
+  v53_Header_Part2* Dest_Header_Part2 = new v53_Header_Part2();
+  v49_Header*       Initial_Header = new v49_Header();
+  v53_Header_Part2* Initial_Header_Part2 = new v53_Header_Part2();
   Stream.seek(0);
 
   Stream.Read(&Initial_Header->id);
@@ -102,7 +102,7 @@ int ReadHeader(const char *mdlname) {
     Logger::Critical("Model version (%d) is above maximum this program will allow (49), aborting...\n",Initial_Header->version);
   }
 
-  Logger::Debug("V:%d\n", Initial_Header->version);
+  Logger::Debug("Version: %d\n", Initial_Header->version);
   Stream.Read(&Initial_Header->checksum);
   Logger::Debug("checksum: %d\n", Initial_Header->checksum);
   Stream.read(Initial_Header->name, 64);

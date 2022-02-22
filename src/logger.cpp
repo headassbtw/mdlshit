@@ -44,7 +44,7 @@ enum LogType{
 
 void printt(const char* ass){
   fprintf(stdout, ass);
-  fprintf(Logger::LogStream, ass);
+  //fprintf(Logger::LogStream, ass);
 }
 
 void CommonLog(LogType col, va_list args, const char* msg...){
@@ -100,7 +100,7 @@ void CommonLog(LogType col, va_list args, const char* msg...){
     break;
   }
   vfprintf(stdout,msg, args);
-  vfprintf(Logger::LogStream,msg, args);
+  //vfprintf(Logger::LogStream,msg, args);
   #ifdef __linux
   printf(RESET);
   #else
