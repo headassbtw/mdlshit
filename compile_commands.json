@@ -1,0 +1,77 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/headass/cppProjects/mdlshit/include",
+      "-Os",
+      "-DNDEBUG",
+      "-c",
+      "-o",
+      "CMakeFiles/mdlshit.dir/src/argtools.cpp.o",
+      "/home/headass/cppProjects/mdlshit/src/argtools.cpp"
+    ],
+    "directory": "/home/headass/cppProjects/mdlshit/build",
+    "file": "/home/headass/cppProjects/mdlshit/src/argtools.cpp",
+    "output": "/home/headass/cppProjects/mdlshit/build/CMakeFiles/mdlshit.dir/src/argtools.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/headass/cppProjects/mdlshit/include",
+      "-Os",
+      "-DNDEBUG",
+      "-c",
+      "-o",
+      "CMakeFiles/mdlshit.dir/src/binarystream.cpp.o",
+      "/home/headass/cppProjects/mdlshit/src/binarystream.cpp"
+    ],
+    "directory": "/home/headass/cppProjects/mdlshit/build",
+    "file": "/home/headass/cppProjects/mdlshit/src/binarystream.cpp",
+    "output": "/home/headass/cppProjects/mdlshit/build/CMakeFiles/mdlshit.dir/src/binarystream.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/headass/cppProjects/mdlshit/include",
+      "-Os",
+      "-DNDEBUG",
+      "-c",
+      "-o",
+      "CMakeFiles/mdlshit.dir/src/headerreader.cpp.o",
+      "/home/headass/cppProjects/mdlshit/src/headerreader.cpp"
+    ],
+    "directory": "/home/headass/cppProjects/mdlshit/build",
+    "file": "/home/headass/cppProjects/mdlshit/src/headerreader.cpp",
+    "output": "/home/headass/cppProjects/mdlshit/build/CMakeFiles/mdlshit.dir/src/headerreader.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/headass/cppProjects/mdlshit/include",
+      "-Os",
+      "-DNDEBUG",
+      "-c",
+      "-o",
+      "CMakeFiles/mdlshit.dir/src/logger.cpp.o",
+      "/home/headass/cppProjects/mdlshit/src/logger.cpp"
+    ],
+    "directory": "/home/headass/cppProjects/mdlshit/build",
+    "file": "/home/headass/cppProjects/mdlshit/src/logger.cpp",
+    "output": "/home/headass/cppProjects/mdlshit/build/CMakeFiles/mdlshit.dir/src/logger.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/headass/cppProjects/mdlshit/include",
+      "-Os",
+      "-DNDEBUG",
+      "-c",
+      "-o",
+      "CMakeFiles/mdlshit.dir/src/main.cpp.o",
+      "/home/headass/cppProjects/mdlshit/src/main.cpp"
+    ],
+    "directory": "/home/headass/cppProjects/mdlshit/build",
+    "file": "/home/headass/cppProjects/mdlshit/src/main.cpp",
+    "output": "/home/headass/cppProjects/mdlshit/build/CMakeFiles/mdlshit.dir/src/main.cpp.o"
+  }
+]

@@ -16,13 +16,6 @@ bool IgnoreOtherFiles = true; //ignores if the other 3 files exist, mcor_pilot_m
 
 
 
-template <class T> T ASS() {
-  T rtn;
-  std::cout << sizeof(T) << std::endl;
-  return rtn;
-}
-
-
 void CopyAddInt32(BinaryReader* reader, BinaryWriter* writer, int add, int count){
     for(int i = 0; i < count;i++){
         int tmp;
