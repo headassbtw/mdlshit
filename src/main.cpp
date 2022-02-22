@@ -756,6 +756,7 @@ int main(int argc, char *argv[]) {
     Logger::Info("Usage: %s <mdl file> [OPTIONS]\n", argv[0]);
     return 1;
   }
+  printf(INTRO);
   if(cmdOptionExists(argv,argv+argc,"--help")){
     Logger::Info("mdlshit:\n");
     Logger::Info("Usage: %s <mdl file> [OPTIONS]\n", argv[0]);
@@ -775,6 +776,5 @@ int main(int argc, char *argv[]) {
   }
 
 
-  printf(INTRO);
   return ReadHeader(argv[1]);
 }

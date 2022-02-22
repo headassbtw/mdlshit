@@ -1,4 +1,6 @@
 .cache/
+.vscode/
+bin/
 build/
 winbuild/
 *.mdl
