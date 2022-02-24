@@ -20,7 +20,7 @@ generate_product_version(
    VERSION_MINOR 20
    VERSION_PATCH 69
 )
-
+add_subdirectory(ui)
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden -Wall")
 IF(MINGW)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/Windows)
@@ -28,6 +28,6 @@ ELSE(MINGW)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/Linux)
 ENDIF(MINGW)
 add_executable(mdlshit ${SRC} ${VersionFilesOutputVariable})
-set(CMAKE_EXE_LINKER_FLAGS " -static")
+#set(CMAKE_EXE_LINKER_FLAGS " -static")
 
-target_link_libraries(mdlshit -static-libgcc -static-libstdc++)
+target_link_libraries(mdlshit Qt_Ui -static-libgcc -static-libstdc++)

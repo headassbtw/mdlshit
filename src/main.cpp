@@ -1,6 +1,7 @@
 #include <binarystream.hpp>
 #include <logger.hpp>
 #include <cstdio>
+#include "./../ui/main.hpp"
 #include <cstdlib>
 #include <cstring>
 #include <argtools.hpp>
@@ -61,7 +62,7 @@ void filler(BinaryReader* reader, BinaryWriter* writer, int count){
   }
 }
 
-int ReadHeader(const char *mdlname) {
+int ReadHeader(const char *mdlname,const char *vtxname,const char *vvdname,const char *phyname,const char *outname) {
 
 
   string mdlname_ = std::string(mdlname);
@@ -69,27 +70,23 @@ int ReadHeader(const char *mdlname) {
   BinaryReader Stream = BinaryReader(mdlname);
 
 
-  string phyName = h(mdlname,"phy");
-  string vtxName = h(mdlname,"vtx");
-  string vvdName = h(mdlname,"vvd");
-  BinaryReader PhyStream = BinaryReader(phyName.c_str());
+  BinaryReader PhyStream = BinaryReader(phyname);
   if(!PhyStream.Stream.good()){
-    Logger::Error("Model's phy file does not exist, please ensure %s exists, and is located in the same directory as the file\n",phyName.c_str());
+    Logger::Error("Model's phy file does not exist, please ensure %s exists, and is located in the same directory as the file\n",phyname);
     return 1;
   }
-  BinaryReader VtxStream = BinaryReader(vtxName.c_str());
+  BinaryReader VtxStream = BinaryReader(vtxname);
   if(!VtxStream.Stream.good()){
-    Logger::Error("Model's vtx file does not exist, please ensure %s exists, and is located in the same directory as the file\n",vtxName.c_str());
+    Logger::Error("Model's vtx file does not exist, please ensure %s exists, and is located in the same directory as the file\n",vtxname);
     return 1;
   }
-  BinaryReader VvdStream = BinaryReader(vvdName.c_str());
+  BinaryReader VvdStream = BinaryReader(vvdname);
   if(!VvdStream.Stream.good()){
-    Logger::Error("Model's vvd file does not exist, please ensure %s exists, and is located in the same directory as the file\n",vvdName.c_str());
+    Logger::Error("Model's vvd file does not exist, please ensure %s exists, and is located in the same directory as the file\n",vvdname);
     return 1;
   }
-  string name = mdlname_.insert(mdlname_.find_last_of('.'),"_conv");
 
-  BinaryWriter OutStream = BinaryWriter(name.c_str());
+  BinaryWriter OutStream = BinaryWriter(outname);
   v53_Header*       Dest_Header = new v53_Header();
   v53_Header_Part2* Dest_Header_Part2 = new v53_Header_Part2();
   v49_Header*       Initial_Header = new v49_Header();
@@ -738,12 +735,16 @@ int NameCopy = Initial_Header->szanimblocknameindex + BytesAdded;
 
   Logger::Notice("done\n");
   Logger::Info("Finished!\n");
-  Logger::End();
+  
   return 0;
 }
 
 int main(int argc, char *argv[]) {
   Logger::Init();
+  UI::main(argc,argv);
+  Logger::End();
+
+
   if (argc < 2) {
     Logger::Critical("Invalid arguments\n");
     Logger::Info("Usage: %s <mdl file> [OPTIONS]\n", argv[0]);
@@ -769,5 +770,5 @@ int main(int argc, char *argv[]) {
   }
 
 
-  return ReadHeader(argv[1]);
+  //return ReadHeader(argv[1]);
 }
