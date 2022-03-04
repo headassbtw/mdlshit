@@ -12,7 +12,7 @@
 #define INTRO "Source MDL v49 --> v53 converter\n"\
               "Copyright 2022 MasterLiberty and headassbtw\n"\
               "Do not distribute\n"
-bool DisableAnim = true; //sets the seq and anim count to 0, from before anims worked
+bool DisableAnim = false; //sets the seq and anim count to 0, from before anims worked
 bool IgnoreOtherFiles = true; //ignores if the other 3 files exist, mcor_pilot_male_br.mdl my beloved
 
 
@@ -219,7 +219,7 @@ int ReadHeader(const char *mdlname,const char *vtxname,const char *vvdname,const
   Stream.Read(&Initial_Header_Part2->unknown2[1]);
   Stream.Read(&Initial_Header_Part2->unknown2[2]);
   Stream.Read(&Initial_Header_Part2->vtxOffset2);
-    Logger::Notice("Finished reading at %d\n",Stream.Position());
+  Logger::Notice("Finished reading at %d\n",Stream.Position());
   
 
   memcpy(Dest_Header->name, Initial_Header->name, sizeof(Initial_Header->name));
@@ -230,13 +230,11 @@ int TextureDiff = (20 * Initial_Header->numtextures);
 #pragma region bone conversion
 int p = Initial_Header->boneindex - Stream.Position();
 OutStream.seek(Stream.Position() + 4);
-  Logger::Info("Writing Bone Filler...\n");
   for(int i = 0;i < p;i++){
       byte tmp;
       Stream.Read(&tmp);
       OutStream.Write(tmp);
   }
-  Logger::Info("Wrote Bone Filler\n");
   int bonecount = Initial_Header->numbones;
   for (int i = 0; i < bonecount; i++) {
       
@@ -271,7 +269,7 @@ OutStream.seek(Stream.Position() + 4);
     BytesAdded += 28;
     Logger::Notice("Converted bone %d of %d\n",i+1,bonecount);
   }
-
+Logger::Info("Finished bone conversion\n");
 #pragma endregion
 
 
@@ -302,11 +300,26 @@ for(int i = 0; i < Initial_Header->numlocalattachments;i++){
 }
 //anims
 int anim_filler_dest = Initial_Header->localanimindex - Stream.Position();
-Logger::Info("%d bytes for anim filler\n",anim_filler_dest);
 filler(&Stream, &OutStream, anim_filler_dest);
 
 for(int i = 0; i < Initial_Header->numlocalanim;i++){
-  CopyAddInt32(&Stream, &OutStream, 0, 7);
+
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //baseptr
+  int szname_og;
+  Stream.Stream.read((char*)&szname_og, 4);
+  int off = -((8)*(Initial_Header->numlocalanim - i));
+  int szname_cv = szname_og + off;
+  OutStream.Stream.write((char*)&szname_cv, 4);
+  Logger::Debug("Converted animation name, old was %d, new is %d\n",szname_og,szname_cv);
+
+  float fps;
+  Stream.Read(&fps);
+  OutStream.Write(fps);
+  Logger::Debug("%f FPS\n",fps);
+  
+
+
+  CopyAddInt32(&Stream, &OutStream, 0, 5);
   int shitfuck[6];
   Stream.read((char*)&shitfuck, 4*6);
   CopyAddInt32(&Stream, &OutStream, 0, 11); //10 ints, two shorts, shorts are two bytes
@@ -316,13 +329,12 @@ for(int i = 0; i < Initial_Header->numlocalanim;i++){
   BytesAdded -= 8;
   Logger::Notice("Converted animation %d of %d\n",i+1,Initial_Header->numlocalanim);
 }
-
+Logger::Info("Finished animations\n");
 
 
 
 //sequences
 int seq_filler_dest = Initial_Header->localseqindex - Stream.Position();
-Logger::Info("%d bytes for seq filler\n",seq_filler_dest);
 filler(&Stream, &OutStream, anim_filler_dest);
 
 for(int i = 0; i < Initial_Header->numlocalseq;i++){
@@ -357,7 +369,7 @@ for(int i = 0; i < Initial_Header->numlocalseq;i++){
 
   Logger::Notice("Converted sequence %d of %d\n",i+1,Initial_Header->numlocalseq);
 }
-
+Logger::Info("Finished sequences\n");
 
 
 int bpart_filler_dest = Initial_Header->bodypartindex - Stream.Position();
@@ -376,6 +388,7 @@ for(int i = 0; i < Initial_Header->numbodyparts;i++){
   filler(&Stream, &OutStream, 12);
   Logger::Notice("Converted body part %d of %d\n",i+1,Initial_Header->numbodyparts);
 }
+Logger::Info("Finished body parts\n");
 
 int inc_filler_dest = Initial_Header->includemodelindex - Stream.Position();
 for(int i = 0;i < inc_filler_dest;i++){
@@ -398,18 +411,16 @@ for(int i = 0; i < Initial_Header->numincludemodels;i++){
 Stream.seek(Stream.Position() - 4);
 OutStream.seek(OutStream.Position() - 4);
 
-
+Logger::Info("Finished included models\n");
 
 #pragma region texture conversion
 
-Logger::Info("Writing Texture Filler...\n");
 int t_filler_dest = Initial_Header->textureindex - Stream.Position();
   for(int i = 0;i < t_filler_dest;i++){
       byte tmp;
       Stream.Read(&tmp);
       OutStream.Write(tmp);
   }
-Logger::Info("Wrote Texture Filler\n");
 int beginposR = Stream.Position();
 int beginposW = OutStream.Position();
 
@@ -425,7 +436,7 @@ int beginposW = OutStream.Position();
     BytesAdded -= 20;
     Logger::Notice("Converted texture %d of %d\n",i+1,Initial_Header->numtextures);
   }
-
+Logger::Info("Finished textures\n");
 #pragma endregion
 
 Logger::Notice("Write cursor is %d bytes short of original texture index\n",OutStream.Position() - Initial_Header->textureindex);
@@ -741,8 +752,8 @@ int NameCopy = Initial_Header->szanimblocknameindex + BytesAdded;
 
 int main(int argc, char *argv[]) {
   Logger::Init();
-  UI::main(argc,argv);
-  Logger::End();
+  //UI::main(argc,argv);
+  //Logger::End();
 
 
   if (argc < 2) {
@@ -759,16 +770,16 @@ int main(int argc, char *argv[]) {
     Logger::Notice("with extensions of vtx, vvd, and phy\n");
     Logger::Info("---------------------------------------------------\n");
     Logger::Info("args:\n");
-    Logger::Info("\"-anims\": Enables animations\n");
+    Logger::Info("\"-noanims\": Disables animations\n");
     Logger::Info("\"--help\": Shows this\n");
     return 0;
     Logger::Info("\"\": \n");
   }
-  if(cmdOptionExists(argv,argv+argc,"-anims")){
-    DisableAnim = false;
-    Logger::Info("Animations enabled, there be dragons\n");
+  if(cmdOptionExists(argv,argv+argc,"-noanims")){
+    DisableAnim = true;
+    Logger::Info("Animations disabled\n");
   }
 
 
-  //return ReadHeader(argv[1]);
+  return ReadHeader(argv[1], h(argv[1],"vtx").c_str(),h(argv[1],"vvd").c_str(),h(argv[1],"phy").c_str(),h(argv[1],"conv.mdl").c_str());
 }
