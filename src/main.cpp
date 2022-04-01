@@ -303,30 +303,13 @@ for(int i = 0; i < Initial_Header->numlocalattachments;i++){
 int anim_filler_dest = Initial_Header->localanimindex - Stream.Position();
 filler(&Stream, &OutStream, anim_filler_dest);
 Dest_Header->localanimindex = OutStream.Position();
-/*
+
 for(int i = 0; i < Initial_Header->numlocalanim;i++){
   CopyAddInt32(&Stream, &OutStream, 0, 7);
-
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //baseptr
-  int szname_og;
-  Stream.Stream.read((char*)&szname_og, 4);
-  int off = -((8)*(Initial_Header->numlocalanim - i));
-  int szname_cv = szname_og + off;
-  OutStream.Stream.write((char*)&szname_cv, 4);
-  Logger::Debug("Converted animation name, old was %d, new is %d\n",szname_og,szname_cv);
-
-  float fps;
-  Stream.Read(&fps);
-  OutStream.Write(fps);
-  Logger::Debug("%f FPS\n",fps);
-
-
-
-  CopyAddInt32(&Stream, &OutStream, 0, 5);
   int shitfuck[6];
   Stream.read((char*)&shitfuck, 4*6);
   CopyAddInt32(&Stream, &OutStream, 0, 11); //10 ints, two shorts, shorts are two bytes
-  
+
   CopyAddFloat32(&Stream, &OutStream, 0, 1);
   OutStream.write((char*)&shitfuck, 16);
   BytesAdded -= 8;
@@ -334,17 +317,14 @@ for(int i = 0; i < Initial_Header->numlocalanim;i++){
 }
 Logger::Info("Finished animations\n");
 
-*/
+
 
 
 //sequences
 int seq_filler_dest = Initial_Header->localseqindex - Stream.Position();
 filler(&Stream, &OutStream, seq_filler_dest);
-
+Dest_Header->localseqindex = OutStream.Position();
 for(int i = 0; i < Initial_Header->numlocalseq;i++){
-  int idk;
-  Stream.Stream.read((char*)&idk, 4);
-  
   CopyAddInt32(&Stream, &OutStream, 0, 1);
   CopyAddInt32(&Stream, &OutStream, 0, 1); //szlabelindex
   CopyAddInt32(&Stream, &OutStream, 0, 1); //szactivitynameindex
@@ -369,7 +349,6 @@ for(int i = 0; i < Initial_Header->numlocalseq;i++){
   OutStream.Write(0); //activityModifierOffset
   OutStream.Write(0); //activityModifierCount
   OutStream.write((char*)&unused, 20);
-  OutStream.Write(0);
   OutStream.Write(0);
   OutStream.Write(0);
   OutStream.Write(0);
