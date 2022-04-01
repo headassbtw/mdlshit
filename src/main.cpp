@@ -12,6 +12,7 @@
 #define INTRO "Source MDL v49 --> v53 converter\n"\
               "Copyright 2022 MasterLiberty and headassbtw\n"\
               "Do not distribute\n"
+
 bool DisableAnim = false; //sets the seq and anim count to 0, from before anims worked
 bool IgnoreOtherFiles = true; //ignores if the other 3 files exist, mcor_pilot_male_br.mdl my beloved
 
@@ -301,44 +302,45 @@ for(int i = 0; i < Initial_Header->numlocalattachments;i++){
 //anims
 int anim_filler_dest = Initial_Header->localanimindex - Stream.Position();
 filler(&Stream, &OutStream, anim_filler_dest);
-
+Dest_Header->localanimindex = OutStream.Position();
 for(int i = 0; i < Initial_Header->numlocalanim;i++){
 
   CopyAddInt32(&Stream, &OutStream, 0, 1); //baseptr
+
   int szname_og;
   Stream.Stream.read((char*)&szname_og, 4);
+
   int off = -((8)*(Initial_Header->numlocalanim - i));
   int szname_cv = szname_og + off;
   OutStream.Stream.write((char*)&szname_cv, 4);
   Logger::Debug("Converted animation name, old was %d, new is %d\n",szname_og,szname_cv);
 
-  float fps;
-  Stream.Read(&fps);
-  OutStream.Write(fps);
-  Logger::Debug("%f FPS\n",fps);
-  
-
+  CopyAddFloat32(&Stream, &OutStream, 0, 1); //fps  
 
   CopyAddInt32(&Stream, &OutStream, 0, 5);
   int shitfuck[6];
   Stream.read((char*)&shitfuck, 4*6);
+  OutStream.write((char*)&shitfuck, 4*6);
   CopyAddInt32(&Stream, &OutStream, 0, 11); //10 ints, two shorts, shorts are two bytes
   
   CopyAddFloat32(&Stream, &OutStream, 0, 1);
-  OutStream.write((char*)&shitfuck, 16);
-  BytesAdded -= 8;
+  //BytesAdded -= 8;
   Logger::Notice("Converted animation %d of %d\n",i+1,Initial_Header->numlocalanim);
 }
 Logger::Info("Finished animations\n");
 
 
 
+
 //sequences
 int seq_filler_dest = Initial_Header->localseqindex - Stream.Position();
 filler(&Stream, &OutStream, anim_filler_dest);
-
+/*
 for(int i = 0; i < Initial_Header->numlocalseq;i++){
-  CopyAddInt32(&Stream, &OutStream, 0, 1);
+  int idk;
+  Stream.Stream.read((char*)&idk, 4);
+  OutStream.write("sqst", 4);
+  //CopyAddInt32(&Stream, &OutStream, 0, 1);
   CopyAddInt32(&Stream, &OutStream, 0, 1); //szlabelindex
   CopyAddInt32(&Stream, &OutStream, 0, 1); //szactivitynameindex
   CopyAddInt32(&Stream, &OutStream, 0, 4);
@@ -364,13 +366,16 @@ for(int i = 0; i < Initial_Header->numlocalseq;i++){
   OutStream.write((char*)&unused, 20);
   OutStream.Write(0);
   OutStream.Write(0);
-  BytesAdded += 16;
+  OutStream.write("sqen", 4);
+  OutStream.Write(0);
+  BytesAdded += 20;
 
 
   Logger::Notice("Converted sequence %d of %d\n",i+1,Initial_Header->numlocalseq);
 }
 Logger::Info("Finished sequences\n");
-
+*/
+Logger::Info("skipped sequences lmao\n");
 
 int bpart_filler_dest = Initial_Header->bodypartindex - Stream.Position();
 for(int i = 0;i < bpart_filler_dest;i++){
@@ -560,7 +565,7 @@ int NameCopy = Initial_Header->szanimblocknameindex + BytesAdded;
   Stream.Read(&hbsidx2);
   OutStream.seek(Dest_Header->hitboxsetindex + 44); OutStream.Write(hbsidx2 - TextureDiff);
   Dest_Header->numlocalanim = (DisableAnim) ? 0 : Initial_Header->numlocalanim;
-  Dest_Header->localanimindex = ((Initial_Header->numanimblocks <= 0) ? Initial_Header->bodypartindex + BoneBytesAdded : Initial_Header->localanimindex + BoneBytesAdded);//- (20 * Initial_Header->numtextures);
+  //Dest_Header->localanimindex = ((Initial_Header->numanimblocks <= 0) ? Initial_Header->bodypartindex + BoneBytesAdded : Initial_Header->localanimindex + BoneBytesAdded);//- (20 * Initial_Header->numtextures);
   Dest_Header->numlocalseq = (DisableAnim) ? 0 : Initial_Header->numlocalseq;
   Dest_Header->localseqindex = ((Initial_Header->numanimblocks <= 0) ? Initial_Header->bodypartindex + BoneBytesAdded : Initial_Header->localseqindex + BoneBytesAdded);// - (20 * Initial_Header->numtextures);
   Dest_Header->activitylistversion = Initial_Header->activitylistversion;
@@ -762,6 +767,17 @@ int main(int argc, char *argv[]) {
     return 1;
   }
   printf(INTRO);
+
+  
+  printf("Compiled on %s, using %s v%s\n", __DATE__,
+  #ifdef __MINGW32__
+  "MinGW",
+  #elif __GNUC__
+  "GCC",
+  #endif
+  __VERSION__);
+
+
   if(cmdOptionExists(argv,argv+argc,"--help")){
     Logger::Info("mdlshit:\n");
     Logger::Info("Usage: %s <mdl file> [OPTIONS]\n", argv[0]);
