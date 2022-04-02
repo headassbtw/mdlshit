@@ -25,6 +25,16 @@ void CopyAddInt32(BinaryReader* reader, BinaryWriter* writer, int add, int count
         writer->Write(tmp + add);
     }
 }
+void CopyAddInt32NullCheck(BinaryReader* reader, BinaryWriter* writer, int add, int count){
+    for(int i = 0; i < count;i++){
+        int tmp;
+        reader->Read(&tmp);
+        if(tmp == 0)
+          writer->Write(tmp);
+        else
+          writer->Write(tmp + add);
+    }
+}
 void AddInt32(BinaryWriter* writer, int add, int count){
     for(int i = 0; i < count;i++){
         writer->Write(add);
@@ -226,6 +236,13 @@ int ReadHeader(const char *mdlname,const char *vtxname,const char *vvdname,const
   memcpy(Dest_Header->name, Initial_Header->name, sizeof(Initial_Header->name));
 
 
+int TestDiff = (Initial_Header->numlocalanim * -8)
++
+(Initial_Header->numlocalseq * 20)
++
+(0);
+
+
 int BytesAdded = 4;
 int TextureDiff = (20 * Initial_Header->numtextures);
 #pragma region bone conversion
@@ -239,7 +256,7 @@ OutStream.seek(Stream.Position() + 4);
   int bonecount = Initial_Header->numbones;
   for (int i = 0; i < bonecount; i++) {
       
-    int boneOff = (28 * bonecount) - (28 * i) - TextureDiff;
+    int boneOff = TestDiff + (28 * bonecount) - (28 * i) - TextureDiff;
     CopyAddInt32(&Stream, &OutStream, boneOff, 1); //sznameindex
     CopyAddInt32(&Stream, &OutStream, 0, 1); //parent
     CopyAddInt32(&Stream, &OutStream, 0, 6); //bonecontroller
@@ -284,12 +301,7 @@ if(OutStream.Position() - BytesAdded != Stream.Position()){
 int BoneBytesAdded = BytesAdded + 0;
 
 int att_filler_dest = Initial_Header->localattachmentindex - Stream.Position();
-for(int i = 0;i < att_filler_dest;i++){
-    byte tmp;
-    Stream.Read(&tmp);
-    OutStream.Write(tmp);
-}
-
+filler(&Stream, &OutStream, att_filler_dest);
 for(int i = 0; i < Initial_Header->numlocalattachments;i++){
   //92 bytes
   int idx;
@@ -299,16 +311,37 @@ for(int i = 0; i < Initial_Header->numlocalattachments;i++){
   filler(&Stream, &OutStream, 88);
   Logger::Notice("Converted local attachment %d of %d\n",i+1,Initial_Header->numlocalattachments);
 }
+
+int SeqAdd = 20 * Initial_Header->numlocalseq;
+
 //anims
 int anim_filler_dest = Initial_Header->localanimindex - Stream.Position();
 filler(&Stream, &OutStream, anim_filler_dest);
 Dest_Header->localanimindex = OutStream.Position();
 
 for(int i = 0; i < Initial_Header->numlocalanim;i++){
-  CopyAddInt32(&Stream, &OutStream, 0, 7);
+  int PISS = -((8*(Initial_Header->numlocalanim - i)));
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //baseptr
+  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //sznameindex
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //fps
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //flags
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //numframes
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //nummovements
+  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //movementindex
   int shitfuck[6];
   Stream.read((char*)&shitfuck, 4*6);
-  CopyAddInt32(&Stream, &OutStream, 0, 11); //10 ints, two shorts, shorts are two bytes
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //animblock
+  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //animindex
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //numikrules
+  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //ikruleindex
+  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //animblockikruleindex
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //numlocalhierarchy
+  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //localhierarchyindex
+  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //sectionindex
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //sectionframes
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //zeroframespan, zeroframecount
+  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //zeroframeindex
+  
 
   CopyAddFloat32(&Stream, &OutStream, 0, 1);
   OutStream.write((char*)&shitfuck, 16);
@@ -325,25 +358,42 @@ int seq_filler_dest = Initial_Header->localseqindex - Stream.Position();
 filler(&Stream, &OutStream, seq_filler_dest);
 Dest_Header->localseqindex = OutStream.Position();
 for(int i = 0; i < Initial_Header->numlocalseq;i++){
-  CopyAddInt32(&Stream, &OutStream, 0, 1);
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //szlabelindex
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //szactivitynameindex
+  int PISS = (TextureDiff + (20*(Initial_Header->numlocalseq - i)))-(8*Initial_Header->numlocalanim);
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //baseptr
+  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //szlabelindex
+  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //szactivitynameindex
   CopyAddInt32(&Stream, &OutStream, 0, 4);
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //eventindex
-  CopyAddInt32(&Stream, &OutStream, 0, 3);   //vectors
-  CopyAddInt32(&Stream, &OutStream, 0, 3);   //vectors
-  CopyAddInt32(&Stream, &OutStream, 0, 1);
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //animindexindex
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //movementindex
-  CopyAddInt32(&Stream, &OutStream, 0, 21);
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //autolayerindex
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //weightlistindex
-  CopyAddInt32(&Stream, &OutStream, 0, 4);
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //iklockindex
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //keyvalueindex
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //cycleposeindex
-
-
+  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //eventindex
+  CopyAddInt32(&Stream, &OutStream, 0, 3);   //bbmin
+  CopyAddInt32(&Stream, &OutStream, 0, 3);   //bbmax
+  CopyAddInt32(&Stream, &OutStream, 0, 1);   //numblends
+  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //animindexindex
+  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //movementindex
+  CopyAddInt32(&Stream, &OutStream, 0, 2); //groupsize
+  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 2); //paramindex
+  CopyAddInt32(&Stream, &OutStream, 0, 2); //paramstart
+  CopyAddInt32(&Stream, &OutStream, 0, 2); //paramend
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //paramparent
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //fadeintime
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //fadeouttime
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //localentrynode
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //localexitnode
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //nodeflags
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //entryphase
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //exitphase
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //lastframe
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //nextseq
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //pose
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //numikrules
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //numautolayers  
+  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //autolayerindex
+  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //weightlistindex
+  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //posekeyindex
+  CopyAddInt32(&Stream, &OutStream, 0, 3);
+  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //iklockindex
+  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //keyvalueindex
+  CopyAddInt32(&Stream, &OutStream, 0, 1); //keyvaluesize
+  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //cycleposeindex
   int unused[5];
   Stream.read((char*)&unused, 20);
   OutStream.Write(0); //activityModifierOffset
@@ -735,11 +785,7 @@ int main(int argc, char *argv[]) {
   //Logger::End();
 
 
-  if (argc < 2) {
-    Logger::Critical("Invalid arguments\n");
-    Logger::Info("Usage: %s <mdl file> [OPTIONS]\n", argv[0]);
-    return 1;
-  }
+  
   printf(INTRO);
 
   
@@ -750,6 +796,12 @@ int main(int argc, char *argv[]) {
   "GCC",
   #endif
   __VERSION__);
+
+  if (argc < 2) {
+    Logger::Critical("Invalid arguments\n");
+    Logger::Info("Usage: %s <mdl file> [OPTIONS]\n", argv[0]);
+    return 1;
+  }
 
 
   if(cmdOptionExists(argv,argv+argc,"--help")){
