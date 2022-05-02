@@ -794,6 +794,8 @@ int main(int argc, char *argv[]) {
   "MinGW",
   #elif __GNUC__
   "GCC",
+  #else
+  "Other",
   #endif
   __VERSION__);
 
