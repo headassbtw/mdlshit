@@ -48,6 +48,8 @@ int main(int argc, char *argv[]) {
   "MinGW",
   #elif __GNUC__
   "GCC",
+  #else
+  "Other",
   #endif
   __VERSION__);
 
@@ -104,5 +106,4 @@ int main(int argc, char *argv[]) {
   else{
     return UI::Run();
   }
-
 }
