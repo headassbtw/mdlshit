@@ -1,6 +1,22 @@
 #pragma once
 #include <cstddef>
+#include <string>
+#include <optional>
 using namespace std;
+
+struct FileInfo{
+	optional<string> mdl;
+	optional<string> vtx;
+	optional<string> vvd;
+	optional<string> phy;
+	optional<string> out;
+
+	optional<int> attachment_override;
+	optional<int> sequence_override;
+	optional<int> animation_override;
+	optional<int> flags_override;
+};
+
 struct Vector{
   float x, y, z;
 };

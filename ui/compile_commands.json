@@ -1,0 +1,31 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-DQT_CORE_LIB",
+      "-DQT_GUI_LIB",
+      "-DQT_NO_DEBUG",
+      "-DQT_WIDGETS_LIB",
+      "-I/home/headass/cppProjects/Qt_Test/build/Qt_Test_autogen/include",
+      "-isystem",
+      "/usr/include/qt",
+      "-isystem",
+      "/usr/include/qt/QtCore",
+      "-isystem",
+      "/usr/lib/qt/mkspecs/linux-g++",
+      "-isystem",
+      "/usr/include/qt/QtGui",
+      "-isystem",
+      "/usr/include/qt/QtWidgets",
+      "-fPIC",
+      "-std=gnu++17",
+      "-c",
+      "-o",
+      "CMakeFiles/Qt_Test.dir/main.cpp.o",
+      "/home/headass/cppProjects/Qt_Test/main.cpp"
+    ],
+    "directory": "/home/headass/cppProjects/Qt_Test/build",
+    "file": "/home/headass/cppProjects/Qt_Test/main.cpp",
+    "output": "/home/headass/cppProjects/Qt_Test/build/CMakeFiles/Qt_Test.dir/main.cpp.o"
+  }
+]
