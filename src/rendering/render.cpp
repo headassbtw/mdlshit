@@ -22,6 +22,7 @@
 #include <thread>
 #include <rendering/progress.hpp>
 #include <structs.hpp>
+#include <logger.hpp>
 #include <conv.hpp>
 //#define _GLFW_USE_MENUBAR
 #define STB_IMAGE_IMPLEMENTATION
@@ -290,6 +291,10 @@ void RenderGUI(){
         }
         if(_block) blocked = true;
         else blocked = false;
+
+        if(blocked){
+            Logger::Error("Conversion blocked, not all criteria met!\n");
+        }
     }
 
     ImGui::BeginDisabled(blocked);
@@ -301,6 +306,7 @@ void RenderGUI(){
         if(files[2]->isEnabled) fileinfo.vvd = files[2]->BoxBuffer;
         if(files[3]->isEnabled) fileinfo.phy = files[3]->BoxBuffer;
         fileinfo.out = rn(files[0]->BoxBuffer,"conv");
+        Logger::Debug("Destination file set to \"%s\"\n",fileinfo.out->c_str());
 
         if(override_attachments) fileinfo.attachment_override =  attachments;
         if(override_sequences) fileinfo.sequence_override =  sequences;
@@ -318,8 +324,38 @@ void RenderGUI(){
 
 
     if(console){
-        ImGui::BeginChild("Logger",{0,0},true);
-        ImGui::Text("Hello!");
+        ImGui::BeginChild("Logger",{0,0},false,ImGuiWindowFlags_AlwaysUseWindowPadding);
+        depth_border();
+        ImFont* monospace = ImGui::GetIO().Fonts->Fonts[2];
+
+        ImGui::PushFont(monospace);
+        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {12.0,4.0});
+
+        if (ImGui::BeginTable("table1", 2,ImGuiTableFlags_BordersInnerV))
+        {
+            ImGui::TableSetupColumn("small",ImGuiTableColumnFlags_WidthFixed);
+            ImGui::TableSetupColumn("half");
+            for (int row = LoggerMessages.size(); row >0; row--)
+            {
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0);
+                ImGui::PushItemWidth(150.0f);
+                switch(LoggerMessages[row-1]->type){
+                    case 4: ImGui::TextColored({0.1,1.0,0.1,1.0},"Debug");break;
+                    case 1: ImGui::TextColored({1.0,1.0,0.2,1.0},"Notice");break;
+                    case 2: ImGui::TextColored({1.0,0.1,0.1,1.0},"Error");break;
+                    case 3: ImGui::TextColored({1.0,0.2,1.0,1.0},"Critical");break;
+                    case 0: ImGui::TextColored({1.0,1.0,1.0,1.0},"Info");break;
+                }
+                ImGui::PopItemWidth();
+                ImGui::TableSetColumnIndex(1);
+                ImGui::Text("%s",LoggerMessages[row-1]->msg.c_str());
+            }
+            ImGui::EndTable();
+        }
+        ImGui::SetScrollHereY(0.999f);
+        ImGui::PopStyleVar();
+        ImGui::PopFont();
         ImGui::EndChild();
     }
 
@@ -478,6 +514,7 @@ int UI::Run(){
     ImGui::GetIO().IniFilename = NULL;
     ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Resources::SegoeUI_compressed, Resources::SegoeUI_compressed_size, 16);
     ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Resources::Impact_compressed, Resources::Impact_compressed_size, 16);
+    ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Resources::Menlo_compressed, Resources::Menlo_compressed_size, 16);
     ImGui::GetIO().Fonts->Build();
     auto style = ImGui::GetStyle();
     //style.Colors[ImGuiCol_WindowBg].w = 0.0;

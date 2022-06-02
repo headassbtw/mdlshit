@@ -34,13 +34,8 @@ void Logger::End(){
 #define CYAN    "\033[36m"
 #define WHITE   "\033[37m"
 
-enum LogType{
-  Info,
-  Notice,
-  Error,
-  Critical,
-  Debug
-};
+vector<LogMsg*> LoggerMessages;
+
 enum ConsoleColor{
   Reset,
   Black,
@@ -51,6 +46,13 @@ enum ConsoleColor{
   Magenta,
   Cyan,
   White
+};
+enum LogType{
+  Info,
+  Notice,
+  Error,
+  Critical,
+  Debug
 };
 void SetConsoleColor(ConsoleColor color){
   int WindowsCol;
@@ -84,6 +86,8 @@ void printt(const char* ass){
 void CommonLog(LogType col, va_list args, const char* msg...){
   
   
+  
+  
   switch(col){
     case Debug:
     SetConsoleColor(Green);
@@ -110,7 +114,15 @@ void CommonLog(LogType col, va_list args, const char* msg...){
     printt("  [INFO]   | ");
     break;
   }
-  vfprintf(stdout,msg, args);
+  char msg_buf[2048];
+  sprintf(msg_buf,msg, args);
+  printf("%s",msg_buf);
+
+  LogMsg* m = new LogMsg();
+  m->msg = string(msg_buf);
+  m->type = col;
+  LoggerMessages.push_back(m);
+
   //vfprintf(Logger::LogStream,msg, args);
   SetConsoleColor(Reset);
 }
