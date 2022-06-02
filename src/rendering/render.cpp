@@ -28,6 +28,7 @@
 #include <stb_image.h>
 using namespace std;
 
+bool demoWindow;
 
 FileInfo fileinfo;
 
@@ -120,23 +121,53 @@ void Convert(int a){
 GLuint GRUNT_POG;
 ImVec2 pog_size;
 
+
+void depth_border(){
+    auto bg = ImGui::GetBackgroundDrawList();
+
+    ImVec4 bounds;
+    auto p = ImGui::GetWindowPos();
+    bounds.x = p.x - ImGui::GetMainViewport()->Pos.x;
+    bounds.y = p.y - ImGui::GetMainViewport()->Pos.y;
+    auto s = ImGui::GetWindowSize();
+    bounds.z = p.x + s.x - ImGui::GetMainViewport()->Pos.x;
+    bounds.w = p.y + s.y - ImGui::GetMainViewport()->Pos.y;
+
+    
+    const ImU32 col = ImGui::GetColorU32(ImGuiCol_WindowBg);
+    float x = p.x + 4.0f;
+    float y = p.y + 4.0f;
+    float sz = 16;
+    const float spacing = 10.0f;
+    const float rounding = sz / 5.0f;
+
+    float th = 1;
+    bg->AddRectFilled(ImVec2(bounds.x+th, bounds.y+th), ImVec2(bounds.z-th, bounds.w-th), col);
+    //bg->AddRect(ImVec2(bounds.x+th, bounds.y+th), ImVec2(bounds.z-th, bounds.w-th), col, 0.0f, ImDrawFlags_None, th*2);      x += sz + spacing;  // Square with all rounded corners
+
+
+}
+
+
 void RenderGUI(){
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,{4.0f,4.0f});
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{4.0f,4.0f});
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{8.0f,8.0f});
 
     
     ImGuiIO& io = ImGui::GetIO();
-        
+    if(demoWindow) ImGui::ShowDemoWindow();
 
     ImGui::SetNextWindowPos(
         {ImGui::GetMainViewport()->Pos.x,
-        ImGui::GetMainViewport()->Pos.y+20}
+        ImGui::GetMainViewport()->Pos.y+23}
     );
 
 
-    ImGui::SetNextWindowSize({viewport_width,viewport_height-20});
+    ImGui::SetNextWindowSize({viewport_width,viewport_height-23});
     ImGui::SetNextWindowBgAlpha(0.2);
-    ImGui::Begin("Box", NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings);
+    ImGui::Begin("Box", NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings);
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize,0.0f);
 
     if (ImGui::BeginMainMenuBar())
     {
@@ -145,6 +176,11 @@ void RenderGUI(){
             if (ImGui::MenuItem("Quit", "ALT+F4")) {
                 glfwSetWindowShouldClose(Window, true);
             }
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Debug"))
+        {
+            ImGui::MenuItem("Show Demo Window", "", &demoWindow);
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Help"))
@@ -157,6 +193,7 @@ void RenderGUI(){
         ImGui::EndMainMenuBar();
     }
 
+    ImGui::PopStyleVar();
 
     for(int i = 0; i < files.size();i++){
         files[i]->UI(viewport_width);
@@ -164,7 +201,8 @@ void RenderGUI(){
 
     
 
-    ImGui::BeginChild("OptionsBox",{(viewport_width/2.0f) - 6,0},true,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings);
+    ImGui::BeginChild("OptionsBox",{(viewport_width/2.0f) - 10,0},false,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysUseWindowPadding);
+    depth_border();
     ImGui::Text("Options");
     ImGui::Separator();
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{0.0f,0.0f});
@@ -183,7 +221,8 @@ void RenderGUI(){
     ImGui::EndChild();
     ImGui::SameLine();
     ImGui::BeginGroup();
-    ImGui::BeginChild("ConvertBox",{(viewport_width/2.0f) - 6,-56},true,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings);
+    ImGui::BeginChild("ConvertBox",{(viewport_width/2.0f) - 10,-56},false,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysUseWindowPadding);
+    depth_border();
     ImGui::Text("Problems");
     ImGui::Separator();
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{0.0f,0.0f});
@@ -222,7 +261,7 @@ void RenderGUI(){
     
     
     ImGui::EndChild();
-    if(ImGui::Button("Check",{(viewport_width/2.0f) - 6,24})){
+    if(ImGui::Button("Check",{(viewport_width/2.0f) - 10,24})){
         files[0]->errors = Tests::TestMDL(files[0]->BoxBuffer);
         files[2]->errors = Tests::TestVVD(files[2]->BoxBuffer);
 
@@ -239,7 +278,7 @@ void RenderGUI(){
 
     ImGui::BeginDisabled(blocked);
     static bool popup = false;
-    if(ImGui::Button("Convert",{(viewport_width/2.0f) - 6,24})){
+    if(ImGui::Button("Convert",{(viewport_width/2.0f) - 10,24})){
         
         fileinfo.mdl = files[0]->BoxBuffer;
         if(files[1]->isEnabled) fileinfo.vtx = files[1]->BoxBuffer;
@@ -295,7 +334,7 @@ void RenderGUI(){
         ImGui::PopStyleVar(1);
     }
     if(showAbout){
-        if(ImGui::Begin("AboutWindow", &showAbout,ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)){
+        if(ImGui::Begin("About", &showAbout,ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)){
             ImGui::Image((void*)(intptr_t)GRUNT_POG, {pog_size.x/3.5f,pog_size.y/3.5f});
             ImGui::SameLine();
             ImGui::BeginGroup();
@@ -411,9 +450,37 @@ int UI::Run(){
     //ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     ImGui::GetIO().IniFilename = NULL;
     ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Resources::SegoeUI_compressed, Resources::SegoeUI_compressed_size, 16);
+    ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Resources::Impact_compressed, Resources::Impact_compressed_size, 16);
     ImGui::GetIO().Fonts->Build();
     auto style = ImGui::GetStyle();
-    style.Colors[ImGuiCol_WindowBg].w = 0.2;
+    //style.Colors[ImGuiCol_WindowBg].w = 0.0;
+    ImGui::GetStyle().ScrollbarRounding = 0.0f;
+    ImGui::GetStyle().Colors[ImGuiCol_TextDisabled] = ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
+    ImGui::GetStyle().Colors[ImGuiCol_Border] = ImVec4(0.55f, 0.55f, 0.55f, 1.0f);
+    ImGui::GetStyle().Colors[ImGuiCol_Separator] = ImVec4(0.5f, 0.5f, 0.5f, 0.5f);
+    ImGui::GetStyle().Colors[ImGuiCol_CheckMark] = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    ImGui::GetStyle().Colors[ImGuiCol_Button] = ImVec4(0.7f, 0.7f, 0.7f, 0.4f);
+    ImGui::GetStyle().Colors[ImGuiCol_ButtonHovered] = ImVec4(0.4f, 0.4f, 0.4f, 1.0f);
+    ImGui::GetStyle().Colors[ImGuiCol_ButtonActive] = ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
+    ImGui::GetStyle().Colors[ImGuiCol_FrameBg] = ImVec4(1.0f, 1.0f, 1.0f, 0.08f);
+    ImGui::GetStyle().Colors[ImGuiCol_FrameBgHovered] = ImVec4(1.0f, 1.0f, 1.0f, 0.3f);
+    ImGui::GetStyle().Colors[ImGuiCol_FrameBgActive] = ImVec4(1.0f, 1.0f, 1.0f, 0.54f);
+    ImGui::GetStyle().Colors[ImGuiCol_TitleBgActive] = ImVec4(0.2f, 0.2f, 0.2f, 1.0f);
+    ImGui::GetStyle().Colors[ImGuiCol_Header] = ImVec4(1.0f, 1.0f, 1.0f, 0.08f);
+    ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered] = ImVec4(1.0f, 1.0f, 1.0f, 0.24f);
+    ImGui::GetStyle().Colors[ImGuiCol_HeaderActive] = ImVec4(1.0f, 1.0f, 1.0f, 0.47f);
+    ImGui::GetStyle().Colors[ImGuiCol_PlotHistogram] = ImVec4(1.0f, 1.0f, 1.0f, 0.7f);
+    ImGui::GetStyle().Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    ImGui::GetStyle().Colors[ImGuiCol_NavHighlight] = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    ImGui::GetStyle().Colors[ImGuiCol_TextSelectedBg] = ImVec4(1.0f, 1.0f, 1.0f, 0.35f);
+    ImGui::GetStyle().Colors[ImGuiCol_SliderGrab] = ImVec4(0.63f, 0.63f, 0.63f, 1.0f);
+    ImGui::GetStyle().Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.93f, 0.93f, 0.93f, 1.0f);
+
+
+
+
+    //ImGui::GetStyle().Colors[ImGuiCol_Text] = {0.0,0.0,0.0,1.0};
+    //ImGui::GetStyle().Colors[ImGuiCol_CheckMark] = {0.0,0.0,0.0,1.0};
     ImGui_ImplGlfw_InitForOpenGL(Window, true);
     ImGui_ImplOpenGL3_Init("#version 130");
 
@@ -423,7 +490,7 @@ int UI::Run(){
     glfwSetInputMode(Window, GLFW_STICKY_KEYS, GL_TRUE);
     glfwPollEvents();
     glViewport(0,0,viewport_width,viewport_height);
-    glClearColor(0, 0, 0, 255);
+    glClearColor(0.1, 0.1, 0.1, 255);
     
 const char* mdls = "*.mdl";
 const char* vtxs = "*.vtx";
