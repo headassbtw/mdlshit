@@ -41,71 +41,78 @@ enum LogType{
   Critical,
   Debug
 };
+enum ConsoleColor{
+  Reset,
+  Black,
+  Red,
+  Green,
+  Yellow,
+  Blue,
+  Magenta,
+  Cyan,
+  White
+};
+void SetConsoleColor(ConsoleColor color){
+  int WindowsCol;
+  const char* UnixCol;
+  switch(color){
+    case Reset:    WindowsCol = 15; UnixCol = RESET;   break;
+    case Black:    WindowsCol = 0;  UnixCol = BLACK;   break;
+    case Red:      WindowsCol = 12; UnixCol = RED;     break;
+    case Green:    WindowsCol = 10; UnixCol = GREEN;   break;
+    case Yellow:   WindowsCol = 14; UnixCol = YELLOW;  break;
+    case Blue:     WindowsCol = 9;  UnixCol = BLUE;    break;
+    case Magenta:  WindowsCol = 13; UnixCol = MAGENTA; break;
+    case Cyan:     WindowsCol = 11; UnixCol = CYAN;    break;
+    case White:    WindowsCol = 15; UnixCol = WHITE;   break;
+  }
+  #ifdef WIN32
+  HANDLE hConsoleOut;
+  hConsoleOut = GetStdHandle(STD_OUTPUT_HANDLE);
+  SetConsoleTextAttribute(hConsoleOut, WindowsCol);
+  #else
+  fprintf(stdout, "%s",UnixCol);
+  #endif
+}
+
 
 void printt(const char* ass){
-  fprintf(stdout, ass);
+  fprintf(stdout, "%s",ass);
   //fprintf(Logger::LogStream, ass);
 }
 
 void CommonLog(LogType col, va_list args, const char* msg...){
-  #ifdef WIN32
-  HANDLE hConsoleOut;
-    hConsoleOut = GetStdHandle(STD_OUTPUT_HANDLE);
-  #endif
+  
   
   switch(col){
     case Debug:
-    #ifdef WIN32
-    SetConsoleTextAttribute(hConsoleOut, FOREGROUND_GREEN);
-    #else
-    printf(GREEN);
-    #endif
+    SetConsoleColor(Green);
     printt("  [DEBUG]  | ");
     break;
     
     case Notice:
-    #ifdef WIN32
-    SetConsoleTextAttribute(hConsoleOut, 14);
-    #else
-    printf(YELLOW);
-    #endif
+    SetConsoleColor(Yellow);
     printt("  [NOTICE] | ");
     break;
 
     case Error:
-    #ifdef WIN32
-    SetConsoleTextAttribute(hConsoleOut, FOREGROUND_RED);
-    #else
-    printf(RED);
-    #endif
+    SetConsoleColor(Red);
     printt("  [ERROR]  | ");
     break;
     
     case Critical:
-    #ifdef WIN32
-    SetConsoleTextAttribute(hConsoleOut, 13);
-    #else
-    printf(MAGENTA);
-    #endif
+    SetConsoleColor(Magenta);
     printt("[CRITICAL] | ");
     break;
 
     case Info:
-    #ifdef WIN32
-    SetConsoleTextAttribute(hConsoleOut, 15);
-    #else
-    printf(WHITE);
-    #endif
+    SetConsoleColor(White);
     printt("  [INFO]   | ");
     break;
   }
   vfprintf(stdout,msg, args);
   //vfprintf(Logger::LogStream,msg, args);
-  #ifdef WIN32
-  SetConsoleTextAttribute(hConsoleOut, 15);
-  #else
-  printf(RESET);
-  #endif
+  SetConsoleColor(Reset);
 }
 void Logger::Notice(const char* msg...){
   va_list args;

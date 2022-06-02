@@ -1,5 +1,5 @@
 #include <GL/glew.h>
-#include <GL/gl.h>
+#include <gl.hpp>
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
@@ -10,7 +10,6 @@
 #include <cstdio>
 #include <vector>
 #include <rendering/render.hpp>
-#include <GL/gl.h>
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <string>
@@ -24,11 +23,12 @@
 #include <rendering/progress.hpp>
 #include <structs.hpp>
 #include <conv.hpp>
+//#define _GLFW_USE_MENUBAR
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 using namespace std;
 
-bool demoWindow;
+bool demoWindow, console;
 
 FileInfo fileinfo;
 
@@ -49,6 +49,10 @@ bool hasBrowser;
 
 vector<Widgets::File*> files;
 vector<Error> Errors;
+
+int window_min_x = 500;
+int window_min_y = 500;
+int log_height = 200;
 
 float viewport_width = 500;
 float viewport_height = 500;
@@ -181,6 +185,18 @@ void RenderGUI(){
         if (ImGui::BeginMenu("Debug"))
         {
             ImGui::MenuItem("Show Demo Window", "", &demoWindow);
+            if(ImGui::MenuItem("Show Log Output", "", &console)){
+                printf("Button pressed\n");
+                if(console){
+                    glfwSetWindowSizeLimits(Window, 500, 700, GLFW_DONT_CARE, GLFW_DONT_CARE);
+                    if(viewport_height<700)
+                    glfwSetWindowSize(Window,viewport_width,700);
+                }
+                else{
+                    glfwSetWindowSizeLimits(Window, 500, 500, GLFW_DONT_CARE, GLFW_DONT_CARE);
+                    glfwSetWindowSize(Window,viewport_width,viewport_height);
+                }
+            }
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Help"))
@@ -201,7 +217,7 @@ void RenderGUI(){
 
     
 
-    ImGui::BeginChild("OptionsBox",{(viewport_width/2.0f) - 10,0},false,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysUseWindowPadding);
+    ImGui::BeginChild("OptionsBox",{(viewport_width/2.0f) -10, (float)((console)?-log_height:0)},false,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysUseWindowPadding);
     depth_border();
     ImGui::Text("Options");
     ImGui::Separator();
@@ -221,7 +237,7 @@ void RenderGUI(){
     ImGui::EndChild();
     ImGui::SameLine();
     ImGui::BeginGroup();
-    ImGui::BeginChild("ConvertBox",{(viewport_width/2.0f) - 10,-56},false,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysUseWindowPadding);
+    ImGui::BeginChild("ConvertBox",{(viewport_width/2.0f) - 10,-(56 + (float)((console)?log_height:0))},false,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysUseWindowPadding);
     depth_border();
     ImGui::Text("Problems");
     ImGui::Separator();
@@ -299,6 +315,15 @@ void RenderGUI(){
     }
     ImGui::EndDisabled();
     ImGui::EndGroup();
+
+
+    if(console){
+        ImGui::BeginChild("Logger",{0,0},true);
+        ImGui::Text("Hello!");
+        ImGui::EndChild();
+    }
+
+    
     ImGui::End();
     if(bingChilling){
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{8.0f,8.0f});
@@ -342,11 +367,13 @@ void RenderGUI(){
             ImGui::Text("- Source engine model converter, v49/47 to v53");
             ImGui::Text("By headassbtw and MasterLiberty");
             ImGui::Text("Compiled on %s",__DATE__);
-            ImGui::Text("Compiled using %s, v%s",
+            ImGui::Text("%s, v%s",
                         #ifdef __MINGW32__
                         "MinGW",
                         #elif __GNUC__
                         "GCC",
+                        #elif __APPLE__
+                        "",
                         #endif
                         __VERSION__);
             ImGui::Text("OpenGL Version: %s",glGetString(GL_VERSION));
@@ -362,7 +389,7 @@ void RenderGUI(){
             ImGui::End();
             
         }
-        ImGui::BringWindowToDisplayFront(ImGui::FindWindowByName("AboutWindow"));
+        ImGui::BringWindowToDisplayFront(ImGui::FindWindowByName("About"));
     }
 
 
@@ -370,7 +397,7 @@ void RenderGUI(){
 }
 
 void callback_name(GLFWwindow* window, int xpos, int ypos){
-    viewport_height = ypos;
+    viewport_height = ypos;  
     viewport_width = xpos;
 }
 
@@ -383,8 +410,8 @@ int UI::Run(){
     }
     
     glfwWindowHint(GLFW_SAMPLES, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     //glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER,GL_TRUE);
@@ -455,6 +482,7 @@ int UI::Run(){
     auto style = ImGui::GetStyle();
     //style.Colors[ImGuiCol_WindowBg].w = 0.0;
     ImGui::GetStyle().ScrollbarRounding = 0.0f;
+    ImGui::GetStyle().TabRounding = 0.0f;
     ImGui::GetStyle().Colors[ImGuiCol_TextDisabled] = ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
     ImGui::GetStyle().Colors[ImGuiCol_Border] = ImVec4(0.55f, 0.55f, 0.55f, 1.0f);
     ImGui::GetStyle().Colors[ImGuiCol_Separator] = ImVec4(0.5f, 0.5f, 0.5f, 0.5f);
@@ -475,14 +503,20 @@ int UI::Run(){
     ImGui::GetStyle().Colors[ImGuiCol_TextSelectedBg] = ImVec4(1.0f, 1.0f, 1.0f, 0.35f);
     ImGui::GetStyle().Colors[ImGuiCol_SliderGrab] = ImVec4(0.63f, 0.63f, 0.63f, 1.0f);
     ImGui::GetStyle().Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.93f, 0.93f, 0.93f, 1.0f);
+    ImGui::GetStyle().Colors[ImGuiCol_Tab] = ImVec4(0.3f, 0.3f, 0.3f, 1.0f);
+    ImGui::GetStyle().Colors[ImGuiCol_TabHovered] = ImVec4(0.71f, 0.71f, 0.71f, 1.0f);
+    ImGui::GetStyle().Colors[ImGuiCol_TabActive] = ImVec4(0.45f, 0.45f, 0.45f, 1.0f);
 
-
+    ImGui::GetStyle().Colors[ImGuiCol_ResizeGrip] = ImVec4(1.0f, 1.0f, 1.0f, 0.2f);
+    ImGui::GetStyle().Colors[ImGuiCol_ResizeGripHovered] = ImVec4(1.0f, 1.0f, 1.0f, 0.67f);
+    ImGui::GetStyle().Colors[ImGuiCol_ResizeGripActive] = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    ImGui::GetStyle().Colors[ImGuiCol_SeparatorActive] = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 
 
     //ImGui::GetStyle().Colors[ImGuiCol_Text] = {0.0,0.0,0.0,1.0};
     //ImGui::GetStyle().Colors[ImGuiCol_CheckMark] = {0.0,0.0,0.0,1.0};
     ImGui_ImplGlfw_InitForOpenGL(Window, true);
-    ImGui_ImplOpenGL3_Init("#version 130");
+    ImGui_ImplOpenGL3_Init("#version 330");
 
     glfwSetWindowSizeCallback(Window, callback_name);
     glfwSetDropCallback(Window, drop_callback);
