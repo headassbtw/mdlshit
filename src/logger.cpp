@@ -4,7 +4,7 @@
 #include <filesystem>
 #include <string>
 #include <logger.hpp>
-#ifndef __linux
+#ifdef WIN32
 #include <windows.h>
 #define PATHCHAR "\\"
 #else
@@ -48,63 +48,63 @@ void printt(const char* ass){
 }
 
 void CommonLog(LogType col, va_list args, const char* msg...){
-  #ifndef __linux
+  #ifdef WIN32
   HANDLE hConsoleOut;
     hConsoleOut = GetStdHandle(STD_OUTPUT_HANDLE);
   #endif
   
   switch(col){
     case Debug:
-    #ifdef __linux
-    printf(GREEN);
-    #else
+    #ifdef WIN32
     SetConsoleTextAttribute(hConsoleOut, FOREGROUND_GREEN);
+    #else
+    printf(GREEN);
     #endif
     printt("  [DEBUG]  | ");
     break;
     
     case Notice:
-    #ifdef __linux
-    printf(YELLOW);
-    #else
+    #ifdef WIN32
     SetConsoleTextAttribute(hConsoleOut, 14);
+    #else
+    printf(YELLOW);
     #endif
     printt("  [NOTICE] | ");
     break;
 
     case Error:
-    #ifdef __linux
-    printf(RED);
-    #else
+    #ifdef WIN32
     SetConsoleTextAttribute(hConsoleOut, FOREGROUND_RED);
+    #else
+    printf(RED);
     #endif
     printt("  [ERROR]  | ");
     break;
     
     case Critical:
-    #ifdef __linux
-    printf(MAGENTA);
-    #else
+    #ifdef WIN32
     SetConsoleTextAttribute(hConsoleOut, 13);
+    #else
+    printf(MAGENTA);
     #endif
     printt("[CRITICAL] | ");
     break;
 
     case Info:
-    #ifdef __linux
-    printf(WHITE);
-    #else
+    #ifdef WIN32
     SetConsoleTextAttribute(hConsoleOut, 15);
+    #else
+    printf(WHITE);
     #endif
     printt("  [INFO]   | ");
     break;
   }
   vfprintf(stdout,msg, args);
   //vfprintf(Logger::LogStream,msg, args);
-  #ifdef __linux
-  printf(RESET);
-  #else
+  #ifdef WIN32
   SetConsoleTextAttribute(hConsoleOut, 15);
+  #else
+  printf(RESET);
   #endif
 }
 void Logger::Notice(const char* msg...){

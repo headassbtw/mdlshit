@@ -1,8 +1,11 @@
 .cache/
 .vscode/
+.DS_Store
 bin/
 build/
 winbuild/
+wbuild/
+macbuild/
 *.mdl
 *.vtx
 *.vvd
