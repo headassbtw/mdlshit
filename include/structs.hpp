@@ -2,19 +2,18 @@
 #include <cstddef>
 #include <string>
 #include <optional>
-using namespace std;
 
 struct FileInfo{
-	optional<string> mdl;
-	optional<string> vtx;
-	optional<string> vvd;
-	optional<string> phy;
-	optional<string> out;
+	std::optional<std::string> mdl;
+	std::optional<std::string> vtx;
+	std::optional<std::string> vvd;
+	std::optional<std::string> phy;
+	std::optional<std::string> out;
 
-	optional<int> attachment_override;
-	optional<int> sequence_override;
-	optional<int> animation_override;
-	optional<int> flags_override;
+	std::optional<int> attachment_override;
+	std::optional<int> sequence_override;
+	std::optional<int> animation_override;
+	std::optional<int> flags_override;
 };
 
 struct Vector{
@@ -89,10 +88,10 @@ struct v49_Header{
 	int					bonetablebynameindex;
 	/*was long*/ float pVertexBase;
 	/*was long*/ float pIndexBase;
-	byte				constdirectionallightdot;
-	byte				rootLOD; 
-	byte				numAllowedRootLODs;
-	byte				unused[1];
+	std::byte				constdirectionallightdot;
+	std::byte				rootLOD; 
+	std::byte				numAllowedRootLODs;
+	std::byte				unused[1];
 	int					unused4;
 	int					numflexcontrollerui;
 	int					flexcontrolleruiindex;
@@ -181,10 +180,10 @@ struct v53_Header{
 	int					bonetablebynameindex; //Respawn moved this to szanimblocknameindex and replaced it with the unknown block after the model data. -Liberty
 	/*was long*/ float pVertexBase;
 	/*was long*/ float pIndexBase;
-	byte				constdirectionallightdot; //Always set to "-52" - Liberty
-	byte				rootLOD;                 //Always set to "2" - Liberty
-	byte				numAllowedRootLODs;
-	byte				unused[1];
+	std::byte				constdirectionallightdot; //Always set to "-52" - Liberty
+	std::byte				rootLOD;                 //Always set to "2" - Liberty
+	std::byte				numAllowedRootLODs;
+	std::byte				unused[1];
 	int					unused4; // zero out if version < 47
 	int					numflexcontrollerui; //These are tricky so null them until further instructions. - Liberty
 	int					flexcontrolleruiindex; //These are tricky so null them until further instructions. - Liberty

@@ -63,7 +63,7 @@ void Widgets::File::UI(float win_width){
 
     if(isEnabled){
         ImGui::SetNextItemWidth(win_width-86);
-        ImGui::InputTextWithHint(boxname.c_str(), "Path",BoxBuffer, 256);
+        ImGui::InputTextWithHint(boxname.c_str(), "Type path or drag file",BoxBuffer, 256);
     ImGui::EndGroup();
     ImGui::SameLine();
     ImGui::BeginGroup();
@@ -100,7 +100,7 @@ void Widgets::File::UI(float win_width){
         effect = 0;
     }
 }
-Widgets::File::File(string Name, bool canDisable, const char* ext){
+Widgets::File::File(std::string Name, bool canDisable, const char* ext){
     name = Name;
     isEnabled = true;
     canBeDisabled = canDisable;

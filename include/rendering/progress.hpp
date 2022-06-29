@@ -1,20 +1,19 @@
 #pragma once
 #include <mutex>
 #include <string>
-using namespace std;
 struct UI_TASK{
   private:
-  mutex show_mutex;
-  mutex name_mutex;
-  mutex prog_mutex;
+  std::mutex show_mutex;
+  std::mutex name_mutex;
+  std::mutex prog_mutex;
   bool show;
-  string _name;
+  std::string _name;
   float prog;
   public:
   bool Show();
-  string Name();
+  std::string Name();
   float Progress();
-  void Begin(string name);
+  void Begin(std::string name);
   void Update(float fraction);
   void End();
 };

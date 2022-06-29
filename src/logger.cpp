@@ -1,4 +1,4 @@
-#include <fstream>
+//#include <fstream>
 #include <stdio.h>
 #include <cstdarg>
 #include <filesystem>
@@ -15,7 +15,7 @@ FILE* Logger::LogStream;
 
 void Logger::Init(){
   std::string ass = "." PATHCHAR "log.log";
-  LogStream = fopen(ass.c_str(), "w+");
+  //LogStream = fopen(ass.c_str(), "w+");
   //LogStream = std::ofstream(ass.c_str(), std::ofstream::trunc);
 }
 void Logger::End(){
@@ -34,7 +34,7 @@ void Logger::End(){
 #define CYAN    "\033[36m"
 #define WHITE   "\033[37m"
 
-vector<LogMsg*> LoggerMessages;
+std::vector<LogMsg*> LoggerMessages;
 
 enum ConsoleColor{
   Reset,
@@ -119,7 +119,7 @@ void CommonLog(LogType col, va_list args, const char* msg...){
   printf("%s",msg_buf);
 
   LogMsg* m = new LogMsg();
-  m->msg = string(msg_buf);
+  m->msg = std::string(msg_buf);
   m->type = col;
   LoggerMessages.push_back(m);
 

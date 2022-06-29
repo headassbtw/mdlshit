@@ -279,6 +279,7 @@ if(OutStream.Position() - BytesAdded != Stream.Position()){
   return 1;
 }
 int BoneBytesAdded = BytesAdded + 0;
+int BytesAddedAfterBones = OutStream.Position() - Stream.Position();
 
 int att_filler_dest = Initial_Header->localattachmentindex - Stream.Position();
 filler(&Stream, &OutStream, att_filler_dest);
@@ -288,7 +289,10 @@ for(int i = 0; i < Initial_Header->numlocalattachments;i++){
   //92 bytes
   int idx;
   Stream.Read(&idx);
-  int off = (idx)  + SeqAdd + AnimYeet;
+  int boneOff = TestDiff - TextureDiff;
+
+  int off = (idx)  + BytesAddedAfterBones;
+
   OutStream.Write(off);
   filler(&Stream, &OutStream, 88);
   Logger::Notice("Converted local attachment %d of %d\n",i+1,Initial_Header->numlocalattachments);

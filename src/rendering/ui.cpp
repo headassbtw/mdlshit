@@ -9,7 +9,7 @@ bool UI_TASK::Show(){
   std::lock_guard<std::mutex> guard(show_mutex);
   return show;
 }
-string UI_TASK::Name(){
+std::string UI_TASK::Name(){
   std::lock_guard<std::mutex> guard(name_mutex);
   return _name;
 }
@@ -17,7 +17,7 @@ float UI_TASK::Progress(){
   std::lock_guard<std::mutex> guard(prog_mutex);
   return prog;
 }
-void UI_TASK::Begin(string name){
+void UI_TASK::Begin(std::string name){
   std::lock_guard<std::mutex> guard(show_mutex);
   show = true;
   std::lock_guard<std::mutex> guardname(name_mutex);

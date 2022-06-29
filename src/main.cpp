@@ -53,9 +53,10 @@ int main(int argc, char *argv[]) {
   #endif
   __VERSION__);
 
+  bool ban;
+  char* error_out;
 
-
-  Demolish_Weebs();
+  ban = CheckBlacklist(error_out);
 
   
 
@@ -104,6 +105,6 @@ int main(int argc, char *argv[]) {
     return Conversion::ReadHeader(inf);
   }
   else{
-    return UI::Run();
+    return UI::Run(ban, error_out);
   }
 }

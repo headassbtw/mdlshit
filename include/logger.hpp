@@ -1,8 +1,6 @@
 #pragma once
-#include <fstream>
 #include <string>
 #include <vector>
-using namespace std;
 
 struct Logger{
   static FILE* LogStream;
@@ -15,8 +13,8 @@ struct Logger{
   static void End();
 };
 struct LogMsg{
-  string msg;
+  std::string msg;
   int type;
 };
 
-extern vector<LogMsg*> LoggerMessages;
+extern std::vector<LogMsg*> LoggerMessages;

@@ -5,7 +5,6 @@
 #include <GLFW/glfw3.h>
 #include <rendering/popup.hpp>
 #include <functional>
-using namespace std;
 
 Popups::FileBrowser::FileBrowser(GLFWwindow* parent){
     glfwWindowHint(GLFW_SAMPLES, 4);
@@ -24,7 +23,7 @@ Popups::FileBrowser::~FileBrowser(){
     glfwDestroyWindow(window);
 }
 
-void Popups::FileBrowser::RegisterCallback(function<int(string)> func){
+void Popups::FileBrowser::RegisterCallback(std::function<int(std::string)> func){
     callback = func;
 }
 

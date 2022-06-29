@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-using namespace std;
 #define WINDOW_WIDTH 500
 #define WINDOW_HEIGHT 500
 
@@ -14,5 +13,5 @@ enum ErrorType{
 
 struct Error{
   ErrorType type;
-  string message;
+  std::string message;
 };

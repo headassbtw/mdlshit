@@ -24,17 +24,20 @@
 #include <structs.hpp>
 #include <logger.hpp>
 #include <conv.hpp>
+#ifdef WIN32
+#include <windows.h>
+#include <shellapi.h>
+#endif
 //#define _GLFW_USE_MENUBAR
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-using namespace std;
 
 bool demoWindow, console;
 
 FileInfo fileinfo;
 
-string rn(const char* file, const char* ext){
-  string yo = string(file);
+std::string rn(const char* file, const char* ext){
+  std::string yo = std::string(file);
   auto dot = yo.find_last_of('.');
   yo.resize(dot);
   yo.append("_");
@@ -48,8 +51,8 @@ GLFWwindow* Window;
 Popups::FileBrowser* browser;
 bool hasBrowser;
 
-vector<Widgets::File*> files;
-vector<Error> Errors;
+std::vector<Widgets::File*> files;
+std::vector<Error> Errors;
 
 int window_min_x = 500;
 int window_min_y = 500;
@@ -76,7 +79,24 @@ void FileMenu(std::string title){
     ImGui::EndChild();
 
 }
+void OpenLink(const char* site){
+    #ifdef WIN32
+    ShellExecute(NULL, "open", site, NULL, NULL, SW_SHOWNORMAL);
+    #else
+    system(("xdg-open " + std::string(site)).c_str());
+    #endif
+}
+void AboutWindow(){
 
+}
+bool BanDialog(char* err_code){
+    ImGui::SetNextWindowSize({300,20});
+    ImGui::SetNextWindowPos({(viewport_width-300)/2,(viewport_height-30)/2});
+    ImGui::Begin("Error",NULL,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
+    ImGui::Text("The Application Failed to Start. Error: %s", err_code);
+
+    ImGui::End();
+}
 
 
 void drop_callback(GLFWwindow* window, int count, const char** paths)
@@ -313,12 +333,42 @@ void RenderGUI(){
         if(override_animations) fileinfo.animation_override =  animations;
         if(override_flags) fileinfo.flags_override =  flags;
 
-        
-
-        bingChilling = true;
+        ImGui::OpenPopup("Status##ConvertModal");
         std::thread fp(Convert,0);
         fp.detach();
     }
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize,0.0f);
+
+    if(ImGui::BeginPopupModal("Status##ConvertModal",NULL,ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)){
+        auto sz = ImGui::GetWindowSize();
+        ImGui::SetWindowSize({300,100});
+        ImGui::SetWindowPos({(viewport_width/2) - (150),(viewport_height/2) - (50)});
+
+      if(UI::Progress.MainTask.Show()){
+                ImGui::Text("%s",UI::Progress.MainTask.Name().c_str());
+                ImGui::ProgressBar(UI::Progress.MainTask.Progress());
+            }
+            if(UI::Progress.SubTask.Show()){
+                ImGui::Text("%s",UI::Progress.SubTask.Name().c_str());
+                ImGui::ProgressBar(UI::Progress.SubTask.Progress());
+            }
+
+
+            if(!UI::Progress.MainTask.Show()){
+                ImGui::Text("Finished!");
+                if(ImGui::Button("Continue",{-20,30})){
+                    for(auto f : files){
+                        f->errors.clear();
+                        memset(f->BoxBuffer, '\0', 256);
+                    }
+                    blocked = true;
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+      ImGui::EndPopup();
+    }
+    ImGui::PopStyleVar();
+
     ImGui::EndDisabled();
     ImGui::EndGroup();
 
@@ -361,62 +411,66 @@ void RenderGUI(){
 
     
     ImGui::End();
-    if(bingChilling){
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{8.0f,8.0f});
-        ImGui::SetNextWindowPos(ImGui::GetMainViewport()->Pos);
-        if(ImGui::Begin("ConvDemoProg",NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoTitleBar)){
-            ImGui::SetWindowSize({viewport_width,viewport_height});
-
-
-            if(UI::Progress.MainTask.Show()){
-                ImGui::Text("%s",UI::Progress.MainTask.Name().c_str());
-                ImGui::ProgressBar(UI::Progress.MainTask.Progress());
-            }
-            if(UI::Progress.SubTask.Show()){
-                ImGui::Text("%s",UI::Progress.SubTask.Name().c_str());
-                ImGui::ProgressBar(UI::Progress.SubTask.Progress());
-            }
-
-
-            if(!UI::Progress.MainTask.Show()){
-                ImGui::Text("Finished!");
-                if(ImGui::Button("Continue", {viewport_width-16.0f,50})){
-                    for(auto f : files){
-                        f->errors.clear();
-                        memset(f->BoxBuffer, '\0', 256);
-                    }
-                    bingChilling = false;
-                    blocked = true;
-                }
-            }
-
-            ImGui::End();
-        }
-        ImGui::PopStyleVar(1);
-    }
     if(showAbout){
         if(ImGui::Begin("About", &showAbout,ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)){
-            ImGui::Image((void*)(intptr_t)GRUNT_POG, {pog_size.x/3.5f,pog_size.y/3.5f});
-            ImGui::SameLine();
-            ImGui::BeginGroup();
-            ImGui::Text("MDLSHIT");
-            ImGui::Text("- Source engine model converter, v49/47 to v53");
-            ImGui::Text("By headassbtw and MasterLiberty");
-            ImGui::Text("Compiled on %s",__DATE__);
-            ImGui::Text("%s, v%s",
-                        #ifdef __MINGW32__
-                        "MinGW",
-                        #elif __GNUC__
-                        "GCC",
-                        #elif __APPLE__
-                        "",
-                        #endif
-                        __VERSION__);
-            ImGui::Text("OpenGL Version: %s",glGetString(GL_VERSION));
-            ImGui::Text("GPU: %s",glGetString(GL_RENDERER));
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{0,0});
+            if(ImGui::BeginTabBar("AboutTabs",ImGuiTabBarFlags_None)){
+                if(ImGui::BeginTabItem("About")){
+                  ImGui::Image((void*)(intptr_t)GRUNT_POG, {pog_size.x/3.5f,pog_size.y/3.5f});
+                  ImGui::SameLine();
+                  ImGui::BeginGroup();
+                  ImGui::Text("MDLSHIT");
+                  ImGui::Text("- Source engine model converter, v49/47 to v53");
+                  ImGui::Text("By headassbtw and MasterLiberty");
+                  ImGui::Text("Compiled on %s",__DATE__);
+                  ImGui::Text("%s, v%s",
+                              #ifdef __MINGW32__
+                              "MinGW",
+                              #elif __GNUC__
+                              "GCC",
+                              #elif __APPLE__
+                              "",
+                              #endif
+                              __VERSION__);
+                  ImGui::Text("OpenGL Version: %s",glGetString(GL_VERSION));
+                  ImGui::Text("GPU: %s",glGetString(GL_RENDERER));
+                  
+                  ImGui::Text("FPS: %f",ImGui::GetIO().Framerate);
+                  ImGui::EndGroup();
+                  ImGui::EndTabItem();
+                }
+                if(ImGui::BeginTabItem("Software Used")){
+                    ImGui::BulletText("Dear ImGui");
+                    ImGui::SameLine();
+                    if(ImGui::SmallButton("GitHub##About_ImGui_GH")){
+                        OpenLink("https://github.com/ocornut/imgui");
+                    }
+                    ImGui::BulletText("GLFW");
+                    ImGui::SameLine();
+                    if(ImGui::SmallButton("GitHub##About_GLFW_GH")){
+                        OpenLink("https://github.com/glfw/glfw");
+                    }
+                    ImGui::BulletText("GLEW");
+                    ImGui::SameLine();
+                    if(ImGui::SmallButton("GitHub##About_GLEW_GH")){
+                        OpenLink("https://github.com/nigels-com/glew");
+                    }
+                    ImGui::BulletText("TinyFileDialogs");
+                    ImGui::SameLine();
+                    if(ImGui::SmallButton("GitHub##About_TFD_GH")){
+                        OpenLink("https://github.com/native-toolkit/libtinyfiledialogs");
+                    }
+                    ImGui::EndTabItem();
+                }
+                if(ImGui::BeginTabItem("Special Thanks")){
+                    ImGui::BulletText("Mental Illness");
+                    ImGui::TextWrapped("only two mental breakdowns happened during the development of this software");
+                    ImGui::EndTabItem();
+                }
+                ImGui::EndTabBar();
+            }
+            ImGui::PopStyleVar();
             
-            ImGui::Text("FPS: %f",ImGui::GetIO().Framerate);
-            ImGui::EndGroup();
             auto sz = ImGui::GetWindowSize();
 
             float xp = (viewport_width - sz.x)/2;
@@ -438,13 +492,18 @@ void callback_name(GLFWwindow* window, int xpos, int ypos){
 }
 
 
-int UI::Run(){
-
+int UI::Run(bool banned, char* banreason){
+    viewport_height = WINDOW_HEIGHT; viewport_width = WINDOW_WIDTH;
     glewExperimental = true;
     if(!glfwInit()){
         fprintf(stderr, "Could not initialize GLFW\n");
     }
-    
+    if(banned){
+        viewport_width = 400;
+        viewport_height = 80;
+    }
+
+
     glfwWindowHint(GLFW_SAMPLES, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -460,7 +519,7 @@ int UI::Run(){
     images[0].pixels = grunt_pog;
 
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-    Window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "mdlshit", NULL, NULL);
+    Window = glfwCreateWindow(viewport_width, viewport_height, "mdlshit", NULL, NULL);
     if(Window == NULL){
         fprintf(stderr, "Failed to open window\n");
         glfwTerminate();
@@ -495,8 +554,14 @@ int UI::Run(){
 
     
 
-    
-    glfwSetWindowSizeLimits(Window, 500, 500, GLFW_DONT_CARE, GLFW_DONT_CARE);
+    if(banned)
+    {
+      glfwSetWindowSizeLimits(Window, 400, 80, 400, 80);
+    }
+    else
+    {
+      glfwSetWindowSizeLimits(Window, 500, 500, GLFW_DONT_CARE, GLFW_DONT_CARE);
+    }
     glfwSetWindowIcon(Window, 1, images);
 
     stbi_image_free(grunt_pog);
@@ -515,11 +580,14 @@ int UI::Run(){
     ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Resources::SegoeUI_compressed, Resources::SegoeUI_compressed_size, 16);
     ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Resources::Impact_compressed, Resources::Impact_compressed_size, 16);
     ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Resources::Menlo_compressed, Resources::Menlo_compressed_size, 16);
+    ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Resources::ComicSans_compressed, Resources::ComicSans_compressed_size, 16);
     ImGui::GetIO().Fonts->Build();
-    auto style = ImGui::GetStyle();
-    //style.Colors[ImGuiCol_WindowBg].w = 0.0;
+    
+
+
     ImGui::GetStyle().ScrollbarRounding = 0.0f;
     ImGui::GetStyle().TabRounding = 0.0f;
+    ImGui::GetStyle().Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.0f, 0.0f, 0.0f, 0.6f);
     ImGui::GetStyle().Colors[ImGuiCol_TextDisabled] = ImVec4(0.6f, 0.6f, 0.6f, 1.0f);
     ImGui::GetStyle().Colors[ImGuiCol_Border] = ImVec4(0.55f, 0.55f, 0.55f, 1.0f);
     ImGui::GetStyle().Colors[ImGuiCol_Separator] = ImVec4(0.5f, 0.5f, 0.5f, 0.5f);
@@ -549,9 +617,6 @@ int UI::Run(){
     ImGui::GetStyle().Colors[ImGuiCol_ResizeGripActive] = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
     ImGui::GetStyle().Colors[ImGuiCol_SeparatorActive] = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
 
-
-    //ImGui::GetStyle().Colors[ImGuiCol_Text] = {0.0,0.0,0.0,1.0};
-    //ImGui::GetStyle().Colors[ImGuiCol_CheckMark] = {0.0,0.0,0.0,1.0};
     ImGui_ImplGlfw_InitForOpenGL(Window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
@@ -585,18 +650,18 @@ hasBrowser = true;
         ImGui::NewFrame();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glfwPollEvents();
-        //Render();
-        Errors.clear();
-        for(auto f : files){
-            for(auto e : f->errors){
-                Errors.push_back(e);
-            }
+        if(banned){
+          BanDialog(banreason);
         }
-        
-
-
-        //TestDockingUI();
-        RenderGUI();
+        else{
+          Errors.clear();
+          for(auto f : files){
+            for(auto e : f->errors){
+              Errors.push_back(e);
+            }
+          }
+          RenderGUI();
+        }
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
@@ -605,7 +670,6 @@ hasBrowser = true;
             ImGui::RenderPlatformWindowsDefault();
         }
         glfwSwapBuffers(Window);
-        //std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
     while(glfwWindowShouldClose(Window) == 0);
     ImGui_ImplOpenGL3_Shutdown();
