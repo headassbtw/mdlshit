@@ -15,7 +15,7 @@ std::vector<Error> Tests::TestMDL(std::string path){
 
       char magic[4];
       test.read(magic, 4);
-      if(strcmp("IDST",magic) == 0){
+      if(strcmp("IDST",magic) >= 0){
         rtn.push_back({ErrorType::Success,std::string("Valid MDL file")});
 
         char ver[1];

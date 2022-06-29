@@ -14,7 +14,7 @@ std::vector<Error> Tests::TestVVD(std::string path){
     char magic[4];
     test.read(magic, 4);
 
-    if(strcmp(magic,"IDSV") == 0){
+    if(strcmp(magic,"IDSV") >= 0){
       rtn.push_back({ErrorType::Success,std::string("Valid VVD File")});
     }
     else{
