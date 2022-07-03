@@ -15,7 +15,7 @@ std::vector<Error> Tests::TestMDL(std::string path){
 
       char magic[4];
       test.read(magic, 4);
-      if(strcmp("IDST",magic) >= 0){
+      if(strcmp(magic,"IDST") >= 0){
         rtn.push_back({ErrorType::Success,std::string("Valid MDL file")});
 
         char ver[1];
@@ -31,7 +31,7 @@ std::vector<Error> Tests::TestMDL(std::string path){
         }
       }
       else{
-        rtn.push_back({ErrorType::Blocking,std::string("Invalid MDL file")});
+        rtn.push_back({ErrorType::Blocking,std::string("Invalid MDL file; magic was \"") + std::string(magic) + "\""});
       }
       test.close();
     }
