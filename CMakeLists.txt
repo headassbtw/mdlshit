@@ -3,6 +3,8 @@ project(mdlshit)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/CMake_Modules)
 
+find_package(OpenGL REQUIRED)
+
 include_directories(include)
 include_directories(external/imgui)
 include_directories(external/glfw/include)
@@ -10,7 +12,6 @@ include_directories(external/glfw/src)
 include_directories(external/glew/include)
 include_directories(external/tinyfiledialogs)
 include_directories(external/glm)
-find_package(OpenGL REQUIRED)
 file(GLOB_RECURSE SRC CONFIGURE_DEPENDS
     src/*.cpp
     external/tinyfiledialogs/*.c
@@ -75,11 +76,10 @@ else()
 endif()
 
 
-
 IF(APPLE)
 target_link_libraries(mdlshit glew_s glfw ImGui "-framework Cocoa"
                                        "-framework IOKit"
                                        "-framework CoreFoundation")
 ELSE(APPLE)
-target_link_libraries(mdlshit glew_s glfw ImGui -static-libgcc -static-libstdc++ -s)
+target_link_libraries(mdlshit ImGui glew_s glfw -static-libgcc -static-libstdc++ -s)
 ENDIF(APPLE)

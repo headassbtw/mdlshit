@@ -300,7 +300,7 @@ for(int i = 0; i < Initial_Header->numlocalattachments;i++){
   Stream.Read(&idx);
   int boneOff = TestDiff - TextureDiff;
 
-  int off = (idx)  + BytesAddedAfterBones;
+  int off = (idx)  - TextureDiff;
 
   OutStream.Write(off);
   filler(&Stream, &OutStream, 88);

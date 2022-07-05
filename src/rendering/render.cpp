@@ -331,9 +331,9 @@ void RenderGUI(){
         Logger::Notice("%i good, %i bad, %i total\n",good,bad,total);
     }
 
-    ImGui::BeginDisabled(blocked);
+    //ImGui::BeginDisabled(blocked);
     static bool popup = false;
-    if(ImGui::Button("Convert",{(viewport_width/2.0f) - 10,24})){
+    if(ImGui::Button("Convert [OVERRIDEN]",{(viewport_width/2.0f) - 10,24})){
         
         fileinfo.mdl = files[0]->BoxBuffer;
         if(files[1]->isEnabled) fileinfo.vtx = files[1]->BoxBuffer;
@@ -383,7 +383,7 @@ void RenderGUI(){
     }
     ImGui::PopStyleVar();
 
-    ImGui::EndDisabled();
+    //ImGui::EndDisabled();
     ImGui::EndGroup();
 
 
