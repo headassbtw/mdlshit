@@ -268,8 +268,14 @@ OutStream.seek(Stream.Position() + 4);
   UI::Progress.SubTask.End();
 Logger::Info("Finished bone conversion\n");
 #pragma endregion
+
+Logger::Info("TextureDiff: %d\n",TextureDiff);
+Logger::Info("TestDiff: %d\n",TestDiff);
+
 int SeqAdd = 20 * Initial_Header->numlocalseq;
 int AnimYeet = -8 * Initial_Header->numlocalanim;
+
+
 
 
 
@@ -280,6 +286,9 @@ if(OutStream.Position() - BytesAdded != Stream.Position()){
 }
 int BoneBytesAdded = BytesAdded + 0;
 int BytesAddedAfterBones = OutStream.Position() - Stream.Position();
+
+printf("BoneBytesAdded: %s\n",std::to_string(BoneBytesAdded).c_str());
+printf("BytesAddedAfterBones: %s\n",std::to_string(BytesAddedAfterBones).c_str());
 
 int att_filler_dest = Initial_Header->localattachmentindex - Stream.Position();
 filler(&Stream, &OutStream, att_filler_dest);
@@ -304,6 +313,11 @@ OutStream.seek(OutStream.Position()+92);
 int fuckshittwoelectricboogaloo;
 Stream.Read(&fuckshittwoelectricboogaloo);
 OutStream.Write(fuckshittwoelectricboogaloo);
+
+Logger::Info("TextureDiff: %s\n",std::to_string(TextureDiff).c_str());
+Logger::Info("SeqAdd: %s\n",std::to_string(SeqAdd).c_str());
+Logger::Info("TestDiff: %s\n",std::to_string(TestDiff).c_str());
+
 
 
 //CopyAddInt32(&Stream, &OutStream, SeqAdd + AnimYeet, 1);

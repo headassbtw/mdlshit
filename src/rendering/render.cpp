@@ -299,14 +299,27 @@ void RenderGUI(){
     
     ImGui::EndChild();
     if(ImGui::Button("Check",{(viewport_width/2.0f) - 10,24})){
+        int total = 0;
+        int bad = 0;
+        int good = 0;
+        for(auto f : files){
+            f->errors.clear();
+        }
         files[0]->errors = Tests::TestMDL(files[0]->BoxBuffer);
         files[2]->errors = Tests::TestVVD(files[2]->BoxBuffer);
 
         bool _block;
         for(auto f : files){
         if(f->isEnabled)
-            for(auto e: f->errors){
-                if(e.type == Blocking) _block = true;
+            for(Error e: f->errors){
+                total++;
+                if(e.type == Blocking){
+                    bad++;
+                    _block = true;
+                }
+                else{
+                    good++;
+                }
             }
         }
         if(_block) blocked = true;
@@ -315,6 +328,7 @@ void RenderGUI(){
         if(blocked){
             Logger::Error("Conversion blocked, not all criteria met!\n");
         }
+        Logger::Notice("%i good, %i bad, %i total\n",good,bad,total);
     }
 
     ImGui::BeginDisabled(blocked);

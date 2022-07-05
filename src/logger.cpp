@@ -79,7 +79,7 @@ void SetConsoleColor(ConsoleColor color){
 
 
 void printt(const char* ass){
-  fprintf(stdout, "%s",ass);
+  printf("%s",ass);
   //fprintf(Logger::LogStream, ass);
 }
 
@@ -115,7 +115,7 @@ void CommonLog(LogType col, va_list args, const char* msg...){
     break;
   }
   char msg_buf[2048];
-  sprintf(msg_buf,msg, args);
+  snprintf(msg_buf,2048, msg, args);
   printf("%s",msg_buf);
 
   LogMsg* m = new LogMsg();

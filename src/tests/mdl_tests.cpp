@@ -1,6 +1,7 @@
 #include "defs.hpp"
 #include <cstring>
 #include <tests.hpp>
+#include <logger.hpp>
 #include <fstream>
 
 
@@ -27,11 +28,15 @@ std::vector<Error> Tests::TestMDL(std::string path){
           rtn.push_back({ErrorType::Warning,std::string("Version 47")});
         }
         else{
-          rtn.push_back({ErrorType::Blocking,std::string("Version ") + std::to_string((int)ver[0])});
+          std::string err = std::string("Version ") + std::to_string((int)ver[0]);
+          rtn.push_back({ErrorType::Blocking,err});
+          Logger::Critical("%s\n",err.c_str());
         }
       }
       else{
-        rtn.push_back({ErrorType::Blocking,std::string("Invalid MDL file; magic was \"") + std::string(magic) + "\""});
+        std::string err = std::string("Invalid MDL file; magic was \"") + std::string(magic) + "\"";
+        rtn.push_back({ErrorType::Blocking,err});
+        Logger::Critical("%s\n",err.c_str());
       }
       test.close();
     }
