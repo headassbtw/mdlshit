@@ -490,7 +490,6 @@ void RenderGUI(){
                 }
                 if(ImGui::BeginTabItem("Special Thanks")){
                     ImGui::BulletText("Mental Illness");
-                    ImGui::TextWrapped("only two mental breakdowns happened during the development of this software");
                     ImGui::EndTabItem();
                 }
                 ImGui::EndTabBar();
