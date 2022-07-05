@@ -10,35 +10,42 @@
 
 bool isOnBlacklist(char* user){
   return (
+    strcmp(user, "Dallas Regional Airport") == 0 ||
     strcmp(user, "Imply") == 0 ||
-    //strcmp(user, "headass") == 0 ||
     strcmp(user, "Blessed Seal") == 0 ||
     strcmp(user, "Blessedseal") == 0 ||
     strcmp(user, "PROTOGENyeet") == 0 ||
-    strcmp(user, "Dallas Regional Airport") == 0 ||
     strcmp(user, "nebustellar") == 0
   );
 }
+bool CheckRegKey(const char* key){
+  #ifdef WIN32
+  HKEY hregkey;
+  auto subkey = key;
+  long retval = RegOpenKeyEx(HKEY_CURRENT_USER, subkey, 0, KEY_WRITE, &hregkey);
+  LONG result = RegQueryValueExA(hregkey, "Location", NULL, NULL, NULL, NULL);
+      
+  if (result == ERROR_SUCCESS) {
+    return true;
+  }
+  #else
+  return false;
+  #endif
+}
+
 
 bool CheckBlacklist(char*& error_out)
 {
   #ifdef WIN32
   //IMAGINE PLAYING LEAGUE
-  HKEY hregkey;
-  auto subkey = "SOFTWARE\\WOW6432Node\\Riot Games, Inc\\League of Legends";
-  long retval = RegOpenKeyEx(HKEY_CURRENT_USER, subkey, 0, KEY_WRITE, &hregkey);
-  LONG result = RegQueryValueExA(hregkey, "Location", NULL, NULL, NULL, NULL);
-      
-  if (result == ERROR_SUCCESS) {
-    //MessageBox(NULL, "The application failed to start.\nError code: 0xF1D", "mdlshit", MB_OK);
+  if(CheckRegKey("SOFTWARE\\WOW6432Node\\Riot Games, Inc\\League of Legends")){
     error_out = "0xF1D";
     return true;
   }
-  else if (result == ERROR_FILE_NOT_FOUND) {
-    Logger::Debug("ay\n");
-  }
-  else{
-    Logger::Debug("ay 2\n");
+  //IMAGINE PLAYING GENSHIT
+  if(CheckRegKey("Software\\miHoYo\\Genshin Impact")){
+    error_out = "0xF1D";
+    return true;
   }
   //username blackist lol
   char * user = getenv("username");

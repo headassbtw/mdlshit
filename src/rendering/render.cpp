@@ -333,6 +333,9 @@ void RenderGUI(){
 
     //ImGui::BeginDisabled(blocked);
     static bool popup = false;
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
     if(ImGui::Button("Convert [OVERRIDEN]",{(viewport_width/2.0f) - 10,24})){
         
         fileinfo.mdl = files[0]->BoxBuffer;
@@ -351,6 +354,7 @@ void RenderGUI(){
         std::thread fp(Convert,0);
         fp.detach();
     }
+    ImGui::PopStyleColor(3);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize,0.0f);
 
     if(ImGui::BeginPopupModal("Status##ConvertModal",NULL,ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)){
@@ -385,6 +389,14 @@ void RenderGUI(){
 
     //ImGui::EndDisabled();
     ImGui::EndGroup();
+    if (ImGui::IsItemHovered())
+    {
+        ImGui::BeginTooltip();
+        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+        ImGui::TextWrapped("Checks to verify that the input files are correct do not work currently,\nthis may cause unusual errors.\nYOU HAVE BEEN WARNED.");
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
 
 
     if(console){
