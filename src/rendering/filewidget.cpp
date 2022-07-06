@@ -6,9 +6,7 @@
 #include <fstream>
 #include <rendering/filewidget.hpp>
 #include <tinyfiledialogs.h>
-#include <filesystem>
 #include <unistd.h>
-using std::filesystem::current_path;
 
 
 void Widgets::File::CheckErrors(){
@@ -71,14 +69,12 @@ void Widgets::File::UI(float win_width){
         memset(BoxBuffer, '\0', 256);
     }
     if(ImGui::Button("Browse",{50,22})){
-        char tmp[256];
-        getcwd(tmp,256);
 
         memset(BoxBuffer, '\0', 256);
         //char const * lFilterPatterns[2] = { "*.txt", "*.jpg" };
         char const * selection = tinyfd_openFileDialog( // there is also a wchar_t version
         "Select file", // title
-        tmp, // optional initial directory
+        NULL, // optional initial directory
         1, // number of filter patterns
         exts, // 
         NULL, // optional filter description

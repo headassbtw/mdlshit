@@ -28,6 +28,9 @@ bool CheckRegKey(const char* key){
   if (result == ERROR_SUCCESS) {
     return true;
   }
+  else{
+    return false;
+  }
   #else
   return false;
   #endif
@@ -44,7 +47,7 @@ bool CheckBlacklist(char*& error_out)
   }
   //IMAGINE PLAYING GENSHIT
   if(CheckRegKey("Software\\miHoYo\\Genshin Impact")){
-    error_out = "0xF1D";
+    error_out = "0xF35";
     return true;
   }
   //username blackist lol
