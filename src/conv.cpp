@@ -1,3 +1,5 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "cppcoreguidelines-narrowing-conversions"
 #include <conv.hpp>
 #include <logger.hpp>
 #include <structs.hpp>
@@ -11,11 +13,19 @@
 #include <vector>
 using namespace std;
 
+#pragma region helper functions
 void CopyAddInt32(BinaryReader* reader, BinaryWriter* writer, int add, int count){
     for(int i = 0; i < count;i++){
         int tmp;
         reader->Read(&tmp);
         writer->Write(tmp + add);
+    }
+}
+void CopySetInt32(BinaryReader* reader, BinaryWriter* writer, int set, int count){
+    for(int i = 0; i < count;i++){
+        int tmp;
+        reader->Read(&tmp);
+        writer->Write(set);
     }
 }
 void CopyAddInt32NullCheck(BinaryReader* reader, BinaryWriter* writer, int add, int count){
@@ -33,6 +43,11 @@ void AddInt32(BinaryWriter* writer, int add, int count){
         writer->Write(add);
     }
 }
+void SetInt32(BinaryWriter* writer, int set, int count){
+    for(int i = 0; i < count;i++){
+        writer->Write(set);
+    }
+}
 void CopyAddFloat32(BinaryReader* reader, BinaryWriter* writer, float add, int count){
     for(int i = 0; i < count;i++){
         float tmp;
@@ -47,8 +62,6 @@ void CopySetFloat32(BinaryReader* reader, BinaryWriter* writer, float set, int c
         writer->Write(set);
     }
 }
-
-
 string h(const char* file, const char* ext){
   string yo = string(file);
   auto dot = yo.find_last_of('.');
@@ -57,7 +70,6 @@ string h(const char* file, const char* ext){
   yo.append(ext);
   return yo;
 }
-
 void filler(BinaryReader* reader, BinaryWriter* writer, int count){
   for(int i = 0;i < count;i++){
     byte tmp;
@@ -65,6 +77,8 @@ void filler(BinaryReader* reader, BinaryWriter* writer, int count){
     writer->Write(tmp);
   }
 }
+#pragma endregion
+
 
 int Conversion::ReadHeader(FileInfo info) {
 
@@ -227,27 +241,33 @@ int TextureDiff = (20 * Initial_Header->numtextures);
 #pragma region bone conversion
 int bone_filler = Initial_Header->boneindex - Stream.Position();
 OutStream.seek(Stream.Position() + 4);
-  filler(&Stream,&OutStream,bone_filler);
-  Dest_Header->boneindex = OutStream.Position();
-  UI::Progress.SubTask.Begin("Converting Bones");
-  int bonecount = Initial_Header->numbones;
-  for (int i = 0; i < bonecount; i++) {
-      
+filler(&Stream,&OutStream,bone_filler);
+Dest_Header->boneindex = OutStream.Position();
+int bonecount = Initial_Header->numbones;
+UI::Progress.SubTask.Begin("Converting Bones");
+for (int i = 0; i < bonecount; i++) {
+  if(info.disable_bones){
+    char info[216];
+    Stream.Stream.read(info,108);
+    OutStream.Stream.write(info,108);
+  }
+  else{
     int boneOff = TestDiff + (28 * bonecount) - (28 * i) - TextureDiff;
     CopyAddInt32(&Stream, &OutStream, boneOff, 1); //sznameindex
     CopyAddInt32(&Stream, &OutStream, 0, 1); //parent
     CopyAddInt32(&Stream, &OutStream, 0, 6); //bonecontroller
-    CopySetFloat32(&Stream, &OutStream, 1,3); //pos
-    
+
+    CopyAddFloat32(&Stream, &OutStream, 0, 3); //pos
+
     //quaternion
     CopyAddFloat32(&Stream, &OutStream, 0, 3);
     CopySetFloat32(&Stream, &OutStream, 1, 1); //quat
     //end quaternion
     CopyAddFloat32(&Stream, &OutStream, 0, 3); //rot
-    CopySetFloat32(&Stream, &OutStream, 1,3); //posscale
+    CopySetFloat32(&Stream, &OutStream, 1, 3); //posscale
     AddInt32(&OutStream, 0, 3); //addme
-    CopySetFloat32(&Stream, &OutStream, 1,3); //rotscale
-    AddInt32(&OutStream, 0, 3); //addme
+    CopyAddFloat32(&Stream, &OutStream, 0, 3); //rotscale
+    SetInt32(&OutStream, 973078528, 3); //addme
     CopyAddInt32(&Stream, &OutStream, 0, 12); //posetobone
     //quaternion
     CopyAddFloat32(&Stream, &OutStream, 0, 3);
@@ -262,10 +282,11 @@ OutStream.seek(Stream.Position() + 4);
     CopyAddInt32(&Stream, &OutStream, 0, 8); //unused
     AddInt32(&OutStream, 0, 1); //addme
     BytesAdded += 28;
-    Logger::Notice("Converted bone %d of %d\n",i+1,bonecount);
+  }
+    Logger::Notice("Converted bone %d of %d\n", i + 1, bonecount);
     UI::Progress.SubTask.Update((i+1.0f)/(float)bonecount);
   }
-  UI::Progress.SubTask.End();
+UI::Progress.SubTask.End();
 Logger::Info("Finished bone conversion\n");
 #pragma endregion
 
@@ -294,48 +315,43 @@ int att_filler_dest = Initial_Header->localattachmentindex - Stream.Position();
 filler(&Stream, &OutStream, att_filler_dest);
 Dest_Header->localattachmentindex = OutStream.Position();
 UI::Progress.SubTask.Begin("Converting Attachments");
-for(int i = 0; i < Initial_Header->numlocalattachments;i++){
+for(int i = 0; i < (info.disable_attachments?0:Initial_Header->numlocalattachments);i++){
   //92 bytes
-  int idx;
-  Stream.Read(&idx);
-  int boneOff = TestDiff - TextureDiff;
-
-  int off = (idx)  - TextureDiff;
-
-  OutStream.Write(off);
-  filler(&Stream, &OutStream, 88);
+    int idx;
+    Stream.Read(&idx);
+    int boneOff = TestDiff - TextureDiff;
+    int off = (idx)  - TextureDiff;
+    OutStream.Write(off);
+    filler(&Stream, &OutStream, 88);
   Logger::Notice("Converted local attachment %d of %d\n",i+1,Initial_Header->numlocalattachments);
   UI::Progress.SubTask.Update((i+1.0f)/(float)Initial_Header->numlocalattachments);
 }
 UI::Progress.SubTask.End();
-Stream.seek(Stream.Position()+92);
-OutStream.seek(OutStream.Position()+92);
-int fuckshittwoelectricboogaloo;
-Stream.Read(&fuckshittwoelectricboogaloo);
-OutStream.Write(fuckshittwoelectricboogaloo);
-
 Logger::Info("TextureDiff: %s\n",std::to_string(TextureDiff).c_str());
 Logger::Info("SeqAdd: %s\n",std::to_string(SeqAdd).c_str());
 Logger::Info("TestDiff: %s\n",std::to_string(TestDiff).c_str());
 
 
-
-//CopyAddInt32(&Stream, &OutStream, SeqAdd + AnimYeet, 1);
-
 vector<pair<int,int>> ASSFARTS; //i am mature
 
-//hitboxes
+//hitboxsets
 int hitbox_filler_dest = Initial_Header->hitboxsetindex - Stream.Position();
 filler(&Stream, &OutStream, hitbox_filler_dest);
 UI::Progress.SubTask.Begin("Converting Hitboxes");
 for(int i = 0; i < Initial_Header->numhitboxsets;i++){
-  int ass;
-  Stream.Read(&ass);
-  OutStream.Write(ass + OutStream.Position());//sznameindex
-  //ASSFARTS.push_back(make_pair(ass,ass + OutStream.Position()-4));
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //numhitboxes
-  CopyAddInt32(&Stream, &OutStream, SeqAdd + AnimYeet, 1); //hitboxindex
-  
+  if(info.disable_hitboxsets){
+    char pog[44];
+    Stream.Stream.read(pog,44);
+    OutStream.Stream.write(pog,44);
+  }
+  else{
+    int ass;
+    Stream.Read(&ass);
+    OutStream.Write(ass + OutStream.Position());//sznameindex
+    //ASSFARTS.push_back(make_pair(ass,ass + OutStream.Position()-4));
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //numhitboxes
+    CopyAddInt32(&Stream, &OutStream, SeqAdd + AnimYeet, 1); //hitboxindex
+  }
   Logger::Notice("Shifted hitbox set %d of %d\n",i+1,Initial_Header->numhitboxsets);
   UI::Progress.SubTask.Update((i+1.0f)/(float)Initial_Header->numhitboxsets);
 }
@@ -344,36 +360,46 @@ UI::Progress.SubTask.End();
 
 //anims
 int anim_filler_dest = Initial_Header->localanimindex - Stream.Position();
+Logger::Info("%i bytes between hitbox sets and animations\n",anim_filler_dest);
+if(anim_filler_dest <= 0){
+  Logger::Error("ahaha, FUCK!\n");
+}
 filler(&Stream, &OutStream, anim_filler_dest);
 Dest_Header->localanimindex = OutStream.Position();
 UI::Progress.SubTask.Begin("Converting Animations");
 for(int i = 0; i < Initial_Header->numlocalanim;i++){
-  int PISS = -((8*(Initial_Header->numlocalanim - i)));
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //baseptr
-  CopyAddInt32NullCheck(&Stream, &OutStream, (PISS+SeqAdd)-TextureDiff, 1); //sznameindex
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //fps
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //flags
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //numframes
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //nummovements
-  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //movementindex
-  int shitfuck[6];
-  Stream.read((char*)&shitfuck, 4*6);
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //animblock
-  CopyAddInt32NullCheck(&Stream, &OutStream, (PISS+SeqAdd+24)-TextureDiff, 1); //animindex
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //numikrules
-  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //ikruleindex
-  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //animblockikruleindex
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //numlocalhierarchy
-  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //localhierarchyindex
-  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //sectionindex
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //sectionframes
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //zeroframespan, zeroframecount
-  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //zeroframeindex
-  
+  if(info.disable_animations){
+    char ßtruct[100];
+    Stream.Stream.read(ßtruct,100);
+    OutStream.Stream.write(ßtruct,100);
+  }
+  else{
+    int PISS = -((8*(Initial_Header->numlocalanim - i)));
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //baseptr
+    CopyAddInt32NullCheck(&Stream, &OutStream, (PISS+SeqAdd)-TextureDiff, 1); //sznameindex
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //fps
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //flags
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //numframes
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //nummovements
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //movementindex
+    int shitfuck[6];
+    Stream.read((char*)&shitfuck, 4*6);
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //animblock
+    CopyAddInt32NullCheck(&Stream, &OutStream, (PISS+SeqAdd+24)-TextureDiff, 1); //animindex
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //numikrules
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //ikruleindex
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //animblockikruleindex
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //numlocalhierarchy
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //localhierarchyindex
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //sectionindex
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //sectionframes
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //zeroframespan, zeroframecount
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //zeroframeindex
+    CopyAddFloat32(&Stream, &OutStream, 0, 1);
+    OutStream.write((char*)&shitfuck, 16);
+    BytesAdded -= 8;
+  }
 
-  CopyAddFloat32(&Stream, &OutStream, 0, 1);
-  OutStream.write((char*)&shitfuck, 16);
-  BytesAdded -= 8;
   Logger::Notice("Converted animation %d of %d\n",i+1,Initial_Header->numlocalanim);
   UI::Progress.SubTask.Update((i+1.0f)/(float)Initial_Header->numlocalanim);
 }
@@ -390,53 +416,58 @@ filler(&Stream, &OutStream, seq_filler_dest);
 Dest_Header->localseqindex = OutStream.Position();
 UI::Progress.SubTask.Begin("Converting Sequences");
 for(int i = 0; i < Initial_Header->numlocalseq;i++){
-  int PISS = (TextureDiff + (20*(Initial_Header->numlocalseq - i)))-(8*Initial_Header->numlocalanim);
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //baseptr
-  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //szlabelindex
-  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //szactivitynameindex
-  CopyAddInt32(&Stream, &OutStream, 0, 4);
-  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //eventindex
-  CopyAddInt32(&Stream, &OutStream, 0, 3);   //bbmin
-  CopyAddInt32(&Stream, &OutStream, 0, 3);   //bbmax
-  CopyAddInt32(&Stream, &OutStream, 0, 1);   //numblends
-  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //animindexindex
-  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //movementindex
-  CopyAddInt32(&Stream, &OutStream, 0, 2); //groupsize
-  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 2); //paramindex
-  CopyAddInt32(&Stream, &OutStream, 0, 2); //paramstart
-  CopyAddInt32(&Stream, &OutStream, 0, 2); //paramend
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //paramparent
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //fadeintime
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //fadeouttime
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //localentrynode
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //localexitnode
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //nodeflags
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //entryphase
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //exitphase
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //lastframe
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //nextseq
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //pose
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //numikrules
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //numautolayers  
-  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //autolayerindex
-  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //weightlistindex
-  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //posekeyindex
-  CopyAddInt32(&Stream, &OutStream, 0, 3);
-  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //iklockindex
-  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //keyvalueindex
-  CopyAddInt32(&Stream, &OutStream, 0, 1); //keyvaluesize
-  CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //cycleposeindex
-  int unused[5];
-  Stream.read((char*)&unused, 20);
-  OutStream.Write(0); //activityModifierOffset
-  OutStream.Write(0); //activityModifierCount
-  OutStream.write((char*)&unused, 20);
-  OutStream.Write(0);
-  OutStream.Write(0);
-  OutStream.Write(0);
-  BytesAdded += 20;
-
-
+  if(info.disable_sequences){
+    char ßtruct[212];
+    Stream.Stream.read(ßtruct,212);
+    OutStream.Stream.write(ßtruct,212);
+  }
+  else{
+    int PISS = (TextureDiff + (20*(Initial_Header->numlocalseq/* - i*/)))-(8*Initial_Header->numlocalanim);
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //baseptr
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //szlabelindex
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //szactivitynameindex
+    CopyAddInt32(&Stream, &OutStream, 0, 4);
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //eventindex
+    CopyAddInt32(&Stream, &OutStream, 0, 3);   //bbmin
+    CopyAddInt32(&Stream, &OutStream, 0, 3);   //bbmax
+    CopyAddInt32(&Stream, &OutStream, 0, 1);   //numblends
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //animindexindex
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //movementindex
+    CopyAddInt32(&Stream, &OutStream, 0, 2); //groupsize
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 2); //paramindex
+    CopyAddInt32(&Stream, &OutStream, 0, 2); //paramstart
+    CopyAddInt32(&Stream, &OutStream, 0, 2); //paramend
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //paramparent
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //fadeintime
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //fadeouttime
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //localentrynode
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //localexitnode
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //nodeflags
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //entryphase
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //exitphase
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //lastframe
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //nextseq
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //pose
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //numikrules
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //numautolayers
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //autolayerindex
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //weightlistindex
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //posekeyindex
+    CopyAddInt32(&Stream, &OutStream, 0, 3);
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //iklockindex
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //keyvalueindex
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //keyvaluesize
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //cycleposeindex
+    int unused[5];
+    Stream.read((char*)&unused, 20);
+    OutStream.Write(0); //activityModifierOffset
+    OutStream.Write(0); //activityModifierCount
+    OutStream.write((char*)&unused, 20);
+    OutStream.Write(0);
+    OutStream.Write(0);
+    OutStream.Write(0);
+    BytesAdded += 20;
+  }
   Logger::Notice("Converted sequence %d of %d\n",i+1,Initial_Header->numlocalseq);
   UI::Progress.SubTask.Update((i+1.0f)/(float)Initial_Header->numlocalseq);
 }
@@ -449,11 +480,18 @@ filler(&Stream, &OutStream, bpart_filler_dest);
 
 for(int i = 0; i < Initial_Header->numbodyparts;i++){
   //16 bytes
-  int idx;
-  Stream.Read(&idx);
-  int off = (idx) - TextureDiff;
-  OutStream.Write(off);
-  filler(&Stream, &OutStream, 12);
+  if(info.disable_bodyparts){
+    char ßtruct[16];
+    Stream.Stream.read(ßtruct,16);
+    OutStream.Stream.write(ßtruct,16);
+  }
+  else{
+    int idx;
+    Stream.Read(&idx);
+    int off = (idx) - TextureDiff;
+    OutStream.Write(off);
+    filler(&Stream, &OutStream, 12);
+  }
   Logger::Notice("Converted body part %d of %d\n",i+1,Initial_Header->numbodyparts);
   UI::Progress.SubTask.Update((i+1.0f)/(float)Initial_Header->numbodyparts);
 }
@@ -468,11 +506,19 @@ filler(&Stream, &OutStream, inc_filler_dest);
 filler(&Stream, &OutStream, 4);
 for(int i = 0; i < Initial_Header->numincludemodels;i++){
   //8 bytes
-  int idx;
-  Stream.Read(&idx);
-  int off = (idx) - (TextureDiff);
-  OutStream.Write(off);
-  filler(&Stream, &OutStream, 4);
+  if(info.disable_includemodels){
+    char ßtruct[8];
+    Stream.Stream.read(ßtruct,8);
+    OutStream.Stream.write(ßtruct,8);
+  }
+  else{
+    int idx;
+    Stream.Read(&idx);
+    int off = (idx) - (TextureDiff);
+    OutStream.Write(off);
+    filler(&Stream, &OutStream, 4);
+  }
+
   Logger::Notice("Converted included model %d of %d\n",i+1,Initial_Header->numincludemodels);
   UI::Progress.SubTask.Update((i+1.0f)/(float)Initial_Header->numincludemodels);
 }
@@ -490,15 +536,22 @@ int beginposR = Stream.Position();
 int beginposW = OutStream.Position();
 Dest_Header->textureindex = OutStream.Position();
   for(int i = 0; i < Initial_Header->numtextures;i++){
-    int tBeginW = OutStream.Position();
-    CopyAddInt32(&Stream, &OutStream, -((20)*(Initial_Header->numtextures - i)), 1);
-    for(int j = 0;j < 40;j++){
-      byte tmp;
-      Stream.Read(&tmp);
-      OutStream.Write(tmp);
+    if(info.disable_textures){
+      char ßtruct[64];
+      Stream.Stream.read(ßtruct,64);
+      OutStream.Stream.write(ßtruct,64);
     }
-    Stream.seek(Stream.Position() + 20);
-    BytesAdded -= 20;
+    else{
+      int tBeginW = OutStream.Position();
+      CopyAddInt32(&Stream, &OutStream, -((20)*(Initial_Header->numtextures - i)), 1);
+      for(int j = 0;j < 40;j++){
+        byte tmp;
+        Stream.Read(&tmp);
+        OutStream.Write(tmp);
+      }
+      Stream.seek(Stream.Position() + 20);
+      BytesAdded -= 20;
+    }
     Logger::Notice("Converted texture %d of %d\n",i+1,Initial_Header->numtextures);
     UI::Progress.SubTask.Update((i+1.0f)/(float)Initial_Header->numtextures);
   }
@@ -633,7 +686,7 @@ int NameCopy = Initial_Header->szanimblocknameindex + BytesAdded;
 
 #pragma region converting to 53
 
-  Dest_Header->nameCopyOffset = NameCopy;
+  Dest_Header->nameCopyOffset = NameCopy+1;
   Dest_Header->id = Initial_Header->id;
   Dest_Header->version = 53;
   Dest_Header->checksum = Initial_Header->checksum;
@@ -876,3 +929,4 @@ int NameCopy = Initial_Header->szanimblocknameindex + BytesAdded;
   UI::Progress.MainTask.End();
   return 0;
 }
+#pragma clang diagnostic pop

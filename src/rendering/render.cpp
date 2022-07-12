@@ -252,6 +252,16 @@ void RenderGUI(){
     if(override_animations) ImGui::InputInt("##Animations", &animations);
     ImGui::Checkbox("Override Flags", &override_flags);
     if(override_flags) ImGui::InputInt("##Flags", &flags);
+    ImGui::Text("Disable Conversions");
+    ImGui::Separator();
+    ImGui::Checkbox("Bones", &fileinfo.disable_bones);
+    ImGui::Checkbox("Attachments", &fileinfo.disable_attachments);
+    ImGui::Checkbox("Hitbox Sets", &fileinfo.disable_hitboxsets);
+    ImGui::Checkbox("Animations", &fileinfo.disable_animations);
+    ImGui::Checkbox("Sequences", &fileinfo.disable_sequences);
+    ImGui::Checkbox("Body Parts", &fileinfo.disable_bodyparts);
+    ImGui::Checkbox("Include Models", &fileinfo.disable_includemodels);
+    ImGui::Checkbox("Textures", &fileinfo.disable_textures);
 
     ImGui::EndChild();
     ImGui::PopStyleVar(1);
@@ -429,7 +439,7 @@ void RenderGUI(){
             }
             ImGui::EndTable();
         }
-        ImGui::SetScrollHereY(0.999f);
+        ImGui::SetScrollHereY(0.001f);
         ImGui::PopStyleVar();
         ImGui::PopFont();
         ImGui::EndChild();
@@ -490,6 +500,7 @@ void RenderGUI(){
                 }
                 if(ImGui::BeginTabItem("Special Thanks")){
                     ImGui::BulletText("Mental Illness");
+                    ImGui::BulletText("ß");
                     ImGui::EndTabItem();
                 }
                 ImGui::EndTabBar();
