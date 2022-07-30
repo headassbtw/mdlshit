@@ -24,7 +24,7 @@ file(GLOB IM_SRC CONFIGURE_DEPENDS
 )
 include(generate_product_version)
 
-set(APP_COPYRIGHT "MasterLiberty & headassbtw (C) Copyright 2687")
+set(APP_COPYRIGHT "MasterLiberty & headassbtw (C) Copyright 2022") #2678 for shitpost
 set(APP_NAME "Titanfall 2 .MDL converter")
 set(APP_INFOSTRING "Fuck you Respawn!")
 generate_product_version(

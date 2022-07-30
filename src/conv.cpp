@@ -14,6 +14,11 @@
 using namespace std;
 
 #pragma region helper functions
+
+/// \param reader The input file
+/// \param writer The output file
+/// \param add The number to add to the int that was read
+/// \param count Amount of times to repeat this
 void CopyAddInt32(BinaryReader* reader, BinaryWriter* writer, int add, int count){
     for(int i = 0; i < count;i++){
         int tmp;
@@ -361,9 +366,7 @@ UI::Progress.SubTask.End();
 //anims
 int anim_filler_dest = Initial_Header->localanimindex - Stream.Position();
 Logger::Info("%i bytes between hitbox sets and animations\n",anim_filler_dest);
-if(anim_filler_dest <= 0){
-  Logger::Error("ahaha, FUCK!\n");
-}
+if(anim_filler_dest <= 0){ Logger::Error("ahaha, FUCK!\n"); }
 filler(&Stream, &OutStream, anim_filler_dest);
 Dest_Header->localanimindex = OutStream.Position();
 UI::Progress.SubTask.Begin("Converting Animations");
@@ -374,32 +377,32 @@ for(int i = 0; i < Initial_Header->numlocalanim;i++){
     OutStream.Stream.write(ßtruct,100);
   }
   else{
-    int PISS = -((8*(Initial_Header->numlocalanim - i)));
+    int PISS = (-((8*(Initial_Header->numlocalanim - i))) + SeqAdd) - TextureDiff;
+    int PISS2 = -((8*(Initial_Header->numlocalanim - i)));
     CopyAddInt32(&Stream, &OutStream, 0, 1); //baseptr
-    CopyAddInt32NullCheck(&Stream, &OutStream, (PISS+SeqAdd)-TextureDiff, 1); //sznameindex
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //sznameindex
     CopyAddInt32(&Stream, &OutStream, 0, 1); //fps
     CopyAddInt32(&Stream, &OutStream, 0, 1); //flags
     CopyAddInt32(&Stream, &OutStream, 0, 1); //numframes
     CopyAddInt32(&Stream, &OutStream, 0, 1); //nummovements
-    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //movementindex
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS2, 1); //movementindex
     int shitfuck[6];
     Stream.read((char*)&shitfuck, 4*6);
     CopyAddInt32(&Stream, &OutStream, 0, 1); //animblock
-    CopyAddInt32NullCheck(&Stream, &OutStream, (PISS+SeqAdd+24)-TextureDiff, 1); //animindex
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS2,1); //animindex
     CopyAddInt32(&Stream, &OutStream, 0, 1); //numikrules
-    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //ikruleindex
-    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //animblockikruleindex
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS2, 1); //ikruleindex
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS2, 1); //animblockikruleindex
     CopyAddInt32(&Stream, &OutStream, 0, 1); //numlocalhierarchy
-    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //localhierarchyindex
-    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //sectionindex
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS2, 1); //localhierarchyindex
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS2, 1); //sectionindex
     CopyAddInt32(&Stream, &OutStream, 0, 1); //sectionframes
     CopyAddInt32(&Stream, &OutStream, 0, 1); //zeroframespan, zeroframecount
-    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //zeroframeindex
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS2, 1); //zeroframeindex
     CopyAddFloat32(&Stream, &OutStream, 0, 1);
     OutStream.write((char*)&shitfuck, 16);
     BytesAdded -= 8;
   }
-
   Logger::Notice("Converted animation %d of %d\n",i+1,Initial_Header->numlocalanim);
   UI::Progress.SubTask.Update((i+1.0f)/(float)Initial_Header->numlocalanim);
 }
@@ -409,11 +412,13 @@ Logger::Info("Finished animations\n");
 
 
 
-
+std::vector<int> events_change;
 //sequences
+Logger::Info("Converting Sequences\n");
 int seq_filler_dest = Initial_Header->localseqindex - Stream.Position();
 filler(&Stream, &OutStream, seq_filler_dest);
 Dest_Header->localseqindex = OutStream.Position();
+
 UI::Progress.SubTask.Begin("Converting Sequences");
 for(int i = 0; i < Initial_Header->numlocalseq;i++){
   if(info.disable_sequences){
@@ -422,12 +427,18 @@ for(int i = 0; i < Initial_Header->numlocalseq;i++){
     OutStream.Stream.write(ßtruct,212);
   }
   else{
-    int PISS = (TextureDiff + (20*(Initial_Header->numlocalseq/* - i*/)))-(8*Initial_Header->numlocalanim);
+    int PISS = (20*(Initial_Header->numlocalseq - i));
+    int PISS2 = (TextureDiff + (20*(Initial_Header->numlocalseq - i)))-(8*Initial_Header->numlocalanim);
+    int seq_start = OutStream.Position();
+
     CopyAddInt32(&Stream, &OutStream, 0, 1); //baseptr
-    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //szlabelindex
-    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //szactivitynameindex
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS2, 1); //szlabelindex
+    CopyAddInt32NullCheck(&Stream, &OutStream, PISS2, 1); //szactivitynameindex
     CopyAddInt32(&Stream, &OutStream, 0, 4);
-    CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //eventindex
+    int eventindex; Stream.read((char*)&eventindex, 4); OutStream.Write(eventindex+PISS);
+    int eventindex_real = seq_start + eventindex + PISS;
+    events_change.push_back(eventindex_real);
+
     CopyAddInt32(&Stream, &OutStream, 0, 3);   //bbmin
     CopyAddInt32(&Stream, &OutStream, 0, 3);   //bbmax
     CopyAddInt32(&Stream, &OutStream, 0, 1);   //numblends
@@ -467,12 +478,17 @@ for(int i = 0; i < Initial_Header->numlocalseq;i++){
     OutStream.Write(0);
     OutStream.Write(0);
     BytesAdded += 20;
+    int return_idx = OutStream.Position();
+
+
   }
   Logger::Notice("Converted sequence %d of %d\n",i+1,Initial_Header->numlocalseq);
   UI::Progress.SubTask.Update((i+1.0f)/(float)Initial_Header->numlocalseq);
 }
 UI::Progress.SubTask.End();
 Logger::Info("Finished sequences\n");
+
+
 
 int bpart_filler_dest = Initial_Header->bodypartindex - Stream.Position();
 UI::Progress.SubTask.Begin("Converting Body Parts");
@@ -615,6 +631,22 @@ if(OutStream.Position() < Stream.Position() + BytesAdded){
   Logger::Critical("(%d vs %d)\n",OutStream.Position(),Stream.Position() + BytesAdded);
   return 1;
 }
+int return_to_after_events = OutStream.Position();
+  Logger::Info("Updating %zu Events\n",events_change.size());
+  for(int i = 0; i < events_change.size();i++){
+    OutStream.seek(events_change[i]+76);
+    int idx;
+    OutStream.Stream.read((char*)idx, 4);
+    idx -= TextureDiff;
+    OutStream.seek(events_change[i]+76);
+    //OutStream.Write(idx);
+    char bitch[5] = {'B','I','T','C','H'};
+    OutStream.write(bitch,5);
+    Logger::Info("Updated event %d of %d\n",i+1,events_change.size());
+  }
+OutStream.seek(return_to_after_events);
+
+
 
   if(info.phy.has_value()){
     BinaryReader PhyStream = BinaryReader(info.phy.value().c_str());
@@ -922,8 +954,16 @@ int NameCopy = Initial_Header->szanimblocknameindex + BytesAdded;
   }
   if(ASSFARTS.size()>0) UI::Progress.SubTask.End();
 
+
+
   Logger::Notice("done\n");
 
+  char hello[5] = {'H','E','L','L','O'};
+
+  OutStream.write(hello,5);
+
+  OutStream.Stream.close();
+  Stream.Stream.close();
 
   Logger::Info("Finished!\n");
   UI::Progress.MainTask.End();

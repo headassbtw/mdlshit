@@ -458,6 +458,7 @@ void RenderGUI(){
                   ImGui::Text("MDLSHIT");
                   ImGui::Text("- Source engine model converter, v49/47 to v53");
                   ImGui::Text("By headassbtw and MasterLiberty");
+                  ImGui::Text("Eat my entire ass, wanderer");
                   ImGui::Text("Compiled on %s",__DATE__);
                   ImGui::Text("%s, v%s",
                               #ifdef __MINGW32__
@@ -468,11 +469,15 @@ void RenderGUI(){
                               "",
                               #endif
                               __VERSION__);
-                  ImGui::Text("OpenGL Version: %s",glGetString(GL_VERSION));
-                  ImGui::Text("GPU: %s",glGetString(GL_RENDERER));
-                  
-                  ImGui::Text("FPS: %f",ImGui::GetIO().Framerate);
+                  if (ImGui::TreeNode("Graphics Info"))
+                  {
+                    ImGui::Text("OpenGL Version: %s",glGetString(GL_VERSION));
+                    ImGui::Text("GPU: %s",glGetString(GL_RENDERER));
+                    ImGui::Text("FPS: %f",ImGui::GetIO().Framerate);
+                    ImGui::TreePop();
+                  }
                   ImGui::EndGroup();
+
                   ImGui::EndTabItem();
                 }
                 if(ImGui::BeginTabItem("Software Used")){
