@@ -20,6 +20,7 @@ BinaryReader::BinaryReader(const char* filename){
 }
 BinaryReader::~BinaryReader(){
   Stream.close();
+  Logger::Info("BinaryReader for file \"%s\" closed\n", _filename);
 }
 void BinaryReader::Read(int* data){
   Stream.read((char*)data, sizeof(int));
@@ -73,12 +74,19 @@ void BinaryReader::Read(Vector* data){
 
 void BinaryReader::seek(int pos){
   Stream.seekg(pos);
+  if(Stream.tellg() != pos){
+    Logger::Critical("BinaryReader failed to seek the read cursor!\n");
+    abort();
+  }
   Stream.seekp(pos);
+  if(Stream.tellp() != pos){
+    Logger::Critical("BinaryReader failed to seek the write cursor!\n");
+  }
 }
 
 BinaryWriter::BinaryWriter(const char* filename){
   _filename = filename;
-  Stream = fstream(_filename, ios::binary | ios::out);
+  Stream = fstream(_filename, ios::binary | ios::out | ios::in);
   
   struct stat results;
   if (stat(filename, &results) == 0){
@@ -91,6 +99,7 @@ BinaryWriter::BinaryWriter(const char* filename){
 }
 BinaryWriter::~BinaryWriter(){
   Stream.close();
+  Logger::Info("BinaryWriter for file \"%s\" closed\n", _filename);
 }
 void BinaryWriter::write(const char* data, int size){
   Stream.write(data, size);
@@ -118,6 +127,10 @@ void BinaryWriter::Write(float data){
   Stream.write((char*)&data, sizeof(float));
 }
 int BinaryWriter::Position(){
+  if(Stream.tellp() <= -1){
+    Logger::Critical("BinaryWriter's seek position was invalid! \n");
+    abort();
+  }
   return Stream.tellp();
 }
 void BinaryWriter::Write(Vector data){
@@ -128,6 +141,19 @@ void BinaryWriter::Write(Vector data){
 
 
 void BinaryWriter::seek(int pos){
-  Stream.seekg(pos);
-  Stream.seekp(pos);
+  if(Stream.fail()){
+    Stream.close();
+    Stream.open(_filename);
+    Logger::Notice("Stream died, reopening file \"%s\"\n",_filename);
+  }
+
+  Stream.seekp(pos, std::ios::beg);
+  if(Stream.tellp() != pos){
+    Logger::Critical("BinaryWriter failed to seek the write cursor to %d!\n", pos);
+    abort();
+  }
+  Stream.seekg(pos, std::ios::beg);
+  if(Stream.tellg() != pos){
+    Logger::Critical("BinaryWriter failed to seek the read cursor to %d!\n", pos);
+  }
 }

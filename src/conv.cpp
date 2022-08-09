@@ -86,7 +86,7 @@ void filler(BinaryReader* reader, BinaryWriter* writer, int count){
 
 
 int Conversion::ReadHeader(FileInfo info) {
-
+  Logger::Debug("Conversion started\n");
   UI::Progress.MainTask.Begin("Converting");
 
   BinaryReader Stream = BinaryReader(info.mdl.value().c_str());
@@ -113,7 +113,7 @@ int Conversion::ReadHeader(FileInfo info) {
   Stream.Read(&Initial_Header->checksum);
   Logger::Debug("checksum: %d\n", Initial_Header->checksum);
   Stream.read(Initial_Header->name, 64);
-  Logger::Debug("name: %s\n", &Initial_Header->name);
+  //Logger::Debug("name: %s\n", &Initial_Header->name);
   Stream.Read(&Initial_Header->fileSize);
   Logger::Debug("fileSize: %d\n", Initial_Header->fileSize);
   Stream.Read(&Initial_Header->eyeposition);
@@ -328,13 +328,14 @@ for(int i = 0; i < (info.disable_attachments?0:Initial_Header->numlocalattachmen
     int off = (idx)  - TextureDiff;
     OutStream.Write(off);
     filler(&Stream, &OutStream, 88);
-  Logger::Notice("Converted local attachment %d of %d\n",i+1,Initial_Header->numlocalattachments);
+  printf("Converted local attachment %d of %d\n",i+1,Initial_Header->numlocalattachments);
   UI::Progress.SubTask.Update((i+1.0f)/(float)Initial_Header->numlocalattachments);
 }
 UI::Progress.SubTask.End();
-Logger::Info("TextureDiff: %s\n",std::to_string(TextureDiff).c_str());
-Logger::Info("SeqAdd: %s\n",std::to_string(SeqAdd).c_str());
-Logger::Info("TestDiff: %s\n",std::to_string(TestDiff).c_str());
+Logger::Info("Finished Local Attachments\n");
+//Logger::Info("TextureDiff: %s\n",std::to_string(TextureDiff).c_str());
+//Logger::Info("SeqAdd: %s\n",std::to_string(SeqAdd).c_str());
+//Logger::Info("TestDiff: %s\n",std::to_string(TestDiff).c_str());
 
 
 vector<pair<int,int>> ASSFARTS; //i am mature
@@ -412,7 +413,7 @@ Logger::Info("Finished animations\n");
 
 
 
-std::vector<int> events_change;
+std::vector<std::pair<int,int>> events_change;
 //sequences
 Logger::Info("Converting Sequences\n");
 int seq_filler_dest = Initial_Header->localseqindex - Stream.Position();
@@ -437,7 +438,7 @@ for(int i = 0; i < Initial_Header->numlocalseq;i++){
     CopyAddInt32(&Stream, &OutStream, 0, 4);
     int eventindex; Stream.read((char*)&eventindex, 4); OutStream.Write(eventindex+PISS);
     int eventindex_real = seq_start + eventindex + PISS;
-    events_change.push_back(eventindex_real);
+    events_change.push_back(std::pair<int,int>(eventindex_real,eventindex_real+76));
 
     CopyAddInt32(&Stream, &OutStream, 0, 3);   //bbmin
     CopyAddInt32(&Stream, &OutStream, 0, 3);   //bbmax
@@ -632,20 +633,28 @@ if(OutStream.Position() < Stream.Position() + BytesAdded){
   return 1;
 }
 int return_to_after_events = OutStream.Position();
-  Logger::Info("Updating %zu Events\n",events_change.size());
-  for(int i = 0; i < events_change.size();i++){
-    OutStream.seek(events_change[i]+76);
-    int idx;
-    OutStream.Stream.read((char*)idx, 4);
-    idx -= TextureDiff;
-    OutStream.seek(events_change[i]+76);
-    //OutStream.Write(idx);
-    char bitch[5] = {'B','I','T','C','H'};
-    OutStream.write(bitch,5);
+int _events_change_size = events_change.size();
+  Logger::Info("Updating %d Events, returning to %i\n",_events_change_size, return_to_after_events);
+  for(int i = 0; i < _events_change_size;i++){
+    int _rtn_tmp = events_change[i].first + 76;
+    OutStream.seek(_rtn_tmp);
+    Logger::Info("here 1\n");
+    //int idx;
+    char idx[4];
+    OutStream.Stream.read(idx, 4);
+    Logger::Info("here 2\n");
+    //idx -= TextureDiff;
+    int r_idx;
+    memcpy(&r_idx,idx,4);
+    OutStream.seek(_rtn_tmp);
+    Logger::Info("here 3\n");
+    OutStream.Write(r_idx);
     Logger::Info("Updated event %d of %d\n",i+1,events_change.size());
   }
 OutStream.seek(return_to_after_events);
+int _outstream_returned_events_pos = OutStream.Position();
 
+Logger::Info("Expected position %d, is at position %d\n",return_to_after_events,_outstream_returned_events_pos);
 
 
   if(info.phy.has_value()){
@@ -654,7 +663,7 @@ OutStream.seek(return_to_after_events);
       Logger::Error("Model's phy file does not exist, please ensure %s exists, and is located in the same directory as the file\n",info.phy.value().c_str());
       return 1;
     }
-    Logger::Info("writing phy at [%d]...\n",OutStream.Position());
+    printf("writing phy at [%i]...\n",OutStream.Position());
     Dest_Header_Part2->phyOffset = OutStream.Position();
     UI::Progress.SubTask.Begin("Copying Physics Data");
     for(int i = 0; i < PhyStream.size;i++){
@@ -960,7 +969,11 @@ int NameCopy = Initial_Header->szanimblocknameindex + BytesAdded;
 
   char hello[5] = {'H','E','L','L','O'};
 
-  OutStream.write(hello,5);
+
+  OutStream.seek(0);
+  //OutStream.Stream.write(hello, 5);
+
+  //OutStream.write(hello,5);
 
   OutStream.Stream.close();
   Stream.Stream.close();

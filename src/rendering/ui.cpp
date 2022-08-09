@@ -1,6 +1,7 @@
 #include "rendering/progress.hpp"
 #include <rendering/progress.hpp>
 #include <thread>
+#include <logger.hpp>
 
 UI_PROGRESS UI::Progress;
 
