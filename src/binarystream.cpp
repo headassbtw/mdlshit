@@ -86,7 +86,7 @@ void BinaryReader::seek(int pos){
 
 BinaryWriter::BinaryWriter(const char* filename){
   _filename = filename;
-  Stream = fstream(_filename, ios::binary | ios::out | ios::in);
+  Stream = fstream(_filename, ios::binary | ios::out);
   
   struct stat results;
   if (stat(filename, &results) == 0){

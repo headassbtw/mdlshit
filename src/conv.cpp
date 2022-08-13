@@ -435,10 +435,13 @@ for(int i = 0; i < Initial_Header->numlocalseq;i++){
     CopyAddInt32(&Stream, &OutStream, 0, 1); //baseptr
     CopyAddInt32NullCheck(&Stream, &OutStream, PISS2, 1); //szlabelindex
     CopyAddInt32NullCheck(&Stream, &OutStream, PISS2, 1); //szactivitynameindex
-    CopyAddInt32(&Stream, &OutStream, 0, 4);
+
+    int eventcount; Stream.Read(&eventcount); OutStream.Write(eventcount);
+    Logger::Info("Sequence %i has %i events\n",i+1,eventcount);
+    Logger::Info("PISS: %i, PISS2: %i",PISS,PISS2);
     int eventindex; Stream.read((char*)&eventindex, 4); OutStream.Write(eventindex+PISS);
     int eventindex_real = seq_start + eventindex + PISS;
-    events_change.push_back(std::pair<int,int>(eventindex_real,eventindex_real+76));
+    events_change.push_back(std::pair<int,int>(eventindex_real,eventcount));
 
     CopyAddInt32(&Stream, &OutStream, 0, 3);   //bbmin
     CopyAddInt32(&Stream, &OutStream, 0, 3);   //bbmax
@@ -636,20 +639,24 @@ int return_to_after_events = OutStream.Position();
 int _events_change_size = events_change.size();
   Logger::Info("Updating %d Events, returning to %i\n",_events_change_size, return_to_after_events);
   for(int i = 0; i < _events_change_size;i++){
-    int _rtn_tmp = events_change[i].first + 76;
-    OutStream.seek(_rtn_tmp);
-    Logger::Info("here 1\n");
-    //int idx;
-    char idx[4];
-    OutStream.Stream.read(idx, 4);
-    Logger::Info("here 2\n");
-    //idx -= TextureDiff;
-    int r_idx;
-    memcpy(&r_idx,idx,4);
-    OutStream.seek(_rtn_tmp);
-    Logger::Info("here 3\n");
-    OutStream.Write(r_idx);
-    Logger::Info("Updated event %d of %d\n",i+1,events_change.size());
+    if(events_change[i].second <= 0){
+      Logger::Info("Skipping...           seq %d of %d\n",i+1,events_change.size());
+    }
+    else{
+      Logger::Info("Updating %i events for seq\n",events_change[i].second);
+      for(int j = 0; j < events_change[i].second; j++){
+
+        int _rtn_tmp = (events_change[i].first + 76) + (80*j);  //takes count of it, idk prevents memory issues
+        OutStream.seek(_rtn_tmp);                               //goes to it
+        char idx[4];                                            //byte array for reading
+        OutStream.Stream.read(idx, 4);                          //reads it
+        int r_idx; memcpy(&r_idx,idx,4);                        //converts from byte array to int
+        r_idx -= TextureDiff;
+        OutStream.seek(_rtn_tmp);                               //returns to where it started
+        OutStream.Write(r_idx);                                 //writes modified index
+        Logger::Info("Updated event %d of %d, seq %d of %d\n",j+1,events_change[i].second,i+1,events_change.size());
+      }
+    }
   }
 OutStream.seek(return_to_after_events);
 int _outstream_returned_events_pos = OutStream.Position();
@@ -970,7 +977,7 @@ int NameCopy = Initial_Header->szanimblocknameindex + BytesAdded;
   char hello[5] = {'H','E','L','L','O'};
 
 
-  OutStream.seek(0);
+  //OutStream.seek(0);
   //OutStream.Stream.write(hello, 5);
 
   //OutStream.write(hello,5);

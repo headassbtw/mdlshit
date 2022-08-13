@@ -1,9 +1,9 @@
 #pragma once
+#include <fstream>
 #include <string>
 #include <vector>
 
 struct Logger{
-  static FILE* LogStream;
   static void Init();
   static void Notice(const char* msg...);
   static void Info(const char* msg...);
@@ -16,5 +16,5 @@ struct LogMsg{
   std::string msg;
   int type;
 };
-
+extern std::ofstream LogStream;
 extern std::vector<LogMsg*> LoggerMessages;

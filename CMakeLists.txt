@@ -45,6 +45,7 @@ set(GLFW_BUILD_TESTS OFF)
 set(BUILD_UTILS OFF)
 
 add_library(ImGui STATIC ${IM_SRC})
+set(GLFW_LIBRARY_TYPE STATIC)
 add_subdirectory(external/glfw)
 add_subdirectory(external/glew/build/cmake)
 

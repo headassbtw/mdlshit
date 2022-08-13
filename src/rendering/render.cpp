@@ -90,37 +90,36 @@ void AboutWindow(){
 
 }
 bool BanDialog(char* err_code){
-    ImGui::SetNextWindowSize({300,20});
-    ImGui::SetNextWindowPos({(viewport_width-300)/2,(viewport_height-30)/2});
-    ImGui::Begin("Error",NULL,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
-    ImGui::Text("The Application Failed to Start. Error: %s", err_code);
-
-    ImGui::End();
+  ImGui::SetNextWindowSize({300,20});
+  ImGui::SetNextWindowPos({(viewport_width-300)/2,(viewport_height-30)/2});
+  ImGui::Begin("Error",NULL,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
+  ImGui::Text("The Application Failed to Start. Error: %s", err_code);
+  ImGui::End();
 }
 
 
 void drop_callback(GLFWwindow* window, int count, const char** paths)
 {
-    double xpos, ypos;
-    glfwGetCursorPos(window, &xpos, &ypos);
+  double xpos, ypos;
+  glfwGetCursorPos(window, &xpos, &ypos);
 
-    printf("%f %f\n", xpos, ypos);
+  printf("%f %f\n", xpos, ypos);
 
-    for (int i = 0;  i < count;  i++){
-        for(int j = 0; j < files.size();j++){
-            if(
-                files[j]->bounds.x <= xpos &&
-                files[j]->bounds.z >= xpos &&
-                files[j]->bounds.y <= ypos &&
-                files[j]->bounds.w >= ypos
-                ){
-                    strcpy(files[j]->BoxBuffer, paths[i]);
-                    blocked = true;
-                    for(auto f : files)
-                        f->errors.clear();
-                }
+  for (int i = 0;  i < count;  i++){
+    for(int j = 0; j < files.size();j++){
+      if(
+        files[j]->bounds.x <= xpos &&
+        files[j]->bounds.z >= xpos &&
+        files[j]->bounds.y <= ypos &&
+        files[j]->bounds.w >= ypos
+        ){
+          strcpy(files[j]->BoxBuffer, paths[i]);
+          blocked = true;
+          for(auto f : files)
+            f->errors.clear();
         }
     }
+  }
     
 }
 
@@ -169,8 +168,6 @@ void depth_border(){
     float th = 1;
     bg->AddRectFilled(ImVec2(bounds.x+th, bounds.y+th), ImVec2(bounds.z-th, bounds.w-th), col);
     //bg->AddRect(ImVec2(bounds.x+th, bounds.y+th), ImVec2(bounds.z-th, bounds.w-th), col, 0.0f, ImDrawFlags_None, th*2);      x += sz + spacing;  // Square with all rounded corners
-
-
 }
 
 
@@ -198,27 +195,27 @@ void RenderGUI(){
     {
         if (ImGui::BeginMenu("File"))
         {
-            if (ImGui::MenuItem("Quit", "ALT+F4")) {
-                glfwSetWindowShouldClose(Window, true);
-            }
-            ImGui::EndMenu();
+          if (ImGui::MenuItem("Quit", "ALT+F4")) {
+            glfwSetWindowShouldClose(Window, true);
+          }
+          ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Debug"))
         {
-            ImGui::MenuItem("Show Demo Window", "", &demoWindow);
-            if(ImGui::MenuItem("Show Log Output", "", &console)){
-                printf("Button pressed\n");
-                if(console){
-                    glfwSetWindowSizeLimits(Window, 500, 700, GLFW_DONT_CARE, GLFW_DONT_CARE);
-                    if(viewport_height<700)
-                    glfwSetWindowSize(Window,viewport_width,700);
-                }
-                else{
-                    glfwSetWindowSizeLimits(Window, 500, 500, GLFW_DONT_CARE, GLFW_DONT_CARE);
-                    glfwSetWindowSize(Window,viewport_width,viewport_height);
-                }
+          ImGui::MenuItem("Show Demo Window", "", &demoWindow);
+          if(ImGui::MenuItem("Show Log Output", "", &console)){
+            printf("Button pressed\n");
+            if(console){
+              glfwSetWindowSizeLimits(Window, 500, 700, GLFW_DONT_CARE, GLFW_DONT_CARE);
+            if(viewport_height<700)
+              glfwSetWindowSize(Window,viewport_width,700);
             }
-            ImGui::EndMenu();
+            else{
+              glfwSetWindowSizeLimits(Window, 500, 500, GLFW_DONT_CARE, GLFW_DONT_CARE);
+              glfwSetWindowSize(Window,viewport_width,viewport_height);
+            }
+          }
+          ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Help"))
         {
@@ -244,24 +241,24 @@ void RenderGUI(){
     ImGui::Separator();
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{0.0f,0.0f});
     ImGui::BeginChild("##ConvertSmol", {0,0},false);
-    ImGui::Checkbox("Override Attachments", &override_attachments);
-    if(override_attachments) ImGui::InputInt("##Attachments", &attachments);
-    ImGui::Checkbox("Override Sequences", &override_sequences);
-    if(override_sequences) ImGui::InputInt("##Sequences", &sequences);
-    ImGui::Checkbox("Override Animations", &override_animations);
-    if(override_animations) ImGui::InputInt("##Animations", &animations);
-    ImGui::Checkbox("Override Flags", &override_flags);
-    if(override_flags) ImGui::InputInt("##Flags", &flags);
+    ImGui::Checkbox("Override Attachments",                   &override_attachments );
+    if(override_attachments) ImGui::InputInt("##Attachments", &attachments          );
+    ImGui::Checkbox("Override Sequences",                     &override_sequences   );
+    if(override_sequences)   ImGui::InputInt("##Sequences",   &sequences            );
+    ImGui::Checkbox("Override Animations",                    &override_animations  );
+    if(override_animations)  ImGui::InputInt("##Animations",  &animations           );
+    ImGui::Checkbox("Override Flags",                         &override_flags       );
+    if(override_flags)       ImGui::InputInt("##Flags",       &flags                );
     ImGui::Text("Disable Conversions");
     ImGui::Separator();
-    ImGui::Checkbox("Bones", &fileinfo.disable_bones);
-    ImGui::Checkbox("Attachments", &fileinfo.disable_attachments);
-    ImGui::Checkbox("Hitbox Sets", &fileinfo.disable_hitboxsets);
-    ImGui::Checkbox("Animations", &fileinfo.disable_animations);
-    ImGui::Checkbox("Sequences", &fileinfo.disable_sequences);
-    ImGui::Checkbox("Body Parts", &fileinfo.disable_bodyparts);
-    ImGui::Checkbox("Include Models", &fileinfo.disable_includemodels);
-    ImGui::Checkbox("Textures", &fileinfo.disable_textures);
+    ImGui::Checkbox("Bones",            &fileinfo.disable_bones         );
+    ImGui::Checkbox("Attachments",      &fileinfo.disable_attachments   );
+    ImGui::Checkbox("Hitbox Sets",      &fileinfo.disable_hitboxsets    );
+    ImGui::Checkbox("Animations",       &fileinfo.disable_animations    );
+    ImGui::Checkbox("Sequences",        &fileinfo.disable_sequences     );
+    ImGui::Checkbox("Body Parts",       &fileinfo.disable_bodyparts     );
+    ImGui::Checkbox("Include Models",   &fileinfo.disable_includemodels );
+    ImGui::Checkbox("Textures",         &fileinfo.disable_textures      );
 
     ImGui::EndChild();
     ImGui::PopStyleVar(1);
@@ -294,9 +291,7 @@ void RenderGUI(){
                 case Success:
                     col = {0.0,1.0,0.0,1.0}; break;
                 }
-
-
-            ImGui::TextColored(col, "%s", e.message.c_str());
+                ImGui::TextColored(col, "%s", e.message.c_str());
             }
             ImGui::TreePop();
         }
@@ -309,51 +304,50 @@ void RenderGUI(){
     
     ImGui::EndChild();
     if(ImGui::Button("Check",{(viewport_width/2.0f) - 10,24})){
-        int total = 0;
-        int bad = 0;
-        int good = 0;
-        for(auto f : files){
-            f->errors.clear();
-        }
-        files[0]->errors = Tests::TestMDL(files[0]->BoxBuffer);
-        files[2]->errors = Tests::TestVVD(files[2]->BoxBuffer);
+      int total = 0;
+      int bad = 0;
+      int good = 0;
+      for(auto f : files){
+        f->errors.clear();
+      }
+      files[0]->errors = Tests::TestMDL(files[0]->BoxBuffer);
+      files[2]->errors = Tests::TestVVD(files[2]->BoxBuffer);
 
-        bool _block;
-        for(auto f : files){
-        if(f->isEnabled)
-            for(Error e: f->errors){
-                total++;
-                if(e.type == Blocking){
-                    bad++;
-                    _block = true;
-                }
-                else{
-                    good++;
-                }
-            }
+      bool _block;
+      for(auto f : files){
+      if(f->isEnabled)
+        for(Error e: f->errors){
+          total++;
+          if(e.type == Blocking){
+            bad++;
+            _block = true;
+          }
+          else{
+            good++;
+          }
         }
-        if(_block) blocked = true;
-        else blocked = false;
+      }
+      if(_block) blocked = true;
+      else blocked = false;
 
-        if(blocked){
-            Logger::Error("Conversion blocked, not all criteria met!\n");
-        }
-        Logger::Notice("%i good, %i bad, %i total\n",good,bad,total);
+      if(blocked){
+        Logger::Error("Conversion blocked, not all criteria met!\n");
+      }
+      Logger::Notice("%i good, %i bad, %i total\n",good,bad,total);
     }
 
     //ImGui::BeginDisabled(blocked);
     static bool popup = false;
-    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
+    ImGui::PushStyleColor(ImGuiCol_Button,        (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive,  (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
     if(ImGui::Button("Convert [OVERRIDEN]",{(viewport_width/2.0f) - 10,24})){
-        
-        fileinfo.mdl = files[0]->BoxBuffer;
+        Logger::Debug("Starting conversion\n");
+                                fileinfo.mdl = files[0]->BoxBuffer;
         if(files[1]->isEnabled) fileinfo.vtx = files[1]->BoxBuffer;
         if(files[2]->isEnabled) fileinfo.vvd = files[2]->BoxBuffer;
         if(files[3]->isEnabled) fileinfo.phy = files[3]->BoxBuffer;
         fileinfo.out = rn(files[0]->BoxBuffer,"conv");
-        Logger::Debug("Destination file set to \"%s\"\n",fileinfo.out->c_str());
 
         if(override_attachments) fileinfo.attachment_override =  attachments;
         if(override_sequences) fileinfo.sequence_override =  sequences;
@@ -361,8 +355,10 @@ void RenderGUI(){
         if(override_flags) fileinfo.flags_override =  flags;
 
         ImGui::OpenPopup("Status##ConvertModal");
+        Logger::Debug("Spinning up conversion thread\n");
         std::thread fp(Convert,0);
         fp.detach();
+        Logger::Debug("Conversion thread detached\n");
     }
     ImGui::PopStyleColor(3);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize,0.0f);
@@ -452,7 +448,7 @@ void RenderGUI(){
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{0,0});
             if(ImGui::BeginTabBar("AboutTabs",ImGuiTabBarFlags_None)){
                 if(ImGui::BeginTabItem("About")){
-                  ImGui::Image((void*)(intptr_t)GRUNT_POG, {pog_size.x/3.5f,pog_size.y/3.5f});
+                  ImGui::Image((void*)(intptr_t)GRUNT_POG, {pog_size.x/3.0f,pog_size.y/3.0f});
                   ImGui::SameLine();
                   ImGui::BeginGroup();
                   ImGui::Text("MDLSHIT");
@@ -469,13 +465,9 @@ void RenderGUI(){
                               "",
                               #endif
                               __VERSION__);
-                  if (ImGui::TreeNode("Graphics Info"))
-                  {
-                    ImGui::Text("OpenGL Version: %s",glGetString(GL_VERSION));
-                    ImGui::Text("GPU: %s",glGetString(GL_RENDERER));
-                    ImGui::Text("FPS: %f",ImGui::GetIO().Framerate);
-                    ImGui::TreePop();
-                  }
+                  ImGui::Text("OpenGL Version: %s",glGetString(GL_VERSION));
+                  ImGui::Text("GPU: %s",glGetString(GL_RENDERER));
+                  ImGui::Text("FPS: %f",ImGui::GetIO().Framerate);
                   ImGui::EndGroup();
 
                   ImGui::EndTabItem();
@@ -506,6 +498,14 @@ void RenderGUI(){
                 if(ImGui::BeginTabItem("Special Thanks")){
                     ImGui::BulletText("Mental Illness");
                     ImGui::BulletText("ß");
+                    ImGui::BulletText("Destiny 2 addiction");
+                    ImGui::BulletText("Sleep deprivation");
+                    ImGui::BulletText(""); ImGui::SameLine();
+                    if(ImGui::SmallButton("Spotify adblock##Spotify_adblock_GH")){
+                      OpenLink("https://github.com/abba23/spotify-adblock");
+                    }
+                    ImGui::BulletText("Embed perms in northstar general");
+                    ImGui::BulletText("I AM THE STORM THAT IS APPROOOOOOOOOOOOOOOOOOOOOOOOOOACHIIIIIIIIIIIIIIIIIIIIIING");
                     ImGui::EndTabItem();
                 }
                 ImGui::EndTabBar();
