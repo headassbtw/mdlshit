@@ -67,8 +67,8 @@ void CopySetFloat32(BinaryReader* reader, BinaryWriter* writer, float set, int c
         writer->Write(set);
     }
 }
-string h(const char* file, const char* ext){
-  string yo = string(file);
+std::string h(const char* file, const char* ext){
+  std::string yo = std::string(file);
   auto dot = yo.find_last_of('.');
   yo.resize(dot);
   yo.append(".");
@@ -77,7 +77,7 @@ string h(const char* file, const char* ext){
 }
 void filler(BinaryReader* reader, BinaryWriter* writer, int count){
   for(int i = 0;i < count;i++){
-    byte tmp;
+    std::byte tmp;
     reader->Read(&tmp);
     writer->Write(tmp);
   }
@@ -423,9 +423,9 @@ Dest_Header->localseqindex = OutStream.Position();
 UI::Progress.SubTask.Begin("Converting Sequences");
 for(int i = 0; i < Initial_Header->numlocalseq;i++){
   if(info.disable_sequences){
-    char ßtruct[212];
-    Stream.Stream.read(ßtruct,212);
-    OutStream.Stream.write(ßtruct,212);
+    char sstruct[212];
+    Stream.Stream.read(sstruct,212);
+    OutStream.Stream.write(sstruct,212);
   }
   else{
     int PISS = (20*(Initial_Header->numlocalseq - i));
@@ -435,11 +435,14 @@ for(int i = 0; i < Initial_Header->numlocalseq;i++){
     CopyAddInt32(&Stream, &OutStream, 0, 1); //baseptr
     CopyAddInt32NullCheck(&Stream, &OutStream, PISS2, 1); //szlabelindex
     CopyAddInt32NullCheck(&Stream, &OutStream, PISS2, 1); //szactivitynameindex
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //flags
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //flags
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //flags
 
     int eventcount; Stream.Read(&eventcount); OutStream.Write(eventcount);
     Logger::Info("Sequence %i has %i events\n",i+1,eventcount);
-    Logger::Info("PISS: %i, PISS2: %i",PISS,PISS2);
-    int eventindex; Stream.read((char*)&eventindex, 4); OutStream.Write(eventindex+PISS);
+    Logger::Info("PISS: %i, PISS2: %i\n",PISS,PISS2);
+    int eventindex; Stream.Read(&eventindex); OutStream.Write(eventindex+PISS);
     int eventindex_real = seq_start + eventindex + PISS;
     events_change.push_back(std::pair<int,int>(eventindex_real,eventcount));
 
@@ -468,7 +471,9 @@ for(int i = 0; i < Initial_Header->numlocalseq;i++){
     CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //autolayerindex
     CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //weightlistindex
     CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //posekeyindex
-    CopyAddInt32(&Stream, &OutStream, 0, 3);
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //pPoseKey
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //PoseKey
+    CopyAddInt32(&Stream, &OutStream, 0, 1); //numiklocks
     CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //iklockindex
     CopyAddInt32NullCheck(&Stream, &OutStream, PISS, 1); //keyvalueindex
     CopyAddInt32(&Stream, &OutStream, 0, 1); //keyvaluesize
@@ -477,14 +482,14 @@ for(int i = 0; i < Initial_Header->numlocalseq;i++){
     Stream.read((char*)&unused, 20);
     OutStream.Write(0); //activityModifierOffset
     OutStream.Write(0); //activityModifierCount
+    //CopyAddInt32(&Stream, &OutStream, 0, 1); //activityModifierOffset
+    //CopyAddInt32(&Stream, &OutStream, 0, 1); //activityModifierCount
     OutStream.write((char*)&unused, 20);
     OutStream.Write(0);
     OutStream.Write(0);
     OutStream.Write(0);
     BytesAdded += 20;
     int return_idx = OutStream.Position();
-
-
   }
   Logger::Notice("Converted sequence %d of %d\n",i+1,Initial_Header->numlocalseq);
   UI::Progress.SubTask.Update((i+1.0f)/(float)Initial_Header->numlocalseq);
@@ -635,7 +640,7 @@ if(OutStream.Position() < Stream.Position() + BytesAdded){
   Logger::Critical("(%d vs %d)\n",OutStream.Position(),Stream.Position() + BytesAdded);
   return 1;
 }
-int return_to_after_events = OutStream.Position();
+int return_to_after_events = OutStream.Position();              //takes note of where we were
 int _events_change_size = events_change.size();
   Logger::Info("Updating %d Events, returning to %i\n",_events_change_size, return_to_after_events);
   for(int i = 0; i < _events_change_size;i++){
@@ -645,21 +650,23 @@ int _events_change_size = events_change.size();
     else{
       Logger::Info("Updating %i events for seq\n",events_change[i].second);
       for(int j = 0; j < events_change[i].second; j++){
-
         int _rtn_tmp = (events_change[i].first + 76) + (80*j);  //takes count of it, idk prevents memory issues
         OutStream.seek(_rtn_tmp);                               //goes to it
         char idx[4];                                            //byte array for reading
         OutStream.Stream.read(idx, 4);                          //reads it
         int r_idx; memcpy(&r_idx,idx,4);                        //converts from byte array to int
-        r_idx -= TextureDiff;
+        r_idx -= (r_idx == 0)?0:TextureDiff;                    //Updates the idx, inline if statement for null check
         OutStream.seek(_rtn_tmp);                               //returns to where it started
         OutStream.Write(r_idx);                                 //writes modified index
+
         Logger::Info("Updated event %d of %d, seq %d of %d\n",j+1,events_change[i].second,i+1,events_change.size());
+        int _currentWritePos = OutStream.Position();
+        Logger::Info("File is writing at %i\n",_currentWritePos);
       }
     }
   }
-OutStream.seek(return_to_after_events);
-int _outstream_returned_events_pos = OutStream.Position();
+OutStream.seek(return_to_after_events);                         //returns to where we were
+int _outstream_returned_events_pos = OutStream.Position();      //verifies
 
 Logger::Info("Expected position %d, is at position %d\n",return_to_after_events,_outstream_returned_events_pos);
 
