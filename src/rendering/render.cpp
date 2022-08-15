@@ -512,25 +512,33 @@ void RenderGUI(){
                   ImGui::BulletText("headassbtw");
                   ImGui::TextColored({1.0,0.8,0.8,1.0},"Research");
                   ImGui::BulletText("MasterLiberty");
-                  ImGui::BulletText("Rika");
                   ImGui::EndTabItem();
                 }
                 if(ImGui::BeginTabItem("Special Thanks")){
                   ImGui::BulletText("Mental Illness");
-                  ImGui::BulletText("ß");
                   ImGui::BulletText("Destiny 2 addiction");
                   ImGui::BulletText("Sleep deprivation");
                   ImGui::BulletText(""); ImGui::SameLine();
                   if(ImGui::SmallButton("Spotify adblock##Spotify_adblock_GH")){
                     OpenLink("https://github.com/abba23/spotify-adblock");
                   }
+                  ImGui::BulletText("foobar2000 (my internet went out)");
                   ImGui::BulletText("Embed perms in northstar general");
                   ImGui::BulletText("I AM THE STORM THAT IS APPROOOOOOOOOOOOOOOOOOOOOOOOOOACHIIIIIIIIIIIIIIIIIIIIIING");
                   ImGui::BulletText("Improvised munitions handbook");
                   ImGui::BulletText(""); ImGui::SameLine(); ImGui::Image((void*)(intptr_t)Klules_Img, {13,13});
+                  if (ImGui::IsItemHovered())
+                  {
+                    ImGui::BeginTooltip();
+                    ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+                    ImGui::TextWrapped("YOU THOUGHT I WAS LIMITED\nTO JUST TEXT, HUH?");
+                    ImGui::PopTextWrapPos();
+                    ImGui::EndTooltip();
+                  }
                   ImGui::EndTabItem();
+
                 }
-                ImGui::EndTabBar();
+              ImGui::EndTabBar();
             }
             ImGui::PopStyleVar();
             
