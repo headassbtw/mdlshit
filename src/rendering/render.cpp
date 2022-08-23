@@ -89,16 +89,6 @@ void OpenLink(const char* site){
 void AboutWindow(){
 
 }
-bool BanDialog(char* err_code){
-  ImGui::SetNextWindowSize({300,20});
-  ImGui::SetNextWindowPos({(viewport_width-300)/2,(viewport_height-30)/2});
-  ImGui::Begin("Error",NULL,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
-  ImGui::Text("The Application Failed to Start. Error: %s", err_code);
-  ImGui::End();
-
-  return false;
-}
-
 
 void drop_callback(GLFWwindow* window, int count, const char** paths)
 {
@@ -144,7 +134,7 @@ void Convert(int a){
 }
 
 
-GLuint GRUNT_POG;
+GLuint GRUNT_POG, Klules_Img;
 ImVec2 pog_size;
 
 
@@ -466,7 +456,13 @@ void RenderGUI(){
                               #elif __APPLE__
                               "",
                               #endif
-                              "hi");
+                              #if _MSC_VER
+                              "MSVC",
+                              _MSC_VER
+                              #else
+                              __VERSION__
+                              #endif
+                              );
                   ImGui::Text("OpenGL Version: %s",glGetString(GL_VERSION));
                   ImGui::Text("GPU: %s",glGetString(GL_RENDERER));
                   ImGui::Text("FPS: %f",ImGui::GetIO().Framerate);
@@ -497,19 +493,38 @@ void RenderGUI(){
                     }
                     ImGui::EndTabItem();
                 }
-                if(ImGui::BeginTabItem("Special Thanks")){
-                    ImGui::BulletText("Mental Illness");
-                    ImGui::BulletText("ß");
-                    ImGui::BulletText("Destiny 2 addiction");
-                    ImGui::BulletText("Sleep deprivation");
-                    ImGui::BulletText(""); ImGui::SameLine();
-                    if(ImGui::SmallButton("Spotify adblock##Spotify_adblock_GH")){
-                      OpenLink("https://github.com/abba23/spotify-adblock");
-                    }
-                    ImGui::BulletText("Embed perms in northstar general");
-                    ImGui::BulletText("I AM THE STORM THAT IS APPROOOOOOOOOOOOOOOOOOOOOOOOOOACHIIIIIIIIIIIIIIIIIIIIIING");
-                    ImGui::EndTabItem();
+              if(ImGui::BeginTabItem("Contrubutors")){
+
+                ImGui::TextColored({1.0,0.8,0.8,1.0},"Programming");
+                ImGui::BulletText("headassbtw");
+                ImGui::BulletText("MasterLiberty");
+                ImGui::TextColored({1.0,0.8,0.8,1.0},"Research");
+                ImGui::BulletText("MasterLiberty");
+                ImGui::EndTabItem();
+              }
+              if(ImGui::BeginTabItem("Special Thanks")){
+                ImGui::BulletText("Mental Illness");
+                ImGui::BulletText("Destiny 2 addiction");
+                ImGui::BulletText("Sleep deprivation");
+                ImGui::BulletText(""); ImGui::SameLine();
+                if(ImGui::SmallButton("Spotify adblock##Spotify_adblock_GH")){
+                  OpenLink("https://github.com/abba23/spotify-adblock");
                 }
+                ImGui::BulletText("foobar2000 (my internet went out)");
+                ImGui::BulletText("Embed perms in northstar general");
+                ImGui::BulletText("I AM THE STORM THAT IS APPROOOOOOOOOOOOOOOOOOOOOOOOOOACHIIIIIIIIIIIIIIIIIIIIIING");
+                ImGui::BulletText("Improvised munitions handbook");
+                ImGui::BulletText(""); ImGui::SameLine(); ImGui::Image((void*)(intptr_t)Klules_Img, {13,13});
+                if (ImGui::IsItemHovered())
+                {
+                  ImGui::BeginTooltip();
+                  ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+                  ImGui::TextWrapped("YOU THOUGHT I WAS LIMITED\nTO JUST TEXT, HUH?");
+                  ImGui::PopTextWrapPos();
+                  ImGui::EndTooltip();
+                }
+                ImGui::EndTabItem();
+              }
                 ImGui::EndTabBar();
             }
             ImGui::PopStyleVar();
@@ -535,15 +550,11 @@ void callback_name(GLFWwindow* window, int xpos, int ypos){
 }
 
 
-int UI::Run(bool banned, char* banreason){
+int UI::Run(){
     viewport_height = WINDOW_HEIGHT; viewport_width = WINDOW_WIDTH;
     glewExperimental = true;
     if(!glfwInit()){
         fprintf(stderr, "Could not initialize GLFW\n");
-    }
-    if(banned){
-        viewport_width = 400;
-        viewport_height = 80;
     }
 
 
@@ -557,7 +568,9 @@ int UI::Run(bool banned, char* banreason){
     int ix,iy, channels;    
 
     GLFWimage images[1];
+    int klules_width, klules_height;
     auto grunt_pog = stbi_load_from_memory(Resources::Grunt, 380291, &images[0].width, &images[0].height, 0, 4);
+    auto klules = stbi_load_from_memory(Resources::Klules, 4067, &klules_width, &klules_height, 0, 4);
 
     images[0].pixels = grunt_pog;
 
@@ -587,24 +600,29 @@ int UI::Run(bool banned, char* banreason){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // Same
 
     // Upload pixels into texture
-#if defined(GL_UNPACK_ROW_LENGTH) && !defined(__EMSCRIPTEN__)
+    #if defined(GL_UNPACK_ROW_LENGTH) && !defined(__EMSCRIPTEN__)
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-#endif
+    #endif
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, images[0].width, images[0].height, 0, GL_RGBA, GL_UNSIGNED_BYTE, grunt_pog);
     pog_size.x = images[0].width;
     pog_size.y = images[0].height;
 
+  glGenTextures(1, &Klules_Img);
+  glBindTexture(GL_TEXTURE_2D, Klules_Img);
 
-    
+  // Setup filtering parameters for display
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // This is required on WebGL for non power-of-two textures
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // Same
 
-    if(banned)
-    {
-      glfwSetWindowSizeLimits(Window, 400, 80, 400, 80);
-    }
-    else
-    {
-      glfwSetWindowSizeLimits(Window, 500, 500, GLFW_DONT_CARE, GLFW_DONT_CARE);
-    }
+  // Upload pixels into texture
+  #if defined(GL_UNPACK_ROW_LENGTH) && !defined(__EMSCRIPTEN__)
+  glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+  #endif
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, klules_width, klules_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, klules);
+
+    glfwSetWindowSizeLimits(Window, 500, 500, GLFW_DONT_CARE, GLFW_DONT_CARE);
     glfwSetWindowIcon(Window, 1, images);
 
     stbi_image_free(grunt_pog);
@@ -693,18 +711,13 @@ hasBrowser = true;
         ImGui::NewFrame();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glfwPollEvents();
-        if(banned){
-          BanDialog(banreason);
-        }
-        else{
-          Errors.clear();
-          for(auto f : files){
-            for(auto e : f->errors){
-              Errors.push_back(e);
-            }
+        Errors.clear();
+        for(auto f : files){
+          for(auto e : f->errors){
+            Errors.push_back(e);
           }
-          RenderGUI();
         }
+        RenderGUI();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)

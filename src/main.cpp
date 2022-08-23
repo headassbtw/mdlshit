@@ -2,7 +2,6 @@
 #include <cstdio>
 #include "conv.hpp"
 #include "structs.hpp"
-#include "blacklist.hpp"
 #include <cstdlib>
 #include <cstring>
 #include <argtools.hpp>
@@ -50,15 +49,13 @@ int main(int argc, char *argv[]) {
   #else
   "Other",
   #endif
-  "hi");
-
-  bool ban;
-  char* error_out;
-
-  ban = CheckBlacklist(error_out);
-
-  
-
+  #if _MSC_VER
+  "MSVC",
+  _MSC_VER
+  #else
+  __VERSION__
+  #endif
+  );
 
   if(cmdOptionExists(argv,argv+argc,"--help")){
     Logger::Info("mdlshit:\n");
@@ -104,6 +101,6 @@ int main(int argc, char *argv[]) {
     return Conversion::ReadHeader(inf);
   }
   else{
-    return UI::Run(ban, error_out);
+    return UI::Run();
   }
 }
