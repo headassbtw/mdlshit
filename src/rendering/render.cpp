@@ -89,13 +89,6 @@ void OpenLink(const char* site){
 void AboutWindow(){
 
 }
-bool BanDialog(char* err_code){
-  ImGui::SetNextWindowSize({300,20});
-  ImGui::SetNextWindowPos({(viewport_width-300)/2,(viewport_height-30)/2});
-  ImGui::Begin("Error",NULL,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
-  ImGui::Text("The Application Failed to Start. Error: %s", err_code);
-  ImGui::End();
-}
 
 
 void drop_callback(GLFWwindow* window, int count, const char** paths)
@@ -563,15 +556,11 @@ void callback_name(GLFWwindow* window, int xpos, int ypos){
 }
 
 
-int UI::Run(bool banned, char* banreason){
+int UI::Run(){
     viewport_height = WINDOW_HEIGHT; viewport_width = WINDOW_WIDTH;
     glewExperimental = true;
     if(!glfwInit()){
         fprintf(stderr, "Could not initialize GLFW\n");
-    }
-    if(banned){
-        viewport_width = 400;
-        viewport_height = 80;
     }
 
 
@@ -645,14 +634,7 @@ int UI::Run(bool banned, char* banreason){
 
     
 
-    if(banned)
-    {
-      glfwSetWindowSizeLimits(Window, 400, 80, 400, 80);
-    }
-    else
-    {
-      glfwSetWindowSizeLimits(Window, 500, 500, GLFW_DONT_CARE, GLFW_DONT_CARE);
-    }
+    glfwSetWindowSizeLimits(Window, 500, 500, GLFW_DONT_CARE, GLFW_DONT_CARE);
     glfwSetWindowIcon(Window, 1, images);
 
     stbi_image_free(grunt_pog);
@@ -741,18 +723,13 @@ hasBrowser = true;
         ImGui::NewFrame();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glfwPollEvents();
-        if(banned){
-          BanDialog(banreason);
-        }
-        else{
-          Errors.clear();
-          for(auto f : files){
-            for(auto e : f->errors){
-              Errors.push_back(e);
-            }
+        Errors.clear();
+        for(auto f : files){
+          for(auto e : f->errors){
+            Errors.push_back(e);
           }
-          RenderGUI();
         }
+        RenderGUI();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)

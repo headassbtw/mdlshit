@@ -2,7 +2,6 @@
 #include <cstdio>
 #include "conv.hpp"
 #include "structs.hpp"
-#include "blacklist.hpp"
 #include <cstdlib>
 #include <cstring>
 #include <argtools.hpp>
@@ -51,10 +50,6 @@ int main(int argc, char *argv[]) {
   #endif
   __VERSION__);
 
-  bool ban;
-  char* error_out;
-
-  ban = CheckBlacklist(error_out);
 
   
 
@@ -103,6 +98,6 @@ int main(int argc, char *argv[]) {
     return Conversion::ReadHeader(inf);
   }
   else{
-    return UI::Run(ban, error_out);
+    return UI::Run();
   }
 }
