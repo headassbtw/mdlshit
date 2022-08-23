@@ -24,6 +24,7 @@ file(GLOB IM_SRC CONFIGURE_DEPENDS
 )
 include(generate_product_version)
 
+
 set(APP_COPYRIGHT "MasterLiberty & headassbtw (C) Copyright 2022") #2678 for shitpost
 set(APP_NAME "Titanfall 2 .MDL converter")
 set(APP_INFOSTRING "Fuck you Respawn!")
@@ -35,9 +36,9 @@ generate_product_version(
    ORIGINAL_FILENAME "mdlshit.exe"
    COMPANY_COPYRIGHT ${APP_COPYRIGHT}
    INTERNAL_NAME "fucking bitch ass model converter"
-   VERSION_MAJOR 4
-   VERSION_MINOR 20
-   VERSION_PATCH 69
+   VERSION_MAJOR 1
+   VERSION_MINOR 0
+   VERSION_PATCH 0
 )
 set(GLFW_BUILD_EXAMPLES OFF)
 set(GLFW_BUILD_DOCS OFF)

@@ -319,8 +319,7 @@ void RenderGUI(){
           }
         }
       }
-      if(_block) blocked = true;
-      else blocked = false;
+      blocked = (good < total);
 
       if(blocked){
         Logger::Error("Conversion blocked, not all criteria met!\n");
@@ -328,12 +327,14 @@ void RenderGUI(){
       Logger::Notice("%i good, %i bad, %i total\n",good,bad,total);
     }
 
-    //ImGui::BeginDisabled(blocked);
+    ImGui::BeginDisabled(blocked);
     static bool popup = false;
-    ImGui::PushStyleColor(ImGuiCol_Button,        (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive,  (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
-    if(ImGui::Button("Convert [OVERRIDEN]",{(viewport_width/2.0f) - 10,24})){
+    if(!blocked){
+      ImGui::PushStyleColor(ImGuiCol_Button,        (ImVec4)ImColor::HSV(0.0f, 0.0f, 0.6f));
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.0f, 0.7f));
+      ImGui::PushStyleColor(ImGuiCol_ButtonActive,  (ImVec4)ImColor::HSV(0.0f, 0.0f, 0.8f));
+    }
+    if(ImGui::Button("Convert",{(viewport_width/2.0f) - 10,24})){
         Logger::Debug("Starting conversion\n");
                                 fileinfo.mdl = files[0]->BoxBuffer;
         if(files[1]->isEnabled) fileinfo.vtx = files[1]->BoxBuffer;
@@ -352,7 +353,7 @@ void RenderGUI(){
         fp.detach();
         Logger::Debug("Conversion thread detached\n");
     }
-    ImGui::PopStyleColor(3);
+    if(!blocked) ImGui::PopStyleColor(3);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize,0.0f);
 
     if(ImGui::BeginPopupModal("Status##ConvertModal",NULL,ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)){
@@ -385,8 +386,11 @@ void RenderGUI(){
     }
     ImGui::PopStyleVar();
 
-    //ImGui::EndDisabled();
+    ImGui::EndDisabled();
     ImGui::EndGroup();
+
+    //uncomment this if tests break again
+    /*
     if (ImGui::IsItemHovered())
     {
         ImGui::BeginTooltip();
@@ -395,6 +399,7 @@ void RenderGUI(){
         ImGui::PopTextWrapPos();
         ImGui::EndTooltip();
     }
+    */
 
 
     if(console){
@@ -493,6 +498,14 @@ void RenderGUI(){
                     }
                     ImGui::EndTabItem();
                 }
+              if(ImGui::BeginTabItem("Patch Notes")){
+
+                ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
+                ImGui::TextColored({1.0,0.8,0.8,1.0},"1.0.0");
+                ImGui::PopFont();
+                ImGui::BulletText("Initial Release!");
+                ImGui::EndTabItem();
+              }
               if(ImGui::BeginTabItem("Contrubutors")){
 
                 ImGui::TextColored({1.0,0.8,0.8,1.0},"Programming");
@@ -500,6 +513,7 @@ void RenderGUI(){
                 ImGui::BulletText("MasterLiberty");
                 ImGui::TextColored({1.0,0.8,0.8,1.0},"Research");
                 ImGui::BulletText("MasterLiberty");
+                ImGui::BulletText("Rika");
                 ImGui::EndTabItem();
               }
               if(ImGui::BeginTabItem("Special Thanks")){
