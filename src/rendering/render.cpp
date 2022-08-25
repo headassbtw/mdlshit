@@ -195,8 +195,8 @@ void RenderGUI(){
         if (ImGui::BeginMenu("Debug"))
         {
           ImGui::MenuItem("Show Demo Window", "", &demoWindow);
+          /*
           if(ImGui::MenuItem("Show Log Output", "", &console)){
-            printf("Button pressed\n");
             if(console){
               glfwSetWindowSizeLimits(Window, 500, 700, GLFW_DONT_CARE, GLFW_DONT_CARE);
             if(viewport_height<700)
@@ -207,6 +207,7 @@ void RenderGUI(){
               glfwSetWindowSize(Window,viewport_width,viewport_height);
             }
           }
+           */
           ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Help"))
