@@ -70,6 +70,44 @@ void BinaryReader::Read(Vector* data){
   Stream.read((char*)&data->z, sizeof(float));
   //printf("read a Vector\n");
 }
+void BinaryReader::Read(Vector3* data) {
+    Stream.read((char*)&data->x, sizeof(float));
+    Stream.read((char*)&data->y, sizeof(float));
+    Stream.read((char*)&data->z, sizeof(float));
+    //printf("read a Vector\n");
+}
+
+void BinaryReader::Read(RadianEuler* data) {
+    Stream.read((char*)&data->x, sizeof(float));
+    Stream.read((char*)&data->y, sizeof(float));
+    Stream.read((char*)&data->z, sizeof(float));
+    //printf("read a Vector\n");
+}
+
+void BinaryReader::Read(matrix3x4_t* data) {
+    Stream.read((char*)&data->c0r0, sizeof(float));
+    Stream.read((char*)&data->c1r0, sizeof(float));
+    Stream.read((char*)&data->c2r0, sizeof(float));
+    Stream.read((char*)&data->c3r0, sizeof(float));
+
+    Stream.read((char*)&data->c0r1, sizeof(float));
+    Stream.read((char*)&data->c1r1, sizeof(float));
+    Stream.read((char*)&data->c2r1, sizeof(float));
+    Stream.read((char*)&data->c3r1, sizeof(float));
+
+    Stream.read((char*)&data->c0r2, sizeof(float));
+    Stream.read((char*)&data->c1r2, sizeof(float));
+    Stream.read((char*)&data->c2r2, sizeof(float));
+    Stream.read((char*)&data->c3r2, sizeof(float));
+}
+
+void BinaryReader::Read(Quaternion* data) {
+    Stream.read((char*)&data->one, sizeof(float));
+    Stream.read((char*)&data->i, sizeof(float));
+    Stream.read((char*)&data->j, sizeof(float));
+    Stream.read((char*)&data->k, sizeof(float));
+    //printf("read a Vector\n");
+}
 
 
 void BinaryReader::seek(int pos){
@@ -138,7 +176,39 @@ void BinaryWriter::Write(Vector data){
   Stream.write((char*)&data.y, sizeof(float));
   Stream.write((char*)&data.z, sizeof(float));
 }
+void BinaryWriter::Write(Vector3 data) {
+    Stream.write((char*)&data.x, sizeof(float));
+    Stream.write((char*)&data.y, sizeof(float));
+    Stream.write((char*)&data.z, sizeof(float));
+}
+void BinaryWriter::Write(RadianEuler data) {
+    Stream.write((char*)&data.x, sizeof(float));
+    Stream.write((char*)&data.y, sizeof(float));
+    Stream.write((char*)&data.z, sizeof(float));
+}
+void BinaryWriter::Write(matrix3x4_t data) {
+    Stream.write((char*)&data.c0r0, sizeof(float));
+    Stream.write((char*)&data.c1r0, sizeof(float));
+    Stream.write((char*)&data.c2r0, sizeof(float));
+    Stream.write((char*)&data.c3r0, sizeof(float));
 
+    Stream.write((char*)&data.c0r1, sizeof(float));
+    Stream.write((char*)&data.c1r1, sizeof(float));
+    Stream.write((char*)&data.c2r1, sizeof(float));
+    Stream.write((char*)&data.c3r1, sizeof(float));
+
+    Stream.write((char*)&data.c0r2, sizeof(float));
+    Stream.write((char*)&data.c1r2, sizeof(float));
+    Stream.write((char*)&data.c2r2, sizeof(float));
+    Stream.write((char*)&data.c3r2, sizeof(float));
+}
+void BinaryWriter::Write(Quaternion data) {
+    Stream.write((char*)&data.one, sizeof(float));
+    Stream.write((char*)&data.i, sizeof(float));
+    Stream.write((char*)&data.j, sizeof(float));
+    Stream.write((char*)&data.k, sizeof(float));
+    //printf("read a Vector\n");
+}
 
 void BinaryWriter::seek(int pos){
   if(Stream.fail()){
