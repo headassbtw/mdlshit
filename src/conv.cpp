@@ -385,10 +385,32 @@ v53_Header_Part2* ConvertSubHeader(BinaryReader* Stream, BinaryWriter* OutStream
     int bytesAddedToTextures = -20 * Initial_Header->numtextures;
     int bytesAddedToIkChains = 16 * Initial_Header->numikchains;
     int allBytesAdded = bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToTextures + bytesAddedToIkChains;
-    BinaryReader MdlStream = BinaryReader(info.mdl.value().c_str());
-    BinaryReader PhyStream = BinaryReader(info.phy.value().c_str());
-    BinaryReader VtxStream = BinaryReader(info.vtx.value().c_str());
-    BinaryReader VvdStream = BinaryReader(info.vvd.value().c_str());
+    int mdlSize = 0;
+    int phySize = 0;
+    int vtxSize = 0;
+    int vvdSize = 0;
+
+
+    if (info.mdl.has_value())
+    {
+        BinaryReader MdlStream = BinaryReader(info.mdl.value().c_str());
+        mdlSize = MdlStream.size;
+    }
+    if (info.phy.has_value())
+    {
+        BinaryReader PhyStream = BinaryReader(info.phy.value().c_str());
+        phySize = PhyStream.size;
+    }
+    if (info.vtx.has_value())
+    {
+        BinaryReader VtxStream = BinaryReader(info.vtx.value().c_str());
+        vtxSize = VtxStream.size;
+    }
+    if (info.vvd.has_value())
+    {
+        BinaryReader VvdStream = BinaryReader(info.vvd.value().c_str());
+        vvdSize = VvdStream.size;
+    }
 
     Dest_Header_Part2->numsrcbonetransform = Initial_Header_Part2->numsrcbonetransform;
     Dest_Header_Part2->srcbonetransformindex = Initial_Header_Part2->srcbonetransformindex + allBytesAdded;
@@ -399,15 +421,15 @@ v53_Header_Part2* ConvertSubHeader(BinaryReader* Stream, BinaryWriter* OutStream
     Dest_Header_Part2->unkindex = 0;
     Dest_Header_Part2->numunk;
     Dest_Header_Part2->unkindex1 = Initial_Header->szanimblocknameindex;
-    Dest_Header_Part2->vtxindex = MdlStream.size + allBytesAdded + PhyStream.size;
-    Dest_Header_Part2->vvdindex = MdlStream.size + allBytesAdded + PhyStream.size + VtxStream.size;
+    Dest_Header_Part2->vtxindex = mdlSize + allBytesAdded + phySize;
+    Dest_Header_Part2->vvdindex = mdlSize + allBytesAdded + phySize + vtxSize;
     Dest_Header_Part2->vvcindex = 0;
-    Dest_Header_Part2->vphyindex = MdlStream.size + allBytesAdded;
-    Dest_Header_Part2->vtxsize = VtxStream.size;
-    Dest_Header_Part2->vvdsize = VvdStream.size;
+    Dest_Header_Part2->vphyindex = mdlSize + allBytesAdded;
+    Dest_Header_Part2->vtxsize = vtxSize;
+    Dest_Header_Part2->vvdsize = vvdSize;
     Dest_Header_Part2->vvcsize = 0;
-    Dest_Header_Part2->vphysize = PhyStream.size;
-    Dest_Header_Part2->unkindex2 = MdlStream.size + allBytesAdded + PhyStream.size;
+    Dest_Header_Part2->vphysize = phySize;
+    Dest_Header_Part2->unkindex2 = mdlSize + allBytesAdded + phySize;
     Dest_Header_Part2->unk;
     Dest_Header_Part2->unkindex3 = 0;
 
