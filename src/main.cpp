@@ -2,6 +2,7 @@
 #include <cstdio>
 #include "conv.hpp"
 #include "structs.hpp"
+#include "blacklist.hpp"
 #include <cstdlib>
 #include <cstring>
 #include <argtools.hpp>
@@ -30,6 +31,7 @@ string hh(const char* file, const char* ext){
   return yo;
 }
 
+
 int main(int argc, char *argv[]) {
   Logger::Init();
   //UI::main(argc,argv);
@@ -48,8 +50,12 @@ int main(int argc, char *argv[]) {
   #else
   "Other",
   #endif
-  __VERSION__);
+  "hi");
 
+  bool ban;
+  char* error_out;
+
+  ban = CheckBlacklist(error_out);
 
   
 
@@ -98,6 +104,6 @@ int main(int argc, char *argv[]) {
     return Conversion::ReadHeader(inf);
   }
   else{
-    return UI::Run();
+    return UI::Run(ban, error_out);
   }
 }
