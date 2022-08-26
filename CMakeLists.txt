@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.20)
 project(mdlshit)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/CMake_Modules)
@@ -14,7 +14,7 @@ include_directories(external/tinyfiledialogs)
 include_directories(external/glm)
 file(GLOB_RECURSE SRC CONFIGURE_DEPENDS
     src/*.cpp
-    external/tinyfiledialogs/*.c
+    external/tinyfiledialogs/*.cpp
 )
 file(GLOB IM_SRC CONFIGURE_DEPENDS
     "external/imgui/*.cpp"
