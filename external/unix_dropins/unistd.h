@@ -1,4 +1,4 @@
-#ifndef __unix__
+#ifdef WIN32
 
 #ifndef _UNISTD_H
 #define _UNISTD_H    1
