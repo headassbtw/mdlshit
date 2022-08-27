@@ -541,7 +541,7 @@ int Conversion::ReadHeader(FileInfo info) {
       }
   }
   UI::Progress.SubTask.End();
-  int bone_filler_dest = Initial_Header->localanimindex - Stream.Position();
+  int bone_filler_dest = Initial_Header->localattachmentindex - Stream.Position();
   filler(&Stream, &OutStream, bone_filler_dest);
 
   UI::Progress.SubTask.Begin("Converting Attachments");
