@@ -502,6 +502,11 @@ void RenderGUI(){
               if(ImGui::BeginTabItem("Patch Notes")){
 
                 ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
+                ImGui::TextColored({1.0,0.8,0.8,1.0},"1.1.0");
+                ImGui::PopFont();
+                ImGui::BulletText("fixes to attachments and extra components");
+
+                ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
                 ImGui::TextColored({1.0,0.8,0.8,1.0},"1.0.0");
                 ImGui::PopFont();
                 ImGui::BulletText("Initial Release!");
