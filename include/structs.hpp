@@ -160,7 +160,7 @@ struct v49_Header{
 	std::byte			rootLOD; 
 	std::byte			numAllowedRootLODs;
 	std::byte			unused[1];
-	int					unused4;
+	float				unused4;
 	int					numflexcontrollerui;
 	int					flexcontrolleruiindex;
 	float				flVertAnimFixedPointScale;
@@ -257,7 +257,7 @@ struct v53_Header{
 	std::byte				rootLOD;                 //Always set to "2" - Liberty
 	std::byte				numAllowedRootLODs;
 	std::byte				unused[1];
-	int					unused4; // zero out if version < 47
+	float					unused4; // zero out if version < 47
 	int					numflexcontrollerui; //These are tricky so null them until further instructions. - Liberty
 	int					flexcontrolleruiindex; //These are tricky so null them until further instructions. - Liberty
 

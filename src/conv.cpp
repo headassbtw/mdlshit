@@ -421,10 +421,10 @@ v53_Header_Part2* ConvertSubHeader(BinaryReader* Stream, BinaryWriter* OutStream
     Dest_Header_Part2->unkindex = 0;
     Dest_Header_Part2->numunk;
     Dest_Header_Part2->unkindex1 = Initial_Header->szanimblocknameindex;
-    Dest_Header_Part2->vtxindex = mdlSize + allBytesAdded + phySize;
-    Dest_Header_Part2->vvdindex = mdlSize + allBytesAdded + phySize + vtxSize;
+    Dest_Header_Part2->vtxindex = vtxSize > 0 ? mdlSize + allBytesAdded + phySize : 0;
+    Dest_Header_Part2->vvdindex = vvdSize > 0 ? mdlSize + allBytesAdded + phySize + vtxSize : 0;
     Dest_Header_Part2->vvcindex = 0;
-    Dest_Header_Part2->vphyindex = mdlSize + allBytesAdded;
+    Dest_Header_Part2->vphyindex = phySize > 0 ? mdlSize + allBytesAdded : 0;
     Dest_Header_Part2->vtxsize = vtxSize;
     Dest_Header_Part2->vvdsize = vvdSize;
     Dest_Header_Part2->vvcsize = 0;
@@ -541,7 +541,7 @@ int Conversion::ReadHeader(FileInfo info) {
       }
   }
   UI::Progress.SubTask.End();
-  int bone_filler_dest = Initial_Header->localattachmentindex - Stream.Position();
+  int bone_filler_dest = Initial_Header->localanimindex - Stream.Position();
   filler(&Stream, &OutStream, bone_filler_dest);
 
   UI::Progress.SubTask.Begin("Converting Attachments");
@@ -561,6 +561,8 @@ int Conversion::ReadHeader(FileInfo info) {
 
   //hitboxsets
 
+  int numOfHitboxes = 0;
+
   Stream.seek(Initial_Header->hitboxsetindex);
   OutStream.seek(Dest_Header->hitboxsetindex);
   UI::Progress.SubTask.Begin("Updating Hitbox Sets");
@@ -572,41 +574,33 @@ int Conversion::ReadHeader(FileInfo info) {
       }
       else {
 
-          int startPosRead = Stream.Position();
-          int startPosOut = OutStream.Position();
           CopyAddInt32(&Stream, &OutStream, bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToIkChains + bytesAddedToTextures, 1);
-          CopyAddInt32(&Stream, &OutStream, 0, 1); //numhitboxes
-          CopyAddInt32(&Stream, &OutStream, 0, 1); //
-          Stream.seek(startPosRead);
-          int idx;
-          int numOfHitboxes;
-          int hitboxIndex;
-          Stream.Read(&idx);
-          Stream.Read(&numOfHitboxes);
-          Stream.Read(&hitboxIndex);
-
-          if (numOfHitboxes > 0) //Might be an issue if more than one hitboxset. -Liberty
-          {
-              for (int j = 0; j < numOfHitboxes; j++)
-              {
-                  CopyAddInt32(&Stream, &OutStream, 0, 1);
-                  CopyAddInt32(&Stream, &OutStream, 0, 1);
-                  CopyAddInt32(&Stream, &OutStream, 0, 3);
-                  CopyAddInt32(&Stream, &OutStream, 0, 3);
-                  CopyAddInt32(&Stream, &OutStream, bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToIkChains + bytesAddedToTextures, 1);
-                  CopyAddInt32(&Stream, &OutStream, 0, 1);
-                  CopyAddInt32(&Stream, &OutStream, 0, 1);
-                  CopyAddInt32(&Stream, &OutStream, 0, 6);
-                  Logger::Notice("Updated hitboxs %d of %d\n", j + 1, numOfHitboxes);
-              }
-          }
-
-          
+          int numberOfHitboxes; Stream.Read(&numberOfHitboxes); numOfHitboxes += numberOfHitboxes; OutStream.Write(numberOfHitboxes); //numhitboxes
+          CopyAddInt32(&Stream, &OutStream, 0, 1);
       }
       Logger::Notice("Updated hitbox set %d of %d\n", i + 1, Initial_Header->numhitboxsets);
       UI::Progress.SubTask.Update((i + 1.0f) / (float)Initial_Header->numhitboxsets);
   }
   UI::Progress.SubTask.End();
+
+
+  if (numOfHitboxes > 0)
+  {
+      UI::Progress.SubTask.Begin("Updating Hitboxes");
+      for (int j = 0; j < numOfHitboxes; j++)
+      {
+          CopyAddInt32(&Stream, &OutStream, 0, 1);
+          CopyAddInt32(&Stream, &OutStream, 0, 1);
+          CopyAddInt32(&Stream, &OutStream, 0, 3);
+          CopyAddInt32(&Stream, &OutStream, 0, 3);
+          CopyAddInt32(&Stream, &OutStream, bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToIkChains + bytesAddedToTextures, 1);
+          CopyAddInt32(&Stream, &OutStream, 0, 1);
+          CopyAddInt32(&Stream, &OutStream, 0, 1);
+          CopyAddInt32(&Stream, &OutStream, 0, 6);
+          Logger::Notice("Updated hitboxs %d of %d\n", j + 1, numOfHitboxes);
+      }
+      UI::Progress.SubTask.End();
+  }
 
   Stream.seek(Initial_Header->bonetablebynameindex);
   OutStream.seek(Dest_Header->bonetablebynameindex);
