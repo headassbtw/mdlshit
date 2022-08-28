@@ -5,7 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <rendering/filewidget.hpp>
-#include <tinyfiledialogs.h>
+#include <tinyfiledialogs.hpp>
 #include <unistd.h>
 
 

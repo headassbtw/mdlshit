@@ -4,11 +4,12 @@
 #include <optional>
 
 struct FileInfo{
-	std::optional<std::string> mdl;
-	std::optional<std::string> vtx;
-	std::optional<std::string> vvd;
-	std::optional<std::string> phy;
-	std::optional<std::string> out;
+	std::optional<std::string> mdl; //main mdl file
+	std::optional<std::string> vtx; //vertices
+	std::optional<std::string> vvd; //vertex data
+	std::optional<std::string> phy; //physics data
+  std::optional<std::string> pfb; //extra physics stuff
+	std::optional<std::string> out; //output file
 
 	std::optional<int> attachment_override;
 	std::optional<int> sequence_override;

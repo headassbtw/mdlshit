@@ -222,9 +222,12 @@ void RenderGUI(){
 
     ImGui::PopStyleVar();
 
-    for(int i = 0; i < files.size();i++){
+    for(int i = 0; i < 3;i++){
         files[i]->UI(viewport_width);
     }
+    files[3]->UI((viewport_width/2)+6);
+    ImGui::SameLine();
+    files[4]->UI((viewport_width/2)+6);
 
     
 
@@ -341,6 +344,7 @@ void RenderGUI(){
         if(files[1]->isEnabled) fileinfo.vtx = files[1]->BoxBuffer;
         if(files[2]->isEnabled) fileinfo.vvd = files[2]->BoxBuffer;
         if(files[3]->isEnabled) fileinfo.phy = files[3]->BoxBuffer;
+        if(files[4]->isEnabled) fileinfo.pfb = files[3]->BoxBuffer;
         fileinfo.out = rn(files[0]->BoxBuffer,"conv");
 
         if(override_attachments) fileinfo.attachment_override =  attachments;
@@ -502,9 +506,19 @@ void RenderGUI(){
               if(ImGui::BeginTabItem("Patch Notes")){
 
                 ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
+                ImGui::TextColored({1.0,0.8,0.8,1.0},"1.2.0");
+                ImGui::PopFont();
+                ImGui::BulletText("Added spot for extra physics data \n(not yet automated)");
+
+                ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
+                ImGui::TextColored({1.0,0.8,0.8,1.0},"1.1.1");
+                ImGui::PopFont();
+                ImGui::BulletText("Fixed a regression");
+
+                ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
                 ImGui::TextColored({1.0,0.8,0.8,1.0},"1.1.0");
                 ImGui::PopFont();
-                ImGui::BulletText("fixes to attachments and extra components");
+                ImGui::BulletText("Fixes to attachments and extra components");
 
                 ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
                 ImGui::TextColored({1.0,0.8,0.8,1.0},"1.0.0");
@@ -713,11 +727,13 @@ const char* mdls = "*.mdl";
 const char* vtxs = "*.vtx";
 const char* vvds = "*.vvd";
 const char* phys = "*.phy";
+const char* pfbs = "*.bin";
 
 files.push_back(new Widgets::File("MDL",false,mdls));
 files.push_back(new Widgets::File("VTX",true,vtxs));
 files.push_back(new Widgets::File("VVD",true,vvds));
 files.push_back(new Widgets::File("PHY",true,phys));
+files.push_back(new Widgets::File("PHY Block",true,pfbs));
 
 for(int i = 0; i < files.size();i++){
     files[i]->CheckErrors();
