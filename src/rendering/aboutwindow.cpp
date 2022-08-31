@@ -72,6 +72,36 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
 
       ImGui::EndTabItem();
     }
+    if(ImGui::BeginTabItem("Patch Notes")){
+
+      ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
+      ImGui::TextColored({1.0,0.8,0.8,1.0},"1.2.0");
+      ImGui::PopFont();
+      ImGui::BulletText("Added spot for extra physics data (not yet automated)");
+      ImGui::BulletText("Added extra file validity checks");
+      ImGui::BulletText("Forced UI to 60fps at all times, 20 when unfocused (previously vsync)");
+      ImGui::BulletText("Stopped creating a log file, as nothing was being written anyway");
+      ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
+      ImGui::TextColored({1.0,0.8,0.8,1.0},"1.1.2");
+      ImGui::PopFont();
+      ImGui::BulletText("Attachment fix, probably");
+
+      ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
+      ImGui::TextColored({1.0,0.8,0.8,1.0},"1.1.1");
+      ImGui::PopFont();
+      ImGui::BulletText("Fixed a regression");
+
+      ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
+      ImGui::TextColored({1.0,0.8,0.8,1.0},"1.1.0");
+      ImGui::PopFont();
+      ImGui::BulletText("Fixes to attachments and extra components");
+
+      ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
+      ImGui::TextColored({1.0,0.8,0.8,1.0},"1.0.0");
+      ImGui::PopFont();
+      ImGui::BulletText("Initial Release!");
+      ImGui::EndTabItem();
+    }
     if(ImGui::BeginTabItem("Software Used")){
       ImGui::BulletText("");
       ImGui::SameLine();
@@ -93,35 +123,6 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
       if(ImGui::SmallButton("TinyFileDialogs##About_TFD_GH")){
         OpenLink("https://github.com/native-toolkit/libtinyfiledialogs");
       }
-      ImGui::EndTabItem();
-    }
-    if(ImGui::BeginTabItem("Patch Notes")){
-
-      ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
-      ImGui::TextColored({1.0,0.8,0.8,1.0},"1.2.0");
-      ImGui::PopFont();
-      ImGui::BulletText("Added spot for extra physics data (not yet automated)");
-      ImGui::BulletText("Added extra file validity checks)");
-      ImGui::BulletText("Forced UI to 60fps at all times, 20 when unfocused (previously vsync)");
-      ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
-      ImGui::TextColored({1.0,0.8,0.8,1.0},"1.1.2");
-      ImGui::PopFont();
-      ImGui::BulletText("Attachment fix, probably");
-
-      ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
-      ImGui::TextColored({1.0,0.8,0.8,1.0},"1.1.1");
-      ImGui::PopFont();
-      ImGui::BulletText("Fixed a regression");
-
-      ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
-      ImGui::TextColored({1.0,0.8,0.8,1.0},"1.1.0");
-      ImGui::PopFont();
-      ImGui::BulletText("Fixes to attachments and extra components");
-
-      ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
-      ImGui::TextColored({1.0,0.8,0.8,1.0},"1.0.0");
-      ImGui::PopFont();
-      ImGui::BulletText("Initial Release!");
       ImGui::EndTabItem();
     }
     if(ImGui::BeginTabItem("Contrubutors")){
