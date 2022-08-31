@@ -228,6 +228,14 @@ void RenderGUI(){
     files[3]->UI((viewport_width/2)+6);
     ImGui::SameLine();
     files[4]->UI((viewport_width/2)+6);
+    if(ImGui::IsItemHovered()){
+      ImGui::BeginTooltip();
+      ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+      ImGui::TextWrapped("This is a section present after the PHY, only touch this if you know what you're doing.");
+      ImGui::PopTextWrapPos();
+      ImGui::EndTooltip();
+    }
+
 
     
 
@@ -504,11 +512,16 @@ void RenderGUI(){
                     ImGui::EndTabItem();
                 }
               if(ImGui::BeginTabItem("Patch Notes")){
-
+                /*
                 ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
                 ImGui::TextColored({1.0,0.8,0.8,1.0},"1.2.0");
                 ImGui::PopFont();
                 ImGui::BulletText("Added spot for extra physics data \n(not yet automated)");
+                */
+                ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
+                ImGui::TextColored({1.0,0.8,0.8,1.0},"1.1.2");
+                ImGui::PopFont();
+                ImGui::BulletText("Attachment fix, probably");
 
                 ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
                 ImGui::TextColored({1.0,0.8,0.8,1.0},"1.1.1");
@@ -733,7 +746,9 @@ files.push_back(new Widgets::File("MDL",false,mdls));
 files.push_back(new Widgets::File("VTX",true,vtxs));
 files.push_back(new Widgets::File("VVD",true,vvds));
 files.push_back(new Widgets::File("PHY",true,phys));
-files.push_back(new Widgets::File("PHY Block",true,pfbs));
+auto phyblock_uiblock = new Widgets::File("PHY Block",true,pfbs);
+phyblock_uiblock->isEnabled = false;
+files.push_back(phyblock_uiblock);
 
 for(int i = 0; i < files.size();i++){
     files[i]->CheckErrors();
