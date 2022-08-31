@@ -70,6 +70,14 @@ void BinaryReader::Read(Vector* data){
   Stream.read((char*)&data->z, sizeof(float));
   //printf("read a Vector\n");
 }
+void BinaryReader::Read(short* data) {
+    Stream.read((char*)data, sizeof(short));
+}
+
+void BinaryReader::Read(uint16_t* data) {
+    Stream.read((char*)data, sizeof(short));
+}
+
 void BinaryReader::Read(Vector3* data) {
     Stream.read((char*)&data->x, sizeof(float));
     Stream.read((char*)&data->y, sizeof(float));
@@ -170,6 +178,9 @@ int BinaryWriter::Position(){
     abort();
   }
   return Stream.tellp();
+}
+void BinaryWriter::Write(short data) {
+    Stream.write((char*)&data, sizeof(short));
 }
 void BinaryWriter::Write(Vector data){
   Stream.write((char*)&data.x, sizeof(float));

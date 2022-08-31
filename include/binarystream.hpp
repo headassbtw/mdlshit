@@ -30,6 +30,8 @@ class BinaryReader{
     void Read(RadianEuler* data);
     void Read(matrix3x4_t* data);
     void Read(Quaternion* data);
+    void Read(short* data);
+    void Read(uint16_t* data);
     void Read(byte* data);
     void Read(byte* data[], int size);
 
@@ -47,6 +49,7 @@ class BinaryWriter{
     void Write(char* data);
     void Write(char* data[]);
     void Write(int data);
+    void Write(short data);
     void Write(int data[]);
     void Write(float data);
     //void Write(long data);

@@ -3,12 +3,12 @@
 #include <string>
 #include <optional>
 
-struct FileInfo{
+struct FileInfo {
 	std::optional<std::string> mdl; //main mdl file
 	std::optional<std::string> vtx; //vertices
 	std::optional<std::string> vvd; //vertex data
 	std::optional<std::string> phy; //physics data
-  std::optional<std::string> pfb; //extra physics stuff
+	std::optional<std::string> pfb; //extra physics stuff
 	std::optional<std::string> out; //output file
 
 	std::optional<int> attachment_override;
@@ -16,14 +16,14 @@ struct FileInfo{
 	std::optional<int> animation_override;
 	std::optional<int> flags_override;
 
-  bool disable_bones = false;
-  bool disable_attachments = false;
-  bool disable_hitboxsets = false;
-  bool disable_animations = false;
-  bool disable_sequences = false;
-  bool disable_bodyparts = false;
-  bool disable_includemodels = false;
-  bool disable_textures = false;
+	bool disable_bones = false;
+	bool disable_attachments = false;
+	bool disable_hitboxsets = false;
+	bool disable_animations = false;
+	bool disable_sequences = false;
+	bool disable_bodyparts = false;
+	bool disable_includemodels = false;
+	bool disable_textures = false;
 };
 
 struct Vector2
@@ -331,9 +331,11 @@ struct v53_Header_Part2{
 
 	// big block of floats I think
 	// not present with no vphy??
-	int unkindex2; // section between vphy and vtx. probably combined loose file, but what?
+	int phybindex; // section between vphy and vtx. probably combined loose file, but what?
 
-	int unk[2];
+	int numofphyb;
+
+	int unk;
 
 	int unkindex3; // goes to the same spot as vtx normally.
 
@@ -512,4 +514,15 @@ struct mstudioposeparamdesc_t
 	float start; // starting value
 	float end; // ending value
 	float loop;	// looping range, 0 for no looping, 360 for rotations, etc.
+};
+
+struct BoneHeaderv49
+{
+	std::byte bone;
+	std::byte flag;
+	short nextOffset;
+	short transX;
+	short transY;
+	short transZ;
+	int dataSize;
 };
