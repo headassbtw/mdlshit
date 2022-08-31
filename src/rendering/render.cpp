@@ -79,13 +79,7 @@ void FileMenu(std::string title){
     ImGui::EndChild();
 
 }
-void OpenLink(const char* site){
-    #ifdef WIN32
-    ShellExecute(NULL, "open", site, NULL, NULL, SW_SHOWNORMAL);
-    #else
-    system(("xdg-open " + std::string(site)).c_str());
-    #endif
-}
+
 void AboutWindow(){
 
 }
@@ -134,7 +128,7 @@ void Convert(int a){
 }
 
 
-GLuint GRUNT_POG, Klules_Img;
+GLuint GRUNT_POG;
 ImVec2 pog_size;
 
 
@@ -315,7 +309,9 @@ void RenderGUI(){
         f->errors.clear();
       }
       files[0]->errors = Tests::TestMDL(files[0]->BoxBuffer);
+      files[1]->errors = Tests::TestVTX(files[1]->BoxBuffer);
       files[2]->errors = Tests::TestVVD(files[2]->BoxBuffer);
+      files[3]->errors = Tests::TestPHY(files[3]->BoxBuffer);
 
       bool _block;
       for(auto f : files){
@@ -454,140 +450,17 @@ void RenderGUI(){
     
     ImGui::End();
     if(showAbout){
-        if(ImGui::Begin("About", &showAbout,ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)){
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{0,0});
-            if(ImGui::BeginTabBar("AboutTabs",ImGuiTabBarFlags_None)){
-                if(ImGui::BeginTabItem("About")){
-                  ImGui::Image((void*)(intptr_t)GRUNT_POG, {pog_size.x/3.0f,pog_size.y/3.0f});
-                  ImGui::SameLine();
-                  ImGui::BeginGroup();
-                  ImGui::Text("MDLSHIT");
-                  ImGui::Text("- Source engine model converter, v49/47 to v53");
-                  ImGui::Text("By headassbtw and MasterLiberty");
-                  ImGui::Text("Eat my entire ass, wanderer");
-                  ImGui::Text("Compiled on %s",__DATE__);
-                  ImGui::Text("%s, v%s",
-                              #ifdef __MINGW32__
-                              "MinGW",
-                              #elif __GNUC__
-                              "GCC",
-                              #elif __APPLE__
-                              "",
-                              #endif
-                              #if _MSC_VER
-                              "MSVC",
-                              _MSC_VER
-                              #else
-                              __VERSION__
-                              #endif
-                              );
-                  ImGui::Text("OpenGL Version: %s",glGetString(GL_VERSION));
-                  ImGui::Text("GPU: %s",glGetString(GL_RENDERER));
-                  ImGui::Text("FPS: %f",ImGui::GetIO().Framerate);
-                  ImGui::EndGroup();
+      if(ImGui::Begin("About", &showAbout,ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)){
+        UI::RenderAboutWindow(GRUNT_POG,pog_size.x,pog_size.y);
+        auto sz = ImGui::GetWindowSize();
 
-                  ImGui::EndTabItem();
-                }
-                if(ImGui::BeginTabItem("Software Used")){
-                    ImGui::BulletText("Dear ImGui");
-                    ImGui::SameLine();
-                    if(ImGui::SmallButton("GitHub##About_ImGui_GH")){
-                        OpenLink("https://github.com/ocornut/imgui");
-                    }
-                    ImGui::BulletText("GLFW");
-                    ImGui::SameLine();
-                    if(ImGui::SmallButton("GitHub##About_GLFW_GH")){
-                        OpenLink("https://github.com/glfw/glfw");
-                    }
-                    ImGui::BulletText("GLEW");
-                    ImGui::SameLine();
-                    if(ImGui::SmallButton("GitHub##About_GLEW_GH")){
-                        OpenLink("https://github.com/nigels-com/glew");
-                    }
-                    ImGui::BulletText("TinyFileDialogs");
-                    ImGui::SameLine();
-                    if(ImGui::SmallButton("GitHub##About_TFD_GH")){
-                        OpenLink("https://github.com/native-toolkit/libtinyfiledialogs");
-                    }
-                    ImGui::EndTabItem();
-                }
-              if(ImGui::BeginTabItem("Patch Notes")){
-                /*
-                ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
-                ImGui::TextColored({1.0,0.8,0.8,1.0},"1.2.0");
-                ImGui::PopFont();
-                ImGui::BulletText("Added spot for extra physics data \n(not yet automated)");
-                */
-                ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
-                ImGui::TextColored({1.0,0.8,0.8,1.0},"1.1.2");
-                ImGui::PopFont();
-                ImGui::BulletText("Attachment fix, probably");
-
-                ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
-                ImGui::TextColored({1.0,0.8,0.8,1.0},"1.1.1");
-                ImGui::PopFont();
-                ImGui::BulletText("Fixed a regression");
-
-                ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
-                ImGui::TextColored({1.0,0.8,0.8,1.0},"1.1.0");
-                ImGui::PopFont();
-                ImGui::BulletText("Fixes to attachments and extra components");
-
-                ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
-                ImGui::TextColored({1.0,0.8,0.8,1.0},"1.0.0");
-                ImGui::PopFont();
-                ImGui::BulletText("Initial Release!");
-                ImGui::EndTabItem();
-              }
-              if(ImGui::BeginTabItem("Contrubutors")){
-
-                ImGui::TextColored({1.0,0.8,0.8,1.0},"Programming");
-                ImGui::BulletText("headassbtw");
-                ImGui::BulletText("MasterLiberty");
-                ImGui::TextColored({1.0,0.8,0.8,1.0},"Research");
-                ImGui::BulletText("MasterLiberty");
-                ImGui::BulletText("Rika");
-                ImGui::EndTabItem();
-              }
-              if(ImGui::BeginTabItem("Special Thanks")){
-                ImGui::BulletText("Mental Illness");
-                ImGui::BulletText("Destiny 2 addiction");
-                ImGui::BulletText("Sleep deprivation");
-                ImGui::BulletText(""); ImGui::SameLine();
-                if(ImGui::SmallButton("Spotify adblock##Spotify_adblock_GH")){
-                  OpenLink("https://github.com/abba23/spotify-adblock");
-                }
-                ImGui::BulletText("foobar2000 (my internet went out)");
-                ImGui::BulletText("Embed perms in northstar general");
-                ImGui::BulletText("I AM THE STORM THAT IS APPROOOOOOOOOOOOOOOOOOOOOOOOOOACHIIIIIIIIIIIIIIIIIIIIIING");
-                ImGui::BulletText("Improvised munitions handbook");
-                ImGui::BulletText(""); ImGui::SameLine(); ImGui::Image((void*)(intptr_t)Klules_Img, {13,13});
-                if (ImGui::IsItemHovered())
-                {
-                  ImGui::BeginTooltip();
-                  ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-                  ImGui::TextWrapped("YOU THOUGHT I WAS LIMITED\nTO JUST TEXT, HUH?");
-                  ImGui::PopTextWrapPos();
-                  ImGui::EndTooltip();
-                }
-                ImGui::EndTabItem();
-              }
-                ImGui::EndTabBar();
-            }
-            ImGui::PopStyleVar();
-            
-            auto sz = ImGui::GetWindowSize();
-
-            float xp = (viewport_width - sz.x)/2;
-            float yp = (viewport_height - sz.y)/2;
-            ImGui::SetWindowPos({xp,yp});
-            ImGui::End();
-            
-        }
-        ImGui::BringWindowToDisplayFront(ImGui::FindWindowByName("About"));
+        float xp = (viewport_width - sz.x)/2;
+        float yp = (viewport_height - sz.y)/2;
+        ImGui::SetWindowPos({xp,yp});
+        ImGui::End();
+      }
+      ImGui::BringWindowToDisplayFront(ImGui::FindWindowByName("About"));
     }
-
-
     ImGui::PopStyleVar(2);
 }
 
@@ -615,9 +488,9 @@ int UI::Run(){
     int ix,iy, channels;    
 
     GLFWimage images[1];
-    int klules_width, klules_height;
+
     auto grunt_pog = stbi_load_from_memory(Resources::Grunt, 380291, &images[0].width, &images[0].height, 0, 4);
-    auto klules = stbi_load_from_memory(Resources::Klules, 4067, &klules_width, &klules_height, 0, 4);
+
 
     images[0].pixels = grunt_pog;
 
@@ -654,20 +527,7 @@ int UI::Run(){
     pog_size.x = images[0].width;
     pog_size.y = images[0].height;
 
-  glGenTextures(1, &Klules_Img);
-  glBindTexture(GL_TEXTURE_2D, Klules_Img);
-
-  // Setup filtering parameters for display
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // This is required on WebGL for non power-of-two textures
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // Same
-
-  // Upload pixels into texture
-  #if defined(GL_UNPACK_ROW_LENGTH) && !defined(__EMSCRIPTEN__)
-  glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-  #endif
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, klules_width, klules_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, klules);
+    UI::SetupAboutWindow();
 
     glfwSetWindowSizeLimits(Window, 500, 500, GLFW_DONT_CARE, GLFW_DONT_CARE);
     glfwSetWindowIcon(Window, 1, images);
