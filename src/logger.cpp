@@ -11,17 +11,17 @@
 #define PATHCHAR "/"
 #endif
 
-std::ofstream LogStream;
+//std::ofstream LogStream;
 
 void Logger::Init(){
-  std::string ass = "." PATHCHAR "log.log";
-  LogStream = std::ofstream(ass.c_str());
-  Info("Log file opened\n");
+  //std::string ass = "." PATHCHAR "log.log";
+  //LogStream = std::ofstream(ass.c_str());
+  //Info("Log file opened\n");
 }
 
 void Logger::End(){
-  LogStream.close();
-  Info("Log file closed\n");
+  //LogStream.close();
+  //Info("Log file closed\n");
 }
 
 #define RESET   "\033[0m"
@@ -121,7 +121,7 @@ void CommonLog(LogType col, const char* msg...){
   m->type = col;
   LoggerMessages.push_back(m);
 
-  LogStream.write(msg_buf, 2048);
+  //LogStream.write(msg_buf, 2048);
 
   SetConsoleColor(Reset);
 }
