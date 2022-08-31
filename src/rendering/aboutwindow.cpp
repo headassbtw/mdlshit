@@ -73,24 +73,24 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
       ImGui::EndTabItem();
     }
     if(ImGui::BeginTabItem("Software Used")){
-      ImGui::BulletText("Dear ImGui");
+      ImGui::BulletText("");
       ImGui::SameLine();
-      if(ImGui::SmallButton("GitHub##About_ImGui_GH")){
+      if(ImGui::SmallButton("Dear ImGui##About_ImGui_GH")){
         OpenLink("https://github.com/ocornut/imgui");
       }
-      ImGui::BulletText("GLFW");
+      ImGui::BulletText("");
       ImGui::SameLine();
-      if(ImGui::SmallButton("GitHub##About_GLFW_GH")){
+      if(ImGui::SmallButton("GLFW##About_GLFW_GH")){
         OpenLink("https://github.com/glfw/glfw");
       }
-      ImGui::BulletText("GLEW");
+      ImGui::BulletText("");
       ImGui::SameLine();
-      if(ImGui::SmallButton("GitHub##About_GLEW_GH")){
+      if(ImGui::SmallButton("GLEW##About_GLEW_GH")){
         OpenLink("https://github.com/nigels-com/glew");
       }
-      ImGui::BulletText("TinyFileDialogs");
+      ImGui::BulletText("");
       ImGui::SameLine();
-      if(ImGui::SmallButton("GitHub##About_TFD_GH")){
+      if(ImGui::SmallButton("TinyFileDialogs##About_TFD_GH")){
         OpenLink("https://github.com/native-toolkit/libtinyfiledialogs");
       }
       ImGui::EndTabItem();
@@ -100,8 +100,9 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
       ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
       ImGui::TextColored({1.0,0.8,0.8,1.0},"1.2.0");
       ImGui::PopFont();
-      ImGui::BulletText("Added spot for extra physics data \n(not yet automated)");
+      ImGui::BulletText("Added spot for extra physics data (not yet automated)");
       ImGui::BulletText("Added extra file validity checks)");
+      ImGui::BulletText("Forced UI to 60fps at all times, 20 when unfocused (previously vsync)");
       ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
       ImGui::TextColored({1.0,0.8,0.8,1.0},"1.1.2");
       ImGui::PopFont();

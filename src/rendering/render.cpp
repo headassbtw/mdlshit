@@ -614,29 +614,36 @@ for(int i = 0; i < files.size();i++){
     files[i]->CheckErrors();
 }
 hasBrowser = true;  
-    
+    double lastTime;
+    double currentTime;
     do{
-        glViewport(0,0,viewport_width,viewport_height);
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glfwPollEvents();
-        Errors.clear();
-        for(auto f : files){
-          for(auto e : f->errors){
-            Errors.push_back(e);
+        //https://discourse.glfw.org/t/frame-limiting/70
+        //:clueless:
+        currentTime = glfwGetTime();
+        if(currentTime - lastTime >= 1.0 / (glfwGetWindowAttrib(Window, GLFW_FOCUSED)?60:20)) {
+          lastTime = currentTime;
+
+          glViewport(0, 0, viewport_width, viewport_height);
+          ImGui_ImplOpenGL3_NewFrame();
+          ImGui_ImplGlfw_NewFrame();
+          ImGui::NewFrame();
+          glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+          glfwPollEvents();
+          Errors.clear();
+          for (auto f: files) {
+            for (auto e: f->errors) {
+              Errors.push_back(e);
+            }
           }
-        }
-        RenderGUI();
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-        {
+          RenderGUI();
+          ImGui::Render();
+          ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+          if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
             ImGui::UpdatePlatformWindows();
             ImGui::RenderPlatformWindowsDefault();
+          }
+          glfwSwapBuffers(Window);
         }
-        glfwSwapBuffers(Window);
     }
     while(glfwWindowShouldClose(Window) == 0);
     ImGui_ImplOpenGL3_Shutdown();
