@@ -344,7 +344,7 @@ void RenderGUI(){
         if(files[1]->isEnabled) fileinfo.vtx = files[1]->BoxBuffer;
         if(files[2]->isEnabled) fileinfo.vvd = files[2]->BoxBuffer;
         if(files[3]->isEnabled) fileinfo.phy = files[3]->BoxBuffer;
-        if(files[4]->isEnabled) fileinfo.pfb = files[3]->BoxBuffer;
+        if(files[4]->isEnabled) fileinfo.pfb = files[4]->BoxBuffer;
         fileinfo.out = rn(files[0]->BoxBuffer,"conv");
 
         if(override_attachments) fileinfo.attachment_override =  attachments;
