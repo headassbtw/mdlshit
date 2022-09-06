@@ -51,7 +51,9 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
       ImGui::Image((void*)(intptr_t)grunt, {grunt_x/3.0f,grunt_y/3.0f});
       ImGui::SameLine();
       ImGui::BeginGroup();
+      ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[3]);
       ImGui::Text("MDLSHIT");
+      ImGui::PopFont();
       ImGui::Text("- Source engine model converter, v49/47 to v53");
       ImGui::Text("By headassbtw and MasterLiberty");
       ImGui::Text("Eat my entire ass, wanderer");
@@ -80,7 +82,7 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
     }
     if(ImGui::BeginTabItem("Patch Notes")){
 
-      PatchNotesVersionHeader("2.0.0");
+      PatchNotesVersionHeader("1.2.0");
       ImGui::BulletText("Added spot for extra physics data (not yet automated)");
       ImGui::BulletText("Added extra file validity checks");
       ImGui::BulletText("Forced UI to 60fps at all times, 20 when unfocused (previously vsync)");
@@ -90,19 +92,13 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
       ImGui::PopFont();
       ImGui::BulletText("Attachment fix, probably");
 
-      ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
-      ImGui::TextColored({1.0,0.8,0.8,1.0},"1.1.1");
-      ImGui::PopFont();
+      PatchNotesVersionHeader("1.1.1");
       ImGui::BulletText("Fixed a regression");
 
-      ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
-      ImGui::TextColored({1.0,0.8,0.8,1.0},"1.1.0");
-      ImGui::PopFont();
+      PatchNotesVersionHeader("1.1.0");
       ImGui::BulletText("Fixes to attachments and extra components");
 
-      ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
-      ImGui::TextColored({1.0,0.8,0.8,1.0},"1.0.0");
-      ImGui::PopFont();
+      PatchNotesVersionHeader("1.0.0");
       ImGui::BulletText("Initial Release!");
       ImGui::EndTabItem();
     }
@@ -131,10 +127,10 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
     }
     if(ImGui::BeginTabItem("Contrubutors")){
 
-      ImGui::TextColored({1.0,0.8,0.8,1.0},"Programming");
+      PatchNotesVersionHeader("Programming");
       ImGui::BulletText("headassbtw");
       ImGui::BulletText("MasterLiberty");
-      ImGui::TextColored({1.0,0.8,0.8,1.0},"Research");
+      PatchNotesVersionHeader("Research");
       ImGui::BulletText("MasterLiberty");
       ImGui::BulletText("Rika");
       ImGui::EndTabItem();
