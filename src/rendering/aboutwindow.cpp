@@ -10,6 +10,12 @@
 GLuint Klules_Img;
 int klules_width, klules_height;
 
+void PatchNotesVersionHeader(std::string VersionID){
+  ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
+  ImGui::TextColored({1.0,0.8,0.8,1.0},VersionID.c_str());
+  ImGui::PopFont();
+}
+
 void OpenLink(const char* site){
 #ifdef WIN32
   ShellExecute(NULL, "open", site, NULL, NULL, SW_SHOWNORMAL);
@@ -74,9 +80,7 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
     }
     if(ImGui::BeginTabItem("Patch Notes")){
 
-      ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
-      ImGui::TextColored({1.0,0.8,0.8,1.0},"1.2.0");
-      ImGui::PopFont();
+      PatchNotesVersionHeader("2.0.0");
       ImGui::BulletText("Added spot for extra physics data (not yet automated)");
       ImGui::BulletText("Added extra file validity checks");
       ImGui::BulletText("Forced UI to 60fps at all times, 20 when unfocused (previously vsync)");

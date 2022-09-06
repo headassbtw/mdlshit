@@ -547,7 +547,7 @@ int UI::Run(){
     ImGui::GetIO().IniFilename = NULL;
     ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Resources::SegoeUI_compressed, Resources::SegoeUI_compressed_size, 16);
     ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Resources::Impact_compressed, Resources::Impact_compressed_size, 16);
-    ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Resources::Menlo_compressed, Resources::Menlo_compressed_size, 16);
+    ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Resources::NvidiaSans_compressed, Resources::NvidiaSans_compressed_size, 20);
     ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Resources::ComicSans_compressed, Resources::ComicSans_compressed_size, 16);
     ImGui::GetIO().Fonts->Build();
     
