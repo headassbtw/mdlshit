@@ -230,7 +230,7 @@ void RenderGUI(){
       ImGui::EndTooltip();
     }
 
-
+const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
     
 
     ImGui::BeginChild("OptionsBox",{(viewport_width/2.0f) -10, (float)((console)?-log_height:0)},false,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysUseWindowPadding);
@@ -246,7 +246,10 @@ void RenderGUI(){
     ImGui::Checkbox("Override Animations",                    &override_animations  );
     if(override_animations)  ImGui::InputInt("##Animations",  &animations           );
     ImGui::Checkbox("Override Flags",                         &override_flags       );
-    if(override_flags)       ImGui::InputInt("##Flags",       &flags                );
+    if(override_flags){
+                             //ImGui::InputInt("##Flags",       &flags                );
+                             ImGui::InputScalar("##Flags", ImGuiDataType_U32, &flags, &u32_min, &u32_max, "%08X", ImGuiInputTextFlags_CharsHexadecimal);
+    }
     ImGui::Text("Disable Conversions");
     ImGui::Separator();
     ImGui::Checkbox("Bones",            &fileinfo.disable_bones         );
@@ -551,6 +554,19 @@ int UI::Run(){
     ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Resources::ComicSans_compressed, Resources::ComicSans_compressed_size, 16);
     ImGui::GetIO().Fonts->Build();
     
+
+    #ifdef WIN32
+
+    ImVec4 Color = ImVec4(0.0f,0.0f,0.0f,1.0f);
+    auto settings = ref new Windows::UI::ViewManagement::UISettings();
+    auto color = settings->GetColorValue(Windows::UI::ViewManagement::UIColorType::Accent);
+
+    Color.R = color.R;
+    Color.G = color.G;
+    Color.B = color.B;
+
+    #endif
+
 
 
     ImGui::GetStyle().ScrollbarRounding = 0.0f;
