@@ -1,2 +1,5 @@
 CMake_Modules/** linguist-vendored
 external/** linguist-vendored
+# We don't use C around these parts
+*.c linguist-vendored
+*.h linguist-vendored

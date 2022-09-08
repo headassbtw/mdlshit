@@ -492,7 +492,7 @@ int UI::Run(){
 
     GLFWimage images[1];
 
-    auto grunt_pog = stbi_load_from_memory(Resources::Grunt, 380291, &images[0].width, &images[0].height, 0, 4);
+    auto grunt_pog = stbi_load_from_memory(Resources::Grunt, 81765, &images[0].width, &images[0].height, 0, 4);
 
 
     images[0].pixels = grunt_pog;
@@ -548,10 +548,8 @@ int UI::Run(){
     //ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     //ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     ImGui::GetIO().IniFilename = NULL;
-    ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Resources::SegoeUI_compressed, Resources::SegoeUI_compressed_size, 16);
-    ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Resources::Impact_compressed, Resources::Impact_compressed_size, 16);
+    ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Resources::OpenSans_compressed, Resources::OpenSans_compressed_size, 16);
     ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Resources::NvidiaSans_compressed, Resources::NvidiaSans_compressed_size, 20);
-    ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Resources::ComicSans_compressed, Resources::ComicSans_compressed_size, 16);
     ImGui::GetIO().Fonts->Build();
     
 

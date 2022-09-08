@@ -11,7 +11,7 @@ GLuint Klules_Img;
 int klules_width, klules_height;
 
 void PatchNotesVersionHeader(std::string VersionID){
-  ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
+  ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
   ImGui::TextColored({1.0,0.8,0.8,1.0},VersionID.c_str());
   ImGui::PopFont();
 }
@@ -48,12 +48,10 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{0,0});
   if(ImGui::BeginTabBar("AboutTabs",ImGuiTabBarFlags_None)){
     if(ImGui::BeginTabItem("About")){
-      ImGui::Image((void*)(intptr_t)grunt, {grunt_x/3.0f,grunt_y/3.0f});
+      ImGui::Image((void*)(intptr_t)grunt, {178,178});
       ImGui::SameLine();
       ImGui::BeginGroup();
-      ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[3]);
       ImGui::Text("MDLSHIT");
-      ImGui::PopFont();
       ImGui::Text("- Source engine model converter, v49/47 to v53");
       ImGui::Text("By headassbtw and MasterLiberty");
       ImGui::Text("Eat my entire ass, wanderer");
@@ -87,9 +85,9 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
       ImGui::BulletText("Added extra file validity checks");
       ImGui::BulletText("Forced UI to 60fps at all times, 20 when unfocused (previously vsync)");
       ImGui::BulletText("Stopped creating a log file, as nothing was being written anyway");
-      ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[2]);
-      ImGui::TextColored({1.0,0.8,0.8,1.0},"1.1.2");
-      ImGui::PopFont();
+      ImGui::BulletText("Removed fonts i shouldn't use, shrunk filezise");
+
+      PatchNotesVersionHeader("1.1.2");
       ImGui::BulletText("Attachment fix, probably");
 
       PatchNotesVersionHeader("1.1.1");
