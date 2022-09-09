@@ -553,17 +553,7 @@ int UI::Run(){
     ImGui::GetIO().Fonts->Build();
     
 
-    #ifdef WIN32
-
-    ImVec4 Color = ImVec4(0.0f,0.0f,0.0f,1.0f);
-    auto settings = ref new Windows::UI::ViewManagement::UISettings();
-    auto color = settings->GetColorValue(Windows::UI::ViewManagement::UIColorType::Accent);
-
-    Color.R = color.R;
-    Color.G = color.G;
-    Color.B = color.B;
-
-    #endif
+  
 
 
 
