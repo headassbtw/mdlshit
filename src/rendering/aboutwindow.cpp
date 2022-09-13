@@ -127,9 +127,9 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
 
       PatchNotesVersionHeader("Programming");
       ImGui::BulletText("headassbtw");
-      ImGui::BulletText("MasterLiberty");
+      ImGui::BulletText("MasterLiberty (Won't accept my windows key)");
       PatchNotesVersionHeader("Research");
-      ImGui::BulletText("MasterLiberty");
+      ImGui::BulletText("MasterLiberty (Still won't accept my windows key)");
       ImGui::BulletText("Rika");
       ImGui::EndTabItem();
     }
