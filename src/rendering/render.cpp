@@ -370,29 +370,29 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
 
     if(ImGui::BeginPopupModal("Status##ConvertModal",NULL,ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)){
         auto sz = ImGui::GetWindowSize();
-        ImGui::SetWindowSize({300,100});
+        ImGui::SetWindowSize({300,200});
         ImGui::SetWindowPos({(viewport_width/2) - (150),(viewport_height/2) - (50)});
 
       if(UI::Progress.MainTask.Show()){
-                ImGui::Text("%s",UI::Progress.MainTask.Name().c_str());
-                ImGui::ProgressBar(UI::Progress.MainTask.Progress());
-            }
-            if(UI::Progress.SubTask.Show()){
-                ImGui::Text("%s",UI::Progress.SubTask.Name().c_str());
-                ImGui::ProgressBar(UI::Progress.SubTask.Progress());
-            }
+        ImGui::Text("%s",UI::Progress.MainTask.Name().c_str());
+        ImGui::ProgressBar(UI::Progress.MainTask.Progress());
+      }
+      if(UI::Progress.SubTask.Show()){
+        ImGui::Text("%s",UI::Progress.SubTask.Name().c_str());
+        ImGui::ProgressBar(UI::Progress.SubTask.Progress());
+      }
 
 
-            if(!UI::Progress.MainTask.Show()){
-                ImGui::Text("Finished!");
-                if(ImGui::Button("Continue",{-20,30})){
-                    for(auto f : files){
-                        f->errors.clear();
-                    }
-                    blocked = true;
-                    ImGui::CloseCurrentPopup();
-                }
-            }
+      if(!UI::Progress.MainTask.Show()){
+        ImGui::Text("Finished!");
+        if(ImGui::Button("Continue",{-20,30})){
+          for(auto f : files){
+            f->errors.clear();
+          }
+          blocked = true;
+          ImGui::CloseCurrentPopup();
+        }
+      }
       ImGui::EndPopup();
     }
     ImGui::PopStyleVar();
