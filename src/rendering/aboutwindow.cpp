@@ -80,12 +80,13 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
     }
     if(ImGui::BeginTabItem("Patch Notes")){
 
-      PatchNotesVersionHeader("1.2.0");
+      PatchNotesVersionHeader("2.0.0");
       ImGui::BulletText("Added spot for extra physics data (not yet automated)");
       ImGui::BulletText("Added extra file validity checks");
       ImGui::BulletText("Forced UI to 60fps at all times, 20 when unfocused (previously vsync)");
       ImGui::BulletText("Stopped creating a log file, as nothing was being written anyway");
       ImGui::BulletText("Removed fonts i shouldn't use, shrunk filezise");
+      ImGui::BulletText("Stopped resetting text files after conversion (shitty decision in hindsight)");
 
       PatchNotesVersionHeader("1.1.2");
       ImGui::BulletText("Attachment fix, probably");

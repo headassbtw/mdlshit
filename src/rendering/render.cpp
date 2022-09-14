@@ -388,7 +388,6 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
                 if(ImGui::Button("Continue",{-20,30})){
                     for(auto f : files){
                         f->errors.clear();
-                        memset(f->BoxBuffer, '\0', 256);
                     }
                     blocked = true;
                     ImGui::CloseCurrentPopup();
