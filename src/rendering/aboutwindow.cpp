@@ -79,6 +79,7 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
       ImGui::EndTabItem();
     }
     if(ImGui::BeginTabItem("Patch Notes")){
+      ImGui::BeginChild("PatchNotes");
 
       PatchNotesVersionHeader("2.0.0");
       ImGui::BulletText("Added spot for extra physics data (not yet automated)");
@@ -99,6 +100,7 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
 
       PatchNotesVersionHeader("1.0.0");
       ImGui::BulletText("Initial Release!");
+      ImGui::EndChild();
       ImGui::EndTabItem();
     }
     if(ImGui::BeginTabItem("Software Used")){

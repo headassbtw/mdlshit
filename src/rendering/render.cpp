@@ -452,7 +452,7 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
     
     ImGui::End();
     if(showAbout){
-      if(ImGui::Begin("About", &showAbout,ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)){
+      if(ImGui::Begin("About", &showAbout,ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollWithMouse)){
         UI::RenderAboutWindow(GRUNT_POG,pog_size.x,pog_size.y);
         auto sz = ImGui::GetWindowSize();
 
