@@ -562,11 +562,6 @@ int UI::Run(){
     ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Resources::OpenSans_compressed, Resources::OpenSans_compressed_size, 16);
     ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Resources::NvidiaSans_compressed, Resources::NvidiaSans_compressed_size, 20);
     ImGui::GetIO().Fonts->Build();
-    
-
-  
-
-    Logger::Info("%f",ImGui::GetStyle().WindowPadding.y);
 
     ImGui::GetStyle().ScrollbarRounding = 0.0f;
     ImGui::GetStyle().TabRounding = 0.0f;
