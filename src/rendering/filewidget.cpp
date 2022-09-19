@@ -27,8 +27,9 @@ void Widgets::File::TestFileDrop(double xpos, double ypos, const char* path){
 void Widgets::File::UI(float win_width){
     auto bg = ImGui::GetBackgroundDrawList();
     auto style = ImGui::GetStyle();
+    
 
-    ImGui::BeginChild(boxname.c_str(), {win_width-16,(isEnabled)?64.0f:38.0f}, false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_AlwaysUseWindowPadding);
+    ImGui::BeginChild(boxname.c_str(), {win_width-16,((isEnabled)?48.0f:22.0f) + (style.WindowPadding.y*2)}, false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_AlwaysUseWindowPadding);
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,{4.0f,4.0f});
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{4.0f,4.0f});
 

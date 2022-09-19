@@ -216,12 +216,27 @@ void RenderGUI(){
 
     ImGui::PopStyleVar();
 
-    for(int i = 0; i < 3;i++){
+    for(int i = 0; i < 4;i++){
         files[i]->UI(viewport_width);
     }
-    files[3]->UI((viewport_width/2)+6);
-    ImGui::SameLine();
-    files[4]->UI((viewport_width/2)+6);
+    
+    
+
+const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
+    
+    const ImU32 w_bg_col = ImGui::GetColorU32(ImGuiCol_WindowBg);
+    
+
+    ImGui::BeginChild("OptionsBox",{(viewport_width/2.0f) -10, (float)((console)?-log_height:0)},false,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysUseWindowPadding);
+    depth_border();
+    ImGui::PushStyleColor(ImGuiCol_WindowBg,ImVec4(0.0f,0.0f,0.0f,0.0f));
+    ImGui::Text("Advanced Options");
+    ImGui::Separator();
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{0.0f,0.0f});
+    ImGui::BeginChild("##ConvertSmol", {0,0},false);
+    ImGui::Text("Extra Files");
+    ImGui::Separator();
+    files[4]->UI((viewport_width/2.0f)-10);
     if(ImGui::IsItemHovered()){
       ImGui::BeginTooltip();
       ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
@@ -229,16 +244,10 @@ void RenderGUI(){
       ImGui::PopTextWrapPos();
       ImGui::EndTooltip();
     }
-
-const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
-    
-
-    ImGui::BeginChild("OptionsBox",{(viewport_width/2.0f) -10, (float)((console)?-log_height:0)},false,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysUseWindowPadding);
-    depth_border();
-    ImGui::Text("Options");
+    files[5]->UI((viewport_width/2.0f)-10);
+    files[6]->UI((viewport_width/2.0f)-10);
+    ImGui::Text("Overrides");
     ImGui::Separator();
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{0.0f,0.0f});
-    ImGui::BeginChild("##ConvertSmol", {0,0},false);
     ImGui::Checkbox("Override Attachments",                   &override_attachments );
     if(override_attachments) ImGui::InputInt("##Attachments", &attachments          );
     ImGui::Checkbox("Override Sequences",                     &override_sequences   );
@@ -263,6 +272,7 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
 
     ImGui::EndChild();
     ImGui::PopStyleVar(1);
+    ImGui::PopStyleColor();
     ImGui::EndChild();
     ImGui::SameLine();
     ImGui::BeginGroup();
@@ -352,6 +362,8 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
         if(files[2]->isEnabled) fileinfo.vvd = files[2]->BoxBuffer;
         if(files[3]->isEnabled) fileinfo.phy = files[3]->BoxBuffer;
         if(files[4]->isEnabled) fileinfo.pfb = files[4]->BoxBuffer;
+        if(files[5]->isEnabled) fileinfo.str = files[5]->BoxBuffer;
+        if(files[6]->isEnabled) fileinfo.aabb = files[6]->BoxBuffer;
         fileinfo.out = rn(files[0]->BoxBuffer,"conv");
 
         if(override_attachments) fileinfo.attachment_override =  attachments;
@@ -554,7 +566,7 @@ int UI::Run(){
 
   
 
-
+    Logger::Info("%f",ImGui::GetStyle().WindowPadding.y);
 
     ImGui::GetStyle().ScrollbarRounding = 0.0f;
     ImGui::GetStyle().TabRounding = 0.0f;
@@ -604,6 +616,7 @@ const char* vtxs = "*.vtx";
 const char* vvds = "*.vvd";
 const char* phys = "*.phy";
 const char* pfbs = "*.bin";
+const char* json = "*.json";
 
 files.push_back(new Widgets::File("MDL",false,mdls));
 files.push_back(new Widgets::File("VTX",true,vtxs));
@@ -612,6 +625,12 @@ files.push_back(new Widgets::File("PHY",true,phys));
 auto phyblock_uiblock = new Widgets::File("PHY Block",true,pfbs);
 phyblock_uiblock->isEnabled = false;
 files.push_back(phyblock_uiblock);
+auto extrastructs_uiblock = new Widgets::File("Extra Structs",true,json);
+extrastructs_uiblock->isEnabled = false;
+files.push_back(extrastructs_uiblock);
+auto aabbtree_uiblock = new Widgets::File("AABB Tree",true,pfbs);
+aabbtree_uiblock->isEnabled = false;
+files.push_back(aabbtree_uiblock);
 
 for(int i = 0; i < files.size();i++){
     files[i]->CheckErrors();
