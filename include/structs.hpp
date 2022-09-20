@@ -9,8 +9,6 @@ struct FileInfo {
 	std::optional<std::string> vvd; //vertex data
 	std::optional<std::string> phy; //physics data
 	std::optional<std::string> pfb; //extra physics stuff
-	std::optional<std::string> str; //extra structs
-	std::optional<std::string> aabb; //aabb trees
 	std::optional<std::string> out; //output file
 
 	std::optional<int> attachment_override;
@@ -28,10 +26,44 @@ struct FileInfo {
 	bool disable_textures = false;
 };
 
+struct sizes
+{
+	int v49_Bone = 216;
+	int v53_Bone = 244;
+	int v49_AnimDesc = 100;
+	int v53_AnimDesc = 92;
+	int v49_SeqDesc = 212;
+	int v53_SeqDesc = 232;
+	int v49_IkChain = 16;
+	int v53_IkChain = 32;
+	int v49_Texture = 64;
+	int v53_Texture = 44;
+};
+
+struct Vector48
+{
+	float x;
+	float y;
+	float z;
+};
+
+struct Quaternion64
+{
+	int64_t x : 21;
+	int64_t y : 21;
+	int64_t z : 21;
+	int64_t wneg : 1;
+};
+
 struct Vector2
 {
 	float x;
 	float y;
+};
+
+struct Vector3Short
+{
+	short x, y, z;
 };
 
 struct Vector3
@@ -45,6 +77,11 @@ struct Vector4
 	float y;
 	float z;
 	float w;
+};
+
+struct QuaternionShort
+{
+	short one, i, j, k;
 };
 
 struct Quaternion
@@ -495,6 +532,81 @@ struct mstudiomodelv53_t
 	uint32_t unk1[4];
 };
 
+struct mstudioseqdesc_t_v53
+{
+	int baseptr;
+
+	int	szlabelindex;
+
+	int szactivitynameindex;
+
+	int flags; // looping/non-looping flags
+
+	int activity; // initialized at loadtime to game DLL values
+	int actweight;
+
+	int numevents;
+	int eventindex;
+
+	Vector3 bbmin; // per sequence bounding box
+	Vector3 bbmax;
+
+	int numblends;
+
+	// Index into array of shorts which is groupsize[0] x groupsize[1] in length
+	int animindexindex;
+
+	int movementindex; // [blend] float array for blended movement
+	int groupsize0;
+	int groupsize1;
+	int paramindex0; // X, Y, Z, XR, YR, ZR
+	int paramindex1; // X, Y, Z, XR, YR, ZR
+	float paramstart0; // local (0..1) starting value
+	float paramstart1; // local (0..1) starting value
+	float paramend0; // local (0..1) ending value
+	float paramend1; // local (0..1) ending value
+	int paramparent;
+
+	float fadeintime; // ideal cross fate in time (0.2 default)
+	float fadeouttime; // ideal cross fade out time (0.2 default)
+
+	int localentrynode; // transition node at entry
+	int localexitnode; // transition node at exit
+	int nodeflags; // transition rules
+
+	float entryphase; // used to match entry gait
+	float exitphase; // used to match exit gait
+
+	float lastframe; // frame that should generation EndOfSequence
+
+	int nextseq; // auto advancing sequences
+	int pose; // index of delta animation between end and nextseq
+
+	int numikrules;
+
+	int numautolayers;
+	int autolayerindex;
+
+	int weightlistindex;
+
+	int posekeyindex;
+
+	int numiklocks;
+	int iklockindex;
+
+	// Key values
+	int keyvalueindex;
+	int keyvaluesize;
+
+	int cycleposeindex; // index of pose parameter to use as cycle index
+
+	int activitymodifierindex;
+	int numactivitymodifiers;
+
+	int unused[10]; // some might be used or they might've just been reseting space like on bones.
+};
+
+
 struct mstudioikchainv53_t
 {
 	int sznameindex;
@@ -528,3 +640,200 @@ struct BoneHeaderv49
 	short transZ;
 	int dataSize;
 };
+
+struct BoneHeaderv53
+{
+	float translationScale;
+	std::byte bone;
+	std::byte r2Flag;
+	short flags;
+	QuaternionShort packedRotation;
+	Vector3Short rawPos;
+	Vector3Short rawScale;
+	int nextOffset;
+	int rawStrPos;
+	int dataSize;
+
+};
+
+struct SectionBoneHeaderv53
+{
+	float translationScale;
+	std::byte bone;
+	std::byte r2Flag;
+	short flags;
+	QuaternionShort packedRotation;
+	Vector3Short rawPos;
+	Vector3Short rawScale;
+	int nextOffset;
+	int rawStrPos;
+	int dataSize;
+
+};
+
+struct mstudioanimdescv53_t
+{
+	int bytesAddedToDesc;
+	int bytesAddedToSec;
+	int* bytesAddedPerSec;
+
+	uint32_t baseptr;
+
+	int sznameindex;
+
+	int fps; // frames per second	
+	int flags; // looping/non-looping flags
+
+	int numframes;
+
+	// piecewise movement
+	int nummovements;
+	int movementindex;
+
+	// pretty sure this gets removed and the anim index is here now.
+	//int unused1[4]; // remove as appropriate (and zero if loading older versions)	
+
+	int animblock;
+	int animindex; // non-zero when anim data isn't in sections
+
+	int numikrules;
+	int ikruleindex; // non-zero when IK data is stored in the mdl
+	int animblockikruleindex; // non-zero when IK data is stored in animblock file
+
+	int numlocalhierarchy;
+	int localhierarchyindex;
+
+	// I think these two are swaped
+	int sectionindex;
+	int sectionframes; // number of frames used in each fast lookup section, zero if not used
+
+	short zeroframespan; // frames per span
+	short zeroframecount; // number of spans
+	int zeroframeindex;
+	float zeroframestalltime; // saved during read stalls
+
+	// ikrulezeroframeindex might be in here
+	int unused[4];
+};
+
+struct v53_HitboxSet
+{
+	int sznameindex;
+	int numOfHitboxes;
+	int hitboxIdx;
+};
+
+struct mstudiobboxv53_t
+{
+	int bone;
+	int group; // intersection group
+
+	Vector3 bbmin; // bounding box
+	Vector3 bbmax;
+
+	int szhitboxnameindex; // offset to the name of the hitbox.
+
+	int unk;
+	int keyvalueindex; // used for KV names in string block, should be set to hitboxname if kv unneeded.
+
+	int unused[6];
+};
+
+struct v53_animsectionidx
+{
+	int animBlock; //Removed
+	int animOffset;
+	SectionBoneHeaderv53* secBoneHdrs;
+};
+
+struct LinearBoneData
+{
+	uint32_t flags;
+	uint32_t parents;
+	Vector3 bonePos;
+	Quaternion boneQuat;
+	RadianEuler boneRot;
+	matrix3x4_t poseToBone;
+	Vector3		posScale;
+	Vector3		rotScale;
+	Quaternion  boneAlignment;
+};
+
+struct AnimSectionData
+{
+	int numOfSecs;
+	int* numOfHdrsPerSec;
+	v53_animsectionidx* animSections;
+	SectionBoneHeaderv53* secBoneheaders;
+};
+
+struct BoneHeaderData
+{
+	int numOfBoneHeaders;
+	int numOfSecBoneHeaders;
+	int* numOfBoneHdrsPerAnim;
+	int* numOfSecBoneHdrsPerAnim;
+	int* numOfSecBoneHdrsPerSec;
+	int* hdrBytesAnimDescAdd;
+	int* secHdrBytesAnimDescAdd;
+	int* secHdrBytesSecAdd;
+	BoneHeaderv53* boneHeaders;
+	SectionBoneHeaderv53* secBoneheaders;
+	v53_animsectionidx* secIdxs;
+	int* secOffsets;
+	int animBytesAdded;
+	int secBytesAdded;
+	int* strStartPos;
+	int numOfSecs;
+};
+
+struct AnimData
+{
+	int numOfAnims;
+	int* secPerAnim;
+	int* bytesAddedToSec;
+	int bytesAddedToAnimDescs;
+	int bytesAddedToAnimSections;
+	mstudioanimdescv53_t* animDescs;
+	BoneHeaderv53* boneHeaders;
+	BoneHeaderData* boneHeaderData;
+};
+
+struct BoneData
+{
+	int numOfBones;
+	int bytesAddedToBones;
+	mstudiobonev53_t* bones;
+};
+
+struct AttachmentData
+{
+	int numOfAttachments;
+	mstudioattachment_t* attachments;
+};
+
+struct HitboxData
+{
+	int numOfHitboxSets;
+	int numOfHitboxes;
+	int* numOfHitboxesPerSet;
+	v53_HitboxSet* hitboxSets;
+	mstudiobboxv53_t* hitboxes;
+
+};
+
+struct SequenceData
+{
+	int numOfSeqs;
+	int bytesAdded;
+	int numOfEvents;
+	int numOfActMods;
+	int* bytesAddedPerSeq;
+	int* numOfEvntPerSeq;
+	int* evntIdxs;
+	int* numOfActModsPerSeq;
+	int* actModIdxs;
+	mstudioseqdesc_t_v53* sequences;
+
+};
+

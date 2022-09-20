@@ -4,6 +4,7 @@
 #include <string>
 #include <sys/stat.h>
 #include <logger.hpp>
+#include <half.hpp>
 using namespace std;
 
 BinaryReader::BinaryReader(const char* filename){
@@ -58,7 +59,7 @@ void BinaryReader::Read(byte* data[] , int size){
 }
 
 void BinaryReader::Read(float* data){
-  Stream.read((char*)data, 4);
+  Stream.read((char*)data, sizeof(float));
   //printf("read a float\n");
 }
 int BinaryReader::Position(){
@@ -74,6 +75,10 @@ void BinaryReader::Read(short* data) {
     Stream.read((char*)data, sizeof(short));
 }
 
+void BinaryReader::Read(uint32_t* data) {
+    Stream.read((char*)data, sizeof(int));
+}
+
 void BinaryReader::Read(uint16_t* data) {
     Stream.read((char*)data, sizeof(short));
 }
@@ -82,6 +87,13 @@ void BinaryReader::Read(Vector3* data) {
     Stream.read((char*)&data->x, sizeof(float));
     Stream.read((char*)&data->y, sizeof(float));
     Stream.read((char*)&data->z, sizeof(float));
+    //printf("read a Vector\n");
+}
+
+void BinaryReader::Read(Vector3Short* data) {
+    Stream.read((char*)&data->x, sizeof(short));
+    Stream.read((char*)&data->y, sizeof(short));
+    Stream.read((char*)&data->z, sizeof(short));
     //printf("read a Vector\n");
 }
 
@@ -114,6 +126,14 @@ void BinaryReader::Read(Quaternion* data) {
     Stream.read((char*)&data->i, sizeof(float));
     Stream.read((char*)&data->j, sizeof(float));
     Stream.read((char*)&data->k, sizeof(float));
+    //printf("read a Vector\n");
+}
+
+void BinaryReader::Read(QuaternionShort* data) {
+    Stream.read((char*)&data->one, 2);
+    Stream.read((char*)&data->i, 2);
+    Stream.read((char*)&data->j, 2);
+    Stream.read((char*)&data->k, 2);
     //printf("read a Vector\n");
 }
 
@@ -156,6 +176,9 @@ void BinaryWriter::Write(char* data){
 void BinaryWriter::Write(byte data){
   Stream.write((char*)&data, sizeof(byte));
 }
+void BinaryWriter::Write(byte* data) {
+    Stream.write((char*)&data, sizeof(byte));
+}
 void BinaryWriter::Write(byte data[], int size){
   Stream.write((char*)&data, sizeof(byte)*size);
 }
@@ -182,10 +205,18 @@ int BinaryWriter::Position(){
 void BinaryWriter::Write(short data) {
     Stream.write((char*)&data, sizeof(short));
 }
+void BinaryWriter::Write(uint32_t data) {
+    Stream.write((char*)&data, sizeof(uint32_t));
+}
 void BinaryWriter::Write(Vector data){
   Stream.write((char*)&data.x, sizeof(float));
   Stream.write((char*)&data.y, sizeof(float));
   Stream.write((char*)&data.z, sizeof(float));
+}
+void BinaryWriter::Write(Vector3Short data) {
+    Stream.write((char*)&data.x, sizeof(short));
+    Stream.write((char*)&data.y, sizeof(short));
+    Stream.write((char*)&data.z, sizeof(short));
 }
 void BinaryWriter::Write(Vector3 data) {
     Stream.write((char*)&data.x, sizeof(float));
@@ -213,6 +244,14 @@ void BinaryWriter::Write(matrix3x4_t data) {
     Stream.write((char*)&data.c2r2, sizeof(float));
     Stream.write((char*)&data.c3r2, sizeof(float));
 }
+void BinaryWriter::Write(QuaternionShort data) {
+    Stream.write((char*)&data.one, sizeof(short));
+    Stream.write((char*)&data.i, sizeof(short));
+    Stream.write((char*)&data.j, sizeof(short));
+    Stream.write((char*)&data.k, sizeof(short));
+    //printf("read a Vector\n");
+}
+
 void BinaryWriter::Write(Quaternion data) {
     Stream.write((char*)&data.one, sizeof(float));
     Stream.write((char*)&data.i, sizeof(float));
