@@ -4,6 +4,7 @@
 #include <cstring>
 #include <fstream>
 #include <iostream>
+#include <half.hpp>
 using namespace std;
 class BinaryReader{
   const char* _filename;
@@ -26,14 +27,17 @@ class BinaryReader{
     //void Read(long* data);
     int Position();
     void Read(Vector* data);
+    void Read(Vector3Short* data);
     void Read(Vector3* data);
     void Read(RadianEuler* data);
     void Read(matrix3x4_t* data);
+    void Read(QuaternionShort* data);
     void Read(Quaternion* data);
     void Read(short* data);
     void Read(uint16_t* data);
     void Read(byte* data);
     void Read(byte* data[], int size);
+    void Read(uint32_t* data);
 
 };
 class BinaryWriter{
@@ -54,11 +58,15 @@ class BinaryWriter{
     void Write(float data);
     //void Write(long data);
     int Position();
+    void Write(uint32_t data);
     void Write(Vector data);
+    void Write(Vector3Short data);
     void Write(Vector3 data);
     void Write(RadianEuler data);
     void Write(matrix3x4_t data);
     void Write(Quaternion data);
+    void Write(QuaternionShort data);
     void Write(byte data);
+    void Write(byte* data);
     void Write(byte data[], int size);
 };
