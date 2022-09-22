@@ -15,6 +15,7 @@ include_directories(external/glfw/src)
 include_directories(external/glew/include)
 include_directories(external/tinyfiledialogs)
 include_directories(external/glm)
+include_directories(external/half/half)
 file(GLOB_RECURSE SRC CONFIGURE_DEPENDS
     src/*.cpp
     external/tinyfiledialogs/*.cpp

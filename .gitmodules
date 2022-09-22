@@ -14,3 +14,6 @@
 [submodule "external/libtinyfiledialogs"]
 	path = external/libtinyfiledialogs
 	url = https://github.com/native-toolkit/libtinyfiledialogs
+[submodule "external/half"]
+	path = external/half
+	url = https://github.com/melowntech/half

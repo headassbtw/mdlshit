@@ -126,6 +126,11 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
       if(ImGui::SmallButton("TinyFileDialogs##About_TFD_GH")){
         OpenLink("https://github.com/native-toolkit/libtinyfiledialogs");
       }
+      ImGui::BulletText("");
+      ImGui::SameLine();
+      if(ImGui::SmallButton("Half##About_HALF_GH")){
+        OpenLink("https://github.com/melowntech/half");
+      }
       ImGui::EndTabItem();
     }
     if(ImGui::BeginTabItem("Contrubutors")){

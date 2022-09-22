@@ -9,6 +9,8 @@ struct FileInfo {
 	std::optional<std::string> vvd; //vertex data
 	std::optional<std::string> phy; //physics data
 	std::optional<std::string> pfb; //extra physics stuff
+	std::optional<std::string> str; //extra structs
+	std::optional<std::string> aabb; //aabb tree
 	std::optional<std::string> out; //output file
 
 	std::optional<int> attachment_override;
