@@ -246,6 +246,7 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
     }
     files[5]->UI((viewport_width/2.0f)-10);
     files[6]->UI((viewport_width/2.0f)-10);
+    /*
     ImGui::Text("Overrides");
     ImGui::Separator();
     ImGui::Checkbox("Override Attachments",                   &override_attachments );
@@ -259,6 +260,7 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
                              //ImGui::InputInt("##Flags",       &flags                );
                              ImGui::InputScalar("##Flags", ImGuiDataType_U32, &flags, &u32_min, &u32_max, "%08X", ImGuiInputTextFlags_CharsHexadecimal);
     }
+    */
     ImGui::Text("Disable Conversions");
     ImGui::Separator();
     ImGui::Checkbox("Bones",            &fileinfo.disable_bones         );

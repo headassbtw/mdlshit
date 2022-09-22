@@ -82,6 +82,7 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
       ImGui::BeginChild("PatchNotes");
 
       PatchNotesVersionHeader("2.0.0");
+      ImGui::BulletText("Removed override options (they did not work)");
       ImGui::BulletText("Moved around some UI elements");
       ImGui::BulletText("Added spot for extra physics data (not yet automated)");
       ImGui::BulletText("Added extra file validity checks");
