@@ -1,5 +1,5 @@
 #include <conv.hpp>
-#include <logger.hpp>
+#include <rapidjson/istreamwrapper.h>
 #include <structs.hpp>
 #include <binarystream.hpp>
 #include <structs.hpp>
@@ -10,6 +10,12 @@
 #include <rendering/progress.hpp>
 #include <vector>
 #include <half.hpp>
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
+using namespace rapidjson;
+
 uint32_t LBD_GetFlags(BinaryReader* Stream, int index)
 {
 	//Logger::Info("flagsPos: %d %d\n", index);
@@ -83,6 +89,315 @@ Quaternion LBD_GetBoneAlignment(BinaryReader* Stream, int index)
 	return boneAlignment;
 }
 
+std::vector<float> CreateQuad(std::vector<std::vector<float>> tris)
+{
+	return tris[0];
+}
+
+
+bool IsWhole(double n) {
+	if (n == (int)n)
+		return true;
+	else
+		return false;
+}
+
+
+
+mstudioruimesh_t CreateRuiMesh(ruiRecipe recipe)
+{
+	mstudioruimesh_t* ruiMesh = new mstudioruimesh_t();
+	int numOfVerts = 0;
+	ruiMesh->numparents = 1;
+	ruiMesh->numfaces = recipe.faces.size();
+	ruiMesh->szruimeshname = recipe.name;
+	ruiMesh->parent.push_back(recipe.parent);
+
+	for (int i = 0; i < ruiMesh->numfaces; i++)
+	{
+		mstudioruimesface_t faceData{recipe.faces[i].uvMin[0], recipe.faces[i].uvMin[1], recipe.faces[i].uvMax[0], recipe.faces[i].uvMax[1], recipe.faces[i].faceScaleMin[0], recipe.faces[i].faceScaleMin[1], recipe.faces[i].faceScaleMax[0], recipe.faces[i].faceScaleMax[1] };
+
+		mstudioruivertmap_t vertMap{ 0 + numOfVerts, 2 + numOfVerts, 3 + numOfVerts };
+		ruiMesh->vertexmap.push_back(vertMap);
+		mstudioruivert_t vert1{ 0, recipe.faces[i].one.x, recipe.faces[i].one.y, recipe.faces[i].one.z };
+		mstudioruivert_t vert2{ 0, recipe.faces[i].two.x, recipe.faces[i].two.y, recipe.faces[i].two.z };
+		mstudioruivert_t vert3{ 0, recipe.faces[i].three.x, recipe.faces[i].three.y, recipe.faces[i].three.z };
+		mstudioruivert_t vert4{ 0, recipe.faces[i].four.x, recipe.faces[i].four.y, recipe.faces[i].four.z };
+		ruiMesh->vertex.push_back(vert1);
+		numOfVerts++;
+		ruiMesh->vertex.push_back(vert2);
+		numOfVerts++;
+		ruiMesh->vertex.push_back(vert3);
+		numOfVerts++;
+
+		if (recipe.faces[i].four.x != 0 && recipe.faces[i].four.y != 0 && recipe.faces[i].four.z != 0)
+		{
+			ruiMesh->vertex.push_back(vert4);
+			numOfVerts++;
+		}
+		ruiMesh->numvertices = recipe.faces[i].numOfVerts;
+		Logger::Info("verts: %d\n", recipe.faces[i].numOfVerts);
+		ruiMesh->facedata.push_back(faceData);
+	}
+
+	mstudioruimesh_t _ruiMesh{ ruiMesh->numparents, ruiMesh->numvertices, ruiMesh->numfaces, 0, 0, 0, 0, (std::byte)0, (std::byte)0, (std::byte)0, (std::byte)0, ruiMesh->szruimeshname, ruiMesh->parent, ruiMesh->vertexmap, ruiMesh->vertex, ruiMesh->facedata };
+
+	return _ruiMesh;
+
+}
+
+
+Face HandleFace(rapidjson::Value& value)
+{
+	std::vector<std::vector<float>> tris;
+	int i = 0;
+	std::vector<float> _tris;
+	Face* face = new Face();
+	int numOfVerts = 0;
+
+	if (value.HasMember("uvMin") && value["uvMin"].IsArray())
+	{
+		for (auto& it : value["uvMin"].GetArray()) // Now we setup the second TextureGUID Map.
+		{
+			if (it.GetStdString() != "")
+			{
+				Logger::Info("uvMin: %f\n", stof(it.GetStdString()));
+				face->uvMin[i] = stof(it.GetStdString());
+				i++;
+			}
+		}
+		i = 0;
+	}
+
+	if (value.HasMember("uvMax") && value["uvMax"].IsArray())
+	{
+		for (auto& it : value["uvMax"].GetArray()) // Now we setup the second TextureGUID Map.
+		{
+			if (it.GetStdString() != "")
+			{
+				Logger::Info("uvMax: %f\n", stof(it.GetStdString()));
+				face->uvMax[i] = stof(it.GetStdString());
+				i++;
+			}
+		}
+		i = 0;
+	}
+
+	if (value.HasMember("faceScaleMin") && value["faceScaleMin"].IsArray())
+	{
+		for (auto& it : value["faceScaleMin"].GetArray()) // Now we setup the second TextureGUID Map.
+		{
+			if (it.GetStdString() != "")
+			{
+				Logger::Info("FaceScaleMax: %f\n", stof(it.GetStdString()));
+				face->faceScaleMin[i] = stof(it.GetStdString());
+				i++;
+			}
+		}
+		i = 0;
+	}
+
+	if (value.HasMember("faceScaleMax") && value["faceScaleMax"].IsArray())
+	{
+		for (auto& it : value["faceScaleMax"].GetArray()) // Now we setup the second TextureGUID Map.
+		{
+			if (it.GetStdString() != "")
+			{
+				Logger::Info("FaceScaleMax: %f\n", stof(it.GetStdString()));
+				face->faceScaleMax[i] = stof(it.GetStdString());
+				i++;
+			}
+		}
+		i = 0;
+	}
+
+
+	if (value.HasMember("verts") && value["verts"].IsArray())
+	{
+		for (auto& it : value["verts"].GetArray()) // Now we setup the second TextureGUID Map.
+		{
+			if (it.GetStdString() != "")
+			{
+				//Logger::Info("PassedJson3\n");
+				Logger::Info("vertFloat: %f\n", stof(it.GetStdString()));
+
+				if (i < 9) _tris.push_back(stof(it.GetStdString()));
+
+				i++;
+				if (i > 8)
+				{
+					i = 0;
+					tris.push_back(_tris);
+					_tris.clear();
+				}
+			}
+		}
+		Logger::Info("vertCount: %d\n", value["verts"].GetArray().Size() / 3);
+		Logger::Info("trisCount: %d\n", tris.size());
+
+		for (int j = 0; j < tris.size(); j++)
+		{
+			face->one.x = tris[j][0];
+			face->one.y = tris[j][1];
+			face->one.z = tris[j][2];
+			face->two.x = tris[j][6];
+			face->two.y = tris[j][7];
+			face->two.z = tris[j][8];
+			face->three.x = tris[j][3];
+			face->three.y = tris[j][4];
+			face->three.z = tris[j][5];
+			if (j + 1 < tris.size())
+			{
+				face->four.x = tris[j + 1][0];
+				face->four.y = tris[j + 1][1];
+				face->four.z = tris[j + 1][2];
+			}
+		}
+		Face _face{ face->uvMin[0], face->uvMin[1], face->uvMax[0], face->uvMax[1], face->faceScaleMin[0], face->faceScaleMin[1], face->faceScaleMax[0], face->faceScaleMax[1], face->one.x, face->one.y, face->one.z, face->two.x, face->two.y, face->two.z, face->three.x, face->three.y, face->three.z, face->four.x, face->four.y, face->four.z, (value["verts"].GetArray().Size() / 3) - (2 * (tris.size() / 2)), tris.size()};
+		return _face;
+	}
+}
+
+mstudioruimesh_t HandleJsonRUI(rapidjson::Value& value)
+{
+		std::vector<std::vector<float>> tris;
+		std::string _name = "";
+		std::vector<Face> faces;
+		std::vector<mstudioruimesh_t> ruiMeshes;
+		int _parent = 0;
+
+		int i = 0;
+		std::vector<float> _tris;
+
+		if (value.HasMember("name") && value["name"].IsString())
+		{
+			if (value["name"].GetStdString() != "")
+			{
+				Logger::Info("Name: %s\n", value["name"].GetStdString().c_str());
+				_name = value["name"].GetStdString();
+			}
+		}
+
+		if (value.HasMember("parent") && value["parent"].IsString())
+		{
+			if (value["parent"].GetStdString() != "")
+			{
+				Logger::Info("Parent: %d\n", stoi(value["parent"].GetStdString()));
+				_parent = stoi(value["parent"].GetStdString());
+			}
+		}
+
+		if (value.HasMember("faces") && value["faces"].IsArray())
+		{
+			Logger::Info("PassedJson2\n");
+			for (auto& it : value["faces"].GetArray())
+			{
+				faces.push_back(HandleFace(it));
+			}
+		}
+
+		ruiRecipe recipe{ _name, _parent, faces };
+
+		return CreateRuiMesh(recipe);
+}
+
+std::vector<mstudioruimesh_t> GetRuiMeshes(FileInfo info)
+{
+	std::vector<mstudioruimesh_t> ruiMeshes;
+	char** argv;
+	std::ifstream ifs(info.str.value().c_str());
+
+	// begin json parsing
+	rapidjson::IStreamWrapper isw{ ifs };
+
+	rapidjson::Document doc{};
+
+	doc.ParseStream(isw);
+
+	if (doc.HasMember("rui") && doc["rui"].IsArray())
+	{
+		for (auto& file : doc["rui"].GetArray())
+		{
+			Logger::Info("PassedJson1\n");
+			ruiMeshes.push_back(HandleJsonRUI(file));
+		}
+	}
+
+	return ruiMeshes;
+
+}
+
+int GetRuiBytesAdded(std::vector<mstudioruimesh_t> ruiMeshes)
+{
+	int bytesAdded = 0;
+	for (int i = 0; i < ruiMeshes.size(); i++)
+	{
+		bytesAdded += 32;
+		bytesAdded += 2 * ruiMeshes[i].numparents;
+		bytesAdded += 32 * ruiMeshes[i].numfaces;
+		bytesAdded += 16 * ruiMeshes[i].numvertices;
+		bytesAdded += 6 * ruiMeshes[i].numfaces;
+		bytesAdded += ruiMeshes[i].szruimeshname.size();
+
+		double sizeCheck = bytesAdded / 16.0;
+		int idk = 0;
+		if (!IsWhole(sizeCheck))
+		{
+			double sizeCheck2 = 16 * ((int)sizeCheck + 1);
+			idk = sizeCheck2 - bytesAdded;
+			bytesAdded += idk;
+		}
+
+		bytesAdded += 8;
+
+	}
+
+	return bytesAdded;
+}
+
+int GetRuiBytesAddedIdv(std::vector<mstudioruimesh_t> ruiMeshes, int num)
+{
+	int bytesAdded = 0;
+	bytesAdded += 32;
+	bytesAdded += 2 * ruiMeshes[num].numparents;
+	bytesAdded += 32 * ruiMeshes[num].numfaces;
+	bytesAdded += 16 * ruiMeshes[num].numvertices;
+	bytesAdded += 6 * ruiMeshes[num].numfaces;
+	bytesAdded += ruiMeshes[num].szruimeshname.size();
+	return bytesAdded;
+}
+
+std::vector<int> GetRuiBytesAddedPer(std::vector<mstudioruimesh_t> ruiMeshes)
+{
+	int bytesAdded = 0;
+	std::vector<int> bytesAddedPerRui;
+	for (int i = 0; i < ruiMeshes.size(); i++)
+	{
+		bytesAddedPerRui.push_back(bytesAdded);
+
+		bytesAdded += 32;
+		bytesAdded += 2 * ruiMeshes[i].numparents;
+		bytesAdded += 32 * ruiMeshes[i].numfaces;
+		bytesAdded += 16 * ruiMeshes[i].numvertices;
+		bytesAdded += 6 * ruiMeshes[i].numfaces;
+		bytesAdded += ruiMeshes[i].szruimeshname.size();
+
+		double sizeCheck = bytesAdded / 16.0;
+		int idk = 0;
+		if (!IsWhole(sizeCheck))
+		{
+			double sizeCheck2 = 16 * ((int)sizeCheck + 1);
+			idk = sizeCheck2 - bytesAdded;
+			bytesAdded += idk;
+		}
+
+		bytesAdded += 8;
+
+	}
+	return bytesAddedPerRui;
+}
+
+
 
 LinearBoneData* GetLinearBoneData(BinaryReader* Stream, v49_Header* Initial_Header, studiohdr2_t* Initial_Header_Part2, int bone)
 {
@@ -91,8 +406,8 @@ LinearBoneData* GetLinearBoneData(BinaryReader* Stream, v49_Header* Initial_Head
 	if (bone < Initial_Header->numbones)
 	{
 		int filler = 4 * 6; 
-		Stream->seek(Initial_Header->studiohdr2index + Initial_Header_Part2->linearboneindex);//Initial_Header->studiohdr2index + Initial_Header_Part2->linearboneindex);
-		int idx = Initial_Header->studiohdr2index + Initial_Header_Part2->linearboneindex;//Initial_Header->studiohdr2index + Initial_Header_Part2->linearboneindex;
+		Stream->seek(Initial_Header->studiohdr2index + Initial_Header_Part2->linearboneindex);
+		int idx = Initial_Header->studiohdr2index + Initial_Header_Part2->linearboneindex;
 		int numOfBones; Stream->Read(&numOfBones);
 		int flagIdx; Stream->Read(&flagIdx);
 		int parentIdx; Stream->Read(&parentIdx);
@@ -103,6 +418,7 @@ LinearBoneData* GetLinearBoneData(BinaryReader* Stream, v49_Header* Initial_Head
 		int posScaleIdx; Stream->Read(&posScaleIdx);
 		int rotScaleIdx; Stream->Read(&rotScaleIdx);
 		int boneAlignmentIdx; Stream->Read(&boneAlignmentIdx);
+		//Logger::Info("idx: %d %d\n", Initial_Header->studiohdr2index + Initial_Header_Part2->linearboneindex);
 		//Logger::Info("flagIdx: %d %d\n", flagIdx);
 		//Logger::Info("parentIdx: %d %d\n", parentIdx);
 		//Logger::Info("BonePosIdx: %d %d\n", bonePosIdx);
@@ -138,6 +454,8 @@ LinearBoneData* GetLinearBoneData(BinaryReader* Stream, v49_Header* Initial_Head
 	return boneData;
 }
 
+
+
 int GetAnimHeaderSize(int flag)
 {
 	switch (flag)
@@ -147,6 +465,12 @@ int GetAnimHeaderSize(int flag)
 	case 8: return 10;
 	case 1: return 10;
 	case 12: return 16;
+	case 49: return 18;
+	case 48: return 12;
+	case 24: return 10;
+	case 17: return 10;
+	case 28: return 16;
+	case 0: return 4;
 
 	default: return 0;
 	}
@@ -172,7 +496,408 @@ uint16_t float_to_half(const float x) { // IEEE-754 16-bit floating-point format
 	return (b & 0x80000000) >> 16 | (e > 112) * ((((e - 112) << 10) & 0x7C00) | m >> 13) | ((e < 113) & (e > 101)) * ((((0x007FF000 + m) >> (125 - e)) + 1) >> 1) | (e > 143) * 0x7FFF; // sign : normalized : denormalized : saturate
 }
 
-int* GetAnimSectionCount(BinaryReader* Stream, v49_Header* Initial_Header, bool debug)
+mstudiobone_t_v53 BoneConversion(mstudiobone_t_v49 v49Bone, int stairs)
+{
+	Vector3 unkvector{ 1,1,1 };
+
+	Vector3 unkvector1{ 0.0004882813 ,0.0004882813 ,0.0004882813 };
+
+	int unkindex = 0;
+
+	Vector3 posscale{ 0,0,0 };
+
+	if (v49Bone.procindex > 0) v49Bone.procindex += stairs;
+	if (v49Bone.surfacepropidx > 0) v49Bone.surfacepropidx += stairs;
+	if (v49Bone.surfacepropLookup > 0) v49Bone.surfacepropLookup += stairs;
+
+	mstudiobone_t_v53 bone{ v49Bone.sznameindex + stairs, v49Bone.parent, -1,-1,-1,-1,-1,-1, v49Bone.pos, v49Bone.quat, v49Bone.rot, unkvector, posscale, v49Bone.rotscale, unkvector1, v49Bone.poseToBone, v49Bone.qAlignment, v49Bone.flags, v49Bone.proctype, v49Bone.procindex, v49Bone.physicsbone, v49Bone.surfacepropidx, v49Bone.contents, v49Bone.surfacepropLookup, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	
+	return bone;
+}
+
+mstudiobbox_tv53 HitboxConversion(mstudiobbox_t_v49 v49Hitbox, int stairs)
+{
+	
+	mstudiobbox_tv53 hitbox{ v49Hitbox.bone, v49Hitbox.group, v49Hitbox.bbmin, v49Hitbox.bbmax, v49Hitbox.szhitboxnameindex + stairs, 0, 0, 0,0,0,0,0,0 };
+
+	return hitbox;
+}
+
+bool contains(std::vector<int> arry, int trgt)
+{
+	for (int i = 0; i < arry.size(); i++)
+	{
+		if (trgt == arry[i]) return true;
+	}
+	return false;
+}
+
+std::vector<int> GetIkChainBones(BinaryReader* Stream, v49_Header* Initial_Header, bool debug)
+{
+	std::vector<int> ikChainBones;
+	std::vector<int> ikChainBonesChildren;
+	std::vector<int> ikChainBonesFinal;
+	int numOfIkLinks = 0;
+	Stream->seek(Initial_Header->ikchainindex);
+
+	for (int i = 0; i < Initial_Header->numikchains; i++)
+	{
+		mstudioikchain_t_v49 ikChain; Stream->Read(&ikChain);
+		if (ikChain.numlinks > 0) numOfIkLinks += ikChain.numlinks;
+	}
+
+	for (int i = 0; i < numOfIkLinks; i++)
+	{
+		mstudioiklink_t_v49 ikLink; Stream->Read(&ikLink);
+		ikChainBones.push_back(ikLink.bone);
+	}
+
+	Stream->seek(Initial_Header->boneindex);
+	for (int i = 0; i < Initial_Header->numbones; i++)
+	{
+		mstudiobone_t_v49 bone; Stream->Read(&bone);
+		for (int j = 0; j < ikChainBones.size(); j++)
+		{
+			if (!contains(ikChainBones, i) && !contains(ikChainBonesChildren, ikChainBones[j]) && !contains(ikChainBonesChildren, i) && bone.parent == ikChainBones[j])
+			{
+				ikChainBonesChildren.push_back(i);
+			}
+		}
+	}
+	int size = ikChainBonesChildren.size();
+	Stream->seek(Initial_Header->boneindex);
+	for (int i = 0; i < Initial_Header->numbones; i++)
+	{
+		mstudiobone_t_v49 bone; Stream->Read(&bone);
+		for (int j = 0; j < size; j++)
+		{
+			if (!contains(ikChainBones, i) && !contains(ikChainBonesChildren, i) && bone.parent == ikChainBonesChildren[j])
+			{
+				ikChainBonesChildren.push_back(i);
+			}
+		}
+	}
+	size = ikChainBonesChildren.size();
+	Stream->seek(Initial_Header->boneindex);
+	for (int i = 0; i < Initial_Header->numbones; i++)
+	{
+		mstudiobone_t_v49 bone; Stream->Read(&bone);
+		for (int j = 0; j < size; j++)
+		{
+			if (!contains(ikChainBones, i) && !contains(ikChainBonesChildren, i) && bone.parent == ikChainBonesChildren[j])
+			{
+				ikChainBonesChildren.push_back(i);
+			}
+		}
+	}
+
+	size = ikChainBonesChildren.size();
+	Stream->seek(Initial_Header->boneindex);
+	for (int i = 0; i < Initial_Header->numbones; i++)
+	{
+		mstudiobone_t_v49 bone; Stream->Read(&bone);
+		for (int j = 0; j < size; j++)
+		{
+			if (!contains(ikChainBones, i) && !contains(ikChainBonesChildren, i) && bone.parent == ikChainBonesChildren[j])
+			{
+				ikChainBonesChildren.push_back(i);
+			}
+		}
+	}
+
+	size = ikChainBonesChildren.size();
+	Stream->seek(Initial_Header->boneindex);
+	for (int i = 0; i < Initial_Header->numbones; i++)
+	{
+		mstudiobone_t_v49 bone; Stream->Read(&bone);
+		for (int j = 0; j < size; j++)
+		{
+			if (!contains(ikChainBones, i) && !contains(ikChainBonesChildren, i) && bone.parent == ikChainBonesChildren[j])
+			{
+				ikChainBonesChildren.push_back(i);
+			}
+		}
+	}
+
+	size = ikChainBonesChildren.size();
+	Stream->seek(Initial_Header->boneindex);
+	for (int i = 0; i < Initial_Header->numbones; i++)
+	{
+		mstudiobone_t_v49 bone; Stream->Read(&bone);
+		for (int j = 0; j < size; j++)
+		{
+			if (!contains(ikChainBones, i) && !contains(ikChainBonesChildren, i) && bone.parent == ikChainBonesChildren[j])
+			{
+				ikChainBonesChildren.push_back(i);
+			}
+		}
+	}
+
+	for (int i = 0; i < ikChainBonesChildren.size(); i++)
+	{
+		ikChainBonesFinal.push_back(ikChainBonesChildren[i]);
+	}
+
+	for (int i = 0; i < ikChainBones.size(); i++)
+	{
+		ikChainBonesFinal.push_back(ikChainBones[i]);
+	}
+
+	return ikChainBonesFinal;
+}
+
+int GetAnimBoneHeaderBytesAddedIndv(BinaryReader* Stream, v49_Header* Initial_Header, int anim, bool debug)
+{
+	int pos = Stream->Position();
+	int bytesAdded = 0;
+	int bytesAddedPer = 0;
+	int strPos = Initial_Header->localanimindex + 100 * anim;
+	int animPos = strPos + 56;
+	int secIndexPos = strPos + 80;
+	Stream->seek(animPos);
+	int animIndex; Stream->Read(&animIndex);
+	Stream->seek(secIndexPos);
+	int sectionIndex; Stream->Read(&sectionIndex);
+	Stream->seek(strPos + animIndex);
+
+	if (sectionIndex == 0)
+	{
+		for (int j = 0; j < 100000; j++)
+		{
+			int pos2 = Stream->Position();
+			std::byte bone; Stream->Read(&bone); 
+			std::byte flag; Stream->Read(&flag); 
+			short nextOffset; Stream->Read(&nextOffset);
+			int headerSize = GetAnimHeaderSize((int)flag);
+			bytesAddedPer += (32 - headerSize);
+			bytesAdded += (32 - headerSize);
+			if (nextOffset == 0)
+			{
+				break;
+			}
+			Stream->seek(pos2 + nextOffset);
+
+		}
+	}
+	Stream->seek(pos);
+	return bytesAdded;
+}
+
+mstudioanimdesc_tv53 AnimDescConversion( mstudioanimdesc_t_v49 v49AnimDesc, int stairs, int stairs2, int stairs3, int basePtr)
+{
+	if (v49AnimDesc.animindex > 0) v49AnimDesc.animindex += stairs + stairs3;
+	if (v49AnimDesc.movementindex > 0) v49AnimDesc.movementindex += stairs + stairs3;
+	if (v49AnimDesc.ikruleindex > 0) v49AnimDesc.ikruleindex += stairs + stairs3;
+	if (v49AnimDesc.localhierarchyindex > 0) v49AnimDesc.localhierarchyindex += stairs + stairs3;
+	if (v49AnimDesc.zeroframeindex > 0) v49AnimDesc.zeroframeindex += stairs + stairs3;
+	if (v49AnimDesc.ikrulezeroframeindex > 0) v49AnimDesc.ikrulezeroframeindex += stairs + stairs3;
+	if (v49AnimDesc.sectionindex > 0) v49AnimDesc.sectionindex += stairs + stairs3;
+	int compressedIkRuleIdx = 0; if (v49AnimDesc.numikrules > 0) compressedIkRuleIdx = basePtr - (v49AnimDesc.ikruleindex + 140 * v49AnimDesc.numikrules);
+
+
+	mstudioanimdesc_tv53 animDesc = { basePtr, v49AnimDesc.sznameindex + stairs2 + stairs3, v49AnimDesc.fps, v49AnimDesc.flags, v49AnimDesc.numframes, v49AnimDesc.nummovements, v49AnimDesc.movementindex, compressedIkRuleIdx, v49AnimDesc.animindex, v49AnimDesc.numikrules, v49AnimDesc.ikruleindex, v49AnimDesc.numlocalhierarchy, v49AnimDesc.localhierarchyindex, v49AnimDesc.sectionindex, v49AnimDesc.sectionframes, v49AnimDesc.zeroframespan, v49AnimDesc.zeroframecount, v49AnimDesc.zeroframeindex, v49AnimDesc.zeroframestalltime, 0, 0, 0, 0, 0 };
+	
+	return animDesc;
+}
+
+mstudioikrule_tv53 IkRuleConversion(mstudioikrule_t_v49 v49IkRule, int stairs)
+{
+	if (v49IkRule.compressedikerrorindex > 0) v49IkRule.compressedikerrorindex += stairs;
+	if (v49IkRule.ikerrorindex > 0) v49IkRule.ikerrorindex += stairs;
+	if (v49IkRule.szattachmentindex > 0) v49IkRule.szattachmentindex += stairs;
+
+	mstudioikrule_tv53 ikRule = {v49IkRule.index, v49IkRule.type, v49IkRule.chain, v49IkRule.bone, v49IkRule.slot, v49IkRule.height, v49IkRule.radius, v49IkRule.floor, v49IkRule.pos, v49IkRule.q, v49IkRule.compressedikerrorindex, v49IkRule.iStart, v49IkRule.ikerrorindex, v49IkRule.start, v49IkRule.peak, v49IkRule.tail, v49IkRule.end, v49IkRule.contact, v49IkRule.drop, v49IkRule.top, v49IkRule.szattachmentindex, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+	return ikRule;
+}
+
+
+std::vector<int> GetAnimSectionCount(BinaryReader* Stream, v49_Header* Initial_Header, bool debug)
+{
+	int secNum = 0;
+	std::vector<int> secPerAnim;
+	int pos = Stream->Position();
+
+	for (int i = 0; i < Initial_Header->numlocalanim; i++)
+	{
+		int startPos = Initial_Header->localanimindex + 100 * i;
+		int animIndexPos = startPos + 56;
+		int secIndexPos = startPos + 80;
+		int framePos = startPos + 16;
+		int secFramPos = startPos + 84;
+
+		Stream->seek(framePos);
+		int frames; Stream->Read(&frames);
+		Stream->seek(secFramPos);
+		int secFrames; Stream->Read(&secFrames);
+
+		Stream->seek(animIndexPos);
+		int animIndex; Stream->Read(&animIndex);
+		Stream->seek(secIndexPos);
+		int sectionIndex; Stream->Read(&sectionIndex);
+
+		if (sectionIndex > 0)
+		{
+			int secNumber = (frames / secFrames) + 2;
+			if (debug) Logger::Info("AnimNum: %d, bytesAdded:  %d\n", i, secNumber);
+			secPerAnim.push_back(secNumber);
+		}
+		else secPerAnim.push_back(0);
+
+
+
+	}
+	Stream->seek(pos);
+	return secPerAnim;
+}
+
+
+int GetAnimBoneHeaderTotal(BinaryReader* Stream, v49_Header* Initial_Header, bool debug)
+{
+	int hdrNum = 0;
+	int* hdrNumPerAnim = new int[Initial_Header->numlocalanim];
+	for (int i = 0; i < Initial_Header->numlocalanim; i++)
+	{
+		int bHdrCount = 0;
+		int strPos = Initial_Header->localanimindex + 100 * i;
+		int animPos = strPos + 56;
+		Stream->seek(animPos);
+		int animIndex; Stream->Read(&animIndex);
+		Stream->seek(strPos + animIndex);
+
+		for (int j = 0; j < Initial_Header->numbones * Initial_Header->numlocalanim; j++)
+		{
+			int pos2 = Stream->Position();
+			std::byte bone; Stream->Read(&bone); //Logger::Info("Bone: %d, Pos:  %d\n", bone, Stream->Position() - 1);
+			std::byte flag; Stream->Read(&flag); //Logger::Info("Flag: %d, Pos:  %d\n", flag, Stream->Position() - 1);
+			short nextOffset; Stream->Read(&nextOffset); //Logger::Info("Next Offset: %d, Pos:  %d\n", nextOffset, Stream->Position() - 2);
+			bHdrCount++;
+			hdrNum++;
+			if (nextOffset == 0)
+			{
+				break;
+			}
+			Stream->seek(pos2 + nextOffset);
+
+		}
+		if (debug) Logger::Info("AnimNum: %d, hdrNum:  %d\n", i, bHdrCount);
+		hdrNumPerAnim[i] = bHdrCount;
+
+
+	}
+	return hdrNum;
+}
+
+std::vector<int> GetAnimBoneHeaderCount(BinaryReader* Stream, v49_Header* Initial_Header, bool debug)
+{
+	int hdrNum = 0;
+	std::vector<int> hdrNumPerAnim;
+	for (int i = 0; i < Initial_Header->numlocalanim; i++)
+	{
+		int bHdrCount = 0;
+		int strPos = Initial_Header->localanimindex + 100 * i;
+		int animPos = strPos + 56;
+		Stream->seek(animPos);
+		int animIndex; Stream->Read(&animIndex);
+		Stream->seek(strPos + animIndex);
+
+		for (int j = 0; j < Initial_Header->numbones * Initial_Header->numlocalanim; j++)
+		{
+			int pos2 = Stream->Position();
+			std::byte bone; Stream->Read(&bone); //Logger::Info("Bone: %d, Pos:  %d\n", bone, Stream->Position() - 1);
+			std::byte flag; Stream->Read(&flag); //Logger::Info("Flag: %d, Pos:  %d\n", flag, Stream->Position() - 1);
+			short nextOffset; Stream->Read(&nextOffset); //Logger::Info("Next Offset: %d, Pos:  %d\n", nextOffset, Stream->Position() - 2);
+			bHdrCount++;
+			hdrNum++;
+			if (nextOffset == 0)
+			{
+				break;
+			}
+			Stream->seek(pos2 + nextOffset);
+
+		}
+		if (debug) Logger::Info("AnimNum: %d, hdrNum:  %d\n", i, bHdrCount);
+		hdrNumPerAnim.push_back(bHdrCount);
+
+
+	}
+	return hdrNumPerAnim;
+}
+
+int GetAnimBytesAdded(BinaryReader* Stream, v49_Header* Initial_Header, bool debug)
+{
+	int bytesAdded = 0;
+	int hdrCount = GetAnimBoneHeaderTotal(Stream, Initial_Header, false);
+
+	for (int i = 0; i < Initial_Header->numlocalanim; i++)
+	{
+		int strPos = Initial_Header->localanimindex + 100 * i;
+		int animPos = strPos + 56;
+		int secIndexPos = strPos + 80;
+
+		Stream->seek(animPos + 100);
+		int nextAnimIndex; Stream->Read(&nextAnimIndex);
+		Stream->seek(secIndexPos + 100);
+		int nextSectionIndex; Stream->Read(&nextSectionIndex);
+
+		Stream->seek(animPos);
+		int animIndex; Stream->Read(&animIndex);
+		Stream->seek(secIndexPos);
+		int sectionIndex; Stream->Read(&sectionIndex);
+		Stream->seek(strPos + animIndex);
+		if (sectionIndex == 0)
+		{
+			for (int j = 0; j < 1000000; j++)
+			{
+				int pos2 = Stream->Position();
+				std::byte bone; Stream->Read(&bone); //Logger::Info("Bone: %d, Pos:  %d\n", bone, Stream->Position() - 1);
+				std::byte flag; Stream->Read(&flag); //Logger::Info("Flag: %d, Pos:  %d\n", flag, Stream->Position() - 1);
+				short nextOffset; Stream->Read(&nextOffset); //Logger::Info("Next Offset: %d, Pos:  %d\n", nextOffset, Stream->Position() - 2);
+				int headerSize = GetAnimHeaderSize((int)flag);
+				bytesAdded += (32 - headerSize);
+				if (nextOffset == 0)
+				{
+					if (i + 1 < Initial_Header->numlocalanim && nextSectionIndex == 0)
+					{
+						int dist = ( ( strPos + 100 + nextAnimIndex ) - ( pos2 + headerSize ) );
+
+						if (dist > 18 || dist < 0)
+						{
+							for (int l = 0; l < 1000; l++)
+							{
+								short animValue; Stream->Read(&animValue);
+								if (animValue == 0)
+								{
+									int newPos = Stream->Position() - 2;
+									dist = ((strPos + 100 + nextAnimIndex) - (newPos));
+									if (dist <= 18)
+									{
+										break;
+									}
+								}
+							}
+						}
+
+						//Logger::Info("dist:  %d\n", dist);
+						//Logger::Info("start:  %d\n", pos2 + headerSize);
+						//Logger::Info("end:  %d\n", strPos + 100 + nextAnimIndex);
+						//Logger::Info("finalDist:  %d\n", 32 - dist);
+						bytesAdded += 32 - dist;
+					}
+					if (debug) Logger::Info("AnimNum: %d, bytesAdded:  %d\n", i, bytesAdded);
+					break;
+				}
+				Stream->seek(pos2 + nextOffset);
+
+			}
+		}
+
+	}
+	return bytesAdded;
+}
+
+
+int GetAnimSectionCountTotal(BinaryReader* Stream, v49_Header* Initial_Header, bool debug)
 {
 	int secNum = 0;
 	int* secPerAnim = new int[Initial_Header->numlocalanim];
@@ -199,23 +924,721 @@ int* GetAnimSectionCount(BinaryReader* Stream, v49_Header* Initial_Header, bool 
 			int secNumber = (frames / secFrames) + 2;
 			if (debug) Logger::Info("AnimNum: %d, bytesAdded:  %d\n", i, secNumber);
 			secPerAnim[i] = secNumber;
+			secNum += secNumber;
 		}
 		else secPerAnim[i] = 0;
 
 
 
 	}
-	return secPerAnim;
+	return secNum;
+}
+
+std::vector<int> GetAnimSectionBoneHeaderCount(BinaryReader* Stream, v49_Header* Initial_Header, bool debug)
+{
+	std::vector<int> secPerAnim = GetAnimSectionCount(Stream, Initial_Header, false);
+	int  secTotal = GetAnimSectionCountTotal(Stream, Initial_Header, false);
+	int* hdrsPerSec = new int[secTotal];
+	std::vector<int> secHdrsPerAnim;
+	int secHdrNum = 0;
+	for (int i = 0; i < Initial_Header->numlocalanim; i++)
+	{
+		int startPos = Initial_Header->localanimindex + 100 * i;
+		int animIndexPos = startPos + 56;
+		int secIndexPos = startPos + 80;
+		int framePos = startPos + 16;
+		int secFramPos = startPos + 84;
+
+		Stream->seek(framePos);
+		int frames; Stream->Read(&frames);
+		Stream->seek(secFramPos);
+		int secFrames; Stream->Read(&secFrames);
+
+		Stream->seek(animIndexPos);
+		int animIndex; Stream->Read(&animIndex);
+		Stream->seek(secIndexPos);
+		int sectionIndex; Stream->Read(&sectionIndex);
+
+		if (sectionIndex > 0)
+		{
+
+			for (int j = 0; j < secPerAnim[i]; j++)
+			{
+				//secHdrNum = 0;
+
+				Stream->seek(startPos + sectionIndex);
+				int animBlock; Stream->Read(&animBlock);
+				int animOffset; Stream->Read(&animOffset);
+				Stream->seek(startPos + animOffset);
+				for (int k = 0; k < Initial_Header->numbones * Initial_Header->numlocalanim; k++)
+				{
+					int pos2 = Stream->Position();
+					std::byte bone; Stream->Read(&bone); //Logger::Info("Bone: %d, Pos:  %d\n", bone, Stream->Position() - 1);
+					std::byte flag; Stream->Read(&flag); //Logger::Info("Flag: %d, Pos:  %d\n", flag, Stream->Position() - 1);
+					short nextOffset; Stream->Read(&nextOffset); //Logger::Info("Next Offset: %d, Pos:  %d\n", nextOffset, Stream->Position() - 2);
+					int headerSize = GetAnimHeaderSize((int)flag);
+					secHdrNum++;
+					if (nextOffset == 0)
+					{
+						Stream->seek(pos2 + headerSize);
+						break;
+					}
+					Stream->seek(pos2 + nextOffset);
+				}
+			}
+			secHdrsPerAnim.push_back(secHdrNum);
+
+
+		}
+		else secHdrsPerAnim.push_back(0);
+
+
+
+	}
+	return secHdrsPerAnim;
+
+}
+
+int GetAnimSectionBoneHeaderCountTotal(BinaryReader* Stream, v49_Header* Initial_Header, bool debug)
+{
+	std::vector<int> secPerAnim = GetAnimSectionCount(Stream, Initial_Header, false);
+	int secHdrNum = 0;
+	for (int i = 0; i < Initial_Header->numlocalanim; i++)
+	{
+		int startPos = Initial_Header->localanimindex + 100 * i;
+		int animIndexPos = startPos + 56;
+		int secIndexPos = startPos + 80;
+		int framePos = startPos + 16;
+		int secFramPos = startPos + 84;
+
+		Stream->seek(framePos);
+		int frames; Stream->Read(&frames);
+		Stream->seek(secFramPos);
+		int secFrames; Stream->Read(&secFrames);
+
+		Stream->seek(animIndexPos);
+		int animIndex; Stream->Read(&animIndex);
+		Stream->seek(secIndexPos);
+		int sectionIndex; Stream->Read(&sectionIndex);
+
+		if (sectionIndex > 0)
+		{
+
+			for (int j = 0; j < secPerAnim[i]; j++)
+			{
+				//secHdrNum = 0;
+
+				Stream->seek(startPos + sectionIndex);
+				int animBlock; Stream->Read(&animBlock);
+				int animOffset; Stream->Read(&animOffset);
+				Stream->seek(startPos + animOffset);
+				for (int k = 0; k < Initial_Header->numbones * Initial_Header->numlocalanim; k++)
+				{
+					int pos2 = Stream->Position();
+					std::byte bone; Stream->Read(&bone); //Logger::Info("Bone: %d, Pos:  %d\n", bone, Stream->Position() - 1);
+					std::byte flag; Stream->Read(&flag); //Logger::Info("Flag: %d, Pos:  %d\n", flag, Stream->Position() - 1);
+					short nextOffset; Stream->Read(&nextOffset); //Logger::Info("Next Offset: %d, Pos:  %d\n", nextOffset, Stream->Position() - 2);
+					int headerSize = GetAnimHeaderSize((int)flag);
+					secHdrNum++;
+					if (nextOffset == 0)
+					{
+						Stream->seek(pos2 + headerSize);
+						break;
+					}
+					Stream->seek(pos2 + nextOffset);
+				}
+			}
+			if (debug) Logger::Info("AnimNum: %d, secHdrNum:  %d\n", i, secHdrNum);
+		}
+
+
+
+	}
+	return secHdrNum;
+
+}
+
+std::vector<int> GetAnimSectionBoneHeaderCountPerSec(BinaryReader* Stream, v49_Header* Initial_Header, bool debug)
+{
+	std::vector<int> secPerAnim = GetAnimSectionCount(Stream, Initial_Header, false);
+	int  secTotal = GetAnimSectionCountTotal(Stream, Initial_Header, false);
+	std::vector<int> hdrsPerSec;
+	int* secHdrsPerAnim = new int[secTotal];
+	int secNum = 0;
+	int test = 0;
+	for (int i = 0; i < Initial_Header->numlocalanim; i++)
+	{
+		int startPos = Initial_Header->localanimindex + 100 * i;
+		int animIndexPos = startPos + 56;
+		int secIndexPos = startPos + 80;
+		int framePos = startPos + 16;
+		int secFramPos = startPos + 84;
+
+		Stream->seek(framePos);
+		int frames; Stream->Read(&frames);
+		Stream->seek(secFramPos);
+		int secFrames; Stream->Read(&secFrames);
+
+		Stream->seek(animIndexPos);
+		int animIndex; Stream->Read(&animIndex);
+		Stream->seek(secIndexPos);
+		int sectionIndex; Stream->Read(&sectionIndex);
+
+		if (sectionIndex > 0)
+		{
+			int secHdrNum = 0;
+
+			for (int j = 0; j < secPerAnim[i]; j++)
+			{
+				secHdrNum = 0;
+
+				Stream->seek(startPos + sectionIndex);
+				int animBlock; Stream->Read(&animBlock);
+				int animOffset; Stream->Read(&animOffset);
+				Stream->seek(startPos + animOffset);
+				for (int k = 0; k < 100000000; k++)
+				{
+					int pos2 = Stream->Position();
+					std::byte bone; Stream->Read(&bone); //Logger::Info("Bone: %d, Pos:  %d\n", bone, Stream->Position() - 1);
+					std::byte flag; Stream->Read(&flag); //Logger::Info("Flag: %d, Pos:  %d\n", flag, Stream->Position() - 1);
+					short nextOffset; Stream->Read(&nextOffset); //Logger::Info("Next Offset: %d, Pos:  %d\n", nextOffset, Stream->Position() - 2);
+					int headerSize = GetAnimHeaderSize((int)flag);
+					secHdrNum++;
+					if (nextOffset == 0)
+					{
+						break;
+					}
+					Stream->seek(pos2 + nextOffset);
+				}
+				hdrsPerSec.push_back(secHdrNum);
+				if (debug) Logger::Info("SecNum: %d, secHdrNum:  %d\n", j, secHdrNum);
+				secNum++;
+			}
+		}
+	}
+	return hdrsPerSec;
+
+}
+
+int GetAnimSectionBytesAdded(BinaryReader* Stream, v49_Header* Initial_Header, bool debug)
+{
+	int bytesAdded = 0;
+	std::vector<int> secHdrsPerAnim = GetAnimSectionBoneHeaderCount(Stream, Initial_Header, false);
+	std::vector<int> secPerAnim = GetAnimSectionCount(Stream, Initial_Header, false);
+	int secNum = 0;
+
+	for (int i = 0; i < Initial_Header->numlocalanim; i++)
+	{
+		int startPos = Initial_Header->localanimindex + 100 * i;
+		int animIndexPos = startPos + 56;
+		int secIndexPos = startPos + 80;
+		int framePos = startPos + 16;
+		int secFramPos = startPos + 84;
+
+		Stream->seek(animIndexPos + 100);
+		int nextAnimIndex; Stream->Read(&nextAnimIndex);
+		Stream->seek(secIndexPos + 100);
+		int nextSectionIndex; Stream->Read(&nextSectionIndex);
+
+		Stream->seek(framePos);
+		int frames; Stream->Read(&frames);
+		Stream->seek(secFramPos);
+		int secFrames; Stream->Read(&secFrames);
+
+		Stream->seek(animIndexPos);
+		int animIndex; Stream->Read(&animIndex);
+		Stream->seek(secIndexPos);
+		int sectionIndex; Stream->Read(&sectionIndex);
+
+		if (sectionIndex > 0)
+		{
+			for (int j = 0; j < secPerAnim[i]; j++)
+			{
+				int bytesAddedPer = 0;
+				Stream->seek(startPos + sectionIndex + 8 * j);
+				int animBlock; Stream->Read(&animBlock);
+				int animOffset; Stream->Read(&animOffset);
+				Stream->seek(startPos + animOffset);
+				for (int k = 0; k < 1000000; k++)
+				{
+					int pos2 = Stream->Position();
+					std::byte bone; Stream->Read(&bone); //Logger::Info("Bone: %d, Pos:  %d\n", bone, Stream->Position() - 1);
+					std::byte flag; Stream->Read(&flag); //Logger::Info("Flag: %d, Pos:  %d\n", flag, Stream->Position() - 1);
+					short nextOffset; Stream->Read(&nextOffset); //Logger::Info("Next Offset: %d, Pos:  %d\n", nextOffset, Stream->Position() - 2);
+					int headerSize = GetAnimHeaderSize((int)flag);
+					bytesAddedPer += (32 - headerSize);
+					bytesAdded += (32 - headerSize);
+					if (nextOffset == 0)
+					{
+						if (i + 1 < Initial_Header->numlocalanim && j == secPerAnim[i])
+						{
+							int dist = ((startPos + 100 + nextAnimIndex) - (pos2 + headerSize));
+
+							if (dist > 18 || dist < 0)
+							{
+								for (int l = 0; l < 1000; l++)
+								{
+									short animValue; Stream->Read(&animValue);
+									if (animValue == 0)
+									{
+										int newPos = Stream->Position() - 2;
+										dist = ((startPos + 100 + nextAnimIndex) - (newPos));
+										if (dist <= 18)
+										{
+											break;
+										}
+									}
+								}
+							}
+							//Logger::Info("secDist:  %d\n", dist);
+							//Logger::Info("secStart:  %d\n", pos2 + headerSize);
+							//Logger::Info("secEnd:  %d\n", startPos + 100 + nextAnimIndex);
+							//Logger::Info("secFinalDist:  %d\n", 32 - dist);
+							bytesAdded += 32 - dist;
+						}
+
+						break;
+					}
+					Stream->seek(pos2 + nextOffset);
+				}
+				secNum++;
+			}
+		}
+	}
+	return bytesAdded;
+}
+
+std::vector<int> GetAnimSectionBytesAdded2(BinaryReader* Stream, v49_Header* Initial_Header, bool debug)
+{
+	int bytesAdded = 0;
+	std::vector<int> secHdrsPerAnim = GetAnimSectionBoneHeaderCount(Stream, Initial_Header, false);
+	std::vector<int> secPerAnim = GetAnimSectionCount(Stream, Initial_Header, false);
+	std::vector<int> bytesAddedPerAnim;
+	int secNum = 0;
+
+	for (int i = 0; i < Initial_Header->numlocalanim; i++)
+	{
+		int startPos = Initial_Header->localanimindex + 100 * i;
+		int animIndexPos = startPos + 56;
+		int secIndexPos = startPos + 80;
+		int framePos = startPos + 16;
+		int secFramPos = startPos + 84;
+
+		Stream->seek(animIndexPos + 100);
+		int nextAnimIndex; Stream->Read(&nextAnimIndex);
+		Stream->seek(secIndexPos + 100);
+		int nextSectionIndex; Stream->Read(&nextSectionIndex);
+
+		Stream->seek(framePos);
+		int frames; Stream->Read(&frames);
+		Stream->seek(secFramPos);
+		int secFrames; Stream->Read(&secFrames);
+
+		Stream->seek(animIndexPos);
+		int animIndex; Stream->Read(&animIndex);
+		Stream->seek(secIndexPos);
+		int sectionIndex; Stream->Read(&sectionIndex);
+		bytesAddedPerAnim.push_back(bytesAdded);
+		if (sectionIndex > 0)
+		{
+			int num = (frames / secFrames) + 2;
+
+			for (int j = 0; j < num; j++)
+			{
+				int bytesAddedPer = 0;
+				Stream->seek(startPos + sectionIndex + 8 * j);
+				int animBlock; Stream->Read(&animBlock);
+				int animOffset; Stream->Read(&animOffset);
+				Stream->seek(startPos + animOffset);
+				for (int k = 0; k < secHdrsPerAnim[i]; k++)
+				{
+					int pos2 = Stream->Position();
+					std::byte bone; Stream->Read(&bone); //Logger::Info("Bone: %d, Pos:  %d\n", bone, Stream->Position() - 1);
+					std::byte flag; Stream->Read(&flag); //Logger::Info("Flag: %d, Pos:  %d\n", flag, Stream->Position() - 1);
+					short nextOffset; Stream->Read(&nextOffset); //Logger::Info("Next Offset: %d, Pos:  %d\n", nextOffset, Stream->Position() - 2);
+					int headerSize = GetAnimHeaderSize((int)flag);
+					bytesAddedPer += (32 - headerSize);
+					bytesAdded += (32 - headerSize);
+					if (nextOffset == 0)
+					{
+						if (i + 1 < Initial_Header->numlocalanim && j + 1 > num )
+						{
+							int dist = nextSectionIndex > 0 ? ((startPos + 100 + nextSectionIndex) - (pos2 + headerSize)) : ((startPos + 100 + nextAnimIndex) - (pos2 + headerSize));
+
+							if (dist > 18 || dist < 0)
+							{
+								for (int l = 0; l < 1000; l++)
+								{
+									short animValue; Stream->Read(&animValue);
+									if (animValue == 0)
+									{
+										int newPos = Stream->Position() - 2;
+										nextSectionIndex > 0 ? dist = ((startPos + 100 + nextSectionIndex) - (newPos)) : dist = ((startPos + 100 + nextAnimIndex) - (newPos));
+										if (dist <= 18)
+										{
+											break;
+										}
+									}
+								}
+							}
+							Logger::Info("secDist:  %d\n", dist);
+							Logger::Info("secStart:  %d\n", pos2 + headerSize);
+							Logger::Info("secEnd:  %d\n", startPos + 100 + nextAnimIndex);
+							Logger::Info("secFinalDist:  %d\n", 32 - dist);
+							bytesAdded += 32 - dist;
+						}
+						break;
+					}
+					Stream->seek(pos2 + nextOffset);
+				}
+				secNum++;
+			}
+		}
+	}
+	return bytesAddedPerAnim;
+}
+
+std::vector<int> GetAnimSectionBoneHeaderBytesAdded(BinaryReader* Stream, v49_Header* Initial_Header, bool debug)
+{
+	int bytesAdded = 0;
+	std::vector<int> secHdrsPerSec = GetAnimSectionBoneHeaderCountPerSec(Stream, Initial_Header, false);
+	std::vector<int> secBytesAddedPerAnim;
+	std::vector<int> secPerAnim = GetAnimSectionCount(Stream, Initial_Header, false);
+	std::vector<int> secBytesAddedPerSec;
+	int secNum = 0;
+	int test = 0;
+
+	for (int i = 0; i < Initial_Header->numlocalanim; i++)
+	{
+		int startPos = Initial_Header->localanimindex + 100 * i;
+		int animIndexPos = startPos + 56;
+		int secIndexPos = startPos + 80;
+		int framePos = startPos + 16;
+		int secFramPos = startPos + 84;
+
+		Stream->seek(animIndexPos + 100);
+		int nextAnimIndex; Stream->Read(&nextAnimIndex);
+		Stream->seek(secIndexPos + 100);
+		int nextSectionIndex; Stream->Read(&nextSectionIndex);
+
+		Stream->seek(framePos);
+		int frames; Stream->Read(&frames);
+		Stream->seek(secFramPos);
+		int secFrames; Stream->Read(&secFrames);
+
+		Stream->seek(animIndexPos);
+		int animIndex; Stream->Read(&animIndex);
+		Stream->seek(secIndexPos);
+		int sectionIndex; Stream->Read(&sectionIndex);
+
+		if (sectionIndex > 0)
+		{
+			secBytesAddedPerAnim.push_back(bytesAdded);
+			for (int j = 0; j < secPerAnim[i]; j++)
+			{
+				int bytesAddedPer = 0;
+				Stream->seek(startPos + sectionIndex + 8 * j);
+				int animBlock; Stream->Read(&animBlock);
+				int animOffset; Stream->Read(&animOffset);
+				Stream->seek(startPos + animOffset);
+				for (int k = 0; k < secHdrsPerSec[i]; k++)
+				{
+					int pos2 = Stream->Position();
+					std::byte bone; Stream->Read(&bone); //Logger::Info("Bone: %d, Pos:  %d\n", bone, Stream->Position() - 1);
+					std::byte flag; Stream->Read(&flag); //Logger::Info("Flag: %d, Pos:  %d\n", flag, Stream->Position() - 1);
+					short nextOffset; Stream->Read(&nextOffset); //Logger::Info("Next Offset: %d, Pos:  %d\n", nextOffset, Stream->Position() - 2);
+					int headerSize = GetAnimHeaderSize((int)flag);
+					bytesAddedPer += (32 - headerSize);
+					bytesAdded += (32 - headerSize);
+					if (nextOffset == 0)
+					{
+						if (i + 1 < Initial_Header->numlocalanim && nextSectionIndex == 0)
+						{
+							int dist = ((startPos + 100 + nextAnimIndex) - (pos2 + headerSize));
+							//Logger::Info("secDist:  %d\n", dist);
+							//Logger::Info("secStart:  %d\n", pos2 + headerSize);
+							//Logger::Info("secEnd:  %d\n", startPos + 100 + nextAnimIndex);
+							//Logger::Info("secFinalDist:  %d\n", 32 - dist);
+							bytesAdded += 32 - dist;
+						}
+						break;
+					}
+					Stream->seek(pos2 + nextOffset);
+				}
+				secNum++;
+			}
+		}
+
+	}
+	return secBytesAddedPerAnim;
+}
+
+std::vector<int> GetAnimBoneHeaderBytesAdded2(BinaryReader* Stream, v49_Header* Initial_Header, bool debug)
+{
+	int bytesAdded = 0;
+	std::vector<int> hdrsPerAnim = GetAnimBoneHeaderCount(Stream, Initial_Header, false);
+	std::vector<int> hdrBytesAddedPerAnim;
+	int passedSec = 0;
+	int test = 0;
+
+	for (int i = 0; i < Initial_Header->numlocalanim; i++)
+	{
+		int bytesAddedPer = 0;
+		int strPos = Initial_Header->localanimindex + 100 * i;
+		int animPos = strPos + 56;
+		int secIndexPos = strPos + 80;
+		Stream->seek(animPos);
+		int animIndex; Stream->Read(&animIndex);
+		Stream->seek(secIndexPos);
+		int sectionIndex; Stream->Read(&sectionIndex);
+		Stream->seek(strPos + animIndex);
+
+		hdrBytesAddedPerAnim.push_back(bytesAdded);
+		if (debug) Logger::Info("AnimNum: %d, bytesAdded:  %d\n", i, hdrBytesAddedPerAnim[i]);
+
+		for (int j = 0; j < hdrsPerAnim[i]; j++)
+		{
+			int pos2 = Stream->Position();
+			std::byte bone; Stream->Read(&bone); //Logger::Info("Bone: %d, Pos:  %d\n", bone, Stream->Position() - 1);
+			std::byte flag; Stream->Read(&flag); //Logger::Info("Flag: %d, Pos:  %d\n", flag, Stream->Position() - 1);
+			short nextOffset; Stream->Read(&nextOffset); //Logger::Info("Next Offset: %d, Pos:  %d\n", nextOffset, Stream->Position() - 2);
+			int headerSize = GetAnimHeaderSize((int)flag);
+			bytesAddedPer += (32 - headerSize);
+			bytesAdded += (32 - headerSize);
+			if (nextOffset == 0)
+			{
+				break;
+			}
+			Stream->seek(pos2 + nextOffset);
+
+		}
+
+	}
+	return hdrBytesAddedPerAnim;
 }
 
 
+std::vector<int> GetAnimBoneHeaderBytesAdded(BinaryReader* Stream, v49_Header* Initial_Header, bool debug)
+{
+	int bytesAdded = 0;
+	std::vector<int> hdrsPerAnim = GetAnimBoneHeaderCount(Stream, Initial_Header, false);
+	std::vector<int> hdrBytesAddedPerAnim;
+	int passedSec = 0;
+	int test = 0;
+
+	for (int i = 0; i < Initial_Header->numlocalanim; i++)
+	{
+		int bytesAddedPer = 0;
+		int strPos = Initial_Header->localanimindex + 100 * i;
+		int animPos = strPos + 56;
+		int secIndexPos = strPos + 80;
+
+		Stream->seek(animPos + 100);
+		int nextAnimIndex; Stream->Read(&nextAnimIndex);
+		Stream->seek(secIndexPos + 100);
+		int nextSectionIndex; Stream->Read(&nextSectionIndex);
+
+		Stream->seek(animPos);
+		int animIndex; Stream->Read(&animIndex);
+		Stream->seek(secIndexPos);
+		int sectionIndex; Stream->Read(&sectionIndex);
+		Stream->seek(strPos + animIndex);
+		hdrBytesAddedPerAnim.push_back(bytesAdded);
+		if (debug) Logger::Info("AnimNum: %d, bytesAdded:  %d\n", i, hdrBytesAddedPerAnim[i]);
+
+		if (sectionIndex == 0)
+		{
+			for (int j = 0; j < hdrsPerAnim[i]; j++)
+			{
+				int pos2 = Stream->Position();
+				std::byte bone; Stream->Read(&bone); //Logger::Info("Bone: %d, Pos:  %d\n", bone, Stream->Position() - 1);
+				std::byte flag; Stream->Read(&flag); //Logger::Info("Flag: %d, Pos:  %d\n", flag, Stream->Position() - 1);
+				short nextOffset; Stream->Read(&nextOffset); //Logger::Info("Next Offset: %d, Pos:  %d\n", nextOffset, Stream->Position() - 2);
+				int headerSize = GetAnimHeaderSize((int)flag);
+				bytesAddedPer += (32 - headerSize);
+				bytesAdded += (32 - headerSize);
+				if (nextOffset == 0)
+				{
+					if (i + 1 < Initial_Header->numlocalanim && nextSectionIndex == 0)
+					{
+						int dist = ((strPos + 100 + nextAnimIndex) - (pos2 + headerSize));
+
+						if (dist > 18 || dist < 0)
+						{
+							for (int l = 0; l < 1000; l++)
+							{
+								short animValue; Stream->Read(&animValue);
+								if (animValue == 0)
+								{
+									int newPos = Stream->Position() - 2;
+									dist = ((strPos + 100 + nextAnimIndex) - (newPos));
+									if (dist <= 18)
+									{
+										break;
+									}
+								}
+							}
+						}
+						//Logger::Info("dist:  %d\n", dist);
+						//Logger::Info("start:  %d\n", pos2 + headerSize);
+						//Logger::Info("end:  %d\n", strPos + 100 + nextAnimIndex);
+						//Logger::Info("finalDist:  %d\n", 32 - dist);
+						bytesAdded += 32 - dist;
+					}
+
+					break;
+				}
+				Stream->seek(pos2 + nextOffset);
+
+			}
+		}
+		else hdrBytesAddedPerAnim[i] = bytesAdded;
+
+	}
+	return hdrBytesAddedPerAnim;
+}
+
+
+std::vector<int> GetAnimSectionBoneHeaderBytesAddedPerSec(BinaryReader* Stream, v49_Header* Initial_Header, bool debug)
+{
+	int bytesAdded = 0;
+	int* secBytesAddedPerAnim = new int[Initial_Header->numlocalanim];
+	std::vector<int> secPerAnim = GetAnimSectionCount(Stream, Initial_Header, false);
+	std::vector<int> secBytesAddedPerSec;
+	std::vector<int> secHdrsPerSec = GetAnimSectionBoneHeaderCountPerSec(Stream, Initial_Header, false);
+	int secNum = 0;
+	int test = 0;
+
+	for (int i = 0; i < Initial_Header->numlocalanim; i++)
+	{
+		int startPos = Initial_Header->localanimindex + 100 * i;
+		int animIndexPos = startPos + 56;
+		int secIndexPos = startPos + 80;
+		int framePos = startPos + 16;
+		int secFramPos = startPos + 84;
+
+		Stream->seek(framePos);
+		int frames; Stream->Read(&frames);
+		Stream->seek(secFramPos);
+		int secFrames; Stream->Read(&secFrames);
+
+		Stream->seek(animIndexPos);
+		int animIndex; Stream->Read(&animIndex);
+		Stream->seek(secIndexPos);
+		int sectionIndex; Stream->Read(&sectionIndex);
+
+		if (sectionIndex > 0)
+		{
+			int num = (frames / secFrames) + 2;
+			for (int j = 0; j < num; j++)
+			{
+				int bytesAddedPer = 0;
+				Stream->seek(startPos + sectionIndex + 8 * j);
+				int animBlock; Stream->Read(&animBlock);
+				int animOffset; Stream->Read(&animOffset);
+				Stream->seek(startPos + animOffset);
+				secBytesAddedPerSec.push_back(bytesAdded);
+				for (int k = 0; k < 10000000; k++)
+				{
+					int pos2 = Stream->Position();
+					std::byte bone; Stream->Read(&bone); //Logger::Info("Bone: %d, Pos:  %d\n", bone, Stream->Position() - 1);
+					std::byte flag; Stream->Read(&flag); //Logger::Info("Flag: %d, Pos:  %d\n", flag, Stream->Position() - 1);
+					short nextOffset; Stream->Read(&nextOffset); //Logger::Info("Next Offset: %d, Pos:  %d\n", nextOffset, Stream->Position() - 2);
+					int headerSize = GetAnimHeaderSize((int)flag);
+					bytesAddedPer += (32 - headerSize);
+					bytesAdded += (32 - headerSize);
+					if (nextOffset == 0)
+					{
+						Stream->seek(pos2 + headerSize);
+						//if (debug) Logger::Info("SecNum: %d, secBytesAddedTtl:  %d\n", secNum, bytesAdded);
+						//if (debug) Logger::Info("SecNum: %d, secBytesAddePerd:  %d\n", secNum, bytesAddedPer);
+						break;
+					}
+					Stream->seek(pos2 + nextOffset);
+				}
+				secNum++;
+			}
+		}
+	}
+	return secBytesAddedPerSec;
+}
+
+std::vector<int> GetBytesAddedPerSeq(BinaryReader* Stream, v49_Header* Initial_Header, SequenceData* sequenceData, bool debug)
+{
+	std::vector<int> bytesAddedPerSeq;
+	int curSeq = 0;
+	int numOfActMods = 0;
+	int bytesAdded = 0;
+	std::vector<int> actMods;
+	for (int i = 0; i < Initial_Header->numlocalseq; i++)
+	{
+		mstudioseqdesc_t_v53 sequence = sequenceData->sequences[i];
+
+		if (sequence.numactivitymodifiers > 0)
+		{
+			actMods.push_back(i);
+		}
+	}
+
+	for (int i = 0; i < Initial_Header->numlocalseq; i++)
+	{
+		int num = 0;
+		for (int j = 0; j < actMods.size(); j++)
+		{
+			if (i < actMods[j])
+			{
+				bytesAdded += 4 * sequenceData->sequences[actMods[j]].numactivitymodifiers;
+				num++;
+			}
+		}
+		if (i == actMods[0]) bytesAddedPerSeq.push_back(0);
+		if (i != actMods[0] && num > 0)bytesAddedPerSeq.push_back(bytesAdded);
+		else if (i != actMods[0] && num == 0)bytesAddedPerSeq.push_back(0);
+	}
+	return bytesAddedPerSeq;
+}
+
+std::vector<int> GetBytesAddedPerSeqIdx(BinaryReader* Stream, v49_Header* Initial_Header, SequenceData* sequenceData, bool debug)
+{
+	std::vector<int> bytesAddedPerSeq;
+	int curSeq = 0;
+	int numOfActMods = 0;
+	int bytesAdded = 0;
+	std::vector<int> actMods;
+	for (int i = 0; i < Initial_Header->numlocalseq; i++)
+	{
+		mstudioseqdesc_t_v53 sequence = sequenceData->sequences[i];
+
+		if (sequence.numactivitymodifiers > 0)
+		{
+			actMods.push_back(i);
+		}
+	}
+
+	for (int i = 0; i < Initial_Header->numlocalseq; i++)
+	{
+		int num = 0;
+		for (int j = 0; j < actMods.size(); j++)
+		{
+			if (i > actMods[j])
+			{
+				bytesAdded += 4 * sequenceData->sequences[actMods[j]].numactivitymodifiers;
+				num++;
+			}
+		}
+		if (i == actMods[0]) bytesAddedPerSeq.push_back(0);
+		if (i != actMods[0] && num > 0)bytesAddedPerSeq.push_back(bytesAdded);
+		else if (i != actMods[0] && num == 0)bytesAddedPerSeq.push_back(0);
+	}
+	return bytesAddedPerSeq;
+}
+
 void ConvertBoneHeader(BinaryReader* Stream, int num, BoneHeaderv53* boneHeaders_v53, v49_Header* Initial_Header, studiohdr2_t* Initial_Header_Part2) //hacky way of converting the headers
 {
-	//Logger::Info("ConvBoneHdrPos: %d %d\n", Stream->Position());
 	int pos2 = Stream->Position();
-	std::byte bone; Stream->Read(&bone); //Logger::Info("Bone: %d, Pos:  %d\n", bone, Stream->Position() - 1);
-	std::byte flag; Stream->Read(&flag); //Logger::Info("Flag: %d, Pos:  %d\n", flag, Stream->Position() - 1);
-	short nextOffset; Stream->Read(&nextOffset); //Logger::Info("Next Offset: %d, Pos:  %d\n", nextOffset, Stream->Position() - 2);
+	std::byte bone; Stream->Read(&bone);
+	std::byte flag; Stream->Read(&flag);
+	short nextOffset; Stream->Read(&nextOffset);
 	short origOffset = nextOffset;
 	int strEndPos = Stream->Position();
 	nextOffset = nextOffset > 0 ? nextOffset + (32 - GetAnimHeaderSize((int)flag)) : 0;
@@ -225,7 +1648,6 @@ void ConvertBoneHeader(BinaryReader* Stream, int num, BoneHeaderv53* boneHeaders
 	case 12:
 	{
 		Vector3Short rotPtr; Stream->Read(&rotPtr); rotPtr.x > 0 ? rotPtr.x += 12 : rotPtr.x = 0; rotPtr.y > 0 ? rotPtr.y += 12 : rotPtr.y = 0; rotPtr.z > 0 ? rotPtr.z += 12 : rotPtr.z = 0;
-		//boneHeaders_v53[num].rawStrPos = Stream->Position();
 		Vector3Short posPtr; Stream->Read(&posPtr); posPtr.x > 0 ? posPtr.x += 10 : posPtr.x = 0; posPtr.y > 0 ? posPtr.y += 10 : posPtr.y = 0; posPtr.z > 0 ? posPtr.z += 10 : posPtr.z = 0;
 		strEndPos = Stream->Position();
 		boneHeaders_v53[num].translationScale = 0;
@@ -308,8 +1730,7 @@ void ConvertBoneHeader(BinaryReader* Stream, int num, BoneHeaderv53* boneHeaders
 		break;
 	}
 	}
-	Stream->seek(pos2 + origOffset);//(GetAnimHeaderSize((int)boneHeaders_v53[num].r2Flag)));
-	//Logger::Info("Bone: %d, Flag:  %d, nextOffset:  %d, \n", boneHeaders_v53[num].bone, boneHeaders_v53[num].r2Flag, boneHeaders_v53[num].nextOffset);
+	Stream->seek(pos2 + origOffset);
 }
 
 bool Contains(int* arry, int trgt, int count)
@@ -357,7 +1778,6 @@ int* GetAnimSecs(BinaryReader* Stream, v49_Header* Initial_Header, bool secNumbe
 			int secStrPos = strPos + strSecIdx;                         //Get animSec stream start pos
 			int secNum = ( (strPos + animIdx - 8) - secStrPos) / 8;   //Calculate number of sections via offset division minus divider bytes
 			num += secNum;                                              //Increase number of sections by secNum calculation
-			//Logger::Info("secNum_2: %d %d\n", secNum);
 			sectionsPerAnim[i] = secNum;
 		}
 		else if(strSecIdx == 0) sectionsPerAnim[i] = 0;
@@ -409,7 +1829,6 @@ int* GetBytesAddedToBoneHdrs(BinaryReader* Stream, v49_Header* Initial_Header, i
 				{
 					if(i + 1 < Initial_Header->numlocalanim) animHdrBytesAdd[i + 1] = bytesAdded;
 					if (debug) Logger::Info("animHdrBytesAdded: %d, animNum %d\n", bytesAdded, i);
-					//secHdrPerAnim[i] = numOfHeaders;
 
 					if (Contains(animsWithSections, i, Initial_Header->numlocalanim))
 					{
@@ -458,7 +1877,6 @@ int* GetBytesAddedToBoneHdrs(BinaryReader* Stream, v49_Header* Initial_Header, i
 									curSec += 1;
 									lastSecHdr = i;
 									tempNum = num;
-									//secBytesAdded = 0;
 									break;
 								}
 							}
@@ -735,26 +2153,95 @@ float GetLargestNumber(float n1, float n2, float n3)
 	//cout << "Enter three numbers: ";
 	//cin >> n1 >> n2 >> n3;
 
-	if (n1 > n2 && n1 < n3 || n1 < n2 && n1 > n3 )
-		return n1;
 
-	if (n2 > n1 && n2 < n3 || n2 < n1 && n2 > n3 )
-		return n2;
-
-	if (n3 > n1 && n3 < n2 || n3 < n1 && n3 > n2 )
-		return n3;
-
-	//if (n1 >= n2 && n1 >= n3)
+	//if (n1 > n2 && n1 == n2 || n1 > n2 && n1 > n3 && n2 == n3 || n1 > n2 && n1 < n3 || n1 > n2 && n3 < n2)
 	//	return n1;
 	//
-	//if (n2 >= n1 && n2 >= n3)
+	//if (n2 > n1 && n2 == n3 || n2 > n1 && n2 > n3 && n1 == n3 || n2 > n1 && n2 < n3 || n2 > n1 && n3 < n1)
 	//	return n2;
 	//
-	//if (n3 >= n1 && n3 >= n2)
-		//return n3;
+	//if (n3 > n1 && n3 == n2 || n3 > n1 && n3 > n2 && n1 == n2 || n3 > n1 && n3 < n2 || n3 > n2 && n3 < n1)
+	//	return n3;
+
+	if (n1 >= n2 && n1 >= n3)
+		return n1;
+	
+	if (n2 >= n1 && n2 >= n3)
+		return n2;
+	
+	if (n3 >= n1 && n3 >= n2)
+		return n3;
 
 	return n1;
 }
+
+void ReadBoneHeader2(BinaryReader* Stream, BoneHeaderv53* boneHeaders_v53, v49_Header* Initial_Header, studiohdr2_t* Initial_Header_Part2, int num, int dataSize, bool debug)
+{
+	int pos2 = Stream->Position();
+	std::byte bone; Stream->Read(&bone); //Logger::Info("Bone: %d, Pos:  %d\n", bone, Stream->Position() - 1);
+	std::byte flag; Stream->Read(&flag); //Logger::Info("Flag: %d, Pos:  %d\n", flag, Stream->Position() - 1);
+	short nextOffset; Stream->Read(&nextOffset); //Logger::Info("Next Offset: %d, Pos:  %d\n", nextOffset, Stream->Position() - 2);
+	int strEndPos = Stream->Position();
+	nextOffset = nextOffset > 0 ? nextOffset + (32 - GetAnimHeaderSize((int)flag)) : 0;
+
+	LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+	Stream->seek(strEndPos);
+
+	boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)0; boneHeaders_v53[num].packedRotation.i = (short)0; boneHeaders_v53[num].packedRotation.j = (short)0; boneHeaders_v53[num].packedRotation.k = (short)0;
+	boneHeaders_v53[num].rawPos; boneHeaders_v53[num].rawPos.x = (short)float_to_half(boneData->bonePos.x); boneHeaders_v53[num].rawPos.y = (short)float_to_half(boneData->bonePos.y); boneHeaders_v53[num].rawPos.z = (short)float_to_half(boneData->bonePos.z);
+
+	if ((int)flag & STUDIO_ANIM_ANIMROT)
+	{
+		Vector3Short rotPtr; Stream->Read(&rotPtr); rotPtr.x > 0 ? rotPtr.x += 12 : rotPtr.x = 0; rotPtr.y > 0 ? rotPtr.y += 12 : rotPtr.y = 0; rotPtr.z > 0 ? rotPtr.z += 12 : rotPtr.z = 0;
+		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rotPtr.x; boneHeaders_v53[num].packedRotation.i = (short)rotPtr.y; boneHeaders_v53[num].packedRotation.j = (short)rotPtr.z; boneHeaders_v53[num].packedRotation.k = (short)0;
+	}
+	if ((int)flag & STUDIO_ANIM_ANIMPOS)
+	{
+		Vector3Short posPtr; Stream->Read(&posPtr); posPtr.x > 0 ? posPtr.x += 10 : posPtr.x = 0; posPtr.y > 0 ? posPtr.y += 10 : posPtr.y = 0; posPtr.z > 0 ? posPtr.z += 10 : posPtr.z = 0;
+		boneHeaders_v53[num].rawPos = posPtr;
+	}
+	if ((int)flag & STUDIO_ANIM_RAWPOS)
+	{
+		Vector3Short rawPos; Stream->Read(&rawPos);
+		boneHeaders_v53[num].rawPos = rawPos;
+	}
+	if ((int)flag & STUDIO_ANIM_RAWROT)
+	{
+		Vector3Short rawRot; Stream->Read(&rawRot);
+		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rawRot.x; boneHeaders_v53[num].packedRotation.i = (short)rawRot.y; boneHeaders_v53[num].packedRotation.j = (short)rawRot.z; boneHeaders_v53[num].packedRotation.k = (short)0;
+	}
+	if ((int)flag & STUDIO_ANIM_RAWROT2)
+	{
+		QuaternionShort rawRot; Stream->Read(&rawRot);
+		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rawRot.one; boneHeaders_v53[num].packedRotation.i = (short)rawRot.i; boneHeaders_v53[num].packedRotation.j = (short)rawRot.j; boneHeaders_v53[num].packedRotation.k = (short)rawRot.k;
+	}
+	strEndPos = Stream->Position();
+	if ((int)flag == 12)boneHeaders_v53[num].translationScale = GetLargestNumber(boneData->posScale.x, boneData->posScale.y, boneData->posScale.z);
+	else boneHeaders_v53[num].translationScale = 0;
+	boneHeaders_v53[num].bone = bone;
+	boneHeaders_v53[num].r2Flag = flag;
+	boneHeaders_v53[num].flags = 0;
+	boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+	boneHeaders_v53[num].nextOffset = nextOffset;
+	boneHeaders_v53[num].dataSize = dataSize;
+	boneHeaders_v53[num].rawStrPos = strEndPos;
+
+	if ((int)flag == 0)
+	{
+		strEndPos = Stream->Position();
+		boneHeaders_v53[num].translationScale = 0;
+		boneHeaders_v53[num].bone = bone;
+		boneHeaders_v53[num].r2Flag = flag;
+		boneHeaders_v53[num].flags = 0;
+		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)0; boneHeaders_v53[num].packedRotation.i = (short)0; boneHeaders_v53[num].packedRotation.j = (short)0; boneHeaders_v53[num].packedRotation.k = (short)0;
+		boneHeaders_v53[num].rawPos; boneHeaders_v53[num].rawPos.x = (short)0; boneHeaders_v53[num].rawPos.y = (short)0; boneHeaders_v53[num].rawPos.z = (short)0;
+		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 0; boneHeaders_v53[num].rawScale.y = 0; boneHeaders_v53[num].rawScale.z = 0;
+		boneHeaders_v53[num].nextOffset = 0;
+		boneHeaders_v53[num].dataSize = 0;
+		boneHeaders_v53[num].rawStrPos = strEndPos;
+	}
+}
+
 
 void ReadBoneHeader(BinaryReader* Stream, BoneHeaderv53* boneHeaders_v53, v49_Header* Initial_Header, studiohdr2_t* Initial_Header_Part2, int num, int dataSize, bool debug)
 {
@@ -767,14 +2254,30 @@ void ReadBoneHeader(BinaryReader* Stream, BoneHeaderv53* boneHeaders_v53, v49_He
 
 	switch ((int)flag)
 	{
+	case 0:
+	{
+		strEndPos = Stream->Position();
+		boneHeaders_v53[num].translationScale = 0;
+		boneHeaders_v53[num].bone = bone;
+		boneHeaders_v53[num].r2Flag = flag;
+		boneHeaders_v53[num].flags = 0;
+		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)0; boneHeaders_v53[num].packedRotation.i = (short)0; boneHeaders_v53[num].packedRotation.j = (short)0; boneHeaders_v53[num].packedRotation.k = (short)0;
+		boneHeaders_v53[num].rawPos; boneHeaders_v53[num].rawPos.x = (short)0; boneHeaders_v53[num].rawPos.y = (short)0; boneHeaders_v53[num].rawPos.z = (short)0;
+		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 0; boneHeaders_v53[num].rawScale.y = 0; boneHeaders_v53[num].rawScale.z = 0;
+		boneHeaders_v53[num].nextOffset = 0;
+		boneHeaders_v53[num].dataSize = 0;
+		boneHeaders_v53[num].rawStrPos = strEndPos;
+
+		break;
+	}
+
 		case 12:
 		{
 			Vector3Short rotPtr; Stream->Read(&rotPtr); rotPtr.x > 0 ? rotPtr.x += 12 : rotPtr.x = 0; rotPtr.y > 0 ? rotPtr.y += 12 : rotPtr.y = 0; rotPtr.z > 0 ? rotPtr.z += 12 : rotPtr.z = 0;
-			//boneHeaders_v53[num].rawStrPos = Stream->Position();
 			Vector3Short posPtr; Stream->Read(&posPtr); posPtr.x > 0 ? posPtr.x += 10 : posPtr.x = 0; posPtr.y > 0 ? posPtr.y += 10 : posPtr.y = 0; posPtr.z > 0 ? posPtr.z += 10 : posPtr.z = 0;
 			strEndPos = Stream->Position();
 			LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
-			boneHeaders_v53[num].translationScale = GetLargestNumber(boneData->posScale.x, boneData->posScale.y, boneData->posScale.z);//GetSecondLargest(boneData->posScale.x, boneData->posScale.y, boneData->posScale.z);//(int)bone == 61 ? (float)0.002806369 : (float)0;//GetLargestNumber(boneData->posScale.x, boneData->posScale.y, boneData->posScale.z);
+			boneHeaders_v53[num].translationScale = GetLargestNumber(boneData->posScale.x, boneData->posScale.y, boneData->posScale.z);
 			boneHeaders_v53[num].bone = bone;
 			boneHeaders_v53[num].r2Flag = flag;
 			boneHeaders_v53[num].flags = 0;
@@ -793,7 +2296,7 @@ void ReadBoneHeader(BinaryReader* Stream, BoneHeaderv53* boneHeaders_v53, v49_He
 			QuaternionShort rawRot; Stream->Read(&rawRot);
 			strEndPos = Stream->Position();
 			LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
-			boneHeaders_v53[num].translationScale = 0;// GetLargestNumber(boneData->posScale.x, boneData->posScale.y, boneData->posScale.z);;
+			boneHeaders_v53[num].translationScale = 0;
 			boneHeaders_v53[num].bone = bone;
 			boneHeaders_v53[num].r2Flag = flag;
 			boneHeaders_v53[num].flags = 0;
@@ -812,12 +2315,12 @@ void ReadBoneHeader(BinaryReader* Stream, BoneHeaderv53* boneHeaders_v53, v49_He
 			Vector3Short rawPos; Stream->Read(&rawPos);
 			strEndPos = Stream->Position();
 			LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
-			boneHeaders_v53[num].translationScale = 0;//GetLargestNumber(boneData->posScale.x, boneData->posScale.y, boneData->posScale.z);;
+			boneHeaders_v53[num].translationScale = 0;
 			boneHeaders_v53[num].bone = bone;
 			boneHeaders_v53[num].r2Flag = flag;
 			boneHeaders_v53[num].flags = 0;
 			boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rawRot.one; boneHeaders_v53[num].packedRotation.i = (short)rawRot.i; boneHeaders_v53[num].packedRotation.j = (short)rawRot.j; boneHeaders_v53[num].packedRotation.k = (short)rawRot.k;
-			boneHeaders_v53[num].rawPos = rawPos;
+			boneHeaders_v53[num].rawPos = rawPos; 
 			boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
 			boneHeaders_v53[num].nextOffset = nextOffset;
 			boneHeaders_v53[num].dataSize = dataSize;
@@ -830,7 +2333,7 @@ void ReadBoneHeader(BinaryReader* Stream, BoneHeaderv53* boneHeaders_v53, v49_He
 			Vector3Short rotPtr; Stream->Read(&rotPtr); rotPtr.x > 0 ? rotPtr.x += 18 : rotPtr.x = 0; rotPtr.y > 0 ? rotPtr.y += 18 : rotPtr.y = 0; rotPtr.z > 0 ? rotPtr.z += 18 : rotPtr.z = 0;
 			strEndPos = Stream->Position();
 			LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
-			boneHeaders_v53[num].translationScale = 0;//GetLargestNumber(boneData->posScale.x, boneData->posScale.y, boneData->posScale.z);
+			boneHeaders_v53[num].translationScale = 0;
 			boneHeaders_v53[num].bone = bone;
 			boneHeaders_v53[num].r2Flag = flag;
 			boneHeaders_v53[num].flags = 0;
@@ -853,6 +2356,81 @@ void ReadBoneHeader(BinaryReader* Stream, BoneHeaderv53* boneHeaders_v53, v49_He
 			boneHeaders_v53[num].r2Flag = flag;
 			boneHeaders_v53[num].flags = 0;
 			boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)0; boneHeaders_v53[num].packedRotation.i = (short)0; boneHeaders_v53[num].packedRotation.j = (short)0; boneHeaders_v53[num].packedRotation.k = (short)0; //boneHeaders_v53[num].packedRotation.one = (short)boneData->boneRot.x; boneHeaders_v53[num].packedRotation.i = (short)boneData->boneRot.y; boneHeaders_v53[num].packedRotation.j = (short)boneData->boneRot.z; boneHeaders_v53[num].packedRotation.k = (short)0;
+			boneHeaders_v53[num].rawPos = rawPos; 
+			boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+			boneHeaders_v53[num].nextOffset = nextOffset;
+			boneHeaders_v53[num].dataSize = dataSize;
+			boneHeaders_v53[num].rawStrPos = strEndPos;
+			break;
+		}
+
+		case 2:
+		{
+			Vector3Short rawRot; Stream->Read(&rawRot);
+			strEndPos = Stream->Position();
+			LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+			boneHeaders_v53[num].translationScale = 0;
+			boneHeaders_v53[num].bone = bone;
+			boneHeaders_v53[num].r2Flag = flag;
+			boneHeaders_v53[num].flags = 0;
+			boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rawRot.x; boneHeaders_v53[num].packedRotation.i = (short)rawRot.y; boneHeaders_v53[num].packedRotation.j = (short)rawRot.z; boneHeaders_v53[num].packedRotation.k = (short)0; //boneHeaders_v53[num].packedRotation.one = (short)boneData->boneRot.x; boneHeaders_v53[num].packedRotation.i = (short)boneData->boneRot.y; boneHeaders_v53[num].packedRotation.j = (short)boneData->boneRot.z; boneHeaders_v53[num].packedRotation.k = (short)0;
+			boneHeaders_v53[num].rawPos; boneHeaders_v53[num].rawPos.x = (short)float_to_half(boneData->bonePos.x); boneHeaders_v53[num].rawPos.y = (short)float_to_half(boneData->bonePos.y); boneHeaders_v53[num].rawPos.z = (short)float_to_half(boneData->bonePos.z);
+			boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+			boneHeaders_v53[num].nextOffset = nextOffset;
+			boneHeaders_v53[num].dataSize = dataSize;
+			boneHeaders_v53[num].rawStrPos = strEndPos;
+			break;
+		}
+
+		case 28:
+		{
+			Vector3Short rotPtr; Stream->Read(&rotPtr); rotPtr.x > 0 ? rotPtr.x += 12 : rotPtr.x = 0; rotPtr.y > 0 ? rotPtr.y += 12 : rotPtr.y = 0; rotPtr.z > 0 ? rotPtr.z += 12 : rotPtr.z = 0;
+			Vector3Short posPtr; Stream->Read(&posPtr); posPtr.x > 0 ? posPtr.x += 10 : posPtr.x = 0; posPtr.y > 0 ? posPtr.y += 10 : posPtr.y = 0; posPtr.z > 0 ? posPtr.z += 10 : posPtr.z = 0;
+			strEndPos = Stream->Position();
+			LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+			boneHeaders_v53[num].translationScale = GetLargestNumber(boneData->posScale.x, boneData->posScale.y, boneData->posScale.z);
+			boneHeaders_v53[num].bone = bone;
+			boneHeaders_v53[num].r2Flag = flag;
+			boneHeaders_v53[num].flags = 0;
+			boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rotPtr.x; boneHeaders_v53[num].packedRotation.i = (short)rotPtr.y; boneHeaders_v53[num].packedRotation.j = (short)rotPtr.z; boneHeaders_v53[num].packedRotation.k = (short)0;
+			boneHeaders_v53[num].rawPos = posPtr;
+			boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+			boneHeaders_v53[num].nextOffset = nextOffset;
+			boneHeaders_v53[num].dataSize = dataSize;
+			boneHeaders_v53[num].rawStrPos = strEndPos;
+
+			break;
+		}
+
+		case 48:
+		{
+			QuaternionShort rawRot; Stream->Read(&rawRot);
+			strEndPos = Stream->Position();
+			LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+			boneHeaders_v53[num].translationScale = 0;
+			boneHeaders_v53[num].bone = bone;
+			boneHeaders_v53[num].r2Flag = flag;
+			boneHeaders_v53[num].flags = 0;
+			boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rawRot.one; boneHeaders_v53[num].packedRotation.i = (short)rawRot.i; boneHeaders_v53[num].packedRotation.j = (short)rawRot.j; boneHeaders_v53[num].packedRotation.k = (short)rawRot.k;
+			boneHeaders_v53[num].rawPos; boneHeaders_v53[num].rawPos.x = (short)float_to_half(boneData->bonePos.x); boneHeaders_v53[num].rawPos.y = (short)float_to_half(boneData->bonePos.y); boneHeaders_v53[num].rawPos.z = (short)float_to_half(boneData->bonePos.z);
+			boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+			boneHeaders_v53[num].nextOffset = nextOffset;
+			boneHeaders_v53[num].dataSize = dataSize;
+			boneHeaders_v53[num].rawStrPos = strEndPos;
+			break;
+		}
+
+		case 49:
+		{
+			QuaternionShort rawRot; Stream->Read(&rawRot);
+			Vector3Short rawPos; Stream->Read(&rawPos);
+			strEndPos = Stream->Position();
+			LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+			boneHeaders_v53[num].translationScale = 0;
+			boneHeaders_v53[num].bone = bone;
+			boneHeaders_v53[num].r2Flag = flag;
+			boneHeaders_v53[num].flags = 0;
+			boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rawRot.one; boneHeaders_v53[num].packedRotation.i = (short)rawRot.i; boneHeaders_v53[num].packedRotation.j = (short)rawRot.j; boneHeaders_v53[num].packedRotation.k = (short)rawRot.k;
 			boneHeaders_v53[num].rawPos = rawPos;
 			boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
 			boneHeaders_v53[num].nextOffset = nextOffset;
@@ -860,10 +2438,112 @@ void ReadBoneHeader(BinaryReader* Stream, BoneHeaderv53* boneHeaders_v53, v49_He
 			boneHeaders_v53[num].rawStrPos = strEndPos;
 			break;
 		}
+
+		case 24:
+		{
+			Vector3Short rotPtr; Stream->Read(&rotPtr); rotPtr.x > 0 ? rotPtr.x += 18 : rotPtr.x = 0; rotPtr.y > 0 ? rotPtr.y += 18 : rotPtr.y = 0; rotPtr.z > 0 ? rotPtr.z += 18 : rotPtr.z = 0;
+			strEndPos = Stream->Position();
+			LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+			boneHeaders_v53[num].translationScale = 0;
+			boneHeaders_v53[num].bone = bone;
+			boneHeaders_v53[num].r2Flag = flag;
+			boneHeaders_v53[num].flags = 0;
+			boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rotPtr.x; boneHeaders_v53[num].packedRotation.i = (short)rotPtr.y; boneHeaders_v53[num].packedRotation.j = (short)rotPtr.z; boneHeaders_v53[num].packedRotation.k = (short)0;
+			boneHeaders_v53[num].rawPos; boneHeaders_v53[num].rawPos.x = (short)float_to_half(boneData->bonePos.x); boneHeaders_v53[num].rawPos.y = (short)float_to_half(boneData->bonePos.y); boneHeaders_v53[num].rawPos.z = (short)float_to_half(boneData->bonePos.z);
+			boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+			boneHeaders_v53[num].nextOffset = nextOffset;
+			boneHeaders_v53[num].dataSize = dataSize;
+			boneHeaders_v53[num].rawStrPos = strEndPos;
+			break;
+		}
+
+		case 17:
+		{
+			Vector3Short rawPos; Stream->Read(&rawPos);
+			strEndPos = Stream->Position();
+			LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+			boneHeaders_v53[num].translationScale = 0;
+			boneHeaders_v53[num].bone = bone;
+			boneHeaders_v53[num].r2Flag = flag;
+			boneHeaders_v53[num].flags = 0;
+			boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)0; boneHeaders_v53[num].packedRotation.i = (short)0; boneHeaders_v53[num].packedRotation.j = (short)0; boneHeaders_v53[num].packedRotation.k = (short)0; //boneHeaders_v53[num].packedRotation.one = (short)boneData->boneRot.x; boneHeaders_v53[num].packedRotation.i = (short)boneData->boneRot.y; boneHeaders_v53[num].packedRotation.j = (short)boneData->boneRot.z; boneHeaders_v53[num].packedRotation.k = (short)0;
+			boneHeaders_v53[num].rawPos = rawPos; 
+			boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+			boneHeaders_v53[num].nextOffset = nextOffset;
+			boneHeaders_v53[num].dataSize = dataSize;
+			boneHeaders_v53[num].rawStrPos = strEndPos;
+			break;
+		}
 	}
-	//Logger::Info("_check\n");
-	//Stream->seek(pos2 + nextOffset - (32 - GetAnimHeaderSize((int)flag)));
 }
+
+void ReadSecBoneHeader2(BinaryReader* Stream, SectionBoneHeaderv53* boneHeaders_v53, v49_Header* Initial_Header, studiohdr2_t* Initial_Header_Part2, int num, int dataSize, bool debug)
+{
+		int pos2 = Stream->Position();
+		std::byte bone; Stream->Read(&bone); //Logger::Info("Bone: %d, Pos:  %d\n", bone, Stream->Position() - 1);
+		std::byte flag; Stream->Read(&flag); //Logger::Info("Flag: %d, Pos:  %d\n", flag, Stream->Position() - 1);
+		short nextOffset; Stream->Read(&nextOffset); //Logger::Info("Next Offset: %d, Pos:  %d\n", nextOffset, Stream->Position() - 2);
+		int strEndPos = Stream->Position();
+		nextOffset = nextOffset > 0 ? nextOffset + (32 - GetAnimHeaderSize((int)flag)) : 0;
+
+		LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+		Stream->seek(strEndPos);
+
+		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)0; boneHeaders_v53[num].packedRotation.i = (short)0; boneHeaders_v53[num].packedRotation.j = (short)0; boneHeaders_v53[num].packedRotation.k = (short)0;
+		boneHeaders_v53[num].rawPos; boneHeaders_v53[num].rawPos.x = (short)float_to_half(boneData->bonePos.x); boneHeaders_v53[num].rawPos.y = (short)float_to_half(boneData->bonePos.y); boneHeaders_v53[num].rawPos.z = (short)float_to_half(boneData->bonePos.z);
+
+		if ((int)flag & STUDIO_ANIM_ANIMROT)
+		{
+			Vector3Short rotPtr; Stream->Read(&rotPtr); rotPtr.x > 0 ? rotPtr.x += 12 : rotPtr.x = 0; rotPtr.y > 0 ? rotPtr.y += 12 : rotPtr.y = 0; rotPtr.z > 0 ? rotPtr.z += 12 : rotPtr.z = 0;
+			boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rotPtr.x; boneHeaders_v53[num].packedRotation.i = (short)rotPtr.y; boneHeaders_v53[num].packedRotation.j = (short)rotPtr.z; boneHeaders_v53[num].packedRotation.k = (short)0;
+		}
+		if ((int)flag & STUDIO_ANIM_ANIMPOS)
+		{
+			Vector3Short posPtr; Stream->Read(&posPtr); posPtr.x > 0 ? posPtr.x += 10 : posPtr.x = 0; posPtr.y > 0 ? posPtr.y += 10 : posPtr.y = 0; posPtr.z > 0 ? posPtr.z += 10 : posPtr.z = 0;
+			boneHeaders_v53[num].rawPos = posPtr;
+		}
+		if ((int)flag & STUDIO_ANIM_RAWPOS)
+		{
+			Vector3Short rawPos; Stream->Read(&rawPos);
+			boneHeaders_v53[num].rawPos = rawPos;
+		}
+		if ((int)flag & STUDIO_ANIM_RAWROT)
+		{
+			Vector3Short rawRot; Stream->Read(&rawRot);
+			boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rawRot.x; boneHeaders_v53[num].packedRotation.i = (short)rawRot.y; boneHeaders_v53[num].packedRotation.j = (short)rawRot.z; boneHeaders_v53[num].packedRotation.k = (short)0;
+		}
+		if ((int)flag & STUDIO_ANIM_RAWROT2)
+		{
+			QuaternionShort rawRot; Stream->Read(&rawRot);
+			boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rawRot.one; boneHeaders_v53[num].packedRotation.i = (short)rawRot.i; boneHeaders_v53[num].packedRotation.j = (short)rawRot.j; boneHeaders_v53[num].packedRotation.k = (short)rawRot.k;
+		}
+		strEndPos = Stream->Position();
+		if ((int)flag == 12)boneHeaders_v53[num].translationScale = GetSecondLargest(boneData->posScale.x, boneData->posScale.y, boneData->posScale.z);
+		else boneHeaders_v53[num].translationScale = 0;
+		boneHeaders_v53[num].bone = bone;
+		boneHeaders_v53[num].r2Flag = flag;
+		boneHeaders_v53[num].flags = 0;
+		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+		boneHeaders_v53[num].nextOffset = nextOffset;
+		boneHeaders_v53[num].dataSize = dataSize;
+		boneHeaders_v53[num].rawStrPos = strEndPos;
+
+		if ((int)flag == 0)
+		{
+			strEndPos = Stream->Position();
+			boneHeaders_v53[num].translationScale = 0;
+			boneHeaders_v53[num].bone = bone;
+			boneHeaders_v53[num].r2Flag = flag;
+			boneHeaders_v53[num].flags = 0;
+			boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)0; boneHeaders_v53[num].packedRotation.i = (short)0; boneHeaders_v53[num].packedRotation.j = (short)0; boneHeaders_v53[num].packedRotation.k = (short)0;
+			boneHeaders_v53[num].rawPos; boneHeaders_v53[num].rawPos.x = (short)0; boneHeaders_v53[num].rawPos.y = (short)0; boneHeaders_v53[num].rawPos.z = (short)0;
+			boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 0; boneHeaders_v53[num].rawScale.y = 0; boneHeaders_v53[num].rawScale.z = 0;
+			boneHeaders_v53[num].nextOffset = 0;
+			boneHeaders_v53[num].dataSize = 0;
+			boneHeaders_v53[num].rawStrPos = strEndPos;
+		}
+
+	}
 
 void ReadSecBoneHeader(BinaryReader* Stream, SectionBoneHeaderv53* boneHeaders_v53, v49_Header* Initial_Header, studiohdr2_t* Initial_Header_Part2, int num, int dataSize, bool debug)
 {
@@ -873,18 +2553,33 @@ void ReadSecBoneHeader(BinaryReader* Stream, SectionBoneHeaderv53* boneHeaders_v
 	short nextOffset; Stream->Read(&nextOffset); //Logger::Info("Next Offset: %d, Pos:  %d\n", nextOffset, Stream->Position() - 2);
 	int strEndPos = Stream->Position();
 	nextOffset = nextOffset > 0 ? nextOffset + (32 - GetAnimHeaderSize((int)flag)) : 0;
-	//Logger::Info("_check01\n");
 	switch ((int)flag)
 	{
+	case 0:
+	{
+		strEndPos = Stream->Position();
+		boneHeaders_v53[num].translationScale = 0;
+		boneHeaders_v53[num].bone = bone;
+		boneHeaders_v53[num].r2Flag = flag;
+		boneHeaders_v53[num].flags = 0;
+		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)0; boneHeaders_v53[num].packedRotation.i = (short)0; boneHeaders_v53[num].packedRotation.j = (short)0; boneHeaders_v53[num].packedRotation.k = (short)0;
+		boneHeaders_v53[num].rawPos; boneHeaders_v53[num].rawPos.x = (short)0; boneHeaders_v53[num].rawPos.y = (short)0; boneHeaders_v53[num].rawPos.z = (short)0;
+		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 0; boneHeaders_v53[num].rawScale.y = 0; boneHeaders_v53[num].rawScale.z = 0;
+		boneHeaders_v53[num].nextOffset = 0;
+		boneHeaders_v53[num].dataSize = 0;
+		boneHeaders_v53[num].rawStrPos = strEndPos;
+
+		break;
+	}
+
 	case 12:
 	{
 		
 		Vector3Short rotPtr; Stream->Read(&rotPtr); rotPtr.x > 0 ? rotPtr.x += 12 : rotPtr.x = 0; rotPtr.y > 0 ? rotPtr.y += 12 : rotPtr.y = 0; rotPtr.z > 0 ? rotPtr.z += 12 : rotPtr.z = 0;
-		//boneHeaders_v53[num].rawStrPos = Stream->Position();
 		Vector3Short posPtr; Stream->Read(&posPtr); posPtr.x > 0 ? posPtr.x += 10 : posPtr.x = 0; posPtr.y > 0 ? posPtr.y += 10 : posPtr.y = 0; posPtr.z > 0 ? posPtr.z += 10 : posPtr.z = 0;
 		strEndPos = Stream->Position();
 		LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
-		boneHeaders_v53[num].translationScale = GetLargestNumber(boneData->posScale.x, boneData->posScale.y, boneData->posScale.z);;
+		boneHeaders_v53[num].translationScale = GetLargestNumber(boneData->posScale.x, boneData->posScale.y, boneData->posScale.z);
 		boneHeaders_v53[num].bone = bone;
 		boneHeaders_v53[num].r2Flag = flag;
 		boneHeaders_v53[num].flags = 0;
@@ -908,7 +2603,7 @@ void ReadSecBoneHeader(BinaryReader* Stream, SectionBoneHeaderv53* boneHeaders_v
 		boneHeaders_v53[num].r2Flag = flag;
 		boneHeaders_v53[num].flags = 0;
 		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rawRot.one; boneHeaders_v53[num].packedRotation.i = (short)rawRot.i; boneHeaders_v53[num].packedRotation.j = (short)rawRot.j; boneHeaders_v53[num].packedRotation.k = (short)rawRot.k;
-		boneHeaders_v53[num].rawPos; boneHeaders_v53[num].rawPos.x = (short)float_to_half(boneData->bonePos.x); boneHeaders_v53[num].rawPos.y = (short)float_to_half(boneData->bonePos.y); boneHeaders_v53[num].rawPos.z = (short)float_to_half(boneData->bonePos.z); //boneHeaders_v53[num].rawPos.x = (short)0; boneHeaders_v53[num].rawPos.y = (short)0; boneHeaders_v53[num].rawPos.z = (short)0; //boneHeaders_v53[num].rawPos.x = (short)boneData->bonePos.x; boneHeaders_v53[num].rawPos.y = (short)boneData->bonePos.y; boneHeaders_v53[num].rawPos.z = (short)boneData->bonePos.z;
+		boneHeaders_v53[num].rawPos; boneHeaders_v53[num].rawPos.x = (short)float_to_half(boneData->bonePos.x); boneHeaders_v53[num].rawPos.y = (short)float_to_half(boneData->bonePos.y); boneHeaders_v53[num].rawPos.z = (short)float_to_half(boneData->bonePos.z);
 		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
 		boneHeaders_v53[num].nextOffset = nextOffset;
 		boneHeaders_v53[num].dataSize = dataSize;
@@ -921,6 +2616,7 @@ void ReadSecBoneHeader(BinaryReader* Stream, SectionBoneHeaderv53* boneHeaders_v
 		QuaternionShort rawRot; Stream->Read(&rawRot);
 		Vector3Short rawPos; Stream->Read(&rawPos);
 		strEndPos = Stream->Position();
+		LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
 		boneHeaders_v53[num].translationScale = 0;
 		boneHeaders_v53[num].bone = bone;
 		boneHeaders_v53[num].r2Flag = flag;
@@ -944,7 +2640,7 @@ void ReadSecBoneHeader(BinaryReader* Stream, SectionBoneHeaderv53* boneHeaders_v
 		boneHeaders_v53[num].r2Flag = flag;
 		boneHeaders_v53[num].flags = 0;
 		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rotPtr.x; boneHeaders_v53[num].packedRotation.i = (short)rotPtr.y; boneHeaders_v53[num].packedRotation.j = (short)rotPtr.z; boneHeaders_v53[num].packedRotation.k = (short)0;
-		boneHeaders_v53[num].rawPos; boneHeaders_v53[num].rawPos.x = (short)float_to_half(boneData->bonePos.x); boneHeaders_v53[num].rawPos.y = (short)float_to_half(boneData->bonePos.y); boneHeaders_v53[num].rawPos.z = (short)float_to_half(boneData->bonePos.z); //boneHeaders_v53[num].rawPos.x = (short)0; boneHeaders_v53[num].rawPos.y = (short)0; boneHeaders_v53[num].rawPos.z = (short)0; //boneHeaders_v53[num].rawPos.x = (short)boneData->bonePos.x; boneHeaders_v53[num].rawPos.y = (short)boneData->bonePos.y; boneHeaders_v53[num].rawPos.z = (short)boneData->bonePos.z;// = boneData->bonePos;  //boneHeaders_v53[j].rawPos.x = 0; boneHeaders_v53[j].rawPos.y = 0; boneHeaders_v53[j].rawPos.z = 0; //= boneData->bonePos;  //boneHeaders_v53[j].rawPos.x = (short)boneData->bonePos.x; boneHeaders_v53[j].rawPos.y = (short)boneData->bonePos.x; boneHeaders_v53[j].rawPos.z = (short)boneData->bonePos.z;
+		boneHeaders_v53[num].rawPos; boneHeaders_v53[num].rawPos.x = (short)float_to_half(boneData->bonePos.x); boneHeaders_v53[num].rawPos.y = (short)float_to_half(boneData->bonePos.y); boneHeaders_v53[num].rawPos.z = (short)float_to_half(boneData->bonePos.z);
 		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
 		boneHeaders_v53[num].nextOffset = nextOffset;
 		boneHeaders_v53[num].dataSize = dataSize;
@@ -953,6 +2649,117 @@ void ReadSecBoneHeader(BinaryReader* Stream, SectionBoneHeaderv53* boneHeaders_v
 	}
 
 	case 1:
+	{
+		Vector3Short rawPos; Stream->Read(&rawPos);
+		strEndPos = Stream->Position();
+		LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+		boneHeaders_v53[num].translationScale = 0;
+		boneHeaders_v53[num].bone = bone;
+		boneHeaders_v53[num].r2Flag = flag;
+		boneHeaders_v53[num].flags = 0;
+		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)0; boneHeaders_v53[num].packedRotation.i = (short)0; boneHeaders_v53[num].packedRotation.j = (short)0; boneHeaders_v53[num].packedRotation.k = (short)0;
+		boneHeaders_v53[num].rawPos = rawPos;
+		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+		boneHeaders_v53[num].nextOffset = nextOffset;
+		boneHeaders_v53[num].dataSize = dataSize;
+		boneHeaders_v53[num].rawStrPos = strEndPos;
+		break;
+	}
+
+	case 2:
+	{
+		Vector3Short rawRot; Stream->Read(&rawRot);
+		strEndPos = Stream->Position();
+		LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+		boneHeaders_v53[num].translationScale = 0;
+		boneHeaders_v53[num].bone = bone;
+		boneHeaders_v53[num].r2Flag = flag;
+		boneHeaders_v53[num].flags = 0;
+		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rawRot.x; boneHeaders_v53[num].packedRotation.i = (short)rawRot.y; boneHeaders_v53[num].packedRotation.j = (short)rawRot.z; boneHeaders_v53[num].packedRotation.k = (short)0; //boneHeaders_v53[num].packedRotation.one = (short)boneData->boneRot.x; boneHeaders_v53[num].packedRotation.i = (short)boneData->boneRot.y; boneHeaders_v53[num].packedRotation.j = (short)boneData->boneRot.z; boneHeaders_v53[num].packedRotation.k = (short)0;
+		boneHeaders_v53[num].rawPos; boneHeaders_v53[num].rawPos.x = (short)float_to_half(boneData->bonePos.x); boneHeaders_v53[num].rawPos.y = (short)float_to_half(boneData->bonePos.y); boneHeaders_v53[num].rawPos.z = (short)float_to_half(boneData->bonePos.z);
+		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+		boneHeaders_v53[num].nextOffset = nextOffset;
+		boneHeaders_v53[num].dataSize = dataSize;
+		boneHeaders_v53[num].rawStrPos = strEndPos;
+		break;
+	}
+
+	case 28:
+	{
+		Vector3Short rotPtr; Stream->Read(&rotPtr); rotPtr.x > 0 ? rotPtr.x += 12 : rotPtr.x = 0; rotPtr.y > 0 ? rotPtr.y += 12 : rotPtr.y = 0; rotPtr.z > 0 ? rotPtr.z += 12 : rotPtr.z = 0;
+		Vector3Short posPtr; Stream->Read(&posPtr); posPtr.x > 0 ? posPtr.x += 10 : posPtr.x = 0; posPtr.y > 0 ? posPtr.y += 10 : posPtr.y = 0; posPtr.z > 0 ? posPtr.z += 10 : posPtr.z = 0;
+		strEndPos = Stream->Position();
+		LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+		boneHeaders_v53[num].translationScale = GetLargestNumber(boneData->posScale.x, boneData->posScale.y, boneData->posScale.z);
+		boneHeaders_v53[num].bone = bone;
+		boneHeaders_v53[num].r2Flag = flag;
+		boneHeaders_v53[num].flags = 0;
+		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rotPtr.x; boneHeaders_v53[num].packedRotation.i = (short)rotPtr.y; boneHeaders_v53[num].packedRotation.j = (short)rotPtr.z; boneHeaders_v53[num].packedRotation.k = (short)0;
+		boneHeaders_v53[num].rawPos = posPtr;
+		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+		boneHeaders_v53[num].nextOffset = nextOffset;
+		boneHeaders_v53[num].dataSize = dataSize;
+		boneHeaders_v53[num].rawStrPos = strEndPos;
+
+		break;
+	}
+
+	case 48:
+	{
+		QuaternionShort rawRot; Stream->Read(&rawRot);
+		strEndPos = Stream->Position();
+		LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+		boneHeaders_v53[num].translationScale = 0;
+		boneHeaders_v53[num].bone = bone;
+		boneHeaders_v53[num].r2Flag = flag;
+		boneHeaders_v53[num].flags = 0;
+		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rawRot.one; boneHeaders_v53[num].packedRotation.i = (short)rawRot.i; boneHeaders_v53[num].packedRotation.j = (short)rawRot.j; boneHeaders_v53[num].packedRotation.k = (short)rawRot.k;
+		boneHeaders_v53[num].rawPos; boneHeaders_v53[num].rawPos.x = (short)float_to_half(boneData->bonePos.x); boneHeaders_v53[num].rawPos.y = (short)float_to_half(boneData->bonePos.y); boneHeaders_v53[num].rawPos.z = (short)float_to_half(boneData->bonePos.z);
+		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+		boneHeaders_v53[num].nextOffset = nextOffset;
+		boneHeaders_v53[num].dataSize = dataSize;
+		boneHeaders_v53[num].rawStrPos = strEndPos;
+		break;
+	}
+
+	case 49:
+	{
+		QuaternionShort rawRot; Stream->Read(&rawRot);
+		Vector3Short rawPos; Stream->Read(&rawPos);
+		strEndPos = Stream->Position();
+		LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+		boneHeaders_v53[num].translationScale = 0;
+		boneHeaders_v53[num].bone = bone;
+		boneHeaders_v53[num].r2Flag = flag;
+		boneHeaders_v53[num].flags = 0;
+		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rawRot.one; boneHeaders_v53[num].packedRotation.i = (short)rawRot.i; boneHeaders_v53[num].packedRotation.j = (short)rawRot.j; boneHeaders_v53[num].packedRotation.k = (short)rawRot.k;
+		boneHeaders_v53[num].rawPos = rawPos;
+		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+		boneHeaders_v53[num].nextOffset = nextOffset;
+		boneHeaders_v53[num].dataSize = dataSize;
+		boneHeaders_v53[num].rawStrPos = strEndPos;
+		break;
+	}
+
+	case 24:
+	{
+		Vector3Short rotPtr; Stream->Read(&rotPtr); rotPtr.x > 0 ? rotPtr.x += 18 : rotPtr.x = 0; rotPtr.y > 0 ? rotPtr.y += 18 : rotPtr.y = 0; rotPtr.z > 0 ? rotPtr.z += 18 : rotPtr.z = 0;
+		strEndPos = Stream->Position();
+		LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+		boneHeaders_v53[num].translationScale = 0;
+		boneHeaders_v53[num].bone = bone;
+		boneHeaders_v53[num].r2Flag = flag;
+		boneHeaders_v53[num].flags = 0;
+		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rotPtr.x; boneHeaders_v53[num].packedRotation.i = (short)rotPtr.y; boneHeaders_v53[num].packedRotation.j = (short)rotPtr.z; boneHeaders_v53[num].packedRotation.k = (short)0;
+		boneHeaders_v53[num].rawPos; boneHeaders_v53[num].rawPos.x = (short)float_to_half(boneData->bonePos.x); boneHeaders_v53[num].rawPos.y = (short)float_to_half(boneData->bonePos.y); boneHeaders_v53[num].rawPos.z = (short)float_to_half(boneData->bonePos.z);
+		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+		boneHeaders_v53[num].nextOffset = nextOffset;
+		boneHeaders_v53[num].dataSize = dataSize;
+		boneHeaders_v53[num].rawStrPos = strEndPos;
+		break;
+	}
+
+	case 17:
 	{
 		Vector3Short rawPos; Stream->Read(&rawPos);
 		strEndPos = Stream->Position();
@@ -980,117 +2787,13 @@ void ReadSecBoneHeader(BinaryReader* Stream, SectionBoneHeaderv53* boneHeaders_v
 	//Logger::Info("RawPos:, x: %d, y: %d, z: %d\n", boneHeaders_v53[num].rawPos.x, boneHeaders_v53[num].rawPos.y, boneHeaders_v53[num].rawPos.z);
 	//Logger::Info("RawScale:, x: %d, y: %d, z: %d\n", (float)boneHeaders_v53[num].rawScale.x, (float)boneHeaders_v53[num].rawScale.y, (float)boneHeaders_v53[num].rawScale.z);
 	//Logger::Info("NextOffset: %d\n", boneHeaders_v53[num].nextOffset);
-	//Logger::Info("_check01\n");
-	//Stream->seek(pos2 + nextOffset - (32 - GetAnimHeaderSize((int)flag)));
 }
-
-//int* GetSecBytesAddedPerSec(BinaryReader* Stream, v49_Header* Initial_Header, studiohdr2_t* Initial_Header_Part2, bool debug)
-//{
-//	int secBytesAdded = 0;
-//	int secNum = 0;
-//	int secIdxNum = 0;
-//	int secHdrNum = 0;
-//	int maxSec = 0;
-//
-//
-//	for (int i = 0; i < Initial_Header->numlocalanim; i++)
-//	{
-//		int startPos = Initial_Header->localanimindex + 100 * i;
-//		int animIndexPos = startPos + 56;
-//		int sectionIndexPos = startPos + 80;
-//
-//		Stream->seek(animIndexPos);		//Go to animIndex pos;
-//		int animIndex; Stream->Read(&animIndex);		//Read animIndex;
-//		Stream->seek(sectionIndexPos);	//Go to sectionIndex pos;
-//		int sectionIndex; Stream->Read(&sectionIndex);	//Read sectionIndex;
-//		if (sectionIndex > 0)
-//		{
-//
-//			int num = ((startPos + animIndex - 8) - (startPos + sectionIndex)) / 8;
-//			maxSec += num;
-//		}
-//	}
-//	int* secHdrBytesAddedPerSec = new int[maxSec];
-//
-//
-//	for (int i = 0; i < Initial_Header->numlocalanim; i++)
-//	{
-//		int startPos = Initial_Header->localanimindex + 100 * i;
-//		int animIndexPos = startPos + 56;
-//		int sectionIndexPos = startPos + 80;
-//
-//		Stream->seek(animIndexPos);		//Go to animIndex pos;
-//		int animIndex; Stream->Read(&animIndex);		//Read animIndex;
-//		Stream->seek(sectionIndexPos);	//Go to sectionIndex pos;
-//		int sectionIndex; Stream->Read(&sectionIndex);	//Read sectionIndex;
-//		if (sectionIndex > 0)
-//		{
-//			int num = ( ( startPos + animIndex - 8 ) - ( startPos + sectionIndex ) ) / 8;
-//
-//			for (int j = 0; j < num; j++)
-//			{
-//				Stream->seek(startPos + sectionIndex + 8 * j);
-//				int animBlock; Stream->Read(&animBlock);
-//				int animOffset; Stream->Read(&animOffset);
-//				Logger::Info("SecNum: %d,SecMaxNum: %d\n", j, num);
-//
-//				Stream->seek(startPos + animOffset);
-//				secHdrBytesAddedPerSec[secNum] = secBytesAdded;
-//				for (int k = 0; k < Initial_Header->numlocalanim * Initial_Header->numbones; k++)
-//				{
-//					int hdrStartPos = Stream->Position();
-//					std::byte bone; Stream->Read(&bone);
-//					std::byte flag; Stream->Read(&flag);
-//					short nextOffset; Stream->Read(&nextOffset);
-//					int headerSize = GetAnimHeaderSize((int)flag);
-//					secBytesAdded += 32 - headerSize;
-//					int dataSize = nextOffset > 0 ? nextOffset - headerSize : 0;
-//
-//					//Stream->seek(hdrStartPos);
-//
-//					secHdrNum++;
-//
-//
-//					if (nextOffset == 0)
-//					{
-//						//secHdrBytesAddedPerSec[secNum] = secBytesAdded;
-//						Logger::Info("secHdrNum1: %d,SecNum: %d\n", secHdrNum, secNum);
-//						Logger::Info("secHdrBytesAddedToSec1: %d,SecNum: %d\n", secBytesAdded, secNum);
-//						//Stream->seek(hdrStartPos + headerSize);
-//						break;
-//					}
-//
-//					Stream->seek(hdrStartPos + nextOffset);
-//				}
-//				secNum++;
-//
-//			}
-//		}
-//	}
-//	return secHdrBytesAddedPerSec;
-//}
-
-
-
 
 BoneHeaderData* GetBoneHeaderData(BinaryReader* Stream, v49_Header* Initial_Header, studiohdr2_t* Initial_Header_Part2, bool debug)
 {
 	int numOfBoneHeaders = GetBoneHeaderNum(Stream, Initial_Header, 0, false);
 	int numOfSecBoneHeaders = GetBoneHeaderNum(Stream, Initial_Header, 1, false);
 	int numOfSecs = GetBoneHeaderNum(Stream, Initial_Header, 2, false);
-
-	//int* numOfBoneHdrsPerAnim = GetAnimBoneHeaderCount(Stream, Initial_Header, true);
-	//int* numOfSecBoneHdrsPerAnim = GetBoneHeaderNumList(Stream, Initial_Header, 1, false);
-	//int* numOfSecsPerAnim = GetBoneHeaderNumList(Stream, Initial_Header, 2, false);
-	//int* numOfSecBoneHdrsPerSec = GetBoneHeaderNumList(Stream, Initial_Header, 3, false);
-
-	//int* hdrBytesAddedToAnimDesc = GetAnimBoneHeaderBytesAdded(Stream, Initial_Header, true);
-	//int* //hdrBytesAnimDescAdd = GetAnimBoneHeaderBytesAdded(Stream, Initial_Header, true);
-	//int* //secHdrBytesAnimDescAdd = GetAnimSectionBoneHeaderBytesAdded(Stream, Initial_Header, true);
-	//int* //secHdrBytesSecAdd = GetAnimSectionBoneHeaderBytesAddedPerSec(Stream, Initial_Header, true);
-	//int* //numOfBoneHdrsPerAnim = GetAnimBoneHeaderCount(Stream, Initial_Header, true);
-	//int* //numOfSecBoneHdrsPerAnim = GetAnimSectionBoneHeaderCount(Stream, Initial_Header, true);
-	//int* //numOfSecBoneHdrsPerSec = GetAnimSectionBoneHeaderCountPerSec(Stream, Initial_Header, true);
 
 	int* secHdrBytesAddedToAnimDesc = new int[Initial_Header->numlocalanim];
 
@@ -1113,7 +2816,6 @@ BoneHeaderData* GetBoneHeaderData(BinaryReader* Stream, v49_Header* Initial_Head
 	int bytesAdded = 0;
 	int secBytesAdded = 0;
 
-	//sectionOffsets[0] = 0;
 	bool passedFirstSec = false;
 
 
@@ -1134,8 +2836,6 @@ BoneHeaderData* GetBoneHeaderData(BinaryReader* Stream, v49_Header* Initial_Head
 		int animIndex; Stream->Read(&animIndex);
 		Stream->seek(secIndexPos);
 		int sectionIndex; Stream->Read(&sectionIndex);
-		//hdrBytesAddedToAnimDesc[i] = bytesAdded;
-		//Logger::Info("AnimNum: %d,BytesAdded: %d\n", i, bytesAdded);
 		if (sectionIndex == 0)
 		{
 			Stream->seek(startPos + animIndex);
@@ -1215,32 +2915,33 @@ BoneHeaderData* GetBoneHeaderData(BinaryReader* Stream, v49_Header* Initial_Head
 	//secHdrBytesAddedToAnimDesc[0] = 0;
 	//secHdrBytesAddedToSec[0] = 0;
 
-	boneHeaderData->secOffsets = sectionOffsets;
-//	boneHeaderData->hdrBytesAnimDescAdd = GetAnimBoneHeaderBytesAdded(Stream, Initial_Header, true);;
-//	boneHeaderData->secHdrBytesAnimDescAdd = GetAnimSectionBoneHeaderBytesAdded(Stream, Initial_Header, 0, true);
-//	boneHeaderData->secHdrBytesSecAdd = GetAnimSectionBoneHeaderBytesAdded(Stream, Initial_Header, 1, true);
-	boneHeaderData->numOfBoneHeaders = numOfBoneHeaders;
-	boneHeaderData->numOfSecBoneHeaders = numOfSecBoneHeaders;
-//	boneHeaderData->numOfBoneHdrsPerAnim = GetAnimBoneHeaderCount(Stream, Initial_Header, true);
-//	boneHeaderData->numOfSecBoneHdrsPerAnim = GetAnimSectionBoneHeaderCount(Stream, Initial_Header, 0, true);
-//	boneHeaderData->numOfSecBoneHdrsPerSec = GetAnimSectionBoneHeaderCount(Stream, Initial_Header, 1, true);//secHdrBytesAddedToSec;//GetSecBytesAddedPerSec(Stream,Initial_Header, Initial_Header_Part2, false);
-	boneHeaderData->boneHeaders = boneHeaders;
-	boneHeaderData->secBoneheaders = secBoneHeaders;
-	boneHeaderData->secBytesAdded = secBytesAdded;
-	boneHeaderData->animBytesAdded = bytesAdded;
-	boneHeaderData->strStartPos = secStartStrPos;
+	//boneHeaderData->secOffsets = sectionOffsets;
+//	//boneHeaderData->hdrBytesAnimDescAdd = GetAnimBoneHeaderBytesAdded(Stream, Initial_Header, true);;
+//	//boneHeaderData->secHdrBytesAnimDescAdd = GetAnimSectionBoneHeaderBytesAdded(Stream, Initial_Header, 0, true);
+//	//boneHeaderData->secHdrBytesSecAdd = GetAnimSectionBoneHeaderBytesAdded(Stream, Initial_Header, 1, true);
+	//boneHeaderData->numOfBoneHeaders = numOfBoneHeaders;
+	//boneHeaderData->numOfSecBoneHeaders = numOfSecBoneHeaders;
+//	//boneHeaderData->numOfBoneHdrsPerAnim = GetAnimBoneHeaderCount(Stream, Initial_Header, true);
+//	//boneHeaderData->numOfSecBoneHdrsPerAnim = GetAnimSectionBoneHeaderCount(Stream, Initial_Header, 0, true);
+//	//boneHeaderData->numOfSecBoneHdrsPerSec = GetAnimSectionBoneHeaderCount(Stream, Initial_Header, 1, true);//secHdrBytesAddedToSec;//GetSecBytesAddedPerSec(Stream,Initial_Header, Initial_Header_Part2, false);
+	//boneHeaderData->boneHeaders = boneHeaders;
+	//boneHeaderData->secBoneheaders = secBoneHeaders;
+	//boneHeaderData->secBytesAdded = secBytesAdded;
+	//boneHeaderData->animBytesAdded = bytesAdded;
+	//boneHeaderData->strStartPos = secStartStrPos;
 	return boneHeaderData;
 }
 
 AnimData* GetAnimData(BinaryReader* Stream, v49_Header* Initial_Header, studiohdr2_t* Initial_Header_Part2, bool debug)
 {
+	int numOfIkRules = 0;
 	int startPos = Stream->Position();
 	AnimData* animData = new AnimData();
 	int animIdx = Initial_Header->localanimindex;
 	animData->numOfAnims = Initial_Header->localanimindex;
-	animData->secPerAnim = GetAnimSectionCount(Stream, Initial_Header, true);
+	animData->secPerAnim = GetAnimSectionCount(Stream, Initial_Header, false);
 	animData->bytesAddedToAnimDescs = -8 * Initial_Header->numlocalanim;
-	animData->bytesAddedToSec = GetBytesAddedToBoneHdrs(Stream, Initial_Header, 2, true);
+	animData->bytesAddedToSec = GetAnimBoneHeaderBytesAdded2(Stream, Initial_Header, false);
 	mstudioanimdescv53_t* animDescs = new mstudioanimdescv53_t[Initial_Header->numlocalanim]();
 	BoneHeaderData* boneHeaderData = GetBoneHeaderData(Stream, Initial_Header, Initial_Header_Part2, false);
 	int hdrNum = 0;
@@ -1273,7 +2974,8 @@ AnimData* GetAnimData(BinaryReader* Stream, v49_Header* Initial_Header, studiohd
 		short zeroframecount; Stream->Read(&zeroframecount);
 		int zeroframeindex; Stream->Read(&zeroframeindex);
 		float zeroframestalltime; Stream->Read(&zeroframestalltime);
-		int* bytesAddedPerSec = new int[animData->secPerAnim[i]];
+		std::vector<int> bytesAddedPerSec;
+		numOfIkRules += numikrules;
 
 		mstudioanimdescv53_t animDesc = { -8 * (Initial_Header->numlocalanim - i), -4 * (animData->secPerAnim[i]), bytesAddedPerSec, basePtr, sznameindex, (float)fps, flags, numframes, nummovements, movementindex, animblock, animindex, numikrules, ikruleindex, animblockikruleindex, numlocalhierarchy, localhierarchyindex, sectionindex, sectionframes, zeroframespan, zeroframecount, zeroframeindex, zeroframestalltime, 0, 0, 0, 0 };
 		animDescs[i] = animDesc;
@@ -1302,11 +3004,10 @@ AnimData* GetAnimData(BinaryReader* Stream, v49_Header* Initial_Header, studiohd
 			Logger::Info("zeroFrameIdx: %d %d\n", animDesc.zeroframeindex);
 			Logger::Info("zeroFrameStallTime: %d %d\n", animDesc.zeroframestalltime);
 		}
-		Logger::Info("_check5.1\n");
 
 
 	}
-	Logger::Info("_check5\n");
+	animData->numOfIkRules = numOfIkRules;
 	animData->boneHeaderData = boneHeaderData;
 	animData->animDescs = animDescs;
 	animData->boneHeaders = boneHeaderData->boneHeaders;
@@ -1319,47 +3020,19 @@ BoneData* GetBoneData(BinaryReader* Stream, v49_Header* Initial_Header, bool deb
 	boneData->numOfBones = Initial_Header->numbones;
 	boneData->bytesAddedToBones = 28 * Initial_Header->numbones;
 	mstudiobonev53_t* bones = new mstudiobonev53_t[Initial_Header->numbones];
-
+	mstudiobone_t_v49* initialBones = new mstudiobone_t_v49[Initial_Header->numbones];
+	Stream->seek(Initial_Header->boneindex);
 	for (int i = 0; i < Initial_Header->numbones; i++) 
 	{
-		Stream->seek(Initial_Header->boneindex + 216 * i);
-		int sznameindex; Stream->Read(&sznameindex);					//sznameindex
-		int parent; Stream->Read(&parent);								//parent
+		mstudiobone_t_v49 bone2;  Stream->Read(&bone2);
 
-		//int bonecontrollers[6]; Stream->Read(bonecontrollers);			//bonecontroller
-		Stream->seek(Stream->Position() + 24);
-		Vector3 pos; Stream->Read(&pos);								//pos
+		Vector3 unkvector {0,0,0};
 
-		Quaternion quat; Stream->Read(&quat);
-		RadianEuler rot; Stream->Read(&rot);
-
-		Vector3 unkvector {0,0,0}; //Stream->Read(&unkvector);
-
-		// compression scale
-		Vector3 posscale; Stream->Read(&posscale);
-		Vector3 rotscale; Stream->Read(&rotscale);
-
-		Vector3 unkvector1 { 0.0004882813 ,0.0004882813 ,0.0004882813 };// Stream->Read(&unkvector1);
-
-		matrix3x4_t poseToBone;	Stream->Read(&poseToBone);
-		Quaternion qAlignment; Stream->Read(&qAlignment);
-
-		int flags;	Stream->Read(&flags);
-		int proctype; Stream->Read(&proctype);
-		int procindex; Stream->Read(&procindex);
-		int physicsbone; Stream->Read(&physicsbone);
-
-		int surfacepropidx; Stream->Read(&surfacepropidx);
-
-		int contents; Stream->Read(&contents);
-
-		int surfacepropLookup; Stream->Read(&surfacepropLookup);
+		Vector3 unkvector1 { 0.0004882813 ,0.0004882813 ,0.0004882813 };
 
 		int unkindex = 0;
 
-		posscale = { 1,1,1 };
-
-		mstudiobonev53_t bone{ sznameindex, parent, -1,-1,-1,-1,-1,-1, pos, quat, rot, unkvector, posscale, rotscale, unkvector1, poseToBone, qAlignment, flags, proctype, procindex, physicsbone, surfacepropidx, contents, surfacepropidx, unkindex, 0, 0, 0, 0, 0, 0, 0};
+		mstudiobonev53_t bone{ bone2.sznameindex, bone2.parent, -1,-1,-1,-1,-1,-1, bone2.pos, bone2.quat, bone2.rot, unkvector, bone2.posscale, bone2.rotscale, unkvector1, bone2.poseToBone, bone2.qAlignment, bone2.flags, bone2.proctype, bone2.procindex, bone2.physicsbone, bone2.surfacepropidx, bone2.contents, bone2.surfacepropidx, unkindex, 0, 0, 0, 0, 0, 0, 0};
 		bones[i] = bone;
 	}
 	boneData->bones = bones;
@@ -1369,12 +3042,14 @@ BoneData* GetBoneData(BinaryReader* Stream, v49_Header* Initial_Header, bool deb
 AttachmentData* GetAttachmentData(BinaryReader* Stream, v49_Header* Initial_Header, bool debug)
 {
 	AttachmentData* attachmentData = new AttachmentData();
-	mstudioattachment_t* attachments = new mstudioattachment_t[Initial_Header->numlocalattachments];
+	mstudioattachment_t_v49* attachments = new mstudioattachment_t_v49[Initial_Header->numlocalattachments];
 	attachmentData->numOfAttachments = Initial_Header->numlocalattachments;
 
 	for (int i = 0; i < Initial_Header->numlocalattachments; i++)
 	{
 		Stream->seek(Initial_Header->localattachmentindex + 92 * i);
+		mstudioattachment_t_v49 attachment2; Stream->Read(&attachment2);
+
 		int					sznameindex; Stream->Read(&sznameindex);
 		int					flags; Stream->Read(&flags);
 
@@ -1385,7 +3060,7 @@ AttachmentData* GetAttachmentData(BinaryReader* Stream, v49_Header* Initial_Head
 		int					unused[8]{0,0,0,0,0,0,0,0};
 
 		mstudioattachment_t attachment{sznameindex, flags, localbone, localmatrix, 0,0,0,0,0,0,0,0 };
-		attachments[i] = attachment;
+		attachments[i] = attachment2;
 	}
 	attachmentData->attachments = attachments;
 	return attachmentData;
@@ -1395,7 +3070,7 @@ HitboxData* GetHitboxData(BinaryReader* Stream, v49_Header* Initial_Header, bool
 {
 	HitboxData* hitboxData = new HitboxData();
 	v53_HitboxSet* hitboxsets = new v53_HitboxSet[Initial_Header->numhitboxsets];
-	int* numOfHitboxesPerSet = new int[Initial_Header->numhitboxsets];
+	std::vector<int> numOfHitboxesPerSet;
 	int numOfHitboxes = 0;
 	int hitboxNum = 0;
 	for (int i = 0; i < Initial_Header->numhitboxsets; i++)
@@ -1415,7 +3090,7 @@ HitboxData* GetHitboxData(BinaryReader* Stream, v49_Header* Initial_Header, bool
 			Logger::Info("numOfHitboxes: %d %d\n", hitboxsets[i].numOfHitboxes);
 			Logger::Info("hitboxIdx: %d %d\n", hitboxsets[i].hitboxIdx);
 		}
-		numOfHitboxesPerSet[i] = hitboxset.numOfHitboxes;
+		numOfHitboxesPerSet.push_back(numofhitboxes);
 	}
 	hitboxData->numOfHitboxesPerSet = numOfHitboxesPerSet;
 
@@ -1465,17 +3140,17 @@ SequenceData* GetSequenceData(BinaryReader* Stream, v49_Header* Initial_Header, 
 {
 	int startPos = Stream->Position();
 	SequenceData* sequenceData = new SequenceData();
-	int* numOfEvntPerSeq = new int[Initial_Header->numlocalseq];
-	int* evntIdxs = new int[Initial_Header->numlocalseq];
-	int* numOfActModsPerSeq = new int[Initial_Header->numlocalseq];
-	int* actModIdxs = new int[Initial_Header->numlocalseq];
+	std::vector<int> numOfEvntPerSeq;
+	std::vector<int> evntIdxs;
+	std::vector<int> numOfActModsPerSeq;
+	std::vector<int> actModIdxs;
 	int numOfEvents = 0;
 	int numOfActMods = 0;
 
 	mstudioseqdesc_t_v53* sequences = new mstudioseqdesc_t_v53[Initial_Header->numlocalseq];
 
 	int bytesAdded = 0;
-	int* bytesAddedPerSeq = new int[Initial_Header->numlocalseq];
+	std::vector<int> bytesAddedPerSeq;
 
 	for (int i = 0; i < Initial_Header->numlocalseq; i++)
 	{
@@ -1558,11 +3233,11 @@ SequenceData* GetSequenceData(BinaryReader* Stream, v49_Header* Initial_Header, 
 		numOfEvents += numevents;
 		numOfActMods += numactivitymodifiers;
 
-		bytesAddedPerSeq[i] = bytesAdded;
-		numOfEvntPerSeq[i] = numevents;
-		evntIdxs[i] = eventindex;
-		numOfActModsPerSeq[i] = numactivitymodifiers;
-		actModIdxs[i] = activitymodifierindex;
+		bytesAddedPerSeq.push_back(bytesAdded);
+		numOfEvntPerSeq.push_back(numevents);
+		evntIdxs.push_back(eventindex);
+		numOfActModsPerSeq.push_back(numactivitymodifiers);
+		actModIdxs.push_back(activitymodifierindex);
 		mstudioseqdesc_t_v53 sequence{ baseptr,szlabelindex,szactivitynameindex,flags,activity,actweight,numevents,eventindex, bbmin, bbmax,numblends,animindexindex,movementindex,groupsize0,groupsize1,paramindex0,paramindex1,paramstart0,paramstart1,paramend0,paramend1,paramparent,fadeintime,fadeouttime,localentrynode,localexitnode,nodeflags,entryphase,exitphase,lastframe,nextseq,pose,numikrules,numautolayers,autolayerindex,weightlistindex,posekeyindex,numiklocks,iklockindex, keyvalueindex, keyvaluesize,cycleposeindex,activitymodifierindex,numactivitymodifiers, 0,0,0,0,0,0,0,0,0,0 };
 		sequences[i] = sequence;
 	}
