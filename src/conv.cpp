@@ -649,15 +649,18 @@ int Conversion::ReadHeader(FileInfo info) {
 
   Stream.seek(0);
 
-  Initial_Header = ReadV49Header(&Stream, Initial_Header);
-  Initial_Header_Part2 = ReadV49SubHeader(&Stream, Initial_Header->studiohdr2index, Initial_Header_Part2);
 
-  AnimData* animData = GetAnimData(&Stream, Initial_Header, Initial_Header_Part2, false);
-  HitboxData* hitboxData = GetHitboxData(&Stream, Initial_Header, false);
-  BoneData* boneData = GetBoneData(&Stream, Initial_Header, false);
-  AttachmentData* attachmentData = GetAttachmentData(&Stream, Initial_Header, false);
-  SequenceData* sequenceData = GetSequenceData(&Stream, Initial_Header, false);
 
+  UI::Progress.SubTask.Begin("Converting Header Data");
+  Initial_Header = ReadV49Header(&Stream, Initial_Header); UI::Progress.SubTask.Update(1/7.0f);
+  Initial_Header_Part2 = ReadV49SubHeader(&Stream, Initial_Header->studiohdr2index, Initial_Header_Part2); UI::Progress.SubTask.Update(2/7.0f);
+
+  AnimData* animData = GetAnimData(&Stream, Initial_Header, Initial_Header_Part2, false); UI::Progress.SubTask.Update(3/7.0f);
+  HitboxData* hitboxData = GetHitboxData(&Stream, Initial_Header, false); UI::Progress.SubTask.Update(4/7.0f);
+  BoneData* boneData = GetBoneData(&Stream, Initial_Header, false); UI::Progress.SubTask.Update(5/7.0f);
+  AttachmentData* attachmentData = GetAttachmentData(&Stream, Initial_Header, false); UI::Progress.SubTask.Update(6/7.0f);
+  SequenceData* sequenceData = GetSequenceData(&Stream, Initial_Header, false); UI::Progress.SubTask.Update(1.0f);
+  UI::Progress.SubTask.End();
   Stream.seek(Initial_Header->localanimindex);
 
   int animByteAddedTotal = GetAnimBytesAdded(&Stream, Initial_Header, false);
@@ -797,7 +800,7 @@ int Conversion::ReadHeader(FileInfo info) {
 
   Stream.seek(Initial_Header->localanimindex);
   OutStream.seek(Dest_Header->localanimindex);
-  UI::Progress.SubTask.Begin("Converting Animations");
+  UI::Progress.SubTask.Begin("Converting Animations (Part 1)");
   int ikRuleNum = 0;
   std::vector<int> ikRuleStairsPerAnim;
   for (int i = 0; i < Initial_Header->numlocalanim; i++) 
@@ -828,9 +831,9 @@ int Conversion::ReadHeader(FileInfo info) {
       }
       ikRuleNum = 0;
       Logger::Notice("Converted animation %d of %d\n", i + 1, Initial_Header->numlocalanim);
-      UI::Progress.SubTask.Update((i + 1.0f) / (float)Initial_Header->numlocalanim);
+      
   }
-  UI::Progress.SubTask.End();
+  
   Logger::Info("Finished animations\n");
   
   if (info.disable_animations) {
@@ -840,6 +843,7 @@ int Conversion::ReadHeader(FileInfo info) {
   }
   else
   { 
+    UI::Progress.SubTask.Begin("Converting Animations (Part 1)");
       int boneHdrNum = 0;
       int secBoneHdrNum = 0;
       int secIdxNum = 0;
@@ -1039,9 +1043,11 @@ int Conversion::ReadHeader(FileInfo info) {
               }
 
           }
+        UI::Progress.SubTask.Update((i + 1.0f) / (float)Initial_Header->numlocalanim);
       }
+    UI::Progress.SubTask.End();
   }
-
+  
 
   std::vector<std::pair<int, int>> events_change;
   ////sequences
@@ -1049,7 +1055,7 @@ int Conversion::ReadHeader(FileInfo info) {
   filler(&Stream, &OutStream, seq_filler_dest);
   Stream.seek(Initial_Header->localseqindex);
   OutStream.seek(Dest_Header->localseqindex);
-  UI::Progress.SubTask.Begin("Converting Sequences");
+  UI::Progress.SubTask.Begin("Converting Sequences (Part 1)");
   int numOfActMods2 = 0;
   int numOfActMods3 = 0;
   for (int i = 0; i < Initial_Header->numlocalseq; i++) {
@@ -1143,9 +1149,11 @@ int Conversion::ReadHeader(FileInfo info) {
       Logger::Notice("Converted sequence %d of %d\n", i + 1, Initial_Header->numlocalseq);
       UI::Progress.SubTask.Update((i + 1.0f) / (float)Initial_Header->numlocalseq);
   }
+  UI::Progress.SubTask.End();
   Stream.seek(Initial_Header->localseqindex + 212 * Initial_Header->numlocalseq);
   OutStream.seek(Dest_Header->localseqindex + 232 * Initial_Header->numlocalseq);
   filler(&Stream, &OutStream, 4 * Initial_Header->numbones);
+  UI::Progress.SubTask.Begin("Converting Sequences (Part 2)");
   int numOfActMods = 0;
   int numOfActMods4 = 0;
   for (int i = 0; i < Initial_Header->numlocalseq; i++)
@@ -1214,8 +1222,9 @@ int Conversion::ReadHeader(FileInfo info) {
           filler(&Stream, &OutStream, 4 * Initial_Header->numbones);
       }
       numOfActMods += sequence.numactivitymodifiers;
-
+      UI::Progress.SubTask.Update((i+1.0)/(Initial_Header->numlocalseq*1.0));
   }
+  UI::Progress.SubTask.End();
   Stream.seek(Initial_Header->localnodeindex);
   OutStream.seek(Dest_Header->localnodeindex);
 
@@ -1295,6 +1304,7 @@ int Conversion::ReadHeader(FileInfo info) {
           OutStream.Write((float)0.707);
           OutStream.Write(kneeDir);
           Logger::Notice("Converting IkChain %d of %d\n", i + 1, Initial_Header->numikchains);
+          UI::Progress.SubTask.Update((i+1.0)/(Initial_Header->numikchains*1.0));
       }
 
       for (int i = 0; i < numOfIkLinks; i++)
@@ -1655,6 +1665,7 @@ int Conversion::ReadHeader(FileInfo info) {
   
   if (sequenceData->numOfActMods > 0)
   {
+    UI::Progress.SubTask.Begin("Updating Activity Modifiers");
       int numActMods = 0;
       for (int i = 0; i < Initial_Header->numlocalseq; i++)
       {
@@ -1670,7 +1681,9 @@ int Conversion::ReadHeader(FileInfo info) {
               OutStream.seek(OutStream.Position() + 4);
           }
           numActMods += sequence.numactivitymodifiers;
+          UI::Progress.SubTask.Update((i + 1.0f) / (float)Initial_Header->numlocalseq);
       }
+      UI::Progress.SubTask.End();
   }
   
   if (Initial_Header->numlocalnodes > 0)
@@ -1684,6 +1697,7 @@ int Conversion::ReadHeader(FileInfo info) {
           Logger::Notice("Converted body part %d of %d\n", i + 1, Initial_Header->numlocalnodes);
           UI::Progress.SubTask.Update((i + 1.0f) / (float)Initial_Header->numlocalnodes);
       }
+      UI::Progress.SubTask.End();
   }
 
   if (Initial_Header->numlocalposeparameters > 0)
@@ -1699,6 +1713,7 @@ int Conversion::ReadHeader(FileInfo info) {
           Logger::Notice("Updated Pose Param Name %d of %d\n", i + 1, Initial_Header->numlocalposeparameters);
           UI::Progress.SubTask.Update((i + 1.0f) / (float)Initial_Header->numlocalposeparameters);
       }
+      UI::Progress.SubTask.End();
   }
 
 

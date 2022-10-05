@@ -1,4 +1,5 @@
 #include "rendering/progress.hpp"
+#include <chrono>
 #include <rendering/progress.hpp>
 #include <thread>
 #include <logger.hpp>
@@ -25,7 +26,7 @@ void UI_TASK::Begin(std::string name){
   _name = name;
 }
 void UI_TASK::Update(float fraction){
-  //std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  //std::this_thread::sleep_for(std::chrono::microseconds(1));
   std::lock_guard<std::mutex> guard(prog_mutex);
   prog = fraction;
 }
