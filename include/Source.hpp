@@ -103,10 +103,28 @@ bool IsWhole(double n) {
 }
 
 
-
-mstudioruimesh_t CreateRuiMesh(ruiRecipe recipe)
+bool Contains(int* arry, int trgt, int count)
 {
-	mstudioruimesh_t* ruiMesh = new mstudioruimesh_t();
+	for (int i = 0; i < count; i++)
+	{
+		if (trgt == arry[i]) return true;
+	}
+	return false;
+}
+
+bool ContainsAlt(std::vector<int> arry, int trgt)
+{
+	for (int i = 0; i < arry.size(); i++)
+	{
+		if (trgt == arry[i]) return true;
+	}
+	return false;
+}
+
+
+mstudioruimesh_t_json CreateRuiMesh(ruiRecipe recipe)
+{
+	mstudioruimesh_t_json* ruiMesh = new mstudioruimesh_t_json();
 	int numOfVerts = 0;
 	ruiMesh->numparents = 1;
 	ruiMesh->numfaces = recipe.faces.size();
@@ -140,7 +158,7 @@ mstudioruimesh_t CreateRuiMesh(ruiRecipe recipe)
 		ruiMesh->facedata.push_back(faceData);
 	}
 
-	mstudioruimesh_t _ruiMesh{ ruiMesh->numparents, ruiMesh->numvertices, ruiMesh->numfaces, 0, 0, 0, 0, (std::byte)0, (std::byte)0, (std::byte)0, (std::byte)0, ruiMesh->szruimeshname, ruiMesh->parent, ruiMesh->vertexmap, ruiMesh->vertex, ruiMesh->facedata };
+	mstudioruimesh_t_json _ruiMesh{ ruiMesh->numparents, ruiMesh->numvertices, ruiMesh->numfaces, 0, 0, 0, 0, (std::byte)0, (std::byte)0, (std::byte)0, (std::byte)0, ruiMesh->szruimeshname, ruiMesh->parent, ruiMesh->vertexmap, ruiMesh->vertex, ruiMesh->facedata };
 
 	return _ruiMesh;
 
@@ -258,7 +276,7 @@ Face HandleFace(rapidjson::Value& value)
 	}
 }
 
-mstudioruimesh_t HandleJsonRUI(rapidjson::Value& value)
+mstudioruimesh_t_json HandleJsonRUI(rapidjson::Value& value)
 {
 		std::vector<std::vector<float>> tris;
 		std::string _name = "";
@@ -301,9 +319,9 @@ mstudioruimesh_t HandleJsonRUI(rapidjson::Value& value)
 		return CreateRuiMesh(recipe);
 }
 
-std::vector<mstudioruimesh_t> GetRuiMeshes(FileInfo info)
+std::vector<mstudioruimesh_t_json> GetRuiMeshes(FileInfo info)
 {
-	std::vector<mstudioruimesh_t> ruiMeshes;
+	std::vector<mstudioruimesh_t_json> ruiMeshes;
 	char** argv;
 	std::ifstream ifs(info.str.value().c_str());
 
@@ -327,7 +345,7 @@ std::vector<mstudioruimesh_t> GetRuiMeshes(FileInfo info)
 
 }
 
-int GetRuiBytesAdded(std::vector<mstudioruimesh_t> ruiMeshes)
+int GetRuiBytesAdded(std::vector<mstudioruimesh_t_json> ruiMeshes)
 {
 	int bytesAdded = 0;
 	for (int i = 0; i < ruiMeshes.size(); i++)
@@ -355,7 +373,7 @@ int GetRuiBytesAdded(std::vector<mstudioruimesh_t> ruiMeshes)
 	return bytesAdded;
 }
 
-int GetRuiBytesAddedIdv(std::vector<mstudioruimesh_t> ruiMeshes, int num)
+int GetRuiBytesAddedIdv(std::vector<mstudioruimesh_t_json> ruiMeshes, int num)
 {
 	int bytesAdded = 0;
 	bytesAdded += 32;
@@ -367,7 +385,7 @@ int GetRuiBytesAddedIdv(std::vector<mstudioruimesh_t> ruiMeshes, int num)
 	return bytesAdded;
 }
 
-std::vector<int> GetRuiBytesAddedPer(std::vector<mstudioruimesh_t> ruiMeshes)
+std::vector<int> GetRuiBytesAddedPer(std::vector<mstudioruimesh_t_json> ruiMeshes)
 {
 	int bytesAdded = 0;
 	std::vector<int> bytesAddedPerRui;
@@ -515,10 +533,10 @@ mstudiobone_t_v53 BoneConversion(mstudiobone_t_v49 v49Bone, int stairs)
 	return bone;
 }
 
-mstudiobbox_tv53 HitboxConversion(mstudiobbox_t_v49 v49Hitbox, int stairs)
+mstudiobbox_t_v53 HitboxConversion(mstudiobbox_t_v49 v49Hitbox, int stairs)
 {
 	
-	mstudiobbox_tv53 hitbox{ v49Hitbox.bone, v49Hitbox.group, v49Hitbox.bbmin, v49Hitbox.bbmax, v49Hitbox.szhitboxnameindex + stairs, 0, 0, 0,0,0,0,0,0 };
+	mstudiobbox_t_v53 hitbox{ v49Hitbox.bone, v49Hitbox.group, v49Hitbox.bbmin, v49Hitbox.bbmax, v49Hitbox.szhitboxnameindex + stairs, 0, 0, 0,0,0,0,0,0 };
 
 	return hitbox;
 }
@@ -683,7 +701,7 @@ int GetAnimBoneHeaderBytesAddedIndv(BinaryReader* Stream, v49_Header* Initial_He
 	return bytesAdded;
 }
 
-mstudioanimdesc_tv53 AnimDescConversion( mstudioanimdesc_t_v49 v49AnimDesc, int stairs, int stairs2, int stairs3, int basePtr)
+mstudioanimdesc_t_v53 AnimDescConversion( mstudioanimdesc_t_v49 v49AnimDesc, int stairs, int stairs2, int stairs3, int basePtr)
 {
 	if (v49AnimDesc.animindex > 0) v49AnimDesc.animindex += stairs + stairs3;
 	if (v49AnimDesc.movementindex > 0) v49AnimDesc.movementindex += stairs + stairs3;
@@ -692,21 +710,21 @@ mstudioanimdesc_tv53 AnimDescConversion( mstudioanimdesc_t_v49 v49AnimDesc, int 
 	if (v49AnimDesc.zeroframeindex > 0) v49AnimDesc.zeroframeindex += stairs + stairs3;
 	if (v49AnimDesc.ikrulezeroframeindex > 0) v49AnimDesc.ikrulezeroframeindex += stairs + stairs3;
 	if (v49AnimDesc.sectionindex > 0) v49AnimDesc.sectionindex += stairs + stairs3;
-	int compressedIkRuleIdx = 0; if (v49AnimDesc.numikrules > 0) compressedIkRuleIdx = basePtr - (v49AnimDesc.ikruleindex + 140 * v49AnimDesc.numikrules);
+	int compressedIkRuleIdx = 0; //if (v49AnimDesc.numikrules > 0) compressedIkRuleIdx = ( basePtr - ( basePtr - (v49AnimDesc.ikruleindex + 140 * v49AnimDesc.numikrules) ) ) * -1 ;
 
 
-	mstudioanimdesc_tv53 animDesc = { basePtr, v49AnimDesc.sznameindex + stairs2 + stairs3, v49AnimDesc.fps, v49AnimDesc.flags, v49AnimDesc.numframes, v49AnimDesc.nummovements, v49AnimDesc.movementindex, compressedIkRuleIdx, v49AnimDesc.animindex, v49AnimDesc.numikrules, v49AnimDesc.ikruleindex, v49AnimDesc.numlocalhierarchy, v49AnimDesc.localhierarchyindex, v49AnimDesc.sectionindex, v49AnimDesc.sectionframes, v49AnimDesc.zeroframespan, v49AnimDesc.zeroframecount, v49AnimDesc.zeroframeindex, v49AnimDesc.zeroframestalltime, 0, 0, 0, 0, 0 };
+	mstudioanimdesc_t_v53 animDesc = { basePtr, v49AnimDesc.sznameindex + stairs2 + stairs3, v49AnimDesc.fps, v49AnimDesc.flags, v49AnimDesc.numframes, v49AnimDesc.nummovements, v49AnimDesc.movementindex, compressedIkRuleIdx * -1, v49AnimDesc.animindex, v49AnimDesc.numikrules, v49AnimDesc.ikruleindex, v49AnimDesc.numlocalhierarchy, v49AnimDesc.localhierarchyindex, v49AnimDesc.sectionindex, v49AnimDesc.sectionframes, v49AnimDesc.zeroframespan, v49AnimDesc.zeroframecount, v49AnimDesc.zeroframeindex, v49AnimDesc.zeroframestalltime, 0, 0, 0, 0, 0 };
 	
 	return animDesc;
 }
 
-mstudioikrule_tv53 IkRuleConversion(mstudioikrule_t_v49 v49IkRule, int stairs)
+mstudioikrule_t_v53 IkRuleConversion(mstudioikrule_t_v49 v49IkRule, int stairs)
 {
 	if (v49IkRule.compressedikerrorindex > 0) v49IkRule.compressedikerrorindex += stairs;
 	if (v49IkRule.ikerrorindex > 0) v49IkRule.ikerrorindex += stairs;
 	if (v49IkRule.szattachmentindex > 0) v49IkRule.szattachmentindex += stairs;
 
-	mstudioikrule_tv53 ikRule = {v49IkRule.index, v49IkRule.type, v49IkRule.chain, v49IkRule.bone, v49IkRule.slot, v49IkRule.height, v49IkRule.radius, v49IkRule.floor, v49IkRule.pos, v49IkRule.q, v49IkRule.compressedikerrorindex, v49IkRule.iStart, v49IkRule.ikerrorindex, v49IkRule.start, v49IkRule.peak, v49IkRule.tail, v49IkRule.end, v49IkRule.contact, v49IkRule.drop, v49IkRule.top, v49IkRule.szattachmentindex, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	mstudioikrule_t_v53 ikRule = {v49IkRule.index, ikruletype(v49IkRule.type), v49IkRule.chain, v49IkRule.bone, v49IkRule.slot, v49IkRule.height, v49IkRule.radius, v49IkRule.floor, v49IkRule.pos, v49IkRule.q.one, v49IkRule.q.i, v49IkRule.q.j, v49IkRule.q.k, v49IkRule.compressedikerrorindex, v49IkRule.iStart, v49IkRule.ikerrorindex, v49IkRule.start, v49IkRule.peak, v49IkRule.tail, v49IkRule.end, v49IkRule.contact, v49IkRule.drop, v49IkRule.top, v49IkRule.szattachmentindex, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 	return ikRule;
 }
@@ -997,6 +1015,92 @@ std::vector<int> GetAnimSectionBoneHeaderCount(BinaryReader* Stream, v49_Header*
 	}
 	return secHdrsPerAnim;
 
+}
+
+int GetAnimSectionBytesAddedIdv(BinaryReader* Stream, v49_Header* Initial_Header, int anim, bool debug)
+{
+	int pos = Stream->Position();
+	int bytesAdded = 0;
+	std::vector<int> secHdrsPerAnim = GetAnimSectionBoneHeaderCount(Stream, Initial_Header, false);
+	std::vector<int> secPerAnim = GetAnimSectionCount(Stream, Initial_Header, false);
+	int secNum = 0;
+	int startPos = Initial_Header->localanimindex + 100 * anim;
+	int animIndexPos = startPos + 56;
+	int secIndexPos = startPos + 80;
+	int framePos = startPos + 16;
+	int secFramPos = startPos + 84;
+
+	Stream->seek(animIndexPos + 100);
+	int nextAnimIndex; Stream->Read(&nextAnimIndex);
+	Stream->seek(secIndexPos + 100);
+	int nextSectionIndex; Stream->Read(&nextSectionIndex);
+
+	Stream->seek(framePos);
+	int frames; Stream->Read(&frames);
+	Stream->seek(secFramPos);
+	int secFrames; Stream->Read(&secFrames);
+
+	Stream->seek(animIndexPos);
+	int animIndex; Stream->Read(&animIndex);
+	Stream->seek(secIndexPos);
+	int sectionIndex; Stream->Read(&sectionIndex);
+
+	if (sectionIndex > 0)
+	{
+		for (int j = 0; j < secPerAnim[anim]; j++)
+		{
+			int bytesAddedPer = 0;
+			Stream->seek(startPos + sectionIndex + 8 * j);
+			int animBlock; Stream->Read(&animBlock);
+			int animOffset; Stream->Read(&animOffset);
+			Stream->seek(startPos + animOffset);
+			for (int k = 0; k < 1000000; k++)
+			{
+				int pos2 = Stream->Position();
+				std::byte bone; Stream->Read(&bone); //Logger::Info("Bone: %d, Pos:  %d\n", bone, Stream->Position() - 1);
+				std::byte flag; Stream->Read(&flag); //Logger::Info("Flag: %d, Pos:  %d\n", flag, Stream->Position() - 1);
+				short nextOffset; Stream->Read(&nextOffset); //Logger::Info("Next Offset: %d, Pos:  %d\n", nextOffset, Stream->Position() - 2);
+				int headerSize = GetAnimHeaderSize((int)flag);
+				bytesAddedPer += (32 - headerSize);
+				bytesAdded += (32 - headerSize);
+				if (nextOffset == 0)
+				{
+					if (anim + 1 < Initial_Header->numlocalanim && j == secPerAnim[anim])
+					{
+						int dist = ((startPos + 100 + nextAnimIndex) - (pos2 + headerSize));
+
+						if (dist > 18 || dist < 0)
+						{
+							for (int l = 0; l < 1000; l++)
+							{
+								short animValue; Stream->Read(&animValue);
+								if (animValue == 0)
+								{
+									int newPos = Stream->Position() - 2;
+									dist = ((startPos + 100 + nextAnimIndex) - (newPos));
+									if (dist <= 18)
+									{
+										break;
+									}
+								}
+							}
+						}
+						//Logger::Info("secDist:  %d\n", dist);
+						//Logger::Info("secStart:  %d\n", pos2 + headerSize);
+						//Logger::Info("secEnd:  %d\n", startPos + 100 + nextAnimIndex);
+						//Logger::Info("secFinalDist:  %d\n", 32 - dist);
+						bytesAdded += 32 - dist;
+					}
+
+					break;
+				}
+				Stream->seek(pos2 + nextOffset);
+			}
+			secNum++;
+		}
+	}
+	Stream->seek(pos);
+	return bytesAdded;
 }
 
 int GetAnimSectionBoneHeaderCountTotal(BinaryReader* Stream, v49_Header* Initial_Header, bool debug)
@@ -1498,6 +1602,37 @@ std::vector<int> GetAnimBoneHeaderBytesAdded(BinaryReader* Stream, v49_Header* I
 	return hdrBytesAddedPerAnim;
 }
 
+std::vector<int> GetDeltaAnims(BinaryReader* Stream, v49_Header* Initial_Header, bool debug)
+{
+	std::vector<int> deltaAnims;
+
+	for (int i = 0; i < Initial_Header->numlocalseq; i++)
+	{
+		int pos = Initial_Header->localseqindex + 212 * i;
+		Stream->seek(pos);
+		mstudioseqdescv49_t seqDesc; Stream->Read(&seqDesc);
+		int flags = seqDesc.flags;
+		if (flags && 0x0004)
+		{
+			Logger::Info("seq:  %d\n", i);
+			Stream->seek(pos + seqDesc.animindexindex);
+			for (int j = 0; j < seqDesc.numblends; j++)
+			{
+				short anim; Stream->Read(&anim);
+				if (!ContainsAlt(deltaAnims, anim))
+				{
+					deltaAnims.push_back(anim);
+					Logger::Info("anim:  %d\n", anim);
+				}
+			}
+		}
+
+
+	}
+	//Logger::Info("finishedSeq:  %d\n");
+	return deltaAnims;
+}
+
 
 std::vector<int> GetAnimSectionBoneHeaderBytesAddedPerSec(BinaryReader* Stream, v49_Header* Initial_Header, bool debug)
 {
@@ -1731,15 +1866,6 @@ void ConvertBoneHeader(BinaryReader* Stream, int num, BoneHeaderv53* boneHeaders
 	}
 	}
 	Stream->seek(pos2 + origOffset);
-}
-
-bool Contains(int* arry, int trgt, int count)
-{
-	for (int i = 0; i < count; i++)
-	{
-		if (trgt == arry[i]) return true;
-	}
-	return false;
 }
 
 int* GetAnimsWithSections(BinaryReader* Stream, v49_Header* Initial_Header)

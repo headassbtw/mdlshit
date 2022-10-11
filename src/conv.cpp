@@ -16,6 +16,7 @@
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+#include "MLUtility.hpp";
 
 using namespace std;
 using namespace rapidjson;
@@ -198,7 +199,7 @@ int FlagTest(int flag)
 
     if (flag & STUDIO_ANIM_DELTA)
     {
-        //Logger::Info("Has Flag: %d\n", STUDIO_ANIM_DELTA);
+        Logger::Info("Has Flag: %d\n", STUDIO_ANIM_DELTA);
         test += STUDIO_ANIM_DELTA_53;
     }
 
@@ -649,18 +650,21 @@ int Conversion::ReadHeader(FileInfo info) {
 
   Stream.seek(0);
 
+  int testPos = Stream.Position();
+  Utility::mdl::v49Mdl mdl = Utility::mdl::_v49Mdl(&Stream, false);
+  Utility::mdl::GetModelCount(mdl, true);
 
+  Stream.seek(testPos);
 
-  UI::Progress.SubTask.Begin("Converting Header Data");
-  Initial_Header = ReadV49Header(&Stream, Initial_Header); UI::Progress.SubTask.Update(1/7.0f);
-  Initial_Header_Part2 = ReadV49SubHeader(&Stream, Initial_Header->studiohdr2index, Initial_Header_Part2); UI::Progress.SubTask.Update(2/7.0f);
+  Initial_Header = ReadV49Header(&Stream, Initial_Header);
+  Initial_Header_Part2 = ReadV49SubHeader(&Stream, Initial_Header->studiohdr2index, Initial_Header_Part2);
 
-  AnimData* animData = GetAnimData(&Stream, Initial_Header, Initial_Header_Part2, false); UI::Progress.SubTask.Update(3/7.0f);
-  HitboxData* hitboxData = GetHitboxData(&Stream, Initial_Header, false); UI::Progress.SubTask.Update(4/7.0f);
-  BoneData* boneData = GetBoneData(&Stream, Initial_Header, false); UI::Progress.SubTask.Update(5/7.0f);
-  AttachmentData* attachmentData = GetAttachmentData(&Stream, Initial_Header, false); UI::Progress.SubTask.Update(6/7.0f);
-  SequenceData* sequenceData = GetSequenceData(&Stream, Initial_Header, false); UI::Progress.SubTask.Update(1.0f);
-  UI::Progress.SubTask.End();
+  AnimData* animData = GetAnimData(&Stream, Initial_Header, Initial_Header_Part2, false);
+  HitboxData* hitboxData = GetHitboxData(&Stream, Initial_Header, false);
+  BoneData* boneData = GetBoneData(&Stream, Initial_Header, false);
+  AttachmentData* attachmentData = GetAttachmentData(&Stream, Initial_Header, false);
+  SequenceData* sequenceData = GetSequenceData(&Stream, Initial_Header, false);
+
   Stream.seek(Initial_Header->localanimindex);
 
   int animByteAddedTotal = GetAnimBytesAdded(&Stream, Initial_Header, false);
@@ -673,11 +677,22 @@ int Conversion::ReadHeader(FileInfo info) {
   std::vector<int> numOfSecBoneHdrsPerAnim = GetAnimSectionBoneHeaderCount(&Stream, Initial_Header, false);
   std::vector<int> numOfSecBoneHdrsPerSec = GetAnimSectionBoneHeaderCountPerSec(&Stream, Initial_Header, false);
   std::vector<int> ikChainBones = GetIkChainBones(&Stream, Initial_Header, false);
+  std::vector<int> deltaAnims = GetDeltaAnims(&Stream, Initial_Header, false);
 
   int animBytesAdded = animByteAddedTotal + animSecByteAddedTotal;
   int bytesAddedToRuiMesh = 0;
   std::vector<int> bytesAddedPerRuiMesh;
   std::vector<mstudioruimesh_t> ruiMeshes;
+
+  if (info.aabb.has_value()) {
+      BinaryReader RUIStream = BinaryReader(info.aabb.value().c_str());
+      bytesAddedToRuiMesh = RUIStream.size;
+      if (!RUIStream.Stream.good()) {
+          Logger::Error("Model's phy file does not exist, please ensure %s exists, and is located in the same directory as the file\n", info.aabb.value().c_str());
+          return 1;
+      }
+  }
+
 
   Dest_Header = ConvertHeader(&Stream, &OutStream, Dest_Header, Initial_Header, Initial_Header_Part2, animByteAddedTotal + animSecByteAddedTotal, sequenceData, bytesAddedToRuiMesh, ruiMeshes.size());
   Dest_Header_Part2 = ConvertSubHeader(&Stream, &OutStream, Dest_Header_Part2, Dest_Header, Initial_Header, Initial_Header_Part2, info, animByteAddedTotal + animSecByteAddedTotal, sequenceData, bytesAddedToRuiMesh);
@@ -772,7 +787,7 @@ int Conversion::ReadHeader(FileInfo info) {
       {
           mstudiobbox_t_v49 v49Hitbox; Stream.Read(&v49Hitbox);
           int stairs = bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToIkChains + bytesAddedToTextures + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + strFiller + bytesAddedToRuiMesh;
-          mstudiobbox_tv53 hitbox = HitboxConversion(v49Hitbox, stairs);
+          mstudiobbox_t_v53 hitbox = HitboxConversion(v49Hitbox, stairs);
           OutStream.Write(hitbox);
           Logger::Notice("Updated hitboxs %d of %d\n", j + 1, numOfHitboxes);
       }
@@ -800,7 +815,7 @@ int Conversion::ReadHeader(FileInfo info) {
 
   Stream.seek(Initial_Header->localanimindex);
   OutStream.seek(Dest_Header->localanimindex);
-  UI::Progress.SubTask.Begin("Converting Animations (Part 1)");
+  UI::Progress.SubTask.Begin("Converting Animations");
   int ikRuleNum = 0;
   std::vector<int> ikRuleStairsPerAnim;
   for (int i = 0; i < Initial_Header->numlocalanim; i++) 
@@ -811,6 +826,16 @@ int Conversion::ReadHeader(FileInfo info) {
           OutStream.Stream.write(ßtruct, 100);
       }
       else {
+          bool isDelta = false;
+          for (int k = 0; k < deltaAnims.size(); k++)
+          {
+              if (i == deltaAnims[k])
+              {
+                  isDelta = true;
+                  break;
+              }
+          }
+
           int outPos = Dest_Header->localanimindex + 92 * i;
           int PISS = (-((8 * (Initial_Header->numlocalanim - i))) + bytesAddedToSeqs) + bytesAddedToTextures + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + strFiller + bytesAddedToRuiMesh;
           int PISS2 = -((8 * (Initial_Header->numlocalanim - i))) + hdrBytesAnimDescAdd[i] + secHdrBytesAnimDescAdd[i];
@@ -821,19 +846,22 @@ int Conversion::ReadHeader(FileInfo info) {
           if (v49AnimDesc.numikrules > 0)
           {
               int stairs = GetAnimBoneHeaderBytesAddedIndv(&Stream, Initial_Header, i, false);
-              v49AnimDesc.ikruleindex += stairs;
+              int stairs2 = 0;
+              if (v49AnimDesc.sectionindex > 0) stairs2 = GetAnimSectionBytesAddedIdv(&Stream, Initial_Header, i, false);
+              v49AnimDesc.ikruleindex += stairs + stairs2;
               ikRuleNum += v49AnimDesc.numikrules;
           }
-          mstudioanimdesc_tv53 animDesc = AnimDescConversion(v49AnimDesc, PISS2, PISS, ikStairs, -outPos);
+          mstudioanimdesc_t_v53 animDesc = AnimDescConversion(v49AnimDesc, PISS2, PISS, ikStairs, -outPos);
           animDesc.animindex -= 4;
           if (animDesc.sectionindex > 0) animDesc.sectionindex -= 4;
+          if (animDesc.ikruleindex > 0) animDesc.ikruleindex -= 4;
           OutStream.Write(animDesc);
       }
       ikRuleNum = 0;
       Logger::Notice("Converted animation %d of %d\n", i + 1, Initial_Header->numlocalanim);
-      
+      UI::Progress.SubTask.Update((i + 1.0f) / (float)Initial_Header->numlocalanim);
   }
-  
+  UI::Progress.SubTask.End();
   Logger::Info("Finished animations\n");
   
   if (info.disable_animations) {
@@ -843,7 +871,6 @@ int Conversion::ReadHeader(FileInfo info) {
   }
   else
   { 
-    UI::Progress.SubTask.Begin("Converting Animations (Part 1)");
       int boneHdrNum = 0;
       int secBoneHdrNum = 0;
       int secIdxNum = 0;
@@ -853,6 +880,17 @@ int Conversion::ReadHeader(FileInfo info) {
       SectionBoneHeaderv53* secBoneHeaders = new SectionBoneHeaderv53[GetAnimSectionBoneHeaderCountTotal(&Stream, Initial_Header, false)];
       for (int i = 0; i < Initial_Header->numlocalanim; i++)
       {
+
+          bool isDelta = false;
+          for (int k = 0; k < deltaAnims.size(); k++)
+          {
+              if (i == deltaAnims[k])
+              {
+                  isDelta = true;
+                  break;
+              }
+          }
+
           mstudioanimdescv53_t animDesc = animData->animDescs[i];
           int startPos = Dest_Header->localanimindex + 92 * i;
           int strStartPos = Initial_Header->localanimindex + 100 * i;
@@ -889,7 +927,7 @@ int Conversion::ReadHeader(FileInfo info) {
                   short nextOffset; Stream.Read(&nextOffset);
                   int headerSize = GetAnimHeaderSize((int)flag);
                   int dataSize = nextOffset > 0 ? nextOffset - headerSize : 0;
-                  FlagTest((int)flag);
+                  //FlagTest((int)flag);
 
                   Stream.seek(hdrStartPos);
                   ReadBoneHeader(&Stream, boneHeaders, Initial_Header, Initial_Header_Part2, boneHdrNum, dataSize, false);
@@ -916,7 +954,7 @@ int Conversion::ReadHeader(FileInfo info) {
                   boneHdrNum++;
                   if (boneHeader.nextOffset == 0)
                   {
-                      Stream.seek(hdrStartPos + headerSize);
+                     Stream.seek(hdrStartPos + headerSize);
                      if(animData->animDescs[i].numikrules > 0) filler(&Stream, &OutStream, strStartPos + animData->animDescs[i].ikruleindex - boneHeader.rawStrPos);
                      if (i + 1 < Initial_Header->numlocalanim && animData->animDescs[i + 1].sectionindex > 0 && animData->animDescs[i].numikrules == 0) filler(&Stream, &OutStream, strStartPos + 100 + animData->animDescs[i + 1].sectionindex - boneHeader.rawStrPos);
                      if (i + 1 < Initial_Header->numlocalanim && animData->animDescs[i + 1].sectionindex == 0 && animData->animDescs[i].numikrules == 0) filler(&Stream, &OutStream, strStartPos + 100 + animData->animDescs[i + 1].animindex - boneHeader.rawStrPos);
@@ -929,7 +967,7 @@ int Conversion::ReadHeader(FileInfo info) {
               }
           }
 
-          if (sectionIndex > 0)
+          if (sectionIndex > 0) //Gosh do I hate how this is setup. - Liberty
           {
               Stream.seek(strPos + animDesc.sectionindex);
               OutStream.seek(startPos + animDesc.sectionindex + PISS2);
@@ -966,6 +1004,7 @@ int Conversion::ReadHeader(FileInfo info) {
                  OutStream.seek(startPos + animOffset + PISS3 + secHdrBytesSecAdd[secNumber]);
                  for (int k = 0; k < 10000; k++)
                  {
+
                      int hdrStartPos = Stream.Position();
                      int pos = OutStream.Position();
                      std::byte bone; Stream.Read(&bone);
@@ -1019,12 +1058,15 @@ int Conversion::ReadHeader(FileInfo info) {
           {
               int numOfCompressedIkErrors = 0;
               int numOfIkErrors = 0;
+              std::vector<int> errorIdxs;
 
               for (int j = 0; j < animDesc.numikrules; j++)
               {
                   int ikStairs = -12 * (animDesc.numikrules - j);
+                  int pos = Stream.Position();
                   mstudioikrule_t_v49 v49IkRule; Stream.Read(&v49IkRule);
-                  mstudioikrule_tv53 ikRule = IkRuleConversion(v49IkRule, ikStairs);
+                  if (v49IkRule.compressedikerrorindex > 0) errorIdxs.push_back(pos + v49IkRule.compressedikerrorindex);
+                  mstudioikrule_t_v53 ikRule = IkRuleConversion(v49IkRule, ikStairs);
                   OutStream.Write(ikRule);
                   if (ikRule.compressedikerrorindex > 0) numOfCompressedIkErrors++;
                   if (ikRule.ikerrorindex > 0) numOfIkErrors++;
@@ -1034,20 +1076,30 @@ int Conversion::ReadHeader(FileInfo info) {
 
               if (numOfCompressedIkErrors > 0)
               {
+                  int animStartPos = Initial_Header->localanimindex + 100 * i;
                   for (int j = 0; j < numOfCompressedIkErrors; j++)
                   {
+                      int next = j + 1;
+                      int pos = Stream.Position();
                       mstudiocompressedikerror_t_v49 v49CompressedIkError; Stream.Read(&v49CompressedIkError);
+                      int endPos = Stream.Position();
                       OutStream.Write(v49CompressedIkError);
-                      filler(&Stream, &OutStream, 24);
+                      if (j + 1 > numOfCompressedIkErrors - 1)
+                      {
+                          if (i + 1 < Initial_Header->numlocalanim && animData->animDescs[i + 1].sectionindex > 0 ) filler(&Stream, &OutStream, animStartPos + 100 + animData->animDescs[i + 1].sectionindex - endPos);
+                          if (i + 1 < Initial_Header->numlocalanim && animData->animDescs[i + 1].sectionindex == 0 ) filler(&Stream, &OutStream, animStartPos + 100 + animData->animDescs[i + 1].animindex - endPos);
+                          if (i + 1 > Initial_Header->numlocalanim - 1 ) filler(&Stream, &OutStream, Initial_Header->localseqindex - endPos);
+                          break;
+                      }
+                      filler(&Stream, &OutStream, errorIdxs[next] - endPos);
+
                   }
               }
 
           }
-        UI::Progress.SubTask.Update((i + 1.0f) / (float)Initial_Header->numlocalanim);
       }
-    UI::Progress.SubTask.End();
   }
-  
+
 
   std::vector<std::pair<int, int>> events_change;
   ////sequences
@@ -1055,7 +1107,7 @@ int Conversion::ReadHeader(FileInfo info) {
   filler(&Stream, &OutStream, seq_filler_dest);
   Stream.seek(Initial_Header->localseqindex);
   OutStream.seek(Dest_Header->localseqindex);
-  UI::Progress.SubTask.Begin("Converting Sequences (Part 1)");
+  UI::Progress.SubTask.Begin("Converting Sequences");
   int numOfActMods2 = 0;
   int numOfActMods3 = 0;
   for (int i = 0; i < Initial_Header->numlocalseq; i++) {
@@ -1097,14 +1149,14 @@ int Conversion::ReadHeader(FileInfo info) {
           sequence.animindexindex > 0 ? OutStream.Write(sequence.animindexindex + stairs) : OutStream.Write(sequence.animindexindex);
 
           sequence.movementindex > 0 ? OutStream.Write(sequence.movementindex + stairs) : OutStream.Write(sequence.movementindex); // [blend] float array for blended movement
-          OutStream.Write(sequence.groupsize0);
-          OutStream.Write(sequence.groupsize1);
-          OutStream.Write(sequence.paramindex0); // X, Y, Z, XR, YR, ZR
-          OutStream.Write(sequence.paramindex1); // X, Y, Z, XR, YR, ZR
-          OutStream.Write(sequence.paramstart0); // local (0..1) starting value
-          OutStream.Write(sequence.paramstart1); // local (0..1) starting value
-          OutStream.Write(sequence.paramend0); // local (0..1) ending value
-          OutStream.Write(sequence.paramend1); // local (0..1) ending value
+          OutStream.Write(sequence.groupsize[0]);
+          OutStream.Write(sequence.groupsize[1]);
+          OutStream.Write(sequence.paramindex[0]); // X, Y, Z, XR, YR, ZR
+          OutStream.Write(sequence.paramindex[1]); // X, Y, Z, XR, YR, ZR
+          OutStream.Write(sequence.paramstart[0]); // local (0..1) starting value
+          OutStream.Write(sequence.paramstart[1]); // local (0..1) starting value
+          OutStream.Write(sequence.paramend[0]); // local (0..1) ending value
+          OutStream.Write(sequence.paramend[1]); // local (0..1) ending value
           OutStream.Write(sequence.paramparent);
 
           OutStream.Write(sequence.fadeintime); // ideal cross fate in time (0.2 default)
@@ -1149,11 +1201,9 @@ int Conversion::ReadHeader(FileInfo info) {
       Logger::Notice("Converted sequence %d of %d\n", i + 1, Initial_Header->numlocalseq);
       UI::Progress.SubTask.Update((i + 1.0f) / (float)Initial_Header->numlocalseq);
   }
-  UI::Progress.SubTask.End();
   Stream.seek(Initial_Header->localseqindex + 212 * Initial_Header->numlocalseq);
   OutStream.seek(Dest_Header->localseqindex + 232 * Initial_Header->numlocalseq);
   filler(&Stream, &OutStream, 4 * Initial_Header->numbones);
-  UI::Progress.SubTask.Begin("Converting Sequences (Part 2)");
   int numOfActMods = 0;
   int numOfActMods4 = 0;
   for (int i = 0; i < Initial_Header->numlocalseq; i++)
@@ -1182,7 +1232,7 @@ int Conversion::ReadHeader(FileInfo info) {
           Stream.seek(strPos + sequence.posekeyindex);
           OutStream.seek(outPos + sequence.posekeyindex + stairs + 4 * numOfActMods);
 
-          filler(&Stream, &OutStream, 4 * (sequence.groupsize0 + sequence.groupsize1 - 1));
+          filler(&Stream, &OutStream, 4 * (sequence.groupsize[0] + sequence.groupsize[1] - 1));
           int lastFloat; Stream.Read(&lastFloat); OutStream.Write(0);
       }
 
@@ -1222,9 +1272,8 @@ int Conversion::ReadHeader(FileInfo info) {
           filler(&Stream, &OutStream, 4 * Initial_Header->numbones);
       }
       numOfActMods += sequence.numactivitymodifiers;
-      UI::Progress.SubTask.Update((i+1.0)/(Initial_Header->numlocalseq*1.0));
+
   }
-  UI::Progress.SubTask.End();
   Stream.seek(Initial_Header->localnodeindex);
   OutStream.seek(Dest_Header->localnodeindex);
 
@@ -1304,7 +1353,6 @@ int Conversion::ReadHeader(FileInfo info) {
           OutStream.Write((float)0.707);
           OutStream.Write(kneeDir);
           Logger::Notice("Converting IkChain %d of %d\n", i + 1, Initial_Header->numikchains);
-          UI::Progress.SubTask.Update((i+1.0)/(Initial_Header->numikchains*1.0));
       }
 
       for (int i = 0; i < numOfIkLinks; i++)
@@ -1375,23 +1423,23 @@ int Conversion::ReadHeader(FileInfo info) {
   Logger::Info("Finished included models\n");
 
 
-  //if (info.aabb.has_value()) {
-  //    BinaryReader RUIStream = BinaryReader(info.aabb.value().c_str());
-  //    if (!RUIStream.Stream.good()) {
-  //        Logger::Error("Model's phy file does not exist, please ensure %s exists, and is located in the same directory as the file\n", info.aabb.value().c_str());
-  //        return 1;
-  //    }
-  //    printf("writing rui at [%i]...\n", OutStream.Position());
-  //    UI::Progress.SubTask.Begin("Copying Physics Data");
-  //    for (int i = 0; i < RUIStream.size; i++) {
-  //        byte tmp;
-  //        RUIStream.Read(&tmp);
-  //        OutStream.Write(tmp);
-  //        UI::Progress.SubTask.Update((i + 1.0f) / (float)RUIStream.size);
-  //    }
-  //    UI::Progress.SubTask.End();
-  //    Logger::Info("done\n");
-  //}
+if (info.aabb.has_value()) {
+    BinaryReader RUIStream = BinaryReader(info.aabb.value().c_str());
+    if (!RUIStream.Stream.good()) {
+        Logger::Error("Model's phy file does not exist, please ensure %s exists, and is located in the same directory as the file\n", info.aabb.value().c_str());
+        return 1;
+    }
+    printf("writing rui at [%i]...\n", OutStream.Position());
+    UI::Progress.SubTask.Begin("Copying Physics Data");
+    for (int i = 0; i < RUIStream.size; i++) {
+        byte tmp;
+        RUIStream.Read(&tmp);
+        OutStream.Write(tmp);
+        UI::Progress.SubTask.Update((i + 1.0f) / (float)RUIStream.size);
+    }
+    UI::Progress.SubTask.End();
+    Logger::Info("done\n");
+}
   //
   //if (ruiMeshes.size() > 0 && !info.aabb.has_value() && info.str.has_value())
   //{
@@ -1508,8 +1556,8 @@ int Conversion::ReadHeader(FileInfo info) {
   
   Stream.seek(Initial_Header_Part2->linearboneindex + 408);
   mstudiolinearbone_t_v49 linearBone; Stream.Read(&linearBone);
-  mstudiolinearbonedata_t_v49 linearBoneData; Stream.Read(&linearBoneData, Initial_Header->numbones);
-  linearBone.posscaleindex = 0;
+  mstudiolinearbonedata_t_v49 linearBoneData; Stream.Read(&linearBoneData, linearBone);
+  //linearBone.posscaleindex = 0;
   for (int i = 0; i < Initial_Header->numbones; i++) 
   {
       if (info.disable_bones) {
@@ -1530,7 +1578,7 @@ int Conversion::ReadHeader(FileInfo info) {
       }
   }
   OutStream.Write(linearBone);
-  OutStream.Write(linearBoneData, Initial_Header->numbones);
+  OutStream.Write(linearBoneData, linearBone);
   AddInt32(&OutStream, 0, 15);  //filler
 
 #pragma region rest of the file
@@ -1665,7 +1713,6 @@ int Conversion::ReadHeader(FileInfo info) {
   
   if (sequenceData->numOfActMods > 0)
   {
-    UI::Progress.SubTask.Begin("Updating Activity Modifiers");
       int numActMods = 0;
       for (int i = 0; i < Initial_Header->numlocalseq; i++)
       {
@@ -1681,9 +1728,7 @@ int Conversion::ReadHeader(FileInfo info) {
               OutStream.seek(OutStream.Position() + 4);
           }
           numActMods += sequence.numactivitymodifiers;
-          UI::Progress.SubTask.Update((i + 1.0f) / (float)Initial_Header->numlocalseq);
       }
-      UI::Progress.SubTask.End();
   }
   
   if (Initial_Header->numlocalnodes > 0)
@@ -1697,7 +1742,6 @@ int Conversion::ReadHeader(FileInfo info) {
           Logger::Notice("Converted body part %d of %d\n", i + 1, Initial_Header->numlocalnodes);
           UI::Progress.SubTask.Update((i + 1.0f) / (float)Initial_Header->numlocalnodes);
       }
-      UI::Progress.SubTask.End();
   }
 
   if (Initial_Header->numlocalposeparameters > 0)
@@ -1713,7 +1757,6 @@ int Conversion::ReadHeader(FileInfo info) {
           Logger::Notice("Updated Pose Param Name %d of %d\n", i + 1, Initial_Header->numlocalposeparameters);
           UI::Progress.SubTask.Update((i + 1.0f) / (float)Initial_Header->numlocalposeparameters);
       }
-      UI::Progress.SubTask.End();
   }
 
 

@@ -637,6 +637,7 @@ struct mstudioattachment_t_v49
 struct mstudiobonenametable_t_v49
 {
 	std::byte bone;
+	std::vector<std::byte> bones;
 };
 
 struct mstudioikchain_t_v49
@@ -818,7 +819,7 @@ struct sectionindexesindex_t_v49
 
 struct mstudioanim_valueptr_t_v49
 {
-	int16_t offset[3];
+	Vector3Short offset = {0,0,0};
 };
 
 struct mstudioanim_t_v49
@@ -829,19 +830,25 @@ struct mstudioanim_t_v49
     int16_t nextoffset;
 
     //STUDIO_ANIM_ANIMROT
-        mstudioanim_valueptr_t_v49 animrot; // pRotV
+        mstudioanim_valueptr_t_v49 animrot = { 0,0,0 }; // pRotV
 
 	//STUDIO_ANIM_ANIMPOS
-	    mstudioanim_valueptr_t_v49 animpos; // pPosV
+	    mstudioanim_valueptr_t_v49 animpos = { 0,0,0 }; // pPosV
 
 	//STUDIO_ANIM_RAWROT
-	    QuaternionShort rawrot; // pQuat48
+	    QuaternionShort rawrot = { 0,0,0,0 }; // pQuat48
 
 	//STUDIO_ANIM_RAWROT2
-	    Quaternion64 rawrot2; // pQuat64
+	    Quaternion64 rawrot2 = { 0,0,0,0 }; // pQuat64
 
 	//STUDIO_ANIM_RAWPOS
-	    Vector48 rawpos; // pPos
+	    Vector48 rawpos = { 0,0,0 }; // pPos
+};
+
+struct mstudioanimdata_t_v49
+{
+	std::byte value;
+	std::vector<std::byte> arry;
 };
 
 enum ikruletype
@@ -858,7 +865,7 @@ struct mstudioikrule_t_v49
 {
 	int index;
 
-	ikruletype type;
+	int type;
 	int chain;
 
 	int	bone;
@@ -990,7 +997,7 @@ struct mstudioseqdescv49_t
 
 struct posekey_t_v49
 {
-	float unk;
+	std::vector<float> unk;
 };
 
 struct mstudioevent_t_v49
@@ -1015,6 +1022,11 @@ struct mstudioautolayer_t_v49
 	float end;		// end of all influence
 };
 
+struct blendgroup_t_v49
+{
+	std::vector<int16_t> blends;
+};
+
 struct mstudioactivitymodifier_t_v49
 {
 	int sznameindex;
@@ -1022,7 +1034,7 @@ struct mstudioactivitymodifier_t_v49
 
 struct seqweightlist_t_v49
 {
-    float boneweight;
+	std::vector<float> boneweight;
 };
 
 struct mstudiomodelgroup_t_v49
@@ -1138,7 +1150,7 @@ struct mstudiotexture_t_v49
 
 struct mstudioskingroup_t_v49
 {
-	int16_t textureId;
+	std::vector<int16_t> textureId;
 };
 
 struct mstudionodedata_v49
@@ -1163,8 +1175,50 @@ struct pertriheader_t_v49
 	int		unused[8]; // hopefully, checks out with other mdl structs 
 };
 
+struct mstudiokeyvalues_t_v49
+{
+	std::vector<char> value;
+};
 
+struct v49Mdl
+{
+	studiohdr_t_v49										mdlhdr;
+	studiohdr2_t_v49									mdlsubhdr;
+	std::vector<mstudiobone_t_v49>						bones;
+	std::vector<mstudiojigglebone_t_v49>				jigglebones;
+	std::vector<mstudioboneflexdriver_t_v49>			boneflexdrivers;
+	std::vector<mstudioattachment_t_v49>				attachments;
+	std::vector<mstudiohitboxset_t_v49>					hitboxsets;
+	std::vector<mstudiobbox_t_v49>						hitboxes;
+	mstudiobonenametable_t_v49							bonenametable;
+	std::vector<mstudioanimdesc_t_v49>					animdescs;
+	std::vector<mstudioikrule_t_v49>					ikrules;
+	std::vector<mstudiocompressedikerror_t_v49>			compressedikerrors;
+	std::vector<mstudioikerror_t_v49>					ikerrors;
+	std::vector<mstudioikrulezeroframe_t_v49>			ikrulezeroframe;
+	std::vector<mstudioseqdescv49_t>					seqdescs;
+	std::vector<posekey_t_v49>							posekeys;
+	std::vector<mstudioevent_t_v49>						events;
+	std::vector<mstudioautolayer_t_v49>					autolayers;
+	std::vector<mstudioactivitymodifier_t_v49>			activitymodifiers;
+	std::vector<seqweightlist_t_v49>					seqweightlist;
+	std::vector<mstudionodename_t_v49>					nodenames;
+	std::vector<mstudionodedata_v49>					nodes;
+	std::vector<mstudiobodyparts_t_v49>					bodyparts;
+	std::vector<mstudiomodel_t_v49>						models;
+	std::vector<mstudiomesh_t_v49>						meshes;
+	std::vector<mstudiovertex_t_v49>					vertexes;
+	std::vector<mstudiomodelgroup_t_v49>				includedmodels;
+	std::vector<mstudiotexturedir_t_v49>				cdtextures;
+	std::vector<mstudiotexture_t_v49>					textures;
+	std::vector<mstudioskingroup_t_v49>					skingroups;
+};
 
+struct mstudiocompressedikerror_t_v52
+{
+	float scale[4]; // first three values are the same as what posscale (if it was used) is, fourth is similar to unkvector1.
+	int16_t offset[4];
+};
 
 struct studiohdr_t_v53
 {
@@ -1396,7 +1450,7 @@ struct mstudiobone_t_v53
 	int unused[7]; // remove as appropriate
 };
 
-struct mstudiolinearbonedata_tv53
+struct mstudiolinearbonedata_t_v53
 {
 	uint32_t	flags[255];
 	uint32_t	parents[255];
@@ -1408,7 +1462,7 @@ struct mstudiolinearbonedata_tv53
 	Quaternion  boneAlignment[255];
 };
 
-struct mstudioikchain_tv53
+struct mstudioikchain_t_v53
 {
 	int sznameindex;
 
@@ -1422,7 +1476,7 @@ struct mstudioikchain_tv53
 	int unused[3]; // these get cut in apex so I can't imagine this is used
 };
 
-struct mstudiobbox_tv53
+struct mstudiobbox_t_v53
 {
 	int bone;
 	hboxgroup group; // intersection group
@@ -1438,7 +1492,7 @@ struct mstudiobbox_tv53
 	int unused[6];
 };
 
-struct mstudioanimdesc_tv53
+struct mstudioanimdesc_t_v53
 {
 	int baseptr;
 
@@ -1474,37 +1528,37 @@ struct mstudioanimdesc_tv53
 	int unused[5];
 };
 
-struct sectionindexes_tv53
+struct sectionindexes_t_v53
 {
 	int sectionoffsets;
 };
 
-struct mstudioanim_tv53
+struct mstudioanim_t_v53
 {
-	float posscale; // does what posscale is used for
+	float posscale = 0; // does what posscale is used for
 
 	std::byte bone; // unsigned byte, bone limit exceeds 128 so has to be. also means max bones is 255.
 	std::byte flags;
 
-	int16_t unk; // normally null data
+	int16_t unk = 0; // normally null data
 
 
-	Quaternion64 rawrot; // pQuat64
+	Quaternion64 rawrot = { 0,0,0, 0 }; // pQuat64
 
-	mstudioanim_valueptr_t_v49 animrot; // pRotV
-	int16_t unused; // pretty sure
+	mstudioanim_valueptr_t_v49 animrot = {0,0,0}; // pRotV
+	int16_t unused = 0; // pretty sure
 
 
-	Vector48 rawpos; // pPos
-	mstudioanim_valueptr_t_v49 animpos; // pPosV
+	Vector48 rawpos = { 0,0,0 }; // pPos
+	mstudioanim_valueptr_t_v49 animpos = { 0,0,0 }; // pPosV
 
-	Vector48 rawscale; // new in v53
-	mstudioanim_valueptr_t_v49 animscale;
+	Vector48 rawscale = { 0,0,0 }; // new in v53
+	mstudioanim_valueptr_t_v49 animscale = { 0,0,0 };
 
 	int nextoffset;
 };
 
-struct mstudioikrule_tv53
+struct mstudioikrule_t_v53
 {
 	int index;
 	ikruletype type;
@@ -1537,7 +1591,7 @@ struct mstudioikrule_tv53
 	int unused[9];
 };
 
-struct mstudioseqdesc_tv53
+struct mstudioseqdesc_t_v53
 {
 	int baseptr;
 
@@ -1609,14 +1663,14 @@ struct mstudioseqdesc_tv53
 	int unused[10]; // some might be used or they might've just been reseting space like on bones.
 };
 
-struct mstudioactivitymodifier_tv53
+struct mstudioactivitymodifier_t_v53
 {
 	int sznameindex;
 
 	int unk;
 };
 
-struct mstudiotexture_tv53
+struct mstudiotexture_t_v53
 {
 	int sznameindex;
 
@@ -1629,8 +1683,8 @@ struct mstudiotexture_tv53
 
 struct mstudiorruiheader_t
 {
-	std::byte ruiunk[4]; // unsure, it doesn't line up
-	int ruimeshindex;
+	std::byte	ruiunk[4]; // unsure, it doesn't line up
+	int			ruimeshindex;
 };
 
 // vertex map for a quad
@@ -1646,14 +1700,14 @@ struct mstudioruivertmap_t
 	int16_t vertstartid;
 	int16_t vertendid;
 
-	// fourth vert for second triangle
+	//fourth// vert for second triangle
 	// 4
 	int16_t vertextraid;
 };
 
 struct mstudioruivert_t
 {
-	int parent; // relative to global mesh parent, assumed
+	int		parent; // relative to global mesh parent, assumed
 
 	Vector3 vertexpos; // position of vertex relative to bone
 };
@@ -1669,34 +1723,58 @@ struct mstudioruimesface_t
 	Vector2 faceuvmin; // vertex 1
 	Vector2 faceuvmax; // vertex 4
 
-	// these could likely be calculated by doing math with a height/width scale
-	// scale of the ui element
+	// these// could likely be calculated by doing math with a height/width scale
+	// scale// of the ui element
 	Vector2 facescalemin; // vertex 1
 	Vector2 facescalemax; // vertex 4
 };
 
 struct mstudioruimesh_t
 {
-	int numparents; // apparently you can have meshes parented to more than one bone(?)    
-	int numvertices; // number of verts
-	int numfaces; // number of faces (quads)
+	int											numparents; // apparently you can have meshes parented to more than one bone(?)    
+	int											numvertices; // number of verts
+	int											numfaces; // number of faces (quads)
 
-	int parentindex; // this gets padding out front of it to even off the struct
+	int											parentindex; // this gets padding out front of it to even off the struct
 
-	int vertexindex; // offset into smd style vertex data
-	int vertmapindex; // offsets into a vertex map for each quad
-	int facedataindex; // offset into uv section
+	int											vertexindex; // offset into smd style vertex data
+	int											vertmapindex; // offsets into a vertex map for each quad
+	int											facedataindex; // offset into uv section
 
-	std::byte unk[4]; // zero sometimes, others not. has to do with face clipping.
+	std::byte									unk[4]; // zero sometimes, others not. has to do with face clipping.
 
-	std::string szruimeshname; // have to subtract header to get actual size (padding included)
+	char*										szruimeshname = new char[255]; // have to subtract header to get actual size (padding included)
 
-	std::vector <int16_t> parent; // parent(s) bone of mesh
+	int16_t*									parent = new int16_t[255]; // parent(s) bone of mesh
 
-	std::vector <mstudioruivertmap_t> vertexmap; // vertex map for each face  
-	std::vector <mstudioruivert_t> vertex;
+	mstudioruivertmap_t*						vertexmap = new mstudioruivertmap_t[255]; // vertex map for each face  
+	mstudioruivert_t*							vertex = new mstudioruivert_t[255];
 
-	std::vector <mstudioruimesface_t> facedata;
+	mstudioruimesface_t*						facedata = new mstudioruimesface_t[255];
+};
+
+struct mstudioruimesh_t_json
+{
+	int											numparents; // apparently you can have meshes parented to more than one bone(?)    
+	int											numvertices; // number of verts
+	int											numfaces; // number of faces (quads)
+
+	int											parentindex; // this gets padding out front of it to even off the struct
+
+	int											vertexindex; // offset into smd style vertex data
+	int											vertmapindex; // offsets into a vertex map for each quad
+	int											facedataindex; // offset into uv section
+
+	std::byte									unk[4]; // zero sometimes, others not. has to do with face clipping.
+
+	std::string									szruimeshname; // have to subtract header to get actual size (padding included)
+
+	std::vector <int16_t>						parent; // parent(s) bone of mesh
+
+	std::vector <mstudioruivertmap_t>			vertexmap; // vertex map for each face  
+	std::vector <mstudioruivert_t>				vertex;
+
+	std::vector <mstudioruimesface_t>			facedata;
 };
 
 struct Vector {
@@ -2101,79 +2179,79 @@ struct mstudiomodelv53_t
 	uint32_t unk1[4];
 };
 
-struct mstudioseqdesc_t_v53
-{
-	int baseptr;
-
-	int	szlabelindex;
-
-	int szactivitynameindex;
-
-	int flags; // looping/non-looping flags
-
-	int activity; // initialized at loadtime to game DLL values
-	int actweight;
-
-	int numevents;
-	int eventindex;
-
-	Vector3 bbmin; // per sequence bounding box
-	Vector3 bbmax;
-
-	int numblends;
-
-	// Index into array of shorts which is groupsize[0] x groupsize[1] in length
-	int animindexindex;
-
-	int movementindex; // [blend] float array for blended movement
-	int groupsize0;
-	int groupsize1;
-	int paramindex0; // X, Y, Z, XR, YR, ZR
-	int paramindex1; // X, Y, Z, XR, YR, ZR
-	float paramstart0; // local (0..1) starting value
-	float paramstart1; // local (0..1) starting value
-	float paramend0; // local (0..1) ending value
-	float paramend1; // local (0..1) ending value
-	int paramparent;
-
-	float fadeintime; // ideal cross fate in time (0.2 default)
-	float fadeouttime; // ideal cross fade out time (0.2 default)
-
-	int localentrynode; // transition node at entry
-	int localexitnode; // transition node at exit
-	int nodeflags; // transition rules
-
-	float entryphase; // used to match entry gait
-	float exitphase; // used to match exit gait
-
-	float lastframe; // frame that should generation EndOfSequence
-
-	int nextseq; // auto advancing sequences
-	int pose; // index of delta animation between end and nextseq
-
-	int numikrules;
-
-	int numautolayers;
-	int autolayerindex;
-
-	int weightlistindex;
-
-	int posekeyindex;
-
-	int numiklocks;
-	int iklockindex;
-
-	// Key values
-	int keyvalueindex;
-	int keyvaluesize;
-
-	int cycleposeindex; // index of pose parameter to use as cycle index
-
-	int activitymodifierindex;
-	int numactivitymodifiers;
-
-	int unused[10]; // some might be used or they might've just been reseting space like on bones.
-};
+//struct mstudioseqdesc_t_v53
+//{
+//	int baseptr;
+//
+//	int	szlabelindex;
+//
+//	int szactivitynameindex;
+//
+//	int flags; // looping/non-looping flags
+//
+//	int activity; // initialized at loadtime to game DLL values
+//	int actweight;
+//
+//	int numevents;
+//	int eventindex;
+//
+//	Vector3 bbmin; // per sequence bounding box
+//	Vector3 bbmax;
+//
+//	int numblends;
+//
+//	// Index into array of shorts which is groupsize[0] x groupsize[1] in length
+//	int animindexindex;
+//
+//	int movementindex; // [blend] float array for blended movement
+//	int groupsize0;
+//	int groupsize1;
+//	int paramindex0; // X, Y, Z, XR, YR, ZR
+//	int paramindex1; // X, Y, Z, XR, YR, ZR
+//	float paramstart0; // local (0..1) starting value
+//	float paramstart1; // local (0..1) starting value
+//	float paramend0; // local (0..1) ending value
+//	float paramend1; // local (0..1) ending value
+//	int paramparent;
+//
+//	float fadeintime; // ideal cross fate in time (0.2 default)
+//	float fadeouttime; // ideal cross fade out time (0.2 default)
+//
+//	int localentrynode; // transition node at entry
+//	int localexitnode; // transition node at exit
+//	int nodeflags; // transition rules
+//
+//	float entryphase; // used to match entry gait
+//	float exitphase; // used to match exit gait
+//
+//	float lastframe; // frame that should generation EndOfSequence
+//
+//	int nextseq; // auto advancing sequences
+//	int pose; // index of delta animation between end and nextseq
+//
+//	int numikrules;
+//
+//	int numautolayers;
+//	int autolayerindex;
+//
+//	int weightlistindex;
+//
+//	int posekeyindex;
+//
+//	int numiklocks;
+//	int iklockindex;
+//
+//	// Key values
+//	int keyvalueindex;
+//	int keyvaluesize;
+//
+//	int cycleposeindex; // index of pose parameter to use as cycle index
+//
+//	int activitymodifierindex;
+//	int numactivitymodifiers;
+//
+//	int unused[10]; // some might be used or they might've just been reseting space like on bones.
+//};
 
 
 struct mstudioikchainv53_t
