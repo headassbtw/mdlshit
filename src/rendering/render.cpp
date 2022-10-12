@@ -676,6 +676,6 @@ hasBrowser = true;
     ImGui::DestroyContext();
     glfwTerminate();
 
-
+    if(LogEnabled) Logger::End();
     return 0;
 }

@@ -13,17 +13,17 @@
 #endif
 
 FILE* LogStream;
-bool LogForceEnabled;
-bool LogEnabled;
+bool LogForceEnabled = false; //these should be init'd already, but just being safe here
+bool LogEnabled = false;
 
 void Logger::Init(){
   std::string ass = "." PATHCHAR "log.log";
-  LogStream = fopen(ass.c_str(),"w");
+  if(!LogEnabled) LogStream = fopen(ass.c_str(),"w");
   Info("Log file opened\n");
 }
 
 void Logger::End(){
-  fclose(LogStream);
+  if(LogEnabled) fclose(LogStream);
   Info("Log file closed\n");
 }
 
@@ -83,7 +83,7 @@ void SetConsoleColor(ConsoleColor color){
 
 void printt(const char* ass){
   printf("%s",ass);
-  fprintf(LogStream, "%s", ass);
+  if(LogEnabled) fprintf(LogStream, "%s", ass);
 }
 void LoggerPrefix(LogType col){
   switch(col){
@@ -150,7 +150,7 @@ void Logger::Notice(const char* msg...){
   vfprintf(stdout,msg,args);
   va_end(args);
   va_start(args, msg); // WHY??
-  vfprintf(LogStream,msg,args);
+  if(LogEnabled) vfprintf(LogStream,msg,args);
   AddToInAppLogger(ass, LogType::Notice);
   va_end(args);
   SetConsoleColor(Reset);
@@ -166,7 +166,7 @@ void Logger::Info(const char* msg...){
   vfprintf(stdout,msg,args);
   va_end(args);
   va_start(args, msg);
-  vfprintf(LogStream,msg,args);
+  if(LogEnabled) vfprintf(LogStream,msg,args);
   AddToInAppLogger(ass, LogType::Info);
   va_end(args);
   SetConsoleColor(Reset);
@@ -182,7 +182,7 @@ void Logger::Error(const char* msg...){
   vfprintf(stdout,msg,args);
   va_end(args);
   va_start(args, msg);
-  vfprintf(LogStream,msg,args);
+  if(LogEnabled) vfprintf(LogStream,msg,args);
   AddToInAppLogger(ass, LogType::Error);
   va_end(args);
   SetConsoleColor(Reset);
@@ -198,7 +198,7 @@ void Logger::Critical(const char* msg...){
   vfprintf(stdout,msg,args);
   va_end(args);
   va_start(args, msg);
-  vfprintf(LogStream,msg,args);
+  if(LogEnabled) vfprintf(LogStream,msg,args);
   AddToInAppLogger(ass, LogType::Critical);
   va_end(args);
   SetConsoleColor(Reset);
@@ -214,7 +214,7 @@ void Logger::Debug(const char* msg...){
   vfprintf(stdout,msg,args);
   va_end(args);
   va_start(args, msg);
-  vfprintf(LogStream,msg,args);
+  if(LogEnabled) vfprintf(LogStream,msg,args);
   AddToInAppLogger(ass, LogType::Debug);
   va_end(args);
   SetConsoleColor(Reset);
