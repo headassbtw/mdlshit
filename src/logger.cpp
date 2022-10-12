@@ -12,17 +12,17 @@
 #define PATHCHAR "/"
 #endif
 
-//std::ofstream LogStream;
+FILE* LogStream;
 
 void Logger::Init(){
-  //std::string ass = "." PATHCHAR "log.log";
-  //LogStream = std::ofstream(ass.c_str());
-  //Info("Log file opened\n");
+  std::string ass = "." PATHCHAR "log.log";
+  LogStream = fopen(ass.c_str(),"w");
+  Info("Log file opened\n");
 }
 
 void Logger::End(){
-  //LogStream.close();
-  //Info("Log file closed\n");
+  fclose(LogStream);
+  Info("Log file closed\n");
 }
 
 #define RESET   "\033[0m"
@@ -81,7 +81,7 @@ void SetConsoleColor(ConsoleColor color){
 
 void printt(const char* ass){
   printf("%s",ass);
-  //fprintf(LogStream, ass);
+  fprintf(LogStream, "%s", ass);
 }
 void LoggerPrefix(LogType col){
   switch(col){
@@ -138,25 +138,33 @@ void help(const char* p, va_list args){
 //these need to be this way.
 //the above function did not work.
 void Logger::Notice(const char* msg...){
-  
   LoggerPrefix(LogType::Notice);
   va_list args;
-  va_start(args, msg);
   char ass[2048];
+  va_start(args, msg);
   vsprintf(ass,msg,args);
-  printf("%s", ass);
+  va_end(args);
+  va_start(args, msg); // THIS FUCKING WORKS?????????????
+  vfprintf(stdout,msg,args);
+  va_end(args);
+  va_start(args, msg); // WHY??
+  vfprintf(LogStream,msg,args);
   AddToInAppLogger(ass, LogType::Notice);
   va_end(args);
   SetConsoleColor(Reset);
-  
 }
 void Logger::Info(const char* msg...){
   LoggerPrefix(LogType::Info);
   va_list args;
-  va_start(args, msg);
   char ass[2048];
+  va_start(args, msg);
   vsprintf(ass,msg,args);
-  printf("%s", ass);
+  va_end(args);
+  va_start(args, msg);
+  vfprintf(stdout,msg,args);
+  va_end(args);
+  va_start(args, msg);
+  vfprintf(LogStream,msg,args);
   AddToInAppLogger(ass, LogType::Info);
   va_end(args);
   SetConsoleColor(Reset);
@@ -164,10 +172,15 @@ void Logger::Info(const char* msg...){
 void Logger::Error(const char* msg...){
   LoggerPrefix(LogType::Error);
   va_list args;
-  va_start(args, msg);
   char ass[2048];
+  va_start(args, msg);
   vsprintf(ass,msg,args);
-  printf("%s", ass);
+  va_end(args);
+  va_start(args, msg);
+  vfprintf(stdout,msg,args);
+  va_end(args);
+  va_start(args, msg);
+  vfprintf(LogStream,msg,args);
   AddToInAppLogger(ass, LogType::Error);
   va_end(args);
   SetConsoleColor(Reset);
@@ -175,10 +188,15 @@ void Logger::Error(const char* msg...){
 void Logger::Critical(const char* msg...){
   LoggerPrefix(LogType::Critical);
   va_list args;
-  va_start(args, msg);
   char ass[2048];
+  va_start(args, msg);
   vsprintf(ass,msg,args);
-  printf("%s", ass);
+  va_end(args);
+  va_start(args, msg);
+  vfprintf(stdout,msg,args);
+  va_end(args);
+  va_start(args, msg);
+  vfprintf(LogStream,msg,args);
   AddToInAppLogger(ass, LogType::Critical);
   va_end(args);
   SetConsoleColor(Reset);
@@ -186,10 +204,15 @@ void Logger::Critical(const char* msg...){
 void Logger::Debug(const char* msg...){
   LoggerPrefix(LogType::Debug);
   va_list args;
-  va_start(args, msg);
   char ass[2048];
+  va_start(args, msg);
   vsprintf(ass,msg,args);
-  printf("%s", ass);
+  va_end(args);
+  va_start(args, msg);
+  vfprintf(stdout,msg,args);
+  va_end(args);
+  va_start(args, msg);
+  vfprintf(LogStream,msg,args);
   AddToInAppLogger(ass, LogType::Debug);
   va_end(args);
   SetConsoleColor(Reset);

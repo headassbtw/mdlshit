@@ -16,5 +16,5 @@ struct LogMsg{
   std::string msg;
   int type;
 };
-extern std::ofstream LogStream;
+extern FILE* LogStream;
 extern std::vector<LogMsg*> LoggerMessages;
