@@ -13,6 +13,8 @@
 #endif
 
 FILE* LogStream;
+bool LogForceEnabled;
+bool LogEnabled;
 
 void Logger::Init(){
   std::string ass = "." PATHCHAR "log.log";

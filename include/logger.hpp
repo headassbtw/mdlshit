@@ -18,3 +18,6 @@ struct LogMsg{
 };
 extern FILE* LogStream;
 extern std::vector<LogMsg*> LoggerMessages;
+extern bool LogForceEnabled;
+extern bool LogEnabled;
+extern bool LogDisabled;

@@ -186,7 +186,11 @@ void RenderGUI(){
         }
         if (ImGui::BeginMenu("Debug"))
         {
-          ImGui::MenuItem("Show Demo Window", "", &demoWindow);
+          if(!LogForceEnabled){
+            if(!LogEnabled) if (ImGui::MenuItem("Enable Log File", "")) {Logger::Init(); LogEnabled = true;}
+            if(LogEnabled) if (ImGui::MenuItem("Disable Log File", "")) {Logger::End(); LogEnabled = false;}
+          }
+          
           
           if(ImGui::MenuItem("Show Log Output", "", &console)){
             if(console){
@@ -200,6 +204,8 @@ void RenderGUI(){
             }
           }
            
+          ImGui::MenuItem("Show Demo Window", "", &demoWindow);
+
           ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Help"))

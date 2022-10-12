@@ -32,9 +32,11 @@ string hh(const char* file, const char* ext){
 
 
 int main(int argc, char *argv[]) {
-  Logger::Init();
-  //UI::main(argc,argv);
-  //Logger::End();
+  if(cmdOptionExists(argv,argv+argc,"--forcelog")){
+    LogForceEnabled = true;
+    LogEnabled = true;
+    Logger::Init();
+  }
 
 
   
@@ -76,6 +78,7 @@ int main(int argc, char *argv[]) {
     anim = true;
     Logger::Info("Animations enabled\n");
   }
+  
   
   if(cmdOptionExists(argv,argv+argc,"--noui")){
 
