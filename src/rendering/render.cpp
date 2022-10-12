@@ -89,8 +89,6 @@ void drop_callback(GLFWwindow* window, int count, const char** paths)
   double xpos, ypos;
   glfwGetCursorPos(window, &xpos, &ypos);
 
-  printf("%f %f\n", xpos, ypos);
-
   for (int i = 0;  i < count;  i++){
     for(int j = 0; j < files.size();j++){
       if(
