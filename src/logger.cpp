@@ -1,5 +1,6 @@
 //#include <fstream>
 #include <fstream>
+#include <sstream>
 #include <stdio.h>
 #include <cstdarg>
 #include <string>
@@ -116,31 +117,47 @@ void CommonLog(LogType col, const char* msg...){
   va_end(args);
   printf("%s",msg_buf);
 
-  LogMsg* m = new LogMsg();
-  m->msg = std::string(msg_buf);
-  m->type = col;
-  LoggerMessages.push_back(m);
+  
 
   //LogStream.write(msg_buf, 2048);
 
   SetConsoleColor(Reset);
 }
 
+void AddToInAppLogger(char* message, LogType type){
+  LogMsg* m = new LogMsg();
+  m->msg = std::string(message);
+  m->type = type;
+  LoggerMessages.push_back(m);
+}
+
+void help(const char* p, va_list args){
+  printf(p,args);
+}
+
 //these need to be this way.
 //the above function did not work.
 void Logger::Notice(const char* msg...){
+  
   LoggerPrefix(LogType::Notice);
   va_list args;
   va_start(args, msg);
-  vfprintf(stdout,msg,args);
+  char ass[2048];
+  vsprintf(ass,msg,args);
+  printf("%s", ass);
+  AddToInAppLogger(ass, LogType::Notice);
   va_end(args);
   SetConsoleColor(Reset);
+  
 }
 void Logger::Info(const char* msg...){
   LoggerPrefix(LogType::Info);
   va_list args;
   va_start(args, msg);
-  vfprintf(stdout,msg,args);
+  char ass[2048];
+  vsprintf(ass,msg,args);
+  printf("%s", ass);
+  AddToInAppLogger(ass, LogType::Info);
   va_end(args);
   SetConsoleColor(Reset);
 }
@@ -148,7 +165,10 @@ void Logger::Error(const char* msg...){
   LoggerPrefix(LogType::Error);
   va_list args;
   va_start(args, msg);
-  vfprintf(stdout,msg,args);
+  char ass[2048];
+  vsprintf(ass,msg,args);
+  printf("%s", ass);
+  AddToInAppLogger(ass, LogType::Error);
   va_end(args);
   SetConsoleColor(Reset);
 }
@@ -156,7 +176,10 @@ void Logger::Critical(const char* msg...){
   LoggerPrefix(LogType::Critical);
   va_list args;
   va_start(args, msg);
-  vfprintf(stdout,msg,args);
+  char ass[2048];
+  vsprintf(ass,msg,args);
+  printf("%s", ass);
+  AddToInAppLogger(ass, LogType::Critical);
   va_end(args);
   SetConsoleColor(Reset);
 }
@@ -164,7 +187,10 @@ void Logger::Debug(const char* msg...){
   LoggerPrefix(LogType::Debug);
   va_list args;
   va_start(args, msg);
-  vfprintf(stdout,msg,args);
+  char ass[2048];
+  vsprintf(ass,msg,args);
+  printf("%s", ass);
+  AddToInAppLogger(ass, LogType::Debug);
   va_end(args);
   SetConsoleColor(Reset);
 }

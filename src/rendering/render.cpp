@@ -187,7 +187,7 @@ void RenderGUI(){
         if (ImGui::BeginMenu("Debug"))
         {
           ImGui::MenuItem("Show Demo Window", "", &demoWindow);
-          /*
+          
           if(ImGui::MenuItem("Show Log Output", "", &console)){
             if(console){
               glfwSetWindowSizeLimits(Window, 500, 700, GLFW_DONT_CARE, GLFW_DONT_CARE);
@@ -199,7 +199,7 @@ void RenderGUI(){
               glfwSetWindowSize(Window,viewport_width,viewport_height);
             }
           }
-           */
+           
           ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Help"))
@@ -424,41 +424,43 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
     }
     */
 
-
+    static int message_count = 0;
     if(console){
-        ImGui::BeginChild("Logger",{0,0},false,ImGuiWindowFlags_AlwaysUseWindowPadding);
-        depth_border();
-        ImFont* monospace = ImGui::GetIO().Fonts->Fonts[2];
+      ImGui::BeginChild("Logger",{0,0},false,ImGuiWindowFlags_AlwaysUseWindowPadding);
+      depth_border();
+      //ImFont* monospace = ImGui::GetIO().Fonts->Fonts[2];
 
-        ImGui::PushFont(monospace);
-        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {12.0,4.0});
-
-        if (ImGui::BeginTable("table1", 2,ImGuiTableFlags_BordersInnerV))
+      //ImGui::PushFont(monospace);
+      ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {12.0,4.0});
+      if (ImGui::BeginTable("table1", 2,ImGuiTableFlags_BordersInnerV))
+      {
+        ImGui::TableSetupColumn("small",ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("half");
+        for (int row = 0; row < LoggerMessages.size(); row++)
         {
-            ImGui::TableSetupColumn("small",ImGuiTableColumnFlags_WidthFixed);
-            ImGui::TableSetupColumn("half");
-            for (int row = LoggerMessages.size(); row >0; row--)
-            {
-                ImGui::TableNextRow();
-                ImGui::TableSetColumnIndex(0);
-                ImGui::PushItemWidth(150.0f);
-                switch(LoggerMessages[row-1]->type){
-                    case 4: ImGui::TextColored({0.1,1.0,0.1,1.0},"Debug");break;
-                    case 1: ImGui::TextColored({1.0,1.0,0.2,1.0},"Notice");break;
-                    case 2: ImGui::TextColored({1.0,0.1,0.1,1.0},"Error");break;
-                    case 3: ImGui::TextColored({1.0,0.2,1.0,1.0},"Critical");break;
-                    case 0: ImGui::TextColored({1.0,1.0,1.0,1.0},"Info");break;
-                }
-                ImGui::PopItemWidth();
-                ImGui::TableSetColumnIndex(1);
-                ImGui::Text("%s",LoggerMessages[row-1]->msg.c_str());
-            }
-            ImGui::EndTable();
+          ImGui::TableNextRow();
+          ImGui::TableSetColumnIndex(0);
+          ImGui::PushItemWidth(150.0f);
+          switch(LoggerMessages[row]->type){
+              case 4: ImGui::TextColored({0.1,1.0,0.1,1.0},"Debug");break;
+              case 1: ImGui::TextColored({1.0,1.0,0.2,1.0},"Notice");break;
+              case 2: ImGui::TextColored({1.0,0.1,0.1,1.0},"Error");break;
+              case 3: ImGui::TextColored({1.0,0.2,1.0,1.0},"Critical");break;
+              case 0: ImGui::TextColored({1.0,1.0,1.0,1.0},"Info");break;
+          }
+          ImGui::PopItemWidth();
+          ImGui::TableSetColumnIndex(1);
+          ImGui::Text("%s",LoggerMessages[row]->msg.c_str());
         }
-        ImGui::SetScrollHereY(0.001f);
-        ImGui::PopStyleVar();
-        ImGui::PopFont();
-        ImGui::EndChild();
+        ImGui::EndTable();
+      }
+      if (message_count < LoggerMessages.size()) {
+        ImGui::SetScrollHereY(1.0f);
+        message_count = LoggerMessages.size();
+      }
+      ImGui::PopStyleVar();
+      //ImGui::PopFont();
+      ImGui::EndChild();
     }
 
     
