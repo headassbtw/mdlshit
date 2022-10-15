@@ -822,8 +822,16 @@ struct mstudioanim_valueptr_t_v49
 	Vector3Short offset = {0,0,0};
 };
 
+struct mstudioanimdata_t_v49
+{
+	std::byte value;
+	std::vector<std::byte> arry;
+};
+
 struct mstudioanim_t_v49
 {
+	int strPos = 0;
+
 	std::byte bone; // alien swarm/csgo says this is a signed int but that doesn't work well for our purposes.
 	std::byte flags;		// weighing options
 
@@ -839,16 +847,12 @@ struct mstudioanim_t_v49
 	    QuaternionShort rawrot = { 0,0,0,0 }; // pQuat48
 
 	//STUDIO_ANIM_RAWROT2
-	    Quaternion64 rawrot2 = { 0,0,0,0 }; // pQuat64
+		QuaternionShort rawrot2 = { 0,0,0,0 }; // pQuat64
 
 	//STUDIO_ANIM_RAWPOS
-	    Vector48 rawpos = { 0,0,0 }; // pPos
-};
+	    Vector3Short rawpos = { 0,0,0 }; // pPos
 
-struct mstudioanimdata_t_v49
-{
-	std::byte value;
-	std::vector<std::byte> arry;
+	mstudioanimdata_t_v49 animdata;
 };
 
 enum ikruletype
@@ -1543,19 +1547,21 @@ struct mstudioanim_t_v53
 	int16_t unk = 0; // normally null data
 
 
-	Quaternion64 rawrot = { 0,0,0, 0 }; // pQuat64
+	QuaternionShort rawrot = { 0,0,0, 0 }; // pQuat64
 
 	mstudioanim_valueptr_t_v49 animrot = {0,0,0}; // pRotV
 	int16_t unused = 0; // pretty sure
 
 
-	Vector48 rawpos = { 0,0,0 }; // pPos
+	Vector3Short rawpos = { 0,0,0 }; // pPos
 	mstudioanim_valueptr_t_v49 animpos = { 0,0,0 }; // pPosV
 
-	Vector48 rawscale = { 0,0,0 }; // new in v53
+	Vector3Short rawscale = { 0,0,0 }; // new in v53
 	mstudioanim_valueptr_t_v49 animscale = { 0,0,0 };
 
 	int nextoffset;
+
+	mstudioanimdata_t_v49 animdata;
 };
 
 struct mstudioikrule_t_v53
@@ -1743,14 +1749,15 @@ struct mstudioruimesh_t
 
 	std::byte									unk[4]; // zero sometimes, others not. has to do with face clipping.
 
-	char*										szruimeshname = new char[255]; // have to subtract header to get actual size (padding included)
+	char*										szruimeshname[255]; // have to subtract header to get actual size (padding included)
 
-	int16_t*									parent = new int16_t[255]; // parent(s) bone of mesh
+	int16_t									parent[255]; // parent(s) bone of mesh
+	
+	mstudioruivertmap_t						vertexmap[255]; // vertex map for each face  
+	mstudioruivert_t							vertex[255];
+	
+	mstudioruimesface_t						facedata[255];
 
-	mstudioruivertmap_t*						vertexmap = new mstudioruivertmap_t[255]; // vertex map for each face  
-	mstudioruivert_t*							vertex = new mstudioruivert_t[255];
-
-	mstudioruimesface_t*						facedata = new mstudioruimesface_t[255];
 };
 
 struct mstudioruimesh_t_json

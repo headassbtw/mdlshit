@@ -410,32 +410,65 @@ void BinaryReader::Read(mstudiosrcbonetransform_t_v49* data) {
 }
 
 void BinaryReader::Read(mstudiolinearbone_t_v49* data) {
+    Logger::Info("Test\n");
     Stream.read((char*)&data->numbones, sizeof(int));
+    Logger::Info("Test\n");
     Stream.read((char*)&data->flagsindex, sizeof(int));
+    Logger::Info("Test\n");
     Stream.read((char*)&data->parentindex, sizeof(int));
+    Logger::Info("Test\n");
     Stream.read((char*)&data->posindex, sizeof(int));
+    Logger::Info("Test\n");
     Stream.read((char*)&data->quatindex, sizeof(int));
+    Logger::Info("Test\n");
     Stream.read((char*)&data->rotindex, sizeof(int));
+    Logger::Info("Test\n");
     Stream.read((char*)&data->posetoboneindex, sizeof(int));
+    Logger::Info("Test\n");
     Stream.read((char*)&data->posscaleindex, sizeof(int));
+    Logger::Info("Test\n");
     Stream.read((char*)&data->rotscaleindex, sizeof(int));
+    Logger::Info("Test\n");
     Stream.read((char*)&data->qalignmentindex, sizeof(int));
+    Logger::Info("Test\n");
     Stream.read((char*)&data->unused, sizeof(int) * 6);
 }
 
-void BinaryReader::Read(mstudiolinearbonedata_t_v49* data, mstudiolinearbone_t_v49 bone) 
+void BinaryReader::Read(mstudiolinearbonedata_t_v49* data, mstudiolinearbone_t_v49* bone) 
 {
-    int numbones = bone.numbones;
+    int numbones = bone->numbones;
+    Logger::Info("Test\n");
+    if (bone->flagsindex > 0)        Stream.read((char*)&data->flags, sizeof(uint32_t) * numbones);
+    Logger::Info("Test\n");
+    if (bone->parentindex > 0)       Stream.read((char*)&data->parents, sizeof(uint32_t) * numbones);
+    Logger::Info("Test\n");
+    if (bone->posindex > 0)          Stream.read((char*)&data->bonePos, sizeof(Vector3) * numbones);
+    Logger::Info("Test\n");
+    if (bone->quatindex > 0)         Stream.read((char*)&data->boneQuat, sizeof(Quaternion) * numbones);
+    Logger::Info("Test\n");
+    if (bone->rotindex > 0)          Stream.read((char*)&data->boneRot, sizeof(RadianEuler) * numbones);
+    Logger::Info("Test\n");
+    if (bone->posetoboneindex > 0)   Stream.read((char*)&data->poseToBone, sizeof(matrix3x4_t) * numbones);
+    Logger::Info("Test\n");
+    if (bone->posscaleindex > 0)     Stream.read((char*)&data->posScale, sizeof(Vector3) * numbones);
+    Logger::Info("Test\n");
+    if (bone->rotscaleindex > 0)     Stream.read((char*)&data->rotScale, sizeof(Vector3) * numbones);
+    Logger::Info("Test\n");
+    if (bone->qalignmentindex > 0)   Stream.read((char*)&data->boneAlignment, sizeof(Quaternion) * numbones);
+    Logger::Info("Test\n");
 
-    if (bone.flagsindex > 0)        Stream.read((char*)&data->flags, sizeof(uint32_t) * numbones);
-    if (bone.parentindex > 0)       Stream.read((char*)&data->parents, sizeof(uint32_t) * numbones);
-    if (bone.posindex > 0)          Stream.read((char*)&data->bonePos, sizeof(Vector3) * numbones);
-    if (bone.quatindex > 0)         Stream.read((char*)&data->boneQuat, sizeof(Quaternion) * numbones);
-    if (bone.rotindex > 0)          Stream.read((char*)&data->boneRot, sizeof(RadianEuler) * numbones);
-    if (bone.posetoboneindex > 0)   Stream.read((char*)&data->poseToBone, sizeof(matrix3x4_t) * numbones);
-    if (bone.posscaleindex > 0)     Stream.read((char*)&data->posScale, sizeof(Vector3) * numbones);
-    if (bone.rotscaleindex > 0)     Stream.read((char*)&data->rotScale, sizeof(Vector3) * numbones);
-    if (bone.qalignmentindex > 0)   Stream.read((char*)&data->boneAlignment, sizeof(Quaternion) * numbones);
+}
+
+void BinaryReader::Read(mstudiolinearbonedata_t_v53* data, int numbones)
+{
+    Stream.read((char*)&data->flags, sizeof(uint32_t) * numbones);
+    Stream.read((char*)&data->parents, sizeof(uint32_t) * numbones);
+    Stream.read((char*)&data->bonePos, sizeof(Vector3) * numbones);
+    Stream.read((char*)&data->boneQuat, sizeof(Quaternion) * numbones);
+    Stream.read((char*)&data->boneRot, sizeof(RadianEuler) * numbones);
+    Stream.read((char*)&data->poseToBone, sizeof(matrix3x4_t) * numbones);
+    Stream.read((char*)&data->rotScale, sizeof(Vector3) * numbones);
+    Stream.read((char*)&data->boneAlignment, sizeof(Quaternion) * numbones);
 
 }
 
@@ -499,6 +532,7 @@ void BinaryReader::Read(mstudioanim_valueptr_t_v49* data) {
 }
 
 void BinaryReader::Read(mstudioanim_t_v49* data) {
+    data->strPos = Position();
     Stream.read((char*)&data->bone, sizeof(std::byte));
     Stream.read((char*)&data->flags, sizeof(std::byte));
     Stream.read((char*)&data->nextoffset, sizeof(uint16_t));
@@ -1784,10 +1818,12 @@ void BinaryWriter::Write(mstudiobbox_t_v49 data) {
 
 void BinaryWriter::Write(mstudiobonenametable_t_v49 data) {
 
+    short fill = 0;
     for (int i = 0; i < data.bones.size(); i++)
     {
         Stream.write((char*)&data.bones[i], sizeof(byte));
     }
+    Stream.write((char*)&fill, sizeof(short));
 }
 
 void BinaryWriter::Write(mstudioanimdesc_t_v49 data) {
@@ -1834,9 +1870,9 @@ void BinaryWriter::Write(mstudioanim_t_v49 data) {
 
     if ((int)data.flags & STUDIO_ANIM_RAWROT) Stream.write((char*)&data.rawrot, sizeof(QuaternionShort));
 
-    if ((int)data.flags & STUDIO_ANIM_RAWROT2) Stream.write((char*)&data.rawrot2, sizeof(Quaternion64));
+    if ((int)data.flags & STUDIO_ANIM_RAWROT2) Stream.write((char*)&data.rawrot2, sizeof(QuaternionShort));
 
-    if ((int)data.flags & STUDIO_ANIM_RAWPOS) Stream.write((char*)&data.rawpos, sizeof(Vector48));
+    if ((int)data.flags & STUDIO_ANIM_RAWPOS) Stream.write((char*)&data.rawpos, sizeof(Vector3Short));
 }
 
 void BinaryWriter::Write(mstudioanimdata_t_v49 data)
@@ -2390,15 +2426,6 @@ void BinaryWriter::Write(mstudioanim_t_v53 data) {
     bool hasRawRotFlag = (int)data.flags & STUDIO_ANIM_RAWROT_53;
     bool hasRawScaleFlag = (int)data.flags & STUDIO_ANIM_RAWSCALE_53;
 
-    if (!hasRawPosFlag)
-    {
-        Stream.write((char*)&data.animpos, sizeof(Vector3Short));
-    }
-    else
-    {
-        Stream.write((char*)&data.rawpos, sizeof(Vector3Short));
-    }
-
     if (!hasRawRotFlag)
     {
         Stream.write((char*)&data.animrot, sizeof(Vector3Short));
@@ -2410,6 +2437,15 @@ void BinaryWriter::Write(mstudioanim_t_v53 data) {
     }
 
     if (!hasRawPosFlag)
+    {
+        Stream.write((char*)&data.animpos, sizeof(Vector3Short));
+    }
+    else
+    {
+        Stream.write((char*)&data.rawpos, sizeof(Vector3Short));
+    }
+
+    if (!hasRawScaleFlag)
     {
         Stream.write((char*)&data.animscale, sizeof(Vector3Short));
     }

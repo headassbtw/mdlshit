@@ -54,7 +54,8 @@ class BinaryReader{
     void Read(mstudioposeparamdesc_t_v49* data);
     void Read(mstudiosrcbonetransform_t_v49* data);
     void Read(mstudiolinearbone_t_v49* data);
-    void Read(mstudiolinearbonedata_t_v49* data, mstudiolinearbone_t_v49 bone);
+    void Read(mstudiolinearbonedata_t_v49* data, mstudiolinearbone_t_v49* bone);
+    void Read(mstudiolinearbonedata_t_v53* data, int numbones);
     void Read(mstudiohitboxset_t_v49* data);
     void Read(mstudiobbox_t_v49* data);
     void Read(mstudiobonenametable_t_v49* data, int numbones);

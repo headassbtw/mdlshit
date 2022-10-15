@@ -507,7 +507,7 @@ float half_to_float(const uint16_t x) { // IEEE-754 16-bit floating-point format
 	return as_float((x & 0x8000) << 16 | (e != 0) * ((e + 112) << 23 | m) | ((e == 0) & (m != 0)) * ((v - 37) << 23 | ((m << (150 - v)) & 0x007FE000))); // sign : normalized : denormalized
 }
 
-uint16_t float_to_half(const float x) { // IEEE-754 16-bit floating-point format (without infinity): 1-5-10, exp-15, +-131008.0, +-6.1035156E-5, +-5.9604645E-8, 3.311 digits
+short float_to_half(const float x) { // IEEE-754 16-bit floating-point format (without infinity): 1-5-10, exp-15, +-131008.0, +-6.1035156E-5, +-5.9604645E-8, 3.311 digits
 	const uint32_t b = as_uint(x) + 0x00001000; // round-to-nearest-even: add last bit after truncated mantissa
 	const uint32_t e = (b & 0x7F800000) >> 23; // exponent
 	const uint32_t m = b & 0x007FFFFF; // mantissa; in line below: 0x007FF000 = 0x00800000-0x00001000 = decimal indicator flag - initial rounding
@@ -1343,6 +1343,7 @@ std::vector<int> GetAnimSectionBytesAdded2(BinaryReader* Stream, v49_Header* Ini
 		Stream->seek(secIndexPos);
 		int sectionIndex; Stream->Read(&sectionIndex);
 		bytesAddedPerAnim.push_back(bytesAdded);
+		if (debug) Logger::Info("animNum: %d, secBytesAdded:  %d\n", i, bytesAddedPerAnim[i]);
 		if (sectionIndex > 0)
 		{
 			int num = (frames / secFrames) + 2;
@@ -1673,6 +1674,7 @@ std::vector<int> GetAnimSectionBoneHeaderBytesAddedPerSec(BinaryReader* Stream, 
 				int animOffset; Stream->Read(&animOffset);
 				Stream->seek(startPos + animOffset);
 				secBytesAddedPerSec.push_back(bytesAdded);
+				if (debug) Logger::Info("SecNum: %d, secBytesAddePerd:  %d\n", secNum, bytesAdded);
 				for (int k = 0; k < 10000000; k++)
 				{
 					int pos2 = Stream->Position();
