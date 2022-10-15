@@ -150,36 +150,45 @@ namespace Utility
 			//bool _143Neg = v3 == v1 - (short)2 && v2 != v1 - (short)1;
 			//bool _413Pos = v3 == v2 + (short)2 && v1 != v2 + (short)1;
 			//bool _413Neg = v3 == v2 - (short)2 && v1 != v2 - (short)1;
-			bool _142Pos = v3 == v1 + (short)1 && v2 != v1 + (short)2 && v2 != v1 + 1;
-			bool _142Neg = v3 == v1 - (short)1 && v2 != v1 - (short)2 && v2 != v1 - 1;
+			bool _142Pos = v3 == v1 + (short)1 && v2 != v3 + 1;
+			bool _142Neg = v3 == v1 - (short)1 && v2 != v3 - 1;
+			bool _214Pos = v1 == v2 + (short)1 && v3 != v2 + (short)2 && v3 != v1 + 1;
+			bool _214Neg = v1 == v2 - (short)1 && v3 != v2 - (short)2 && v3 != v1 - 1;
+			bool _124Pos = v2 == v1 - (short)1 && v3 == v1 + 1;
+			bool _124Neg = v2 == v1 - (short)1 && v3 == v1 - (short)2 && v3 == v2 - 1;
 			bool _default = !_132Pos && !_123Pos && !_132Neg && !_123Neg && !_134Pos && !_134Neg;
 
+			
 
-			if (_134Pos && !_123Pos && !_123Neg && !_132Neg && !_132Pos)
+
+
+			if (_134Pos)
 			{
 				//Logger::Info("Is Quad\n");
 				vertOrder.push_back(vertMap.vertstartid);
 				vertOrder.push_back(vertMap.vertendid);
-				vertOrder.push_back(vertMap.vertstartid + (short)1);
+				vertOrder.push_back(vertMap.vertextraid);
+				//vertOrder.push_back(vertMap.vertstartid + (short)1);
 				vertOrder.push_back(vertMap.vertextraid);
 				vertOrder.push_back(vertMap.vertstartid + (short)1);
-				vertOrder.push_back(vertMap.vertendid);
+				vertOrder.push_back(vertMap.vertstartid);
 				//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
 				return vertOrder;
 			}
-			//if (_134Neg && !_123Pos && !_123Neg && !_132Neg && !_132Pos)
-			//{
-			//	//Logger::Info("Is Quad\n");
-			//	vertOrder.push_back(vertMap.vertstartid);
-			//	vertOrder.push_back(vertMap.vertendid);
-			//	vertOrder.push_back(vertMap.vertstartid - (short)1);
-			//	vertOrder.push_back(vertMap.vertextraid);
-			//	vertOrder.push_back(vertMap.vertstartid - (short)1);
-			//	vertOrder.push_back(vertMap.vertendid);
-			//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
-			//	return vertOrder;
-			//}
-			if (_142Pos && !_123Pos && !_123Neg && !_132Neg && !_132Pos)
+			else if (_134Neg)
+			{
+				//Logger::Info("Is Quad\n");
+				vertOrder.push_back(vertMap.vertstartid);
+				vertOrder.push_back(vertMap.vertendid);
+				vertOrder.push_back(vertMap.vertextraid);
+				//vertOrder.push_back(vertMap.vertstartid - (short)1);
+				vertOrder.push_back(vertMap.vertextraid);
+				vertOrder.push_back(vertMap.vertstartid - (short)1);
+				vertOrder.push_back(vertMap.vertstartid);
+				//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+				return vertOrder;
+			}
+			if (_142Pos)
 			{
 				//Logger::Info("Is Quad\n");
 				vertOrder.push_back(vertMap.vertstartid);
@@ -191,15 +200,63 @@ namespace Utility
 				//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
 				return vertOrder;
 			}
-			//if (_142Neg && !_123Pos && !_123Neg && !_132Neg && !_132Pos)
+			if (_142Neg)
+			{
+				//Logger::Info("Is Quad\n");
+				vertOrder.push_back(vertMap.vertstartid);
+				vertOrder.push_back(vertMap.vertendid);
+				vertOrder.push_back(vertMap.vertextraid);
+				vertOrder.push_back(vertMap.vertstartid);
+				vertOrder.push_back(vertMap.vertextraid);
+				vertOrder.push_back(vertMap.vertextraid - (short)1);
+				//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+				return vertOrder;
+			}
+			//if (_214Pos && !_142Neg && !_123Pos && !_123Neg && !_132Neg && !_132Pos)
 			//{
 			//	//Logger::Info("Is Quad\n");
 			//	vertOrder.push_back(vertMap.vertstartid);
 			//	vertOrder.push_back(vertMap.vertendid);
 			//	vertOrder.push_back(vertMap.vertextraid);
+			//	vertOrder.push_back(vertMap.vertendid);
 			//	vertOrder.push_back(vertMap.vertstartid);
+			//	vertOrder.push_back(vertMap.vertstartid + (short)1);
+			//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+			//	return vertOrder;
+			//}
+			if (_124Pos)
+			{
+				//Logger::Info("Is Quad\n");
+				vertOrder.push_back(vertMap.vertstartid);
+				vertOrder.push_back(vertMap.vertendid);
+				vertOrder.push_back(vertMap.vertextraid);
+				vertOrder.push_back(vertMap.vertextraid);
+				vertOrder.push_back(vertMap.vertstartid);
+				vertOrder.push_back(vertMap.vertendid - (short)1);
+				//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+				return vertOrder;
+			}
+			//if (_124Neg && !_142Neg && !_123Pos && !_123Neg && !_132Neg && !_132Pos)
+			//{
+			//	//Logger::Info("Is Quad\n");
+			//	vertOrder.push_back(vertMap.vertstartid);
+			//	vertOrder.push_back(vertMap.vertendid);
 			//	vertOrder.push_back(vertMap.vertextraid);
-			//	vertOrder.push_back(vertMap.vertextraid - (short)1);
+			//	vertOrder.push_back(vertMap.vertextraid);
+			//	vertOrder.push_back(vertMap.vertendid);
+			//	vertOrder.push_back(vertMap.vertendid - (short)1);
+			//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+			//	return vertOrder;
+			//}
+			//if (_214Neg && !_142Pos && !_123Pos && !_123Neg && !_132Neg && !_132Pos)
+			//{
+			//	//Logger::Info("Is Quad\n");
+			//	vertOrder.push_back(vertMap.vertstartid);
+			//	vertOrder.push_back(vertMap.vertendid);
+			//	vertOrder.push_back(vertMap.vertextraid);
+			//	vertOrder.push_back(vertMap.vertendid);
+			//	vertOrder.push_back(vertMap.vertstartid);
+			//	vertOrder.push_back(vertMap.vertstartid - (short)1);
 			//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
 			//	return vertOrder;
 			//}
@@ -916,94 +973,96 @@ namespace Utility
 				std::vector<int> bytesAddedPerSec;
 				int secNum = 0;
 				int lastHdr = 0;
-
-				for (int i = 0; i < mdlhdr.numlocalanim; i++)
+				if (sections.size() > 0)
 				{
-					int nextAnim = i + 1;
-
-					int startPos = mdlhdr.localanimindex + 100 * i;
-					int animIndexPos = startPos + 56;
-					int secIndexPos = startPos + 80;
-					int framePos = startPos + 16;
-					int secFramPos = startPos + 84;
-
-					int frames = animdescs[i].numframes;
-					int secFrames = animdescs[i].sectionframes;
-
-					if (animdescs[i].sectionindex > 0)
+					for (int i = 0; i < mdlhdr.numlocalanim; i++)
 					{
-						int num = (frames / secFrames) + 2;
+						int nextAnim = i + 1;
 
-						for (int j = 0; j < num; j++)
+						int startPos = mdlhdr.localanimindex + 100 * i;
+						int animIndexPos = startPos + 56;
+						int secIndexPos = startPos + 80;
+						int framePos = startPos + 16;
+						int secFramPos = startPos + 84;
+
+						int frames = animdescs[i].numframes;
+						int secFrames = animdescs[i].sectionframes;
+
+						if (animdescs[i].sectionindex > 0)
 						{
-							int nextSec = j + 1;
-							int bytesAddedPer = 0;
-							bytesAddedPerSec.push_back(bytesAdded);
-							Logger::Info("secBytesAdded: %d, Anim: %d\n", bytesAdded, i);
-							for (int k = lastHdr; k < sections.size(); k++)
+							int num = (frames / secFrames) + 2;
+
+							for (int j = 0; j < num; j++)
 							{
-								int pos2 = sections[k].strPos;
-								int headerSize = GetAnimHeaderSize((int)sections[k].flags);
-								lastHdr++;
-								bytesAddedPer += (32 - headerSize);
-								bytesAdded += (32 - headerSize);
-								if (sections[k].nextoffset == 0)
+								int nextSec = j + 1;
+								int bytesAddedPer = 0;
+								bytesAddedPerSec.push_back(bytesAdded);
+								Logger::Info("secBytesAdded: %d, Anim: %d\n", bytesAdded, i);
+								for (int k = lastHdr; k < sections.size(); k++)
 								{
-									if (i + 1 < mdlhdr.numlocalanim && j + 1 > num - 1)
+									int pos2 = sections[k].strPos;
+									int headerSize = GetAnimHeaderSize((int)sections[k].flags);
+									lastHdr++;
+									bytesAddedPer += (32 - headerSize);
+									bytesAdded += (32 - headerSize);
+									if (sections[k].nextoffset == 0)
 									{
-										int dist = animdescs[nextAnim].sectionindex > 0 ? ((startPos + 100 + animdescs[nextAnim].sectionindex) - (pos2 + headerSize)) : ((startPos + 100 + animdescs[nextAnim].animindex) - (pos2 + headerSize));
-
-										if (dist > 18 || dist < 0)
+										if (i + 1 < mdlhdr.numlocalanim && j + 1 > num - 1)
 										{
-											for (int l = 0; l < 1000; l++)
+											int dist = animdescs[nextAnim].sectionindex > 0 ? ((startPos + 100 + animdescs[nextAnim].sectionindex) - (pos2 + headerSize)) : ((startPos + 100 + animdescs[nextAnim].animindex) - (pos2 + headerSize));
+
+											if (dist > 18 || dist < 0)
 											{
-												short animValue{ (short)sections[j].animdata.arry[l] };
-												if (animValue == 0)
+												for (int l = 0; l < 1000; l++)
 												{
-													int newPos = l;
-													dist = anims[j].animdata.arry.size() - newPos;
-													if (dist <= 18)
+													short animValue{ (short)sections[j].animdata.arry[l] };
+													if (animValue == 0)
 													{
-														break;
+														int newPos = l;
+														dist = anims[j].animdata.arry.size() - newPos;
+														if (dist <= 18)
+														{
+															break;
+														}
 													}
 												}
 											}
+											Logger::Info("secDist:  %d\n", dist);
+											Logger::Info("secFinalDist:  %d\n", 32 - dist);
+											bytesAdded += 32 - dist;
 										}
-										Logger::Info("secDist:  %d\n", dist);
-										Logger::Info("secFinalDist:  %d\n", 32 - dist);
-										bytesAdded += 32 - dist;
-									}
 
-									if ( j + 1 < num )
-									{
-										int nextSection = secNum + 1;
-										int dist = ((startPos + sectionindexes[nextSection].sectionoffset) - (pos2 + headerSize));
-
-										if (dist > 18 || dist < 0)
+										if (j + 1 < num)
 										{
-											for (int l = 0; l < 1000; l++)
+											int nextSection = secNum + 1;
+											int dist = ((startPos + sectionindexes[nextSection].sectionoffset) - (pos2 + headerSize));
+
+											if (dist > 18 || dist < 0)
 											{
-												short animValue{ (short)sections[j].animdata.arry[l] };
-												if (animValue == 0)
+												for (int l = 0; l < 1000; l++)
 												{
-													int newPos = l;
-													dist = anims[j].animdata.arry.size() - newPos;
-													if (dist <= 18)
+													short animValue{ (short)sections[j].animdata.arry[l] };
+													if (animValue == 0)
 													{
-														break;
+														int newPos = l;
+														dist = anims[j].animdata.arry.size() - newPos;
+														if (dist <= 18)
+														{
+															break;
+														}
 													}
 												}
 											}
+											Logger::Info("secDist:  %d\n", dist);
+											Logger::Info("secFinalDist:  %d\n", 32 - dist);
+											bytesAdded += 32 - dist;
 										}
-										Logger::Info("secDist:  %d\n", dist);
-										Logger::Info("secFinalDist:  %d\n", 32 - dist);
-										bytesAdded += 32 - dist;
-									}
 
-									break;
+										break;
+									}
 								}
+								secNum++;
 							}
-							secNum++;
 						}
 					}
 				}
@@ -1058,8 +1117,8 @@ namespace Utility
 			std::vector<int> secHdrBytesAnimDescAdd = v53GetSecHdrBytesAdded(true);
 			std::vector<int> secHdrBytesSecAdd = v53GetSecBytesAdded(true);
 
-			int animByteAddedTotal = v53GetTotalAnimHdrBytesAdded(hdrBytesAnimDescAdd);
-			int animSecByteAddedTotal = v53GetTotalSecHdrBytesAdded(secHdrBytesAnimDescAdd);
+			int animByteAddedTotal = 0;
+			int animSecByteAddedTotal = 0;
 
 			int animBytesAdded = animByteAddedTotal + animSecByteAddedTotal;
 			int bytesAddedToRuiMesh = 0;
@@ -1079,21 +1138,27 @@ namespace Utility
 
 			void SetMdlInts()
 			{
+				Logger::Info("Test\n");
 				ikRuleStairsPerAnim = v53IkRuleStairsPerAnim();
 				hdrBytesAnimDescAdd = v53GetAnimHdrBytesAdded(true);
-				secHdrBytesAnimDescAdd = v53GetSecHdrBytesAdded(true);
-				secHdrBytesSecAdd = v53GetSecBytesAdded(true);
-
+				Logger::Info("Test\n");
 				animByteAddedTotal = v53GetTotalAnimHdrBytesAdded(hdrBytesAnimDescAdd);
-				animSecByteAddedTotal = v53GetTotalSecHdrBytesAdded(secHdrBytesAnimDescAdd);
-
+				if (sections.size() > 0)
+				{
+					secHdrBytesAnimDescAdd = v53GetSecHdrBytesAdded(true);
+					secHdrBytesSecAdd = v53GetSecBytesAdded(true);
+					animSecByteAddedTotal = v53GetTotalSecHdrBytesAdded(secHdrBytesAnimDescAdd);
+				}
+				Logger::Info("Test\n");
 				animBytesAdded = animByteAddedTotal + animSecByteAddedTotal;
 				bytesAddedToRuiMesh = 0;
 				bytesAddedToIkRules = 0;// -12 * animData->numOfIkRules;
 				bytesAddedToHeader = 52;
 				bytesAddedToBones = mdlhdr.numbones * 28;
+				Logger::Info("Test\n");
 				bytesAddedToAnims = -8 * mdlhdr.numlocalanim;
 				bytesAddedToAnimData = mdlhdr.numlocalanim > 0 ? animByteAddedTotal + animSecByteAddedTotal + bytesAddedToIkRules : 0;
+				Logger::Info("Test\n");
 				bytesAddedToSeqs = 20 * mdlhdr.numlocalseq;
 				bytesAddedToTextures = -20 * mdlhdr.numtextures;
 				bytesAddedToIkChains = 16 * mdlhdr.numikchains;
@@ -1102,6 +1167,7 @@ namespace Utility
 				strFiller = 60;
 				allBytesAdded = bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToTextures + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods + bytesAddedToIkRules + textureFiller + bytesAddedToRuiMesh;
 				numOfLinks = 0;
+				Logger::Info("TestEnd\n");
 			}
 
 			std::vector<mstudiobone_t_v53> BoneConversion()
@@ -2140,9 +2206,9 @@ namespace Utility
 						Logger::Info("SkinGroup Read: %d\n", i);
 					}
 				}
-				Logger::Info("Test\n");
+
 			}
-			Logger::Info("Test\n");
+
 			if (mdlhdr.keyvaluesize > 0)
 			{
 				Stream->seek(mdlhdr.keyvalueindex);
@@ -2164,15 +2230,15 @@ namespace Utility
 					Logger::Info("SrcBoneTransform Read: %d\n", i);
 				}
 			}
-			Logger::Info("Test\n");
+
 			if (mdlhdr.numbones > 0)
 			{
-				Logger::Info("Test\n");
+
 				Stream->Read(&linearbone);
 				Stream->Read(&linearbonedata, mdlhdr.numbones);
 				Logger::Info("LinearBone Read: %d\n", mdlhdr.numbones);
 			}
-			Logger::Info("Test\n");
+
 			if (mdlhdr.numruimeshes > 0)
 			{
 				Stream->seek(mdlhdr.ruimeshindex);
@@ -2240,10 +2306,10 @@ namespace Utility
 			std::vector<mstudiotexturedir_t_v49>				cdtextures;
 			std::vector<mstudiotexture_t_v49>					textures;
 			std::vector<mstudioskingroup_t_v49>					skingroups;
-			mstudiokeyvalues_t_v49								keyvalues;
+			mstudiokeyvalues_t_v49								keyvalues{};
 			std::vector<mstudiosrcbonetransform_t_v49>			srcbonetransforms;
-			mstudiolinearbone_t_v49								linearbone;
-			mstudiolinearbonedata_t_v49							linearbonedata;
+			mstudiolinearbone_t_v49								linearbone{};
+			mstudiolinearbonedata_t_v49							linearbonedata{};
 
 			int numjigglebones = 0;
 
@@ -2274,20 +2340,21 @@ namespace Utility
 					Logger::Info("Bone Read: %s\n", func::ReadMDLString(Stream, bonePos + bone.sznameindex).c_str());
 					Logger::Info("Bone Read: %d\n", i);
 				}
-			}
-			if (numjigglebones > 0)
-			{
-				int jiggleBonePos = mdlhdr.boneindex + 216 * mdlhdr.numbones;
 
-				Stream->seek(jiggleBonePos);
-
-				for (int i = 0; i < numjigglebones; i++)
+				if (numjigglebones > 0)
 				{
-					mstudiojigglebone_t_v49 jigglebone; Stream->Read(&jigglebone);
-					jigglebones.push_back(jigglebone);
-					Logger::Info("JiggleBone Read: %d\n", i);
+					int jiggleBonePos = mdlhdr.boneindex + 216 * mdlhdr.numbones;
+
+					Stream->seek(jiggleBonePos);
+
+					for (int i = 0; i < numjigglebones; i++)
+					{
+						mstudiojigglebone_t_v49 jigglebone; Stream->Read(&jigglebone);
+						jigglebones.push_back(jigglebone);
+						Logger::Info("JiggleBone Read: %d\n", i);
+					}
+					//Logger::Info("strPos: %d\n", Stream->Position());
 				}
-				//Logger::Info("strPos: %d\n", Stream->Position());
 			}
 
 			if (mdlhdr.numlocalattachments > 0)
@@ -2662,22 +2729,23 @@ namespace Utility
 					Logger::Info("Bodypart Read: %s\n", func::ReadMDLString(Stream, mdlhdr.bodypartindex + 16 * i + bodyparts[i].sznameindex).c_str());
 					Logger::Info("Bodypart Read: %d\n", i);
 				}
-			}
 
-			if (nummodels > 0)
-			{
-				Stream->seek(mdlhdr.bodypartindex + 16 * mdlhdr.numbodyparts);
-				for (int i = 0; i < nummodels; i++)
+
+				if (nummodels > 0)
 				{
-					mstudiomodel_t_v49 model; Stream->Read(&model);
-					if (model.nummeshes > 0) nummeshes += model.nummeshes;
-					models.push_back(model);
-					int modelPos = mdlhdr.bodypartindex + 16 * mdlhdr.numbodyparts + 148 * i;
+					Stream->seek(mdlhdr.bodypartindex + 16 * mdlhdr.numbodyparts);
+					for (int i = 0; i < nummodels; i++)
+					{
+						mstudiomodel_t_v49 model; Stream->Read(&model);
+						if (model.nummeshes > 0) nummeshes += model.nummeshes;
+						models.push_back(model);
+						int modelPos = mdlhdr.bodypartindex + 16 * mdlhdr.numbodyparts + 148 * i;
 
-					Logger::Info("Model Read: %s\n", func::ReadMDLString(Stream, modelPos).c_str());
-					Logger::Info("Model Read: %d\n", i);
+						Logger::Info("Model Read: %s\n", func::ReadMDLString(Stream, modelPos).c_str());
+						Logger::Info("Model Read: %d\n", i);
+					}
+
 				}
-
 			}
 
 			if (mdlhdr.numikchains > 0)
@@ -2796,14 +2864,14 @@ namespace Utility
 					Logger::Info("SrcBoneTransform Read: %d\n", i);
 				}
 			}
-			if (mdlhdr.numbones > 0)
-			{
-				Stream->Read(&linearbone);
-				Stream->Read(&linearbonedata, &linearbone);
-				Logger::Info("LinearBone Read: %d\n", mdlhdr.numbones);
-			}
+			//if (mdlhdr.numbones > 0)
+			//{
+			//	Stream->Read(&linearbone);
+			//	Stream->Read(&linearbonedata, &linearbone);
+			//	Logger::Info("LinearBone Read: %d\n", mdlhdr.numbones);
+			//}
 			v49Mdl _v49mdl{ mdlhdr,mdlsubhdr,bones,jigglebones,boneflexdrivers,attachments,hitboxsets,hitboxes,bonenametable,animdescs,anims, sectionindexes, sections, ikrules,compressedikerrors,ikerrors,ikrulezeroframe,seqdescs,blends,posekeys,events,autolayers,activitymodifiers,seqweightlist,nodenames,nodes,bodyparts,models,meshes,ikchains,iklinks,poseparamdescs,includedmodels,cdtextures,textures,skingroups,keyvalues,srcbonetransforms,linearbone,linearbonedata};
-
+			Stream->seek(0);
 			return _v49mdl;
 		}
 
