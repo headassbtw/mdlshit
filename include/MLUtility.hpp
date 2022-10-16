@@ -140,78 +140,166 @@ namespace Utility
 			//}
 
 
-			bool _132Pos = v2 == v1 + (short)2 && v3 == v1 + (short)1;
-			bool _123Pos = v2 == v1 + (short)1 && v3 == v2 + (short)1;
-			bool _132Neg = v2 == v1 - (short)2 && v3 == v1 - (short)1;
-			bool _123Neg = v2 == v1 - (short)1 && v3 == v2 - (short)1;
-			bool _134Pos = v2 == v1 + (short)2 && v3 != v1 + (short)1;
-			bool _134Neg = v2 == v1 - (short)2 && v3 != v1 - (short)1;
-			//bool _143Pos = v3 == v1 + (short)2 && v2 != v1 + (short)1;
-			//bool _143Neg = v3 == v1 - (short)2 && v2 != v1 - (short)1;
+			//bool _132Pos = v2 == v1 + (short)2 && v3 == v1 + (short)1;
+			//bool _123Pos = v2 == v1 + (short)1 && v3 == v2 + (short)1;
+			//bool _132Neg = v2 == v1 - (short)2 && v3 == v1 - (short)1;
+			//bool _123Neg = v2 == v1 - (short)1 && v3 == v2 - (short)1;
+			//bool _134Pos = v2 == v1 + (short)2 && v3 != v1 + (short)1;
+			//bool _134Neg = v2 == v1 - (short)2 && v3 != v1 - (short)1;
+			////bool _143Pos = v3 == v1 + (short)2 && v2 != v1 + (short)1;
+			////bool _143Neg = v3 == v1 - (short)2 && v2 != v1 - (short)1;
 			//bool _413Pos = v3 == v2 + (short)2 && v1 != v2 + (short)1;
 			//bool _413Neg = v3 == v2 - (short)2 && v1 != v2 - (short)1;
-			bool _142Pos = v3 == v1 + (short)1 && v2 != v3 + 1;
-			bool _142Neg = v3 == v1 - (short)1 && v2 != v3 - 1;
-			bool _214Pos = v1 == v2 + (short)1 && v3 != v2 + (short)2 && v3 != v1 + 1;
-			bool _214Neg = v1 == v2 - (short)1 && v3 != v2 - (short)2 && v3 != v1 - 1;
-			bool _124Pos = v2 == v1 - (short)1 && v3 == v1 + 1;
-			bool _124Neg = v2 == v1 - (short)1 && v3 == v1 - (short)2 && v3 == v2 - 1;
-			bool _default = !_132Pos && !_123Pos && !_132Neg && !_123Neg && !_134Pos && !_134Neg;
+			//bool _142Pos = v3 == v1 + (short)1 && v2 != v3 + 1;
+			//bool _142Neg = v3 == v1 - (short)1 && v2 != v3 - 1;
+			//bool _214Pos = v1 == v2 + (short)1 && v3 != v2 + (short)2 && v3 != v1 + 1;
+			//bool _214Neg = v1 == v2 - (short)1 && v3 != v2 - (short)2 && v3 != v1 - 1;
+			//bool _124Pos = v2 == v1 - (short)1 && v3 == v1 + 1;
+			//bool _124Neg = v2 == v1 - (short)1 && v3 == v1 - (short)2 && v3 == v2 - 1;
+			//bool _default = !_132Pos && !_123Pos && !_132Neg && !_123Neg && !_134Pos && !_134Neg;
+			//bool _134Pos = v2 == v1 + 2 && v3 != v1 + 1;
+			//bool _134Neg = v2 == v1 - 2 && v3 != v1 - 1;
+			//bool _142Pos = v3 == v1 + 1 && v2 != v3 + 1 && v2 != v1 + 1 && v2 != v1 - 1 && v2 < v1;
+			//bool _142Neg = v3 == v1 - 1 && v2 != v3 - 1 && v2 != v1 - 1;
+			//bool _124Pos = v2 == v1 - 1 && v3 == v1 + 1;
+			//bool _124Neg = v2 == v1 + 1 && v3 != v1 - 1;
+			//bool _241Pos = v1 == v3 - 1 && v2 > v1 && v3 == v1 + 1;
+			//bool _421Pos = v2 == v1 - 2 && v3 == v1 - 1;
 
+			bool _134Pos = v2 == v1 + 2 && v3 != v1 + 1 && v3 != v2 + 1 && v3 != v1 + 1;
+			bool _134Neg = v2 == v1 - 2 && v3 != v1 - 1 && v3 != v1 + 1;
+			bool _132Pos = v2 == v1 + 2 && v3 == v1 + 1;
+			bool _132Neg = v2 == v1 - 2 && v3 == v1 - 1;
+			bool _123Pos = v2 == v1 + 1 && v3 == v2 + 1;
+			bool _123Neg = v2 == v1 - 1 && v3 == v2 - 1;
+
+
+			bool _124Pos = v2 == v1 + 1 && v3 == v1 - 1;
+			bool _124Neg = v2 == v1 - 1 && v3 == v1 + 1;
+
+			bool _421Pos = v3 == v2 + 1 && v1 != v2 - 1 && !_132Neg;
+			bool _421Neg = v3 == v2 - 1 && v1 != v2 + 1;
+
+			bool _142Pos = v3 == v1 + 1 && v2 != v1 + 2 && !_124Neg && !_134Pos && !_134Neg && !_124Pos;
+			bool _142Neg = v3 == v1 - 1 && v2 != v1 - 2 && !_134Pos && !_134Neg && !_124Pos && !_124Neg;
 			
+			if (_132Pos) Logger::Info("//Is Quad 132POS\n");
+			if (_132Neg) Logger::Info("//Is Quad 132NEG\n");
+
+			if (_123Pos) Logger::Info("//Is Quad 123POS\n");
+			if (_123Neg) Logger::Info("//Is Quad 123NEG\n");
+
+			if (_134Pos) Logger::Info("//Is Quad 134POS\n");
+			if (_134Neg) Logger::Info("//Is Quad 134NEG\n");
+
+			if (_124Pos) Logger::Info("//Is Quad 124POS\n");
+			if (_124Neg) Logger::Info("//Is Quad 124NEG\n");
+
+			if (_421Pos) Logger::Info("//Is Quad 421POS\n");
+			if (_421Neg) Logger::Info("//Is Quad 421NEG\n");
+
+			if (_142Pos) Logger::Info("//Is Quad 142POS\n");
+			if (_142Neg) Logger::Info("//Is Quad 142NEG\n");
 
 
-
-			if (_134Pos)
-			{
-				//Logger::Info("Is Quad\n");
-				vertOrder.push_back(vertMap.vertstartid);
-				vertOrder.push_back(vertMap.vertendid);
-				vertOrder.push_back(vertMap.vertextraid);
-				//vertOrder.push_back(vertMap.vertstartid + (short)1);
-				vertOrder.push_back(vertMap.vertextraid);
-				vertOrder.push_back(vertMap.vertstartid + (short)1);
-				vertOrder.push_back(vertMap.vertstartid);
-				//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
-				return vertOrder;
-			}
-			if (_134Neg)
-			{
-				//Logger::Info("Is Quad\n");
-				vertOrder.push_back(vertMap.vertstartid);
-				vertOrder.push_back(vertMap.vertendid);
-				vertOrder.push_back(vertMap.vertextraid);
-				//vertOrder.push_back(vertMap.vertstartid - (short)1);
-				vertOrder.push_back(vertMap.vertextraid);
-				vertOrder.push_back(vertMap.vertstartid - (short)1);
-				vertOrder.push_back(vertMap.vertstartid);
-				//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
-				return vertOrder;
-			}
-			if (_142Pos)
-			{
-				//Logger::Info("Is Quad\n");
-				vertOrder.push_back(vertMap.vertstartid);
-				vertOrder.push_back(vertMap.vertendid);
-				vertOrder.push_back(vertMap.vertextraid);
-				vertOrder.push_back(vertMap.vertstartid);
-				vertOrder.push_back(vertMap.vertextraid);
-				vertOrder.push_back(vertMap.vertextraid + (short)1);
-				//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
-				return vertOrder;
-			}
-			if (_142Neg)
-			{
-				//Logger::Info("Is Quad\n");
-				vertOrder.push_back(vertMap.vertstartid);
-				vertOrder.push_back(vertMap.vertendid);
-				vertOrder.push_back(vertMap.vertextraid);
-				vertOrder.push_back(vertMap.vertstartid);
-				vertOrder.push_back(vertMap.vertextraid);
-				vertOrder.push_back(vertMap.vertextraid - (short)1);
-				//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
-				return vertOrder;
-			}
+			//if (_134Pos)
+			//{
+			//	Logger::Info("//Is Quad 134POS\n");
+			//	vertOrder.push_back(vertMap.vertstartid);
+			//	vertOrder.push_back(vertMap.vertendid);
+			//	vertOrder.push_back(vertMap.vertextraid);
+			//	//vertOrder.push_back(vertMap.vertstartid + (short)1);
+			//	vertOrder.push_back(vertMap.vertextraid);
+			//	vertOrder.push_back(vertMap.vertstartid + (short)1);
+			//	vertOrder.push_back(vertMap.vertstartid);
+			//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+			//	return vertOrder;
+			//}
+			//if (_134Neg)
+			//{
+			//	Logger::Info("//Is Quad 134NEG\n");
+			//	vertOrder.push_back(vertMap.vertstartid);
+			//	vertOrder.push_back(vertMap.vertendid);
+			//	vertOrder.push_back(vertMap.vertextraid);
+			//	//vertOrder.push_back(vertMap.vertstartid - (short)1);
+			//	vertOrder.push_back(vertMap.vertextraid);
+			//	vertOrder.push_back(vertMap.vertstartid - (short)1);
+			//	vertOrder.push_back(vertMap.vertstartid);
+			//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+			//	return vertOrder;
+			//}
+			//if (_142Pos)
+			//{
+			//	Logger::Info("//Is Quad 142POS\n");
+			//	vertOrder.push_back(vertMap.vertstartid);
+			//	vertOrder.push_back(vertMap.vertextraid + (short)1); //vertOrder.push_back(vertMap.vertendid);
+			//	vertOrder.push_back(vertMap.vertextraid);
+			//	vertOrder.push_back(vertMap.vertendid);
+			//	vertOrder.push_back(vertMap.vertextraid);
+			//	vertOrder.push_back(vertMap.vertstartid);
+			//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+			//	return vertOrder;
+			//}
+			//if (_142Neg)
+			//{
+			//	Logger::Info("//Is Quad 142NEG\n");
+			//	vertOrder.push_back(vertMap.vertstartid);
+			//	vertOrder.push_back(vertMap.vertendid);
+			//	vertOrder.push_back(vertMap.vertextraid);
+			//	vertOrder.push_back(vertMap.vertstartid);
+			//	vertOrder.push_back(vertMap.vertendid);
+			//	vertOrder.push_back(vertMap.vertextraid - (short)1);
+			//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+			//	return vertOrder;
+			//}
+			//if (_124Pos)
+			//{
+			//	Logger::Info("//Is Quad 124POS\n");
+			//	vertOrder.push_back(vertMap.vertstartid);
+			//	vertOrder.push_back(vertMap.vertendid);
+			//	vertOrder.push_back(vertMap.vertextraid);
+			//	vertOrder.push_back(vertMap.vertextraid);
+			//	vertOrder.push_back(vertMap.vertstartid);
+			//	vertOrder.push_back(vertMap.vertendid - (short)1);
+			//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+			//	return vertOrder;
+			//}
+			//if (_241Pos)
+			//{
+			//	Logger::Info("//Is Quad 241POS\n");
+			//	vertOrder.push_back(vertMap.vertstartid);
+			//	vertOrder.push_back(vertMap.vertendid);
+			//	vertOrder.push_back(vertMap.vertextraid);
+			//	vertOrder.push_back(vertMap.vertstartid);
+			//	vertOrder.push_back(vertMap.vertextraid);
+			//	vertOrder.push_back(vertMap.vertstartid - (short)1);
+			//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+			//	return vertOrder;
+			//}
+			//if (_421Pos)
+			//{
+			//	Logger::Info("//Is Quad 421POS\n");
+			//	vertOrder.push_back(vertMap.vertstartid);
+			//	vertOrder.push_back(vertMap.vertendid);
+			//	vertOrder.push_back(vertMap.vertextraid);
+			//	vertOrder.push_back(vertMap.vertextraid);
+			//	vertOrder.push_back(vertMap.vertstartid);
+			//	vertOrder.push_back(vertMap.vertendid - (short)1);
+			//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+			//	return vertOrder;
+			//}
+			//if (_124Neg)
+			//{
+			//	Logger::Info("//Is Quad 124NEG\n");
+			//	vertOrder.push_back(vertMap.vertstartid);
+			//	vertOrder.push_back(vertMap.vertendid);
+			//	vertOrder.push_back(vertMap.vertextraid);
+			//	vertOrder.push_back(vertMap.vertextraid);
+			//	vertOrder.push_back(vertMap.vertstartid);
+			//	vertOrder.push_back(vertMap.vertendid - (short)1);
+			//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+			//	return vertOrder;
+			//}
 			//if (_214Pos && !_142Neg && !_123Pos && !_123Neg && !_132Neg && !_132Pos)
 			//{
 			//	//Logger::Info("Is Quad\n");
@@ -224,18 +312,18 @@ namespace Utility
 			//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
 			//	return vertOrder;
 			//}
-			if (_124Pos)
-			{
-				//Logger::Info("Is Quad\n");
-				vertOrder.push_back(vertMap.vertstartid);
-				vertOrder.push_back(vertMap.vertendid);
-				vertOrder.push_back(vertMap.vertextraid);
-				vertOrder.push_back(vertMap.vertextraid);
-				vertOrder.push_back(vertMap.vertstartid);
-				vertOrder.push_back(vertMap.vertendid - (short)1);
-				//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
-				return vertOrder;
-			}
+			//if (_124Pos)
+			//{
+			//	//Logger::Info("Is Quad\n");
+			//	vertOrder.push_back(vertMap.vertstartid);
+			//	vertOrder.push_back(vertMap.vertendid);
+			//	vertOrder.push_back(vertMap.vertextraid);
+			//	vertOrder.push_back(vertMap.vertextraid);
+			//	vertOrder.push_back(vertMap.vertstartid);
+			//	vertOrder.push_back(vertMap.vertendid - (short)1);
+			//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+			//	return vertOrder;
+			//}
 			//if (_124Neg && !_142Neg && !_123Pos && !_123Neg && !_132Neg && !_132Pos)
 			//{
 			//	//Logger::Info("Is Quad\n");
@@ -284,9 +372,9 @@ namespace Utility
 			//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
 			//	return vertOrder;
 			//}
-			//if (_413Pos && !_123Pos && !_123Neg && !_132Neg && !_132Pos)
+			//if (_413Pos)
 			//{
-			//	//Logger::Info("Is Quad\n");
+			//	Logger::Info("//Is Quad 413POS\n");
 			//	vertOrder.push_back(vertMap.vertendid);
 			//	vertOrder.push_back(vertMap.vertextraid);
 			//	vertOrder.push_back(vertMap.vertendid + (short)1);
@@ -296,43 +384,18 @@ namespace Utility
 			//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
 			//	return vertOrder;
 			//}
-			//if (_413Neg && !_123Pos && !_123Neg && !_132Neg && !_132Pos)
+			//if (_413Neg)
 			//{
-			//	//Logger::Info("Is Quad\n");
+			//	Logger::Info("//Is Quad 413NEG\n");
 			//	vertOrder.push_back(vertMap.vertendid);
 			//	vertOrder.push_back(vertMap.vertextraid);
 			//	vertOrder.push_back(vertMap.vertendid - (short)1);
 			//	vertOrder.push_back(vertMap.vertstartid);
 			//	vertOrder.push_back(vertMap.vertendid);
-			//	vertOrder.push_back(vertMap.vertextraid);
+			//	vertOrder.push_back(vertMap.vertendid - (short)1);
 			//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
 			//	return vertOrder;
 			//}
-			if (_132Pos || _123Pos )
-			{
-				//Logger::Info("Is Tris\n");
-				vertOrder.push_back(vertMap.vertstartid);
-				vertOrder.push_back(vertMap.vertendid);
-				vertOrder.push_back(vertMap.vertextraid);
-				return vertOrder;
-			}
-			
-			if (_132Neg || _123Neg)
-			{
-				//Logger::Info("Is Tris\n");
-				vertOrder.push_back(vertMap.vertstartid);
-				vertOrder.push_back(vertMap.vertendid);
-				vertOrder.push_back(vertMap.vertextraid);
-				return vertOrder;
-			}
-			
-			if (_default)
-			{
-				vertOrder.push_back(vertMap.vertstartid);
-				vertOrder.push_back(vertMap.vertendid);
-				vertOrder.push_back(vertMap.vertextraid);
-				return vertOrder;
-			}
 
 			vertOrder.push_back(vertMap.vertstartid);
 			vertOrder.push_back(vertMap.vertendid);
@@ -690,7 +753,7 @@ namespace Utility
 
 									if (dist > 18 || dist < 0)
 									{
-										for (int l = 0; l < 10000000; l++)
+										for (int l = 0; l < anims[j].animdata.arry.size(); l++)
 										{
 											short animValue{ (short)anims[j].animdata.arry[l] };
 											if (animValue == 0)
@@ -742,7 +805,7 @@ namespace Utility
 
 									if (dist > 18 || dist < 0)
 									{
-										for (int l = 0; l < 10000000; l++)
+										for (int l = 0; l < anims[j].animdata.arry.size(); l++)
 										{
 											short animValue{ (short)anims[j].animdata.arry[l] };
 											if (animValue == 0)
@@ -793,7 +856,7 @@ namespace Utility
 								
 									if (dist > 18 || dist < 0)
 									{
-										for (int l = 0; l < 10000000; l++)
+										for (int l = 0; l < anims[j].animdata.arry.size(); l++)
 										{
 											short animValue{ (short)anims[j].animdata.arry[l] };
 											if (animValue == 0)
@@ -859,19 +922,18 @@ namespace Utility
 								bytesAdded += (32 - headerSize);
 								if (sections[k].nextoffset == 0)
 								{
-									if (i + 1 < mdlhdr.numlocalanim && j + 1 > num - 1)
+									if (i + 1 < mdlhdr.numlocalanim - 1 && j + 1 > num - 1)
 									{
 										int dist = animdescs[nextAnim].sectionindex > 0 ? ((startPos + 100 + animdescs[nextAnim].sectionindex) - (pos2 + headerSize)) : ((startPos + 100 + animdescs[nextAnim].animindex) - (pos2 + headerSize));
-
 										if (dist > 18 || dist < 0)
 										{
-											for (int l = 0; l < 1000; l++)
+											for (int l = 0; l < sections[j].animdata.arry.size(); l++)
 											{
 												short animValue{ (short)sections[j].animdata.arry[l] };
 												if (animValue == 0)
 												{
 													int newPos = l;
-													dist = anims[j].animdata.arry.size() - newPos;
+													dist = sections[j].animdata.arry.size() - newPos;
 													if (dist <= 18)
 													{
 														break;
@@ -883,21 +945,19 @@ namespace Utility
 										Logger::Info("secFinalDist:  %d\n", 32 - dist);
 										bytesAdded += 32 - dist;
 									}
-
-									if (j + 1 < num)
+									if (i + 1 < mdlhdr.numlocalanim && j + 1 < num)
 									{
 										int nextSection = secNum + 1;
 										int dist = ((startPos + sectionindexes[nextSection].sectionoffset) - (pos2 + headerSize));
-
 										if (dist > 18 || dist < 0)
 										{
-											for (int l = 0; l < 1000; l++)
+											for (int l = 0; l < sections[j].animdata.arry.size(); l++)
 											{
 												short animValue{ (short)sections[j].animdata.arry[l] };
 												if (animValue == 0)
 												{
 													int newPos = l;
-													dist = anims[j].animdata.arry.size() - newPos;
+													dist = sections[j].animdata.arry.size() - newPos;
 													if (dist <= 18)
 													{
 														break;
@@ -957,13 +1017,13 @@ namespace Utility
 
 										if (dist > 18 || dist < 0)
 										{
-											for (int l = 0; l < 1000; l++)
+											for (int l = 0; l < sections[j].animdata.arry.size(); l++)
 											{
 												short animValue{ (short)sections[j].animdata.arry[l] };
 												if (animValue == 0)
 												{
 													int newPos = l;
-													dist = anims[j].animdata.arry.size() - newPos;
+													dist = sections[j].animdata.arry.size() - newPos;
 													if (dist <= 18)
 													{
 														break;
@@ -981,13 +1041,13 @@ namespace Utility
 
 										if (dist > 18 || dist < 0)
 										{
-											for (int l = 0; l < 1000; l++)
+											for (int l = 0; l < sections[j].animdata.arry.size(); l++)
 											{
 												short animValue{ (short)sections[j].animdata.arry[l] };
 												if (animValue == 0)
 												{
 													int newPos = l;
-													dist = anims[j].animdata.arry.size() - newPos;
+													dist = sections[j].animdata.arry.size() - newPos;
 													if (dist <= 18)
 													{
 														break;
@@ -1052,13 +1112,13 @@ namespace Utility
 
 										if (dist > 18 || dist < 0)
 										{
-											for (int l = 0; l < 1000; l++)
+											for (int l = 0; l < sections[j].animdata.arry.size(); l++)
 											{
 												short animValue{ (short)sections[j].animdata.arry[l] };
 												if (animValue == 0)
 												{
 													int newPos = l;
-													dist = anims[j].animdata.arry.size() - newPos;
+													dist = sections[j].animdata.arry.size() - newPos;
 													if (dist <= 18)
 													{
 														break;
@@ -1078,13 +1138,13 @@ namespace Utility
 
 										if (dist > 18 || dist < 0)
 										{
-											for (int l = 0; l < 1000; l++)
+											for (int l = 0; l < sections[j].animdata.arry.size(); l++)
 											{
 												short animValue{ (short)sections[j].animdata.arry[l] };
 												if (animValue == 0)
 												{
 													int newPos = l;
-													dist = anims[j].animdata.arry.size() - newPos;
+													dist = sections[j].animdata.arry.size() - newPos;
 													if (dist <= 18)
 													{
 														break;
@@ -1151,13 +1211,13 @@ namespace Utility
 
 										if (dist > 18 || dist < 0)
 										{
-											for (int l = 0; l < 1000; l++)
+											for (int l = 0; l < sections[j].animdata.arry.size(); l++)
 											{
 												short animValue{ (short)sections[j].animdata.arry[l] };
 												if (animValue == 0)
 												{
 													int newPos = l;
-													dist = anims[j].animdata.arry.size() - newPos;
+													dist = sections[j].animdata.arry.size() - newPos;
 													if (dist <= 18)
 													{
 														break;
@@ -1177,13 +1237,13 @@ namespace Utility
 
 										if (dist > 18 || dist < 0)
 										{
-											for (int l = 0; l < 1000; l++)
+											for (int l = 0; l < sections[j].animdata.arry.size(); l++)
 											{
 												short animValue{ (short)sections[j].animdata.arry[l] };
 												if (animValue == 0)
 												{
 													int newPos = l;
-													dist = anims[j].animdata.arry.size() - newPos;
+													dist = sections[j].animdata.arry.size() - newPos;
 													if (dist <= 18)
 													{
 														break;
@@ -1629,26 +1689,26 @@ namespace Utility
 			//Logger::Info("RuiMesh Read: %d  %d\n", ruiMesh.vertexmap[0].vertstartid, ruiMesh.vertexmap[0].vertendid);
 			int faceNum = 0;
 			int vertNum = 0;
-			//for (int i = 0; i < ruiMesh.numvertices; i++)
-			//{
-			//	//Logger::Info("FACE%d \n", faceNum);
-			//	if (vertNum >= 3)
-			//	{
-			//		Logger::Info("FACE%d \n", faceNum);
-			//		faceNum++;
-			//		vertNum = 0;
-			//	}
-			//	mstudioruivert_t vert1 = ruiMesh.vertex[i];
-			//	Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert1.vertexpos.x, vert1.vertexpos.y, vert1.vertexpos.z);
-			//	vertNum++;
-			//	//for (int j = 0; j < ruiMesh.numvertices; j++)
-			//	//{
-			//	//	mstudioruivert_t vert1 = ruiMesh.vertex[vertNum];
-			//	//	Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert1.vertexpos.x, vert1.vertexpos.y, vert1.vertexpos.z);
-			//	//	vertNum++;
-			//	//}
-			//	//faceNum++;
-			//}
+			for (int i = 0; i < ruiMesh.numvertices; i++)
+			{
+				//Logger::Info("FACE%d \n", faceNum);
+				if (vertNum >= 3)
+				{
+					Logger::Info("FACE%d \n", faceNum);
+					faceNum++;
+					vertNum = 0;
+				}
+				mstudioruivert_t vert1 = ruiMesh.vertex[i];
+				Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert1.vertexpos.x, vert1.vertexpos.y, vert1.vertexpos.z);
+				vertNum++;
+				//for (int j = 0; j < ruiMesh.numvertices; j++)
+				//{
+				//	mstudioruivert_t vert1 = ruiMesh.vertex[vertNum];
+				//	Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert1.vertexpos.x, vert1.vertexpos.y, vert1.vertexpos.z);
+				//	vertNum++;
+				//}
+				//faceNum++;
+			}
 			for (int i = 0; i < ruiMesh.numfaces; i++)
 			{
 				mstudioruivertmap_t map = ruiMesh.vertexmap[i];
@@ -2968,12 +3028,12 @@ namespace Utility
 					Logger::Info("SrcBoneTransform Read: %d\n", i);
 				}
 			}
-			//if (mdlhdr.numbones > 0)
-			//{
-			//	Stream->Read(&linearbone);
-			//	Stream->Read(&linearbonedata, &linearbone);
-			//	Logger::Info("LinearBone Read: %d\n", mdlhdr.numbones);
-			//}
+			if (mdlhdr.numbones > 0)
+			{
+				Stream->Read(&linearbone);
+				Stream->Read(&linearbonedata, mdlhdr.numbones);
+				Logger::Info("LinearBone Read: %d\n", mdlhdr.numbones);
+			}
 			v49Mdl _v49mdl{ mdlhdr,mdlsubhdr,bones,jigglebones,boneflexdrivers,attachments,hitboxsets,hitboxes,bonenametable,animdescs,anims, sectionindexes, sections, ikrules,compressedikerrors,ikerrors,ikrulezeroframe,seqdescs,blends,posekeys,events,autolayers,activitymodifiers,seqweightlist,nodenames,nodes,bodyparts,models,meshes,ikchains,iklinks,poseparamdescs,includedmodels,cdtextures,textures,skingroups,keyvalues,srcbonetransforms,linearbone,linearbonedata};
 
 			return _v49mdl;
