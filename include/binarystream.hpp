@@ -54,7 +54,7 @@ class BinaryReader{
     void Read(mstudioposeparamdesc_t_v49* data);
     void Read(mstudiosrcbonetransform_t_v49* data);
     void Read(mstudiolinearbone_t_v49* data);
-    void Read(mstudiolinearbonedata_t_v49* data, mstudiolinearbone_t_v49* bone);
+    void Read(mstudiolinearbonedata_t_v49* data, int numbones);
     void Read(mstudiolinearbonedata_t_v53* data, int numbones);
     void Read(mstudiohitboxset_t_v49* data);
     void Read(mstudiobbox_t_v49* data);
@@ -154,7 +154,7 @@ class BinaryWriter{
     void Write(mstudioposeparamdesc_t_v49 data);
     void Write(mstudiosrcbonetransform_t_v49 data);
     void Write(mstudiolinearbone_t_v49 data);
-    void Write(mstudiolinearbonedata_t_v49 data, mstudiolinearbone_t_v49 bone);
+    void Write(mstudiolinearbonedata_t_v49 data, int numbones);
     void Write(mstudiohitboxset_t_v49 data);
     void Write(mstudiobbox_t_v49 data);
     void Write(mstudiobonenametable_t_v49 data);
@@ -210,6 +210,7 @@ class BinaryWriter{
     void Write(mstudioruivert_t data);
     void Write(mstudioruimesface_t data);
     void Write(mstudioruimesh_t data);
+    void Write(mstudiolinearbonedata_t_v53 data, int numbones);
 
 
     void Write(std::string data);

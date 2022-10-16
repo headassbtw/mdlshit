@@ -542,7 +542,7 @@ struct mstudiobone_t_v49
 	Quaternion qAlignment;
 
 	int flags;
-	boneprocflags proctype;
+	int proctype;
 	int procindex; // procedural rule
 	int physicsbone; // index into physically simulated bone
 
@@ -746,7 +746,7 @@ enum hboxgroup
 struct mstudiobbox_t_v49
 {
 	int bone;
-	hboxgroup group;				// intersection group
+	int group;				// intersection group
 
 	Vector3 bbmin;					// bounding box
 	Vector3 bbmax;
@@ -1437,7 +1437,7 @@ struct mstudiobone_t_v53
 	Quaternion qAlignment;
 
 	int flags;
-	boneprocflags proctype;
+	int proctype;
 	int procindex; // procedural rule
 	int physicsbone; // index into physically simulated bone
 
@@ -1483,7 +1483,7 @@ struct mstudioikchain_t_v53
 struct mstudiobbox_t_v53
 {
 	int bone;
-	hboxgroup group; // intersection group
+	int group; // intersection group
 
 	Vector3 bbmin; // bounding box
 	Vector3 bbmax;
@@ -1567,7 +1567,7 @@ struct mstudioanim_t_v53
 struct mstudioikrule_t_v53
 {
 	int index;
-	ikruletype type;
+	int type;
 	int chain;
 	int bone;
 

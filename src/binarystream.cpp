@@ -410,52 +410,68 @@ void BinaryReader::Read(mstudiosrcbonetransform_t_v49* data) {
 }
 
 void BinaryReader::Read(mstudiolinearbone_t_v49* data) {
-    Logger::Info("Test\n");
+
     Stream.read((char*)&data->numbones, sizeof(int));
-    Logger::Info("Test\n");
+
     Stream.read((char*)&data->flagsindex, sizeof(int));
-    Logger::Info("Test\n");
+
     Stream.read((char*)&data->parentindex, sizeof(int));
-    Logger::Info("Test\n");
+
     Stream.read((char*)&data->posindex, sizeof(int));
-    Logger::Info("Test\n");
+
     Stream.read((char*)&data->quatindex, sizeof(int));
-    Logger::Info("Test\n");
+
     Stream.read((char*)&data->rotindex, sizeof(int));
-    Logger::Info("Test\n");
+
     Stream.read((char*)&data->posetoboneindex, sizeof(int));
-    Logger::Info("Test\n");
+
     Stream.read((char*)&data->posscaleindex, sizeof(int));
-    Logger::Info("Test\n");
+
     Stream.read((char*)&data->rotscaleindex, sizeof(int));
-    Logger::Info("Test\n");
+
     Stream.read((char*)&data->qalignmentindex, sizeof(int));
-    Logger::Info("Test\n");
+
     Stream.read((char*)&data->unused, sizeof(int) * 6);
 }
 
-void BinaryReader::Read(mstudiolinearbonedata_t_v49* data, mstudiolinearbone_t_v49* bone) 
+void BinaryReader::Read(mstudiolinearbonedata_t_v49* data, int numbones)
 {
-    int numbones = bone->numbones;
-    Logger::Info("Test\n");
-    if (bone->flagsindex > 0)        Stream.read((char*)&data->flags, sizeof(uint32_t) * numbones);
-    Logger::Info("Test\n");
-    if (bone->parentindex > 0)       Stream.read((char*)&data->parents, sizeof(uint32_t) * numbones);
-    Logger::Info("Test\n");
-    if (bone->posindex > 0)          Stream.read((char*)&data->bonePos, sizeof(Vector3) * numbones);
-    Logger::Info("Test\n");
-    if (bone->quatindex > 0)         Stream.read((char*)&data->boneQuat, sizeof(Quaternion) * numbones);
-    Logger::Info("Test\n");
-    if (bone->rotindex > 0)          Stream.read((char*)&data->boneRot, sizeof(RadianEuler) * numbones);
-    Logger::Info("Test\n");
-    if (bone->posetoboneindex > 0)   Stream.read((char*)&data->poseToBone, sizeof(matrix3x4_t) * numbones);
-    Logger::Info("Test\n");
-    if (bone->posscaleindex > 0)     Stream.read((char*)&data->posScale, sizeof(Vector3) * numbones);
-    Logger::Info("Test\n");
-    if (bone->rotscaleindex > 0)     Stream.read((char*)&data->rotScale, sizeof(Vector3) * numbones);
-    Logger::Info("Test\n");
-    if (bone->qalignmentindex > 0)   Stream.read((char*)&data->boneAlignment, sizeof(Quaternion) * numbones);
-    Logger::Info("Test\n");
+    Stream.read((char*)&data->flags, sizeof(uint32_t) * numbones);
+
+    Stream.read((char*)&data->parents, sizeof(uint32_t) * numbones);
+
+    Stream.read((char*)&data->bonePos, sizeof(Vector3) * numbones);
+
+    Stream.read((char*)&data->boneQuat, sizeof(Quaternion) * numbones);
+
+    Stream.read((char*)&data->boneRot, sizeof(RadianEuler) * numbones);
+
+    Stream.read((char*)&data->poseToBone, sizeof(matrix3x4_t) * numbones);
+
+    Stream.read((char*)&data->posScale, sizeof(Vector3) * numbones);
+
+    Stream.read((char*)&data->rotScale, sizeof(Vector3) * numbones);
+
+    Stream.read((char*)&data->boneAlignment, sizeof(Quaternion) * numbones);
+
+    //if (bone->flagsindex > 0)        Stream.read((char*)&data->flags, sizeof(uint32_t) * numbones);
+    //
+    //if (bone->parentindex > 0)       Stream.read((char*)&data->parents, sizeof(uint32_t) * numbones);
+    //
+    //if (bone->posindex > 0)          Stream.read((char*)&data->bonePos, sizeof(Vector3) * numbones);
+    //
+    //if (bone->quatindex > 0)         Stream.read((char*)&data->boneQuat, sizeof(Quaternion) * numbones);
+    //
+    //if (bone->rotindex > 0)          Stream.read((char*)&data->boneRot, sizeof(RadianEuler) * numbones);
+    //
+    //if (bone->posetoboneindex > 0)   Stream.read((char*)&data->poseToBone, sizeof(matrix3x4_t) * numbones);
+    //
+    //if (bone->posscaleindex > 0)     Stream.read((char*)&data->posScale, sizeof(Vector3) * numbones);
+    //
+    //if (bone->rotscaleindex > 0)     Stream.read((char*)&data->rotScale, sizeof(Vector3) * numbones);
+    //
+    //if (bone->qalignmentindex > 0)   Stream.read((char*)&data->boneAlignment, sizeof(Quaternion) * numbones);
+
 
 }
 
@@ -1785,19 +1801,49 @@ void BinaryWriter::Write(mstudiolinearbone_t_v49 data) {
     Stream.write((char*)&data.unused, sizeof(int) * 6);
 }
 
-void BinaryWriter::Write(mstudiolinearbonedata_t_v49 data, mstudiolinearbone_t_v49 bone) {
-    int numbones = bone.numbones;
+void BinaryWriter::Write(mstudiolinearbonedata_t_v49 data, int numbones) 
+{
+    Stream.write((char*)&data.flags, sizeof(uint32_t) * numbones);
+    Stream.write((char*)&data.parents, sizeof(uint32_t) * numbones);
+    Stream.write((char*)&data.bonePos, sizeof(Vector3) * numbones);
+    Stream.write((char*)&data.boneQuat, sizeof(Quaternion) * numbones);
+    Stream.write((char*)&data.boneRot, sizeof(RadianEuler) * numbones);
+    Stream.write((char*)&data.poseToBone, sizeof(matrix3x4_t) * numbones);
+    Stream.write((char*)&data.posScale, sizeof(Vector3) * numbones);
+    Stream.write((char*)&data.rotScale, sizeof(Vector3) * numbones);
+    Stream.write((char*)&data.boneAlignment, sizeof(Quaternion) * numbones);
 
-    if(bone.flagsindex > 0)Stream.write((char*)&data.flags, sizeof(uint32_t) * numbones);
-    if(bone.parentindex > 0)Stream.write((char*)&data.parents, sizeof(uint32_t) * numbones);
-    if(bone.posindex > 0)Stream.write((char*)&data.bonePos, sizeof(Vector3) * numbones);
-    if(bone.quatindex > 0)Stream.write((char*)&data.boneQuat, sizeof(Quaternion) * numbones);
-    if(bone.rotindex > 0)Stream.write((char*)&data.boneRot, sizeof(RadianEuler) * numbones);
-    if(bone.posetoboneindex > 0)Stream.write((char*)&data.poseToBone, sizeof(matrix3x4_t) * numbones);
-    if(bone.posscaleindex > 0)Stream.write((char*)&data.posScale, sizeof(Vector3) * numbones);
-    if(bone.rotscaleindex > 0)Stream.write((char*)&data.rotScale, sizeof(Vector3) * numbones);
-    if(bone.qalignmentindex > 0)Stream.write((char*)&data.boneAlignment, sizeof(Quaternion) * numbones);
+    //if(bone.flagsindex > 0)         Stream.write((char*)&data.flags, sizeof(uint32_t) * numbones);
+    //if(bone.parentindex > 0)        Stream.write((char*)&data.parents, sizeof(uint32_t) * numbones);
+    //if(bone.posindex > 0)           Stream.write((char*)&data.bonePos, sizeof(Vector3) * numbones);
+    //if(bone.quatindex > 0)          Stream.write((char*)&data.boneQuat, sizeof(Quaternion) * numbones);
+    //if(bone.rotindex > 0)           Stream.write((char*)&data.boneRot, sizeof(RadianEuler) * numbones);
+    //if(bone.posetoboneindex > 0)    Stream.write((char*)&data.poseToBone, sizeof(matrix3x4_t) * numbones);
+    //if(bone.posscaleindex > 0)      Stream.write((char*)&data.posScale, sizeof(Vector3) * numbones);
+    //if(bone.rotscaleindex > 0)      Stream.write((char*)&data.rotScale, sizeof(Vector3) * numbones);
+    //if(bone.qalignmentindex > 0)    Stream.write((char*)&data.boneAlignment, sizeof(Quaternion) * numbones);
+}
 
+void BinaryWriter::Write(mstudiolinearbonedata_t_v53 data, int numbones)
+{
+    Stream.write((char*)&data.flags, sizeof(uint32_t) * numbones);
+    Stream.write((char*)&data.parents, sizeof(uint32_t) * numbones);
+    Stream.write((char*)&data.bonePos, sizeof(Vector3) * numbones);
+    Stream.write((char*)&data.boneQuat, sizeof(Quaternion) * numbones);
+    Stream.write((char*)&data.boneRot, sizeof(RadianEuler) * numbones);
+    Stream.write((char*)&data.poseToBone, sizeof(matrix3x4_t) * numbones);
+    Stream.write((char*)&data.rotScale, sizeof(Vector3) * numbones);
+    Stream.write((char*)&data.boneAlignment, sizeof(Quaternion) * numbones);
+
+    //if(bone.flagsindex > 0)         Stream.write((char*)&data.flags, sizeof(uint32_t) * numbones);
+    //if(bone.parentindex > 0)        Stream.write((char*)&data.parents, sizeof(uint32_t) * numbones);
+    //if(bone.posindex > 0)           Stream.write((char*)&data.bonePos, sizeof(Vector3) * numbones);
+    //if(bone.quatindex > 0)          Stream.write((char*)&data.boneQuat, sizeof(Quaternion) * numbones);
+    //if(bone.rotindex > 0)           Stream.write((char*)&data.boneRot, sizeof(RadianEuler) * numbones);
+    //if(bone.posetoboneindex > 0)    Stream.write((char*)&data.poseToBone, sizeof(matrix3x4_t) * numbones);
+    //if(bone.posscaleindex > 0)      Stream.write((char*)&data.posScale, sizeof(Vector3) * numbones);
+    //if(bone.rotscaleindex > 0)      Stream.write((char*)&data.rotScale, sizeof(Vector3) * numbones);
+    //if(bone.qalignmentindex > 0)    Stream.write((char*)&data.boneAlignment, sizeof(Quaternion) * numbones);
 }
 
 void BinaryWriter::Write(mstudiohitboxset_t_v49 data) {

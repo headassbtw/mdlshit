@@ -647,17 +647,15 @@ int Conversion::ReadHeader(FileInfo info) {
   studiohdr2_t* Initial_Header_Part2 = new studiohdr2_t();
   v53_Header* Dest_Header = new v53_Header();
   v53_Header_Part2* Dest_Header_Part2 = new v53_Header_Part2();
-
   Stream.seek(0);
 
   int testPos = Stream.Position();
+
+
+  Utility::mdl::v49Mdl mdl = Utility::mdl::_v49Mdl(&Stream, false);
   //BinaryReader Stream2 = BinaryReader(info.aabb.value().c_str());
   //Utility::mdl::v53Mdl mdl2 = Utility::mdl::_v53Mdl(&Stream2, false);
-  Utility::mdl::v49Mdl mdl = Utility::mdl::_v49Mdl(&Stream, false);
-  //Utility::mdl::GetModelCount(mdl, true);
   mdl.SetMdlInts();
-  //mdl.v53GetAnimHdrBytesAdded(true);
-  //mdl.v53GetSecHdrBytesAdded(true);
 
   Stream.seek(testPos);
 
@@ -672,15 +670,13 @@ int Conversion::ReadHeader(FileInfo info) {
 
   Stream.seek(Initial_Header->localanimindex);
 
-  std::vector<int> hdrBytesAnimDescAdd = mdl.v53GetAnimHdrBytesAdded(true);//GetAnimBoneHeaderBytesAdded(&Stream, Initial_Header, false);
-  std::vector<int> secHdrBytesAnimDescAdd = mdl.v53GetSecHdrBytesAdded(true);//GetAnimSectionBytesAdded2(&Stream, Initial_Header, true);
+  std::vector<int> hdrBytesAnimDescAdd = mdl.v53GetAnimHdrBytesAdded(true);
+  std::vector<int> secHdrBytesAnimDescAdd = mdl.v53GetSecHdrBytesAdded(true);
 
-  int animByteAddedTotal = mdl.v53GetTotalAnimHdrBytesAdded(hdrBytesAnimDescAdd);//GetAnimBytesAdded(&Stream, Initial_Header, false);
-  int animSecByteAddedTotal = mdl.v53GetTotalSecHdrBytesAdded(secHdrBytesAnimDescAdd);//GetAnimSectionBytesAdded(&Stream, Initial_Header, false);
-  std::vector<int> secHdrBytesSecAdd = mdl.v53GetSecBytesAdded(true);//GetAnimSectionBoneHeaderBytesAddedPerSec(&Stream, Initial_Header, false);
-  std::vector<int> numOfBoneHdrsPerAnim = GetAnimBoneHeaderCount(&Stream, Initial_Header, false);
-  std::vector<int> numOfSecBoneHdrsPerAnim = GetAnimSectionBoneHeaderCount(&Stream, Initial_Header, false);
-  std::vector<int> numOfSecBoneHdrsPerSec = GetAnimSectionBoneHeaderCountPerSec(&Stream, Initial_Header, false);
+  int animByteAddedTotal = mdl.v53GetTotalAnimHdrBytesAdded();
+  int animSecByteAddedTotal = mdl.v53GetTotalSecHdrBytesAdded();
+
+  std::vector<int> secHdrBytesSecAdd = mdl.v53GetSecBytesAdded(true);
   std::vector<int> ikChainBones = GetIkChainBones(&Stream, Initial_Header, false);
   std::vector<int> deltaAnims = GetDeltaAnims(&Stream, Initial_Header, false);
 
@@ -748,11 +744,18 @@ int Conversion::ReadHeader(FileInfo info) {
           UI::Progress.SubTask.Update((i + 1.0f) / (float)bonecount);
       }
   }
+  if (mdl.jigglebones.size() > 0)
+  {
+      for (int i = 0; i < mdl.jigglebones.size(); i++)
+      {
+          mstudiojigglebone_t_v49 jiggleBone = mdl.jigglebones[i];
+
+          OutStream.Write(jiggleBone);
+      }
+  }
   delete boneData;
   UI::Progress.SubTask.End();
-  int bone_filler_dest = Initial_Header->localattachmentindex - ( Initial_Header->boneindex + Initial_Header->numbones * 216 );
-  filler(&Stream, &OutStream, bone_filler_dest);
-
+  OutStream.seek(Dest_Header->localattachmentindex);
   UI::Progress.SubTask.Begin("Converting Attachments");
   for (int i = 0; i < (info.disable_attachments ? 0 : Dest_Header->numlocalattachments); i++) {
       mstudioattachment_t_v49 attachment = attachmentData->attachments[i];
@@ -841,23 +844,7 @@ int Conversion::ReadHeader(FileInfo info) {
                   break;
               }
           }
-
-          //int outPos = Dest_Header->localanimindex + 92 * i;
-          //int PISS = (-((8 * (Initial_Header->numlocalanim - i))) + bytesAddedToSeqs) + bytesAddedToTextures + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + strFiller + bytesAddedToRuiMesh;
-          //int PISS2 = -((8 * (Initial_Header->numlocalanim - i))) + hdrBytesAnimDescAdd[i] + secHdrBytesAnimDescAdd[i];
-          //int ikStairs = -12 * (ikRuleNum);
-          //mstudioanimdesc_t_v49 v49AnimDesc; Stream.Read(&v49AnimDesc);
-          //
-          //ikRuleStairsPerAnim.push_back(ikStairs);
-          //if (v49AnimDesc.numikrules > 0)
-          //{
-          //    int stairs = GetAnimBoneHeaderBytesAddedIndv(&Stream, Initial_Header, i, false);
-          //    int stairs2 = 0;
-          //    if (v49AnimDesc.sectionindex > 0) stairs2 = GetAnimSectionBytesAddedIdv(&Stream, Initial_Header, i, false);
-          //    v49AnimDesc.ikruleindex += stairs + stairs2;
-          //    ikRuleNum += v49AnimDesc.numikrules;
-          //}
-          mstudioanimdesc_t_v53 animDesc = animdescs[i];//AnimDescConversion(v49AnimDesc, PISS2, PISS, ikStairs, -outPos);
+          mstudioanimdesc_t_v53 animDesc = animdescs[i];
           animDesc.animindex -= 4;
           if (animDesc.sectionindex > 0) animDesc.sectionindex -= 4;
           if (animDesc.ikruleindex > 0) animDesc.ikruleindex -= 4;
