@@ -650,8 +650,16 @@ int Conversion::ReadHeader(FileInfo info) {
   Stream.seek(0);
 
   int testPos = Stream.Position();
-
-
+  bool readV53 = true;
+  if (readV53 && info.aabb.has_value()) //This is a temp for rui testing. -Liberty
+  {
+      BinaryReader v53Stream = BinaryReader(info.aabb.value().c_str());
+      Utility::mdl::v53Mdl mdl2 = Utility::mdl::_v53Mdl(&v53Stream, false);
+      if (!v53Stream.Stream.good()) {
+          Logger::Error("Model's phy file does not exist, please ensure %s exists, and is located in the same directory as the file\n", info.aabb.value().c_str());
+          return 1;
+      }
+  }
   Utility::mdl::v49Mdl mdl = Utility::mdl::_v49Mdl(&Stream, false);
   //BinaryReader Stream2 = BinaryReader(info.aabb.value().c_str());
   //Utility::mdl::v53Mdl mdl2 = Utility::mdl::_v53Mdl(&Stream2, false);
@@ -685,7 +693,7 @@ int Conversion::ReadHeader(FileInfo info) {
   std::vector<int> bytesAddedPerRuiMesh;
   std::vector<mstudioruimesh_t> ruiMeshes;
 
-  if (info.aabb.has_value()) //This is a temp for rui testing. -Liberty
+  if (info.aabb.has_value() && !readV53) //This is a temp for rui testing. -Liberty
   {
       BinaryReader RUIStream = BinaryReader(info.aabb.value().c_str());
       bytesAddedToRuiMesh = RUIStream.size;
@@ -1557,7 +1565,7 @@ if (info.aabb.has_value()) {
   
   Stream.seek(Initial_Header_Part2->linearboneindex + 408);
   mstudiolinearbone_t_v49 linearBone; Stream.Read(&linearBone);
-  mstudiolinearbonedata_t_v49 linearBoneData; Stream.Read(&linearBoneData, &linearBone);
+  mstudiolinearbonedata_t_v49 linearBoneData; Stream.Read(&linearBoneData, Initial_Header->numbones);
   //linearBone.posscaleindex = 0;
   for (int i = 0; i < Initial_Header->numbones; i++) 
   {
@@ -1579,7 +1587,7 @@ if (info.aabb.has_value()) {
       }
   }
   OutStream.Write(linearBone);
-  OutStream.Write(linearBoneData, linearBone);
+  OutStream.Write(linearBoneData, Initial_Header->numbones);
   AddInt32(&OutStream, 0, 15);  //filler
 
 #pragma region rest of the file
