@@ -81,6 +81,10 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
     if(ImGui::BeginTabItem("Patch Notes")){
       ImGui::BeginChild("PatchNotes");
 
+      PatchNotesVersionHeader("2.0.1");
+      ImGui::BulletText("Fixes IKrules");
+      ImGui::BulletText("Fixes jiggle bones (booba or cloth)");
+
       PatchNotesVersionHeader("2.0.0");
       ImGui::BulletText("Animation support");
       ImGui::BulletText("Removed override options (they did not work)");
