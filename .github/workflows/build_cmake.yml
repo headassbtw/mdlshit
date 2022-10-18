@@ -26,7 +26,7 @@ jobs:
         submodules: recursive
     
     - name: Install dependencies
-      run: sudo apt install -y cmake g++-mingw-w64-x86-64 make libgl1-mesa-dev libx11-dev libxext-dev libxrandr-dev
+      run: sudo apt install -y cmake g++-mingw-w64-x86-64 make libgl1-mesa-dev libx11-dev libxext-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
 
     - name: Configure CMake
       shell: bash
