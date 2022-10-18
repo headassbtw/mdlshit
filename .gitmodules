@@ -7,7 +7,7 @@
 	url = https://github.com/glfw/glfw
 [submodule "external/glew"]
 	path = external/glew
-	url = https://github.com/nigels-com/glew
+	url = https://github.com/Perlmint/glew-cmake
 [submodule "external/glm"]
 	path = external/glm
 	url = https://github.com/g-truc/glm
