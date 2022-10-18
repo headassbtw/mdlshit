@@ -10,8 +10,7 @@ on:
       - reopened
   push: 
     branches: 
-      - master
-      - Testing
+      - CI
 
 env:
   BUILD_TYPE: Release

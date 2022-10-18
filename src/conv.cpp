@@ -838,9 +838,9 @@ int Conversion::ReadHeader(FileInfo info) {
   for (int i = 0; i < Initial_Header->numlocalanim; i++) 
   {
       if (info.disable_animations) {
-          char ßtruct[100];
-          Stream.Stream.read(ßtruct, 100);
-          OutStream.Stream.write(ßtruct, 100);
+          char sstruct[100];
+          Stream.Stream.read(sstruct, 100);
+          OutStream.Stream.write(sstruct, 100);
       }
       else {
           bool isDelta = false;
@@ -866,9 +866,9 @@ int Conversion::ReadHeader(FileInfo info) {
   Logger::Info("Finished animations\n");
   
   if (info.disable_animations) {
-      char ßtruct[100];
-      Stream.Stream.read(ßtruct, 100);
-      OutStream.Stream.write(ßtruct, 100);
+      char sstruct[100];
+      Stream.Stream.read(sstruct, 100);
+      OutStream.Stream.write(sstruct, 100);
   }
   else
   { 
@@ -1304,9 +1304,9 @@ int Conversion::ReadHeader(FileInfo info) {
       for (int i = 0; i < Initial_Header->numbodyparts; i++) {
           //16 bytes
           if (info.disable_bodyparts) {
-              char ßtruct[16];
-              Stream.Stream.read(ßtruct, 16);
-              OutStream.Stream.write(ßtruct, 16);
+              char sstruct[16];
+              Stream.Stream.read(sstruct, 16);
+              OutStream.Stream.write(sstruct, 16);
           }
           else {
               int stairs = bytesAddedToTextures + bytesAddedToIkChains + textureFiller + strFiller + bytesAddedToRuiMesh;
@@ -1416,9 +1416,9 @@ int Conversion::ReadHeader(FileInfo info) {
   for (int i = 0; i < Initial_Header->numincludemodels; i++) {
       //8 bytes
       if (info.disable_includemodels) {
-          char ßtruct[8];
-          Stream.Stream.read(ßtruct, 8);
-          OutStream.Stream.write(ßtruct, 8);
+          char sstruct[8];
+          Stream.Stream.read(sstruct, 8);
+          OutStream.Stream.write(sstruct, 8);
       }
       else {
           CopyAddInt32(&Stream, &OutStream, 0, 1);  //material
@@ -1525,9 +1525,9 @@ if (info.aabb.has_value()) {
   UI::Progress.SubTask.Begin("Converting Textures");
   for (int i = 0; i < Initial_Header->numtextures; i++) {
       if (info.disable_textures) {
-          char ßtruct[64];
-          Stream.Stream.read(ßtruct, 64);
-          OutStream.Stream.write(ßtruct, 64);
+          char sstruct[64];
+          Stream.Stream.read(sstruct, 64);
+          OutStream.Stream.write(sstruct, 64);
       }
       else {
           CopyAddInt32(&Stream, &OutStream, -((20) * (Initial_Header->numtextures - i)) + strFiller, 1);
@@ -1546,9 +1546,9 @@ if (info.aabb.has_value()) {
   filler(&Stream, &OutStream, cdt_filler_dest);
   for (int i = 0; i < Initial_Header->numcdtextures; i++) {
       if (info.disable_textures) {
-          char ßtruct[4];
-          Stream.Stream.read(ßtruct, 4);
-          OutStream.Stream.write(ßtruct, 4);
+          char sstruct[4];
+          Stream.Stream.read(sstruct, 4);
+          OutStream.Stream.write(sstruct, 4);
       }
       else 
       {
