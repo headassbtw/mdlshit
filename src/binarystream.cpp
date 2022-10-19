@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include <logger.hpp>
 #include <half.hpp>
+//#include "MLUtility.hpp";
 using namespace std;
 
 BinaryReader::BinaryReader(const char* filename){
@@ -551,7 +552,7 @@ void BinaryReader::Read(mstudioanim_t_v49* data) {
     data->strPos = Position();
     Stream.read((char*)&data->bone, sizeof(std::byte));
     Stream.read((char*)&data->flags, sizeof(std::byte));
-    Stream.read((char*)&data->nextoffset, sizeof(uint16_t));
+    Stream.read((char*)&data->nextoffset, sizeof(short));
     if((int)data->flags & STUDIO_ANIM_ANIMROT) Stream.read((char*)&data->animrot, sizeof(Vector3Short));
 
     if((int)data->flags & STUDIO_ANIM_ANIMPOS) Stream.read((char*)&data->animpos, sizeof(Vector3Short));
@@ -707,21 +708,19 @@ void BinaryReader::Read(mstudioseqdescv49_t* data) {
 
 void BinaryReader::Read(blendgroup_t_v49* data, int groupSize)
 {
-    for (int i = 0; i < groupSize; i++)
+    if (groupSize > 1)
     {
-        short blend = 0;
-        Stream.read((char*)&blend, sizeof(short));
-        data->blends.push_back(blend);
+        Stream.read((char*)&data->blends, sizeof(short) * groupSize);
+    }
+    else
+    {
+        Stream.read((char*)&data->blends, sizeof(short) * 2);
     }
 }
 
-void BinaryReader::Read(posekey_t_v49* data, int groupSize) {
-    for (int i = 0; i < groupSize; i++)
-    {
-        float unk = 0;
-        Stream.read((char*)&unk, sizeof(float));
-        data->unk.push_back(unk);
-    }
+void BinaryReader::Read(posekey_t_v49* data, int groupSize) 
+{
+    Stream.read((char*)&data->unk, sizeof(float) * groupSize);
 }
 
 void BinaryReader::Read(mstudioevent_t_v49* data) {
@@ -873,16 +872,16 @@ void BinaryReader::Read(mstudiotexture_t_v49* data) {
 
 void BinaryReader::Read(mstudioskingroup_t_v49* data, int groupSize) 
 {
-    for (int i = 0; i < groupSize; i++)
-    {
-        short textId = 0;
-        Stream.read((char*)&textId, sizeof(short));
-        data->textureId.push_back(textId);
-    }
+    Stream.read((char*)&data->textureId, sizeof(short) * groupSize);
 }
 
-void BinaryReader::Read(mstudionodedata_v49* data) {
-    Stream.read((char*)&data->unk, sizeof(short));
+void BinaryReader::Read(mstudionodedata_v49* data, int groupSize) {
+    for (int i = 0; i < groupSize; i++)
+    {
+        char value = 0;
+        Stream.read((char*)&value, 1);
+        data->unk.push_back(value);
+    }
 }
 
 void BinaryReader::Read(mstudionodename_t_v49* data) {
@@ -916,13 +915,21 @@ void BinaryReader::Read(mstudiocompressedikerror_t_v52* data) {
 }
 
 void BinaryReader::Read(studiohdr_t_v53* data) {
-    //Logger::Info("Pos Read: %d\n", Position());
+
+    char name[64];
+
     Stream.read((char*)&data->id, sizeof(int));                         // Model format ID, such as 
     Stream.read((char*)&data->version, sizeof(int));                    // Format version numbe
     Stream.read((char*)&data->checksum, sizeof(int));                   // This has to be the 
-    Stream.read((char*)&data->sznameindex, sizeof(int));                   // This has to be the 
-    Stream.read((char*)&data->name, 64);                                // The internal name 
-    //Logger::Info("Pos Read: %d\n", Position());
+    Stream.read((char*)&data->sznameindex, sizeof(int));                // This has to be the 
+    Stream.read((char*)&name, 64);                                      // The internal name 
+    std::vector<char> _vec;
+    for (int i = 0; i < 64; i++)
+    {
+        _vec.push_back(name[i]);
+    }
+    data->name = _vec;
+
     Stream.read((char*)&data->length, sizeof(int));                     // Data size of MDL file
 
     Stream.read((char*)&data->eyeposition, sizeof(Vector3));	        // ideal eye
@@ -954,10 +961,10 @@ void BinaryReader::Read(studiohdr_t_v53* data) {
 
     Stream.read((char*)&data->activitylistversion, sizeof(int));
     Stream.read((char*)&data->eventsindexed, sizeof(int));
-    //Logger::Info("Pos Read: %d\n", Position());
+
     Stream.read((char*)&data->numtextures, sizeof(int));
     Stream.read((char*)&data->textureindex, sizeof(int));
-    //Logger::Info("Pos Read: %d\n", data->textureindex);
+
     Stream.read((char*)&data->numcdtextures, sizeof(int));
     Stream.read((char*)&data->cdtextureindex, sizeof(int));
 
@@ -2064,10 +2071,12 @@ void BinaryWriter::Write(mstudioseqdescv49_t data) {
 
 void BinaryWriter::Write(blendgroup_t_v49 data)
 {
-    Stream.write((char*)&data.blends, sizeof(short) * data.blends.size() );
+    //Stream.write((char*)&data.blends, sizeof(short) * data.blends.size() );
+    Stream.write((char*)&data.blends, sizeof(short) * sizeof(data.blends));
 }
 
-void BinaryWriter::Write(posekey_t_v49 data, int groupSize) {
+void BinaryWriter::Write(posekey_t_v49 data, int groupSize) 
+{
     Stream.write((char*)&data.unk, sizeof(float) * groupSize);
 }
 
@@ -2098,7 +2107,12 @@ void BinaryWriter::Write(mstudioactivitymodifier_t_v49 data) {
 }
 
 void BinaryWriter::Write(seqweightlist_t_v49 data) {
-    Stream.write((char*)&data.boneweight, sizeof(float) * data.boneweight.size());
+    //Stream.write((char*)&data.boneweight, sizeof(float) * data.boneweight.size());
+
+    for (int i = 0; i < data.boneweight.size(); i++)
+    {
+        Stream.write((char*)&data.boneweight[i], sizeof(float));
+    }
 }
 
 void BinaryWriter::Write(mstudiomodelgroup_t_v49 data) {
@@ -2212,12 +2226,16 @@ void BinaryWriter::Write(mstudiotexture_t_v49 data) {
 
 }
 
-void BinaryWriter::Write(mstudioskingroup_t_v49 data, int groupSize) {
+void BinaryWriter::Write(mstudioskingroup_t_v49 data, int groupSize) 
+{
     Stream.write((char*)&data.textureId, sizeof(short) * groupSize);
 }
 
 void BinaryWriter::Write(mstudionodedata_v49 data) {
-    Stream.write((char*)&data.unk, sizeof(short));
+    for (int i = 0; i < data.unk.size(); i++)
+    {
+        Stream.write((char*)&data.unk[i], 1);
+    }
 }
 
 void BinaryWriter::Write(mstudionodename_t_v49 data) {
@@ -2236,8 +2254,12 @@ void BinaryWriter::Write(pertriheader_t_v49 data) {
 
 }
 
-void BinaryWriter::Write(mstudiokeyvalues_t_v49 data, int groupSize) {
-    Stream.write((char*)&data.value, sizeof(char) * groupSize);
+void BinaryWriter::Write(mstudiokeyvalues_t_v49 data)
+{
+    for (int i = 0; i < data.value.size(); i++)
+    {
+        Stream.write((char*)&data.value[i], sizeof(byte));
+    }
 }
 
 void BinaryWriter::Write(mstudiocompressedikerror_t_v52 data) {
@@ -2251,7 +2273,7 @@ void BinaryWriter::Write(studiohdr_t_v53 data) {
     Stream.write((char*)&data.version, sizeof(int));                    // Format version numbe
     Stream.write((char*)&data.checksum, sizeof(int));                   // This has to be the 
     Stream.write((char*)&data.sznameindex, sizeof(int));                   // This has to be the 
-    Stream.write((char*)&data.name, 64);                                // The internal name 
+    for (int i = 0; i < data.name.size(); i++) Stream.write((char*)&data.name[i], sizeof(byte));                                // The internal name 
 
     Stream.write((char*)&data.length, sizeof(int));                     // Data size of MDL file
 

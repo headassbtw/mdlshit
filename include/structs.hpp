@@ -363,7 +363,7 @@ struct studiohdr_t_v49
 	Vector3 view_bbmin;		// clipping bounding box
 	Vector3 view_bbmax;
 
-	mdlflags_t flags;
+	int flags;
 
 	int numbones; // bones
 	int boneindex;
@@ -911,6 +911,7 @@ struct mstudiocompressedikerror_t_v49
 {
 	float scale[6];
 	int16_t index[6]; //offset
+	mstudioanimdata_t_v49 animdata;
 };
 
 struct mstudioikerror_t_v49
@@ -1001,7 +1002,7 @@ struct mstudioseqdescv49_t
 
 struct posekey_t_v49
 {
-	std::vector<float> unk;
+	float unk[4];
 };
 
 struct mstudioevent_t_v49
@@ -1028,7 +1029,7 @@ struct mstudioautolayer_t_v49
 
 struct blendgroup_t_v49
 {
-	std::vector<int16_t> blends;
+	int16_t blends[8];
 };
 
 struct mstudioactivitymodifier_t_v49
@@ -1154,12 +1155,12 @@ struct mstudiotexture_t_v49
 
 struct mstudioskingroup_t_v49
 {
-	std::vector<int16_t> textureId;
+	int16_t textureId[64];
 };
 
 struct mstudionodedata_v49
 {
-	int16_t unk[2];
+	std::vector<int16_t> unk;
 };
 
 struct mstudionodename_t_v49
@@ -1184,39 +1185,39 @@ struct mstudiokeyvalues_t_v49
 	std::vector<char> value;
 };
 
-struct v49Mdl
-{
-	studiohdr_t_v49										mdlhdr;
-	studiohdr2_t_v49									mdlsubhdr;
-	std::vector<mstudiobone_t_v49>						bones;
-	std::vector<mstudiojigglebone_t_v49>				jigglebones;
-	std::vector<mstudioboneflexdriver_t_v49>			boneflexdrivers;
-	std::vector<mstudioattachment_t_v49>				attachments;
-	std::vector<mstudiohitboxset_t_v49>					hitboxsets;
-	std::vector<mstudiobbox_t_v49>						hitboxes;
-	mstudiobonenametable_t_v49							bonenametable;
-	std::vector<mstudioanimdesc_t_v49>					animdescs;
-	std::vector<mstudioikrule_t_v49>					ikrules;
-	std::vector<mstudiocompressedikerror_t_v49>			compressedikerrors;
-	std::vector<mstudioikerror_t_v49>					ikerrors;
-	std::vector<mstudioikrulezeroframe_t_v49>			ikrulezeroframe;
-	std::vector<mstudioseqdescv49_t>					seqdescs;
-	std::vector<posekey_t_v49>							posekeys;
-	std::vector<mstudioevent_t_v49>						events;
-	std::vector<mstudioautolayer_t_v49>					autolayers;
-	std::vector<mstudioactivitymodifier_t_v49>			activitymodifiers;
-	std::vector<seqweightlist_t_v49>					seqweightlist;
-	std::vector<mstudionodename_t_v49>					nodenames;
-	std::vector<mstudionodedata_v49>					nodes;
-	std::vector<mstudiobodyparts_t_v49>					bodyparts;
-	std::vector<mstudiomodel_t_v49>						models;
-	std::vector<mstudiomesh_t_v49>						meshes;
-	std::vector<mstudiovertex_t_v49>					vertexes;
-	std::vector<mstudiomodelgroup_t_v49>				includedmodels;
-	std::vector<mstudiotexturedir_t_v49>				cdtextures;
-	std::vector<mstudiotexture_t_v49>					textures;
-	std::vector<mstudioskingroup_t_v49>					skingroups;
-};
+//struct v49Mdl
+//{
+//	studiohdr_t_v49										mdlhdr;
+//	studiohdr2_t_v49									mdlsubhdr;
+//	std::vector<mstudiobone_t_v49>						bones;
+//	std::vector<mstudiojigglebone_t_v49>				jigglebones;
+//	std::vector<mstudioboneflexdriver_t_v49>			boneflexdrivers;
+//	std::vector<mstudioattachment_t_v49>				attachments;
+//	std::vector<mstudiohitboxset_t_v49>					hitboxsets;
+//	std::vector<mstudiobbox_t_v49>						hitboxes;
+//	mstudiobonenametable_t_v49							bonenametable;
+//	std::vector<mstudioanimdesc_t_v49>					animdescs;
+//	std::vector<mstudioikrule_t_v49>					ikrules;
+//	std::vector<mstudiocompressedikerror_t_v49>			compressedikerrors;
+//	std::vector<mstudioikerror_t_v49>					ikerrors;
+//	std::vector<mstudioikrulezeroframe_t_v49>			ikrulezeroframe;
+//	std::vector<mstudioseqdescv49_t>					seqdescs;
+//	std::vector<posekey_t_v49>							posekeys;
+//	std::vector<mstudioevent_t_v49>						events;
+//	std::vector<mstudioautolayer_t_v49>					autolayers;
+//	std::vector<mstudioactivitymodifier_t_v49>			activitymodifiers;
+//	std::vector<seqweightlist_t_v49>					seqweightlist;
+//	std::vector<mstudionodename_t_v49>					nodenames;
+//	std::vector<mstudionodedata_v49>					nodes;
+//	std::vector<mstudiobodyparts_t_v49>					bodyparts;
+//	std::vector<mstudiomodel_t_v49>						models;
+//	std::vector<mstudiomesh_t_v49>						meshes;
+//	std::vector<mstudiovertex_t_v49>					vertexes;
+//	std::vector<mstudiomodelgroup_t_v49>				includedmodels;
+//	std::vector<mstudiotexturedir_t_v49>				cdtextures;
+//	std::vector<mstudiotexture_t_v49>					textures;
+//	std::vector<mstudioskingroup_t_v49>					skingroups;
+//};
 
 struct mstudiocompressedikerror_t_v52
 {
@@ -1230,7 +1231,7 @@ struct studiohdr_t_v53
 	int version; // Format version number, such as 48 (0x30,0x00,0x00,0x00)
 	int checksum; // This has to be the same in the phy and vtx files to load!
 	int sznameindex;// ;// + this - 12)>; // This has been moved from studiohdr2 to the front of the main header.
-	char name[64]; // The internal name of the model, padding with null bytes.
+	std::vector<char> name; // The internal name of the model, padding with null bytes.
 					// Typically "my_model.mdl" will have an internal name of "my_model"
 	int length; // Data size of MDL file in bytes.
 
@@ -1244,7 +1245,7 @@ struct studiohdr_t_v53
 	Vector3 view_bbmin;		// clipping bounding box
 	Vector3 view_bbmax;
 
-	rmdlflags_t flags;
+	int flags;
 
 	// highest observed: 250
 	// max is definitely 256 because 8bit uint limit
@@ -1408,7 +1409,7 @@ struct studiohdr_t_v53
 
 	int unkindex3; // goes to the same spot as vtx normally.
 
-	int unused1[60]; // god I hope
+	int* unused1 = new int[60]; // god I hope
 
 };
 

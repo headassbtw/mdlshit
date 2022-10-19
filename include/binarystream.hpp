@@ -86,7 +86,7 @@ class BinaryReader{
     void Read(mstudiotexturedir_t_v49* data);
     void Read(mstudiotexture_t_v49* data);
     void Read(mstudioskingroup_t_v49* data, int groupSize);
-    void Read(mstudionodedata_v49* data);
+    void Read(mstudionodedata_v49* data, int groupSize);
     void Read(mstudionodename_t_v49* data);
     void Read(pertriheader_t_v49* data);
     void Read(mstudiokeyvalues_t_v49* data, int groupSize);
@@ -188,7 +188,7 @@ class BinaryWriter{
     void Write(mstudionodedata_v49 data);
     void Write(mstudionodename_t_v49 data);
     void Write(pertriheader_t_v49 data);
-    void Write(mstudiokeyvalues_t_v49 data, int groupSize);
+    void Write(mstudiokeyvalues_t_v49 data);
     template <typename T> void Write(std::vector<T> data);
 
     void Write(mstudiocompressedikerror_t_v52 data);
