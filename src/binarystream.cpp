@@ -5,7 +5,6 @@
 #include <sys/stat.h>
 #include <logger.hpp>
 #include <half.hpp>
-//#include "MLUtility.hpp";
 using namespace std;
 
 BinaryReader::BinaryReader(const char* filename){
@@ -149,38 +148,38 @@ template <typename T> void BinaryReader::Read(std::vector<T>* data, int groupSiz
 
 void BinaryReader::Read(studiohdr_t_v49* data) {
 
-    Stream.read((char*)&data->id, sizeof(int));                         // Model format ID, such as 
-    Stream.read((char*)&data->version, sizeof(int));                    // Format version numbe
-    Stream.read((char*)&data->checksum, sizeof(int));                   // This has to be the 
-    Stream.read((char*)&data->name, 64);                                // The internal name 
+    Stream.read((char*)&data->id, sizeof(int));                         
+    Stream.read((char*)&data->version, sizeof(int));                    
+    Stream.read((char*)&data->checksum, sizeof(int));                   
+    Stream.read((char*)&data->name, 64);                                
 
-    Stream.read((char*)&data->length, sizeof(int));                     // Data size of MDL file
+    Stream.read((char*)&data->length, sizeof(int));                     
 
-    Stream.read((char*)&data->eyeposition, sizeof(Vector3));	        // ideal eye
+    Stream.read((char*)&data->eyeposition, sizeof(Vector3));	        
 
-    Stream.read((char*)&data->illumposition, sizeof(Vector3));	        // illuminat
+    Stream.read((char*)&data->illumposition, sizeof(Vector3));	        
 
-    Stream.read((char*)&data->hull_min, sizeof(Vector3));		        // ideal mov
+    Stream.read((char*)&data->hull_min, sizeof(Vector3));		        
     Stream.read((char*)&data->hull_max, sizeof(Vector3));
 
-    Stream.read((char*)&data->view_bbmin, sizeof(Vector3));		        // clipping 
+    Stream.read((char*)&data->view_bbmin, sizeof(Vector3));		        
     Stream.read((char*)&data->view_bbmax, sizeof(Vector3));
 
     Stream.read((char*)&data->flags, sizeof(int));
 
-    Stream.read((char*)&data->numbones, sizeof(int));                   // bones
+    Stream.read((char*)&data->numbones, sizeof(int));                   
     Stream.read((char*)&data->boneindex, sizeof(int));
 
-    Stream.read((char*)&data->numbonecontrollers, sizeof(int));         // bone cont
+    Stream.read((char*)&data->numbonecontrollers, sizeof(int));         
     Stream.read((char*)&data->bonecontrollerindex, sizeof(int));
 
     Stream.read((char*)&data->numhitboxsets, sizeof(int));
     Stream.read((char*)&data->hitboxsetindex, sizeof(int));
 
-    Stream.read((char*)&data->numlocalanim, sizeof(int));               // animations/pose
-    Stream.read((char*)&data->localanimindex, sizeof(int));             // animation des
+    Stream.read((char*)&data->numlocalanim, sizeof(int));               
+    Stream.read((char*)&data->localanimindex, sizeof(int));             
 
-    Stream.read((char*)&data->numlocalseq, sizeof(int));                // sequences
+    Stream.read((char*)&data->numlocalseq, sizeof(int));                
     Stream.read((char*)&data->localseqindex, sizeof(int));
 
     Stream.read((char*)&data->activitylistversion, sizeof(int));
@@ -263,13 +262,13 @@ void BinaryReader::Read(studiohdr_t_v49* data) {
 
     Stream.read((char*)&data->unused, sizeof(std::byte));
 
-    Stream.read((char*)&data->unused4, sizeof(int));                            // zero out if version 
+    Stream.read((char*)&data->unused4, sizeof(int));         
 
     Stream.read((char*)&data->numflexcontrollerui, sizeof(int));
     Stream.read((char*)&data->flexcontrolleruiindex, sizeof(int));
 
     Stream.read((char*)&data->flVertAnimFixedPointScale, sizeof(float));
-    Stream.read((char*)&data->surfacepropLookup, sizeof(int));                  // this index
+    Stream.read((char*)&data->surfacepropLookup, sizeof(int)); 
 
     Stream.read((char*)&data->studiohdr2index, sizeof(int));
 
@@ -330,17 +329,17 @@ void BinaryReader::Read(mstudiojigglebone_t_v49* data) {
         Stream.read((char*)&data->alongDamping, sizeof(float));
         
 
-        Stream.read((char*)&data->angleLimit, sizeof(float)); // maxim
+        Stream.read((char*)&data->angleLimit, sizeof(float));
         
 
-        Stream.read((char*)&data->minYaw, sizeof(float)); // in radian
-        Stream.read((char*)&data->maxYaw, sizeof(float)); // in radian
+        Stream.read((char*)&data->minYaw, sizeof(float));
+        Stream.read((char*)&data->maxYaw, sizeof(float));
         Stream.read((char*)&data->yawFriction, sizeof(float));
         Stream.read((char*)&data->yawBounce, sizeof(float));
         
 
-        Stream.read((char*)&data->minPitch, sizeof(float)); // in radi
-        Stream.read((char*)&data->maxPitch, sizeof(float)); // in radi
+        Stream.read((char*)&data->minPitch, sizeof(float));
+        Stream.read((char*)&data->maxPitch, sizeof(float));
         Stream.read((char*)&data->pitchFriction, sizeof(float));
         Stream.read((char*)&data->pitchBounce, sizeof(float));
         
@@ -454,26 +453,6 @@ void BinaryReader::Read(mstudiolinearbonedata_t_v49* data, int numbones)
     Stream.read((char*)&data->rotScale, sizeof(Vector3) * numbones);
 
     Stream.read((char*)&data->boneAlignment, sizeof(Quaternion) * numbones);
-
-    //if (bone->flagsindex > 0)        Stream.read((char*)&data->flags, sizeof(uint32_t) * numbones);
-    //
-    //if (bone->parentindex > 0)       Stream.read((char*)&data->parents, sizeof(uint32_t) * numbones);
-    //
-    //if (bone->posindex > 0)          Stream.read((char*)&data->bonePos, sizeof(Vector3) * numbones);
-    //
-    //if (bone->quatindex > 0)         Stream.read((char*)&data->boneQuat, sizeof(Quaternion) * numbones);
-    //
-    //if (bone->rotindex > 0)          Stream.read((char*)&data->boneRot, sizeof(RadianEuler) * numbones);
-    //
-    //if (bone->posetoboneindex > 0)   Stream.read((char*)&data->poseToBone, sizeof(matrix3x4_t) * numbones);
-    //
-    //if (bone->posscaleindex > 0)     Stream.read((char*)&data->posScale, sizeof(Vector3) * numbones);
-    //
-    //if (bone->rotscaleindex > 0)     Stream.read((char*)&data->rotScale, sizeof(Vector3) * numbones);
-    //
-    //if (bone->qalignmentindex > 0)   Stream.read((char*)&data->boneAlignment, sizeof(Quaternion) * numbones);
-
-
 }
 
 void BinaryReader::Read(mstudiolinearbonedata_t_v53* data, int numbones)
@@ -581,7 +560,7 @@ void BinaryReader::Read(mstudioikrule_t_v49* data) {
 
     Stream.read((char*)&data->bone, sizeof(int));
 
-    Stream.read((char*)&data->slot, sizeof(int));	// iktarget slot.  Usually same as chain.
+    Stream.read((char*)&data->slot, sizeof(int));	
     Stream.read((char*)&data->height, sizeof(float));
     Stream.read((char*)&data->radius, sizeof(float));
     Stream.read((char*)&data->floor, sizeof(float));
@@ -595,21 +574,21 @@ void BinaryReader::Read(mstudioikrule_t_v49* data) {
     Stream.read((char*)&data->iStart, sizeof(int));
     Stream.read((char*)&data->ikerrorindex, sizeof(int));
 
-    Stream.read((char*)&data->start, sizeof(float));	// beginning of influence
-    Stream.read((char*)&data->peak, sizeof(float));	// start of full influence
-    Stream.read((char*)&data->tail, sizeof(float));	// end of full influence
-    Stream.read((char*)&data->end, sizeof(float));		// end of all influence
+    Stream.read((char*)&data->start, sizeof(float));	
+    Stream.read((char*)&data->peak, sizeof(float));	    
+    Stream.read((char*)&data->tail, sizeof(float));	    
+    Stream.read((char*)&data->end, sizeof(float));		
 
     Stream.read((char*)&data->unused3, sizeof(float));
-    Stream.read((char*)&data->contact, sizeof(float));	// frame footstep makes ground concact
-    Stream.read((char*)&data->drop, sizeof(float));	// how far down the foot should drop when reaching for IK
-    Stream.read((char*)&data->top, sizeof(float));	// top of the foot box
+    Stream.read((char*)&data->contact, sizeof(float));
+    Stream.read((char*)&data->drop, sizeof(float));	
+    Stream.read((char*)&data->top, sizeof(float));
 
     Stream.read((char*)&data->unused6, sizeof(int));
     Stream.read((char*)&data->unused7, sizeof(int));
     Stream.read((char*)&data->unused8, sizeof(int));
     
-    Stream.read((char*)&data->szattachmentindex, sizeof(int));		// name of world attachment
+    Stream.read((char*)&data->szattachmentindex, sizeof(int));		
     
     Stream.read((char*)&data->unused, sizeof(int) * 7);
 
@@ -659,27 +638,27 @@ void BinaryReader::Read(mstudioseqdescv49_t* data) {
 
     Stream.read((char*)&data->animindexindex, sizeof(int));
 
-    Stream.read((char*)&data->movementindex, sizeof(int));		//
+    Stream.read((char*)&data->movementindex, sizeof(int));		
     Stream.read((char*)&data->groupsize, sizeof(int) * 2);
-    Stream.read((char*)&data->paramindex, sizeof(int) * 2);	//
-    Stream.read((char*)&data->paramstart, sizeof(float) * 2);	//
-    Stream.read((char*)&data->paramend, sizeof(float) * 2);		//
+    Stream.read((char*)&data->paramindex, sizeof(int) * 2);	    
+    Stream.read((char*)&data->paramstart, sizeof(float) * 2);	
+    Stream.read((char*)&data->paramend, sizeof(float) * 2);		
     Stream.read((char*)&data->paramparent, sizeof(int));
 
-    Stream.read((char*)&data->fadeintime, sizeof(float));		//
-    Stream.read((char*)&data->fadeouttime, sizeof(float));		//
+    Stream.read((char*)&data->fadeintime, sizeof(float));		
+    Stream.read((char*)&data->fadeouttime, sizeof(float));		
 
-    Stream.read((char*)&data->localentrynode, sizeof(int));		//
-    Stream.read((char*)&data->localexitnode, sizeof(int));		//
-    Stream.read((char*)&data->nodeflags, sizeof(int));			//
+    Stream.read((char*)&data->localentrynode, sizeof(int));		
+    Stream.read((char*)&data->localexitnode, sizeof(int));		
+    Stream.read((char*)&data->nodeflags, sizeof(int));			
 
-    Stream.read((char*)&data->entryphase, sizeof(float));		//
-    Stream.read((char*)&data->exitphase, sizeof(float));		//
+    Stream.read((char*)&data->entryphase, sizeof(float));		
+    Stream.read((char*)&data->exitphase, sizeof(float));		
 
-    Stream.read((char*)&data->lastframe, sizeof(float));		//
+    Stream.read((char*)&data->lastframe, sizeof(float));		
 
-    Stream.read((char*)&data->nextseq, sizeof(int));			//
-    Stream.read((char*)&data->pose, sizeof(int));			//
+    Stream.read((char*)&data->nextseq, sizeof(int));			
+    Stream.read((char*)&data->pose, sizeof(int));			    
 
     Stream.read((char*)&data->numikrules, sizeof(int));
 
@@ -697,7 +676,7 @@ void BinaryReader::Read(mstudioseqdescv49_t* data) {
     Stream.read((char*)&data->keyvalueindex, sizeof(int));
     Stream.read((char*)&data->keyvaluesize, sizeof(int));
 
-    Stream.read((char*)&data->cycleposeindex, sizeof(int));		//
+    Stream.read((char*)&data->cycleposeindex, sizeof(int));		
 
     Stream.read((char*)&data->activitymodifierindex, sizeof(int));
     Stream.read((char*)&data->numactivitymodifiers, sizeof(int));
@@ -918,11 +897,11 @@ void BinaryReader::Read(studiohdr_t_v53* data) {
 
     char name[64];
 
-    Stream.read((char*)&data->id, sizeof(int));                         // Model format ID, such as 
-    Stream.read((char*)&data->version, sizeof(int));                    // Format version numbe
-    Stream.read((char*)&data->checksum, sizeof(int));                   // This has to be the 
-    Stream.read((char*)&data->sznameindex, sizeof(int));                // This has to be the 
-    Stream.read((char*)&name, 64);                                      // The internal name 
+    Stream.read((char*)&data->id, sizeof(int));                        
+    Stream.read((char*)&data->version, sizeof(int));                   
+    Stream.read((char*)&data->checksum, sizeof(int));                  
+    Stream.read((char*)&data->sznameindex, sizeof(int));               
+    Stream.read((char*)&name, 64);                                     
     std::vector<char> _vec;
     for (int i = 0; i < 64; i++)
     {
@@ -930,33 +909,33 @@ void BinaryReader::Read(studiohdr_t_v53* data) {
     }
     data->name = _vec;
 
-    Stream.read((char*)&data->length, sizeof(int));                     // Data size of MDL file
+    Stream.read((char*)&data->length, sizeof(int));                    
 
-    Stream.read((char*)&data->eyeposition, sizeof(Vector3));	        // ideal eye
+    Stream.read((char*)&data->eyeposition, sizeof(Vector3));	       
 
-    Stream.read((char*)&data->illumposition, sizeof(Vector3));	        // illuminat
+    Stream.read((char*)&data->illumposition, sizeof(Vector3));	       
 
-    Stream.read((char*)&data->hull_min, sizeof(Vector3));		        // ideal mov
+    Stream.read((char*)&data->hull_min, sizeof(Vector3));		       
     Stream.read((char*)&data->hull_max, sizeof(Vector3));
 
-    Stream.read((char*)&data->view_bbmin, sizeof(Vector3));		        // clipping 
+    Stream.read((char*)&data->view_bbmin, sizeof(Vector3));		       
     Stream.read((char*)&data->view_bbmax, sizeof(Vector3));
 
     Stream.read((char*)&data->flags, sizeof(int));
 
-    Stream.read((char*)&data->numbones, sizeof(int));                   // bones
+    Stream.read((char*)&data->numbones, sizeof(int));                  
     Stream.read((char*)&data->boneindex, sizeof(int));
 
-    Stream.read((char*)&data->numbonecontrollers, sizeof(int));         // bone cont
+    Stream.read((char*)&data->numbonecontrollers, sizeof(int));        
     Stream.read((char*)&data->bonecontrollerindex, sizeof(int));
 
     Stream.read((char*)&data->numhitboxsets, sizeof(int));
     Stream.read((char*)&data->hitboxsetindex, sizeof(int));
 
-    Stream.read((char*)&data->numlocalanim, sizeof(int));               // animations/pose
-    Stream.read((char*)&data->localanimindex, sizeof(int));             // animation des
+    Stream.read((char*)&data->numlocalanim, sizeof(int));               
+    Stream.read((char*)&data->localanimindex, sizeof(int));             
 
-    Stream.read((char*)&data->numlocalseq, sizeof(int));                // sequences
+    Stream.read((char*)&data->numlocalseq, sizeof(int));                
     Stream.read((char*)&data->localseqindex, sizeof(int));
 
     Stream.read((char*)&data->activitylistversion, sizeof(int));
@@ -1029,7 +1008,7 @@ void BinaryReader::Read(studiohdr_t_v53* data) {
 
     Stream.read((char*)&data->unused, sizeof(std::byte));
 
-    Stream.read((char*)&data->fadedistance, sizeof(float));                            // zero out if version 
+    Stream.read((char*)&data->fadedistance, sizeof(float));                       
 
     Stream.read((char*)&data->numflexcontrollerui, sizeof(int));
     Stream.read((char*)&data->flexcontrolleruiindex, sizeof(int));
@@ -1192,7 +1171,7 @@ void BinaryReader::Read(mstudioikrule_t_v53* data) {
 
     Stream.read((char*)&data->bone, sizeof(int));
 
-    Stream.read((char*)&data->slot, sizeof(int));	// iktarget slot.  Usually same as chain.
+    Stream.read((char*)&data->slot, sizeof(int));
     Stream.read((char*)&data->height, sizeof(float));
     Stream.read((char*)&data->radius, sizeof(float));
     Stream.read((char*)&data->floor, sizeof(float));
@@ -1204,16 +1183,16 @@ void BinaryReader::Read(mstudioikrule_t_v53* data) {
     Stream.read((char*)&data->iStart, sizeof(int));
     Stream.read((char*)&data->ikerrorindex, sizeof(int));
 
-    Stream.read((char*)&data->start, sizeof(float));	// beginning of influence
-    Stream.read((char*)&data->peak, sizeof(float));	// start of full influence
-    Stream.read((char*)&data->tail, sizeof(float));	// end of full influence
-    Stream.read((char*)&data->end, sizeof(float));		// end of all influence
+    Stream.read((char*)&data->start, sizeof(float));
+    Stream.read((char*)&data->peak, sizeof(float));	
+    Stream.read((char*)&data->tail, sizeof(float));
+    Stream.read((char*)&data->end, sizeof(float));
 
-    Stream.read((char*)&data->contact, sizeof(float));	// frame footstep makes ground concact
-    Stream.read((char*)&data->drop, sizeof(float));	// how far down the foot should drop when reaching for IK
-    Stream.read((char*)&data->top, sizeof(float));	// top of the foot box
+    Stream.read((char*)&data->contact, sizeof(float));
+    Stream.read((char*)&data->drop, sizeof(float));
+    Stream.read((char*)&data->top, sizeof(float));	
 
-    Stream.read((char*)&data->szattachmentindex, sizeof(int));		// name of world attachment
+    Stream.read((char*)&data->szattachmentindex, sizeof(int));	
 
     Stream.read((char*)&data->unused, sizeof(int) * 9);
 }
@@ -1242,27 +1221,27 @@ void BinaryReader::Read(mstudioseqdesc_t_v53* data) {
 
     Stream.read((char*)&data->animindexindex, sizeof(int));
 
-    Stream.read((char*)&data->movementindex, sizeof(int));		//
+    Stream.read((char*)&data->movementindex, sizeof(int));		
     Stream.read((char*)&data->groupsize, sizeof(int) * 2);
-    Stream.read((char*)&data->paramindex, sizeof(int) * 2);	//
-    Stream.read((char*)&data->paramstart, sizeof(float) * 2);	//
-    Stream.read((char*)&data->paramend, sizeof(float) * 2);		//
+    Stream.read((char*)&data->paramindex, sizeof(int) * 2);	    
+    Stream.read((char*)&data->paramstart, sizeof(float) * 2);	
+    Stream.read((char*)&data->paramend, sizeof(float) * 2);		
     Stream.read((char*)&data->paramparent, sizeof(int));
 
-    Stream.read((char*)&data->fadeintime, sizeof(float));		//
-    Stream.read((char*)&data->fadeouttime, sizeof(float));		//
+    Stream.read((char*)&data->fadeintime, sizeof(float));		
+    Stream.read((char*)&data->fadeouttime, sizeof(float));		
 
-    Stream.read((char*)&data->localentrynode, sizeof(int));		//
-    Stream.read((char*)&data->localexitnode, sizeof(int));		//
-    Stream.read((char*)&data->nodeflags, sizeof(int));			//
+    Stream.read((char*)&data->localentrynode, sizeof(int));		
+    Stream.read((char*)&data->localexitnode, sizeof(int));		
+    Stream.read((char*)&data->nodeflags, sizeof(int));			
 
-    Stream.read((char*)&data->entryphase, sizeof(float));		//
-    Stream.read((char*)&data->exitphase, sizeof(float));		//
+    Stream.read((char*)&data->entryphase, sizeof(float));		
+    Stream.read((char*)&data->exitphase, sizeof(float));		
 
-    Stream.read((char*)&data->lastframe, sizeof(float));		//
+    Stream.read((char*)&data->lastframe, sizeof(float));		
 
-    Stream.read((char*)&data->nextseq, sizeof(int));			//
-    Stream.read((char*)&data->pose, sizeof(int));			//
+    Stream.read((char*)&data->nextseq, sizeof(int));			
+    Stream.read((char*)&data->pose, sizeof(int));			    
 
     Stream.read((char*)&data->numikrules, sizeof(int));
 
@@ -1280,7 +1259,7 @@ void BinaryReader::Read(mstudioseqdesc_t_v53* data) {
     Stream.read((char*)&data->keyvalueindex, sizeof(int));
     Stream.read((char*)&data->keyvaluesize, sizeof(int));
 
-    Stream.read((char*)&data->cycleposeindex, sizeof(int));		//
+    Stream.read((char*)&data->cycleposeindex, sizeof(int));
 
     Stream.read((char*)&data->activitymodifierindex, sizeof(int));
     Stream.read((char*)&data->numactivitymodifiers, sizeof(int));
@@ -1354,7 +1333,7 @@ template <typename T> void BinaryReader::Read(std::vector<T>* data, int groupSiz
 {
     for (int i = 0; i < groupSize; i++)
     {
-        Logger::Info("Test Read: %d\n", i);
+        //Logger::Info("Test Read: %d\n", i);
         T value; BinaryReader::Read(&value);
         data->push_back(value);
     }
@@ -1362,7 +1341,6 @@ template <typename T> void BinaryReader::Read(std::vector<T>* data, int groupSiz
 
 void BinaryReader::Read(mstudioruimesh_t* data)
 {
-    //Logger::Info("Pos Read: %d\n", Position());
     Stream.read((char*)&data->numparents, sizeof(int));
     Stream.read((char*)&data->numvertices, sizeof(int));
     Stream.read((char*)&data->numfaces, sizeof(int));
@@ -1386,16 +1364,10 @@ void BinaryReader::Read(mstudioruimesh_t* data)
     //Logger::Info("Faces Read: %d\n", 6 * data->numfaces);
     //Logger::Info("Verts Read: %d\n", 16 * data->numvertices);
     Stream.read((char*)&data->parent, sizeof(short) * data->numparents);
-    //Logger::Info("Parent Read: %d\n", Position());
     Stream.read((char*)&data->vertexmap, sizeof(mstudioruivertmap_t) * data->numfaces);
     Stream.read((char*)&data->vertex, sizeof(mstudioruivert_t) * data->numvertices);
     Stream.read((char*)&data->facedata, sizeof(mstudioruimesface_t) * data->numfaces);
 }
-
-
-//void BinaryReader::Read(mstudiocompressedikerror_t_v49* data) {
-//
-//}
 
 void BinaryReader::seek(int pos){
   Stream.seekg(pos);
@@ -1533,38 +1505,38 @@ template <typename T> void BinaryWriter::Write(std::vector<T> data)
 
 void BinaryWriter::Write(studiohdr_t_v49 data) {
 
-    Stream.write((char*)&data.id, sizeof(int));                         // Model format ID, such as 
-    Stream.write((char*)&data.version, sizeof(int));                    // Format version numbe
-    Stream.write((char*)&data.checksum, sizeof(int));                   // This has to be the 
-    Stream.write((char*)&data.name, 64);                                // The internal name 
+    Stream.write((char*)&data.id, sizeof(int));                        
+    Stream.write((char*)&data.version, sizeof(int));                   
+    Stream.write((char*)&data.checksum, sizeof(int));                  
+    Stream.write((char*)&data.name, 64);                               
 
-    Stream.write((char*)&data.length, sizeof(int));                     // Data size of MDL file
+    Stream.write((char*)&data.length, sizeof(int));                    
 
-    Stream.write((char*)&data.eyeposition, sizeof(Vector3));	        // ideal eye
+    Stream.write((char*)&data.eyeposition, sizeof(Vector3));	       
 
-    Stream.write((char*)&data.illumposition, sizeof(Vector3));	        // illuminat
+    Stream.write((char*)&data.illumposition, sizeof(Vector3));	       
 
-    Stream.write((char*)&data.hull_min, sizeof(Vector3));		        // ideal mov
+    Stream.write((char*)&data.hull_min, sizeof(Vector3));		       
     Stream.write((char*)&data.hull_max, sizeof(Vector3));
 
-    Stream.write((char*)&data.view_bbmin, sizeof(Vector3));		        // clipping 
+    Stream.write((char*)&data.view_bbmin, sizeof(Vector3));		   
     Stream.write((char*)&data.view_bbmax, sizeof(Vector3));
 
     Stream.write((char*)&data.flags, sizeof(int));
 
-    Stream.write((char*)&data.numbones, sizeof(int));                   // bones
+    Stream.write((char*)&data.numbones, sizeof(int)); 
     Stream.write((char*)&data.boneindex, sizeof(int));
 
-    Stream.write((char*)&data.numbonecontrollers, sizeof(int));         // bone cont
+    Stream.write((char*)&data.numbonecontrollers, sizeof(int)); 
     Stream.write((char*)&data.bonecontrollerindex, sizeof(int));
 
     Stream.write((char*)&data.numhitboxsets, sizeof(int));
     Stream.write((char*)&data.hitboxsetindex, sizeof(int));
 
-    Stream.write((char*)&data.numlocalanim, sizeof(int));               // animations/pose
-    Stream.write((char*)&data.localanimindex, sizeof(int));             // animation des
+    Stream.write((char*)&data.numlocalanim, sizeof(int)); 
+    Stream.write((char*)&data.localanimindex, sizeof(int));  
 
-    Stream.write((char*)&data.numlocalseq, sizeof(int));                // sequences
+    Stream.write((char*)&data.numlocalseq, sizeof(int));   
     Stream.write((char*)&data.localseqindex, sizeof(int));
 
     Stream.write((char*)&data.activitylistversion, sizeof(int));
@@ -1647,13 +1619,13 @@ void BinaryWriter::Write(studiohdr_t_v49 data) {
 
     Stream.write((char*)&data.unused, sizeof(std::byte));
 
-    Stream.write((char*)&data.unused4, sizeof(int));                            // zero out if version 
+    Stream.write((char*)&data.unused4, sizeof(int));     
 
     Stream.write((char*)&data.numflexcontrollerui, sizeof(int));
     Stream.write((char*)&data.flexcontrolleruiindex, sizeof(int));
 
     Stream.write((char*)&data.flVertAnimFixedPointScale, sizeof(float));
-    Stream.write((char*)&data.surfacepropLookup, sizeof(int));                  // this index
+    Stream.write((char*)&data.surfacepropLookup, sizeof(int));
 
     Stream.write((char*)&data.studiohdr2index, sizeof(int));
 
@@ -1714,17 +1686,17 @@ void BinaryWriter::Write(mstudiojigglebone_t_v49 data) {
     Stream.write((char*)&data.alongDamping, sizeof(float));
 
 
-    Stream.write((char*)&data.angleLimit, sizeof(float)); // maxim
+    Stream.write((char*)&data.angleLimit, sizeof(float));
 
 
-    Stream.write((char*)&data.minYaw, sizeof(float)); // in radian
-    Stream.write((char*)&data.maxYaw, sizeof(float)); // in radian
+    Stream.write((char*)&data.minYaw, sizeof(float));
+    Stream.write((char*)&data.maxYaw, sizeof(float));
     Stream.write((char*)&data.yawFriction, sizeof(float));
     Stream.write((char*)&data.yawBounce, sizeof(float));
 
 
-    Stream.write((char*)&data.minPitch, sizeof(float)); // in radi
-    Stream.write((char*)&data.maxPitch, sizeof(float)); // in radi
+    Stream.write((char*)&data.minPitch, sizeof(float));
+    Stream.write((char*)&data.maxPitch, sizeof(float));
     Stream.write((char*)&data.pitchFriction, sizeof(float));
     Stream.write((char*)&data.pitchBounce, sizeof(float));
 
@@ -1819,16 +1791,6 @@ void BinaryWriter::Write(mstudiolinearbonedata_t_v49 data, int numbones)
     Stream.write((char*)&data.posScale, sizeof(Vector3) * numbones);
     Stream.write((char*)&data.rotScale, sizeof(Vector3) * numbones);
     Stream.write((char*)&data.boneAlignment, sizeof(Quaternion) * numbones);
-
-    //if(bone.flagsindex > 0)         Stream.write((char*)&data.flags, sizeof(uint32_t) * numbones);
-    //if(bone.parentindex > 0)        Stream.write((char*)&data.parents, sizeof(uint32_t) * numbones);
-    //if(bone.posindex > 0)           Stream.write((char*)&data.bonePos, sizeof(Vector3) * numbones);
-    //if(bone.quatindex > 0)          Stream.write((char*)&data.boneQuat, sizeof(Quaternion) * numbones);
-    //if(bone.rotindex > 0)           Stream.write((char*)&data.boneRot, sizeof(RadianEuler) * numbones);
-    //if(bone.posetoboneindex > 0)    Stream.write((char*)&data.poseToBone, sizeof(matrix3x4_t) * numbones);
-    //if(bone.posscaleindex > 0)      Stream.write((char*)&data.posScale, sizeof(Vector3) * numbones);
-    //if(bone.rotscaleindex > 0)      Stream.write((char*)&data.rotScale, sizeof(Vector3) * numbones);
-    //if(bone.qalignmentindex > 0)    Stream.write((char*)&data.boneAlignment, sizeof(Quaternion) * numbones);
 }
 
 void BinaryWriter::Write(mstudiolinearbonedata_t_v53 data, int numbones)
@@ -1841,16 +1803,6 @@ void BinaryWriter::Write(mstudiolinearbonedata_t_v53 data, int numbones)
     Stream.write((char*)&data.poseToBone, sizeof(matrix3x4_t) * numbones);
     Stream.write((char*)&data.rotScale, sizeof(Vector3) * numbones);
     Stream.write((char*)&data.boneAlignment, sizeof(Quaternion) * numbones);
-
-    //if(bone.flagsindex > 0)         Stream.write((char*)&data.flags, sizeof(uint32_t) * numbones);
-    //if(bone.parentindex > 0)        Stream.write((char*)&data.parents, sizeof(uint32_t) * numbones);
-    //if(bone.posindex > 0)           Stream.write((char*)&data.bonePos, sizeof(Vector3) * numbones);
-    //if(bone.quatindex > 0)          Stream.write((char*)&data.boneQuat, sizeof(Quaternion) * numbones);
-    //if(bone.rotindex > 0)           Stream.write((char*)&data.boneRot, sizeof(RadianEuler) * numbones);
-    //if(bone.posetoboneindex > 0)    Stream.write((char*)&data.poseToBone, sizeof(matrix3x4_t) * numbones);
-    //if(bone.posscaleindex > 0)      Stream.write((char*)&data.posScale, sizeof(Vector3) * numbones);
-    //if(bone.rotscaleindex > 0)      Stream.write((char*)&data.rotScale, sizeof(Vector3) * numbones);
-    //if(bone.qalignmentindex > 0)    Stream.write((char*)&data.boneAlignment, sizeof(Quaternion) * numbones);
 }
 
 void BinaryWriter::Write(mstudiohitboxset_t_v49 data) {
@@ -1944,7 +1896,7 @@ void BinaryWriter::Write(mstudioikrule_t_v49 data) {
 
     Stream.write((char*)&data.bone, sizeof(int));
 
-    Stream.write((char*)&data.slot, sizeof(int));	// iktarget slot.  Usually same as chain.
+    Stream.write((char*)&data.slot, sizeof(int));
     Stream.write((char*)&data.height, sizeof(float));
     Stream.write((char*)&data.radius, sizeof(float));
     Stream.write((char*)&data.floor, sizeof(float));
@@ -1958,21 +1910,20 @@ void BinaryWriter::Write(mstudioikrule_t_v49 data) {
     Stream.write((char*)&data.iStart, sizeof(int));
     Stream.write((char*)&data.ikerrorindex, sizeof(int));
 
-    Stream.write((char*)&data.start, sizeof(float));	// beginning of influence
-    Stream.write((char*)&data.peak, sizeof(float));	// start of full influence
-    Stream.write((char*)&data.tail, sizeof(float));	// end of full influence
-    Stream.write((char*)&data.end, sizeof(float));		// end of all influence
+    Stream.write((char*)&data.start, sizeof(float));
+    Stream.write((char*)&data.peak, sizeof(float));
+    Stream.write((char*)&data.tail, sizeof(float));
+    Stream.write((char*)&data.end, sizeof(float));	
 
     Stream.write((char*)&data.unused3, sizeof(float));
-    Stream.write((char*)&data.contact, sizeof(float));	// frame footstep makes ground concact
-    Stream.write((char*)&data.drop, sizeof(float));	// how far down the foot should drop when reaching for IK
-    Stream.write((char*)&data.top, sizeof(float));	// top of the foot box
+    Stream.write((char*)&data.contact, sizeof(float));
+    Stream.write((char*)&data.top, sizeof(float));
 
     Stream.write((char*)&data.unused6, sizeof(int));
     Stream.write((char*)&data.unused7, sizeof(int));
     Stream.write((char*)&data.unused8, sizeof(int));
 
-    Stream.write((char*)&data.szattachmentindex, sizeof(int));		// name of world attachment
+    Stream.write((char*)&data.szattachmentindex, sizeof(int));
 
     Stream.write((char*)&data.unused, sizeof(int) * 7);
 
@@ -2022,27 +1973,27 @@ void BinaryWriter::Write(mstudioseqdescv49_t data) {
 
     Stream.write((char*)&data.animindexindex, sizeof(int));
 
-    Stream.write((char*)&data.movementindex, sizeof(int));		//
+    Stream.write((char*)&data.movementindex, sizeof(int));		
     Stream.write((char*)&data.groupsize, sizeof(int) * 2);
-    Stream.write((char*)&data.paramindex, sizeof(int) * 2);	//
-    Stream.write((char*)&data.paramstart, sizeof(float) * 2);	//
-    Stream.write((char*)&data.paramend, sizeof(float) * 2);		//
+    Stream.write((char*)&data.paramindex, sizeof(int) * 2);	    
+    Stream.write((char*)&data.paramstart, sizeof(float) * 2);	
+    Stream.write((char*)&data.paramend, sizeof(float) * 2);		
     Stream.write((char*)&data.paramparent, sizeof(int));
 
-    Stream.write((char*)&data.fadeintime, sizeof(float));		//
-    Stream.write((char*)&data.fadeouttime, sizeof(float));		//
+    Stream.write((char*)&data.fadeintime, sizeof(float));		
+    Stream.write((char*)&data.fadeouttime, sizeof(float));		
 
-    Stream.write((char*)&data.localentrynode, sizeof(int));		//
-    Stream.write((char*)&data.localexitnode, sizeof(int));		//
-    Stream.write((char*)&data.nodeflags, sizeof(int));			//
+    Stream.write((char*)&data.localentrynode, sizeof(int));		
+    Stream.write((char*)&data.localexitnode, sizeof(int));		
+    Stream.write((char*)&data.nodeflags, sizeof(int));			
 
-    Stream.write((char*)&data.entryphase, sizeof(float));		//
-    Stream.write((char*)&data.exitphase, sizeof(float));		//
+    Stream.write((char*)&data.entryphase, sizeof(float));		
+    Stream.write((char*)&data.exitphase, sizeof(float));		
 
-    Stream.write((char*)&data.lastframe, sizeof(float));		//
+    Stream.write((char*)&data.lastframe, sizeof(float));		
 
-    Stream.write((char*)&data.nextseq, sizeof(int));			//
-    Stream.write((char*)&data.pose, sizeof(int));			//
+    Stream.write((char*)&data.nextseq, sizeof(int));
+    Stream.write((char*)&data.pose, sizeof(int));
 
     Stream.write((char*)&data.numikrules, sizeof(int));
 
@@ -2060,7 +2011,7 @@ void BinaryWriter::Write(mstudioseqdescv49_t data) {
     Stream.write((char*)&data.keyvalueindex, sizeof(int));
     Stream.write((char*)&data.keyvaluesize, sizeof(int));
 
-    Stream.write((char*)&data.cycleposeindex, sizeof(int));		//
+    Stream.write((char*)&data.cycleposeindex, sizeof(int));
 
     Stream.write((char*)&data.activitymodifierindex, sizeof(int));
     Stream.write((char*)&data.numactivitymodifiers, sizeof(int));
@@ -2071,7 +2022,6 @@ void BinaryWriter::Write(mstudioseqdescv49_t data) {
 
 void BinaryWriter::Write(blendgroup_t_v49 data)
 {
-    //Stream.write((char*)&data.blends, sizeof(short) * data.blends.size() );
     Stream.write((char*)&data.blends, sizeof(short) * sizeof(data.blends));
 }
 
@@ -2107,8 +2057,6 @@ void BinaryWriter::Write(mstudioactivitymodifier_t_v49 data) {
 }
 
 void BinaryWriter::Write(seqweightlist_t_v49 data) {
-    //Stream.write((char*)&data.boneweight, sizeof(float) * data.boneweight.size());
-
     for (int i = 0; i < data.boneweight.size(); i++)
     {
         Stream.write((char*)&data.boneweight[i], sizeof(float));
@@ -2269,39 +2217,39 @@ void BinaryWriter::Write(mstudiocompressedikerror_t_v52 data) {
 
 void BinaryWriter::Write(studiohdr_t_v53 data) {
 
-    Stream.write((char*)&data.id, sizeof(int));                         // Model format ID, such as 
-    Stream.write((char*)&data.version, sizeof(int));                    // Format version numbe
-    Stream.write((char*)&data.checksum, sizeof(int));                   // This has to be the 
-    Stream.write((char*)&data.sznameindex, sizeof(int));                   // This has to be the 
-    for (int i = 0; i < data.name.size(); i++) Stream.write((char*)&data.name[i], sizeof(byte));                                // The internal name 
+    Stream.write((char*)&data.id, sizeof(int));
+    Stream.write((char*)&data.version, sizeof(int));
+    Stream.write((char*)&data.checksum, sizeof(int));
+    Stream.write((char*)&data.sznameindex, sizeof(int));
+    for (int i = 0; i < data.name.size(); i++) Stream.write((char*)&data.name[i], sizeof(byte)); 
 
-    Stream.write((char*)&data.length, sizeof(int));                     // Data size of MDL file
+    Stream.write((char*)&data.length, sizeof(int));
 
-    Stream.write((char*)&data.eyeposition, sizeof(Vector3));	        // ideal eye
+    Stream.write((char*)&data.eyeposition, sizeof(Vector3));
 
-    Stream.write((char*)&data.illumposition, sizeof(Vector3));	        // illuminat
+    Stream.write((char*)&data.illumposition, sizeof(Vector3));
 
-    Stream.write((char*)&data.hull_min, sizeof(Vector3));		        // ideal mov
+    Stream.write((char*)&data.hull_min, sizeof(Vector3));
     Stream.write((char*)&data.hull_max, sizeof(Vector3));
 
-    Stream.write((char*)&data.view_bbmin, sizeof(Vector3));		        // clipping 
+    Stream.write((char*)&data.view_bbmin, sizeof(Vector3));	
     Stream.write((char*)&data.view_bbmax, sizeof(Vector3));
 
     Stream.read((char*)&data.flags, sizeof(int));
 
-    Stream.write((char*)&data.numbones, sizeof(int));                   // bones
+    Stream.write((char*)&data.numbones, sizeof(int));
     Stream.write((char*)&data.boneindex, sizeof(int));
 
-    Stream.write((char*)&data.numbonecontrollers, sizeof(int));         // bone cont
+    Stream.write((char*)&data.numbonecontrollers, sizeof(int)); 
     Stream.write((char*)&data.bonecontrollerindex, sizeof(int));
 
     Stream.write((char*)&data.numhitboxsets, sizeof(int));
     Stream.write((char*)&data.hitboxsetindex, sizeof(int));
 
-    Stream.write((char*)&data.numlocalanim, sizeof(int));               // animations/pose
-    Stream.write((char*)&data.localanimindex, sizeof(int));             // animation des
+    Stream.write((char*)&data.numlocalanim, sizeof(int)); 
+    Stream.write((char*)&data.localanimindex, sizeof(int));
 
-    Stream.write((char*)&data.numlocalseq, sizeof(int));                // sequences
+    Stream.write((char*)&data.numlocalseq, sizeof(int)); 
     Stream.write((char*)&data.localseqindex, sizeof(int));
 
     Stream.write((char*)&data.activitylistversion, sizeof(int));
@@ -2376,7 +2324,7 @@ void BinaryWriter::Write(studiohdr_t_v53 data) {
 
     Stream.write((char*)&data.unused, sizeof(std::byte));
 
-    Stream.write((char*)&data.fadedistance, sizeof(float));                            // zero out if version 
+    Stream.write((char*)&data.fadedistance, sizeof(float));   
 
     Stream.write((char*)&data.numflexcontrollerui, sizeof(int));
     Stream.write((char*)&data.flexcontrolleruiindex, sizeof(int));
@@ -2539,7 +2487,7 @@ void BinaryWriter::Write(mstudioikrule_t_v53 data) {
 
     Stream.write((char*)&data.bone, sizeof(int));
 
-    Stream.write((char*)&data.slot, sizeof(int));	// iktarget slot.  Usually same as chain.
+    Stream.write((char*)&data.slot, sizeof(int));
     Stream.write((char*)&data.height, sizeof(float));
     Stream.write((char*)&data.radius, sizeof(float));
     Stream.write((char*)&data.floor, sizeof(float));
@@ -2551,16 +2499,16 @@ void BinaryWriter::Write(mstudioikrule_t_v53 data) {
     Stream.write((char*)&data.iStart, sizeof(int));
     Stream.write((char*)&data.ikerrorindex, sizeof(int));
 
-    Stream.write((char*)&data.start, sizeof(float));	// beginning of influence
-    Stream.write((char*)&data.peak, sizeof(float));	// start of full influence
-    Stream.write((char*)&data.tail, sizeof(float));	// end of full influence
-    Stream.write((char*)&data.end, sizeof(float));		// end of all influence
+    Stream.write((char*)&data.start, sizeof(float));
+    Stream.write((char*)&data.peak, sizeof(float));
+    Stream.write((char*)&data.tail, sizeof(float));
+    Stream.write((char*)&data.end, sizeof(float));
 
-    Stream.write((char*)&data.contact, sizeof(float));	// frame footstep makes ground concact
-    Stream.write((char*)&data.drop, sizeof(float));	// how far down the foot should drop when reaching for IK
-    Stream.write((char*)&data.top, sizeof(float));	// top of the foot box
+    Stream.write((char*)&data.contact, sizeof(float));
+    Stream.write((char*)&data.drop, sizeof(float));
+    Stream.write((char*)&data.top, sizeof(float));
 
-    Stream.write((char*)&data.szattachmentindex, sizeof(int));		// name of world attachment
+    Stream.write((char*)&data.szattachmentindex, sizeof(int));
 
     Stream.write((char*)&data.unused, sizeof(int) * 9);
 }
@@ -2589,27 +2537,27 @@ void BinaryWriter::Write(mstudioseqdesc_t_v53 data) {
 
     Stream.write((char*)&data.animindexindex, sizeof(int));
 
-    Stream.write((char*)&data.movementindex, sizeof(int));		//
+    Stream.write((char*)&data.movementindex, sizeof(int));		
     Stream.write((char*)&data.groupsize, sizeof(int) * 2);
-    Stream.write((char*)&data.paramindex, sizeof(int) * 2);	//
-    Stream.write((char*)&data.paramstart, sizeof(float) * 2);	//
-    Stream.write((char*)&data.paramend, sizeof(float) * 2);		//
+    Stream.write((char*)&data.paramindex, sizeof(int) * 2);	    
+    Stream.write((char*)&data.paramstart, sizeof(float) * 2);	
+    Stream.write((char*)&data.paramend, sizeof(float) * 2);		
     Stream.write((char*)&data.paramparent, sizeof(int));
 
-    Stream.write((char*)&data.fadeintime, sizeof(float));		//
-    Stream.write((char*)&data.fadeouttime, sizeof(float));		//
+    Stream.write((char*)&data.fadeintime, sizeof(float));		
+    Stream.write((char*)&data.fadeouttime, sizeof(float));		
 
-    Stream.write((char*)&data.localentrynode, sizeof(int));		//
-    Stream.write((char*)&data.localexitnode, sizeof(int));		//
-    Stream.write((char*)&data.nodeflags, sizeof(int));			//
+    Stream.write((char*)&data.localentrynode, sizeof(int));		
+    Stream.write((char*)&data.localexitnode, sizeof(int));		
+    Stream.write((char*)&data.nodeflags, sizeof(int));			
 
-    Stream.write((char*)&data.entryphase, sizeof(float));		//
-    Stream.write((char*)&data.exitphase, sizeof(float));		//
+    Stream.write((char*)&data.entryphase, sizeof(float));		
+    Stream.write((char*)&data.exitphase, sizeof(float));		
 
-    Stream.write((char*)&data.lastframe, sizeof(float));		//
+    Stream.write((char*)&data.lastframe, sizeof(float));		
 
-    Stream.write((char*)&data.nextseq, sizeof(int));			//
-    Stream.write((char*)&data.pose, sizeof(int));			//
+    Stream.write((char*)&data.nextseq, sizeof(int));			
+    Stream.write((char*)&data.pose, sizeof(int));			    
 
     Stream.write((char*)&data.numikrules, sizeof(int));
 
@@ -2627,7 +2575,7 @@ void BinaryWriter::Write(mstudioseqdesc_t_v53 data) {
     Stream.write((char*)&data.keyvalueindex, sizeof(int));
     Stream.write((char*)&data.keyvaluesize, sizeof(int));
 
-    Stream.write((char*)&data.cycleposeindex, sizeof(int));		//
+    Stream.write((char*)&data.cycleposeindex, sizeof(int));		
 
     Stream.write((char*)&data.activitymodifierindex, sizeof(int));
     Stream.write((char*)&data.numactivitymodifiers, sizeof(int));
