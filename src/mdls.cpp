@@ -1299,7 +1299,6 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 			if (seqdescs[i].animindexindex > 0)
 			{
 				Stream->seek(seqPos + seqdescs[i].animindexindex);
-				Logger::Info("BlendGroupPos Read: %d\n", Stream->Position());
 				blendgroup_t_v49 blendgroup; Stream->Read(&blendgroup, numBlends);
 				blends.push_back(blendgroup);
 				Logger::Info("BlendGroup Read: %d\n", i);
