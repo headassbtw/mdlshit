@@ -106,8 +106,6 @@ namespace MDL
 			srcbonetransforms = _srcbonetransforms;
 			linearbone = _linearbone;
 			linearbonedata = _linearbonedata;
-
-			//return v49Mdl( _mdlhdr,  _mdlsubhdr, _bones, _jigglebones, _boneflexdrivers, _attachments, _hitboxsets, _hitboxes, _bonenametable, _animdescs, _ikrules, _compressedikerrors, _ikerrors,  _ikrulezeroframe, _seqdescs, _blends, _posekeys, _events, _autolayers, _activitymodifiers, _seqweightlist, _nodenames, _nodes, _bodyparts, _models, _meshes, _ikchains, _iklinks, _poseparamdescs, _includedmodels, _cdtextures, _textures, _skingroups, _keyvalues, _srcbonetransforms, _linearbone, _linearbonedata)
 		}
 	};
 
@@ -292,9 +290,6 @@ namespace MDL
 			srcbonetransforms = _srcbonetransforms;
 			linearbone = _linearbone;
 			linearbonedata = _linearbonedata;
-
-			//return v49Mdl( _mdlhdr,  _mdlsubhdr, _bones, _jigglebones, _boneflexdrivers, _attachments, _hitboxsets, _hitboxes, _bonenametable, _animdescs, _ikrules, _compressedikerrors, _ikerrors,  _ikrulezeroframe, _seqdescs, _blends, _posekeys, _events, _autolayers, _activitymodifiers, _seqweightlist, _nodenames, _nodes, _bodyparts, _models, _meshes, _ikchains, _iklinks, _poseparamdescs, _includedmodels, _cdtextures, _textures, _skingroups, _keyvalues, _srcbonetransforms, _linearbone, _linearbonedata)
-
 		}
 	};
 }

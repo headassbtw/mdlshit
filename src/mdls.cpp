@@ -15,7 +15,6 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 #include <logger.hpp>
-//#include <Source.hpp>
 
 using namespace std;
 
@@ -70,9 +69,6 @@ float GetSecondLargest(float n1, float n2, float n3)
 {
 	float n = 3, num[]{ n1,n2,n3 }, largest, second;
 
-	//for (int i = 0; i < n; i++) {
-	//	cin >> num[i];
-	//}
 	/* Here we are comparing first two elements of the
 	 * array, and storing the largest one in the variable
 	 * "largest" and the other one to "second" variable.
@@ -108,10 +104,6 @@ float GetSecondLargest(float n1, float n2, float n3)
 
 float GetLargestNumber(float n1, float n2, float n3)
 {
-	//cout << "Enter three numbers: ";
-	//cin >> n1 >> n2 >> n3;
-
-
 	//if (n1 > n2 && n1 == n2 || n1 > n2 && n1 > n3 && n2 == n3 || n1 > n2 && n1 < n3 || n1 > n2 && n3 < n2)
 	//	return n1;
 	//
@@ -326,7 +318,7 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			bones.push_back(bone);
 			if (bone.proctype == 5) numjigglebones++;
 
-			//Logger::Info("Bone Read: %s\n", ReadMDLString(Stream, bonePos + bone.sznameindex).c_str());
+			Logger::Info("Bone Read: %s\n", ReadMDLString(Stream, bonePos + bone.sznameindex).c_str());
 			Logger::Info("Bone Read: %d\n", i);
 		}
 	}
@@ -356,7 +348,7 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			mstudioattachment_t_v49 attachment; Stream->Read(&attachment);
 			attachments.push_back(attachment);
 
-			//Logger::Info("Attachment Read: %s\n", ReadMDLString(Stream, attachmentPos + attachment.sznameindex).c_str());
+			Logger::Info("Attachment Read: %s\n", ReadMDLString(Stream, attachmentPos + attachment.sznameindex).c_str());
 			Logger::Info("Attachment Read: %d\n", i);
 		}
 		//Logger::Info("strPos: %d\n", Stream->Position());
@@ -370,7 +362,7 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			Stream->seek(hitboxsetPos);
 
 			mstudiohitboxset_t_v49 hitboxset; Stream->Read(&hitboxset);
-			//Logger::Info("HitboxSet Read: %s\n", ReadMDLString(Stream, hitboxsetPos + hitboxset.sznameindex).c_str());
+			Logger::Info("HitboxSet Read: %s\n", ReadMDLString(Stream, hitboxsetPos + hitboxset.sznameindex).c_str());
 			if (hitboxset.numhitboxes > 0) numhitboxes += hitboxset.numhitboxes;
 			hitboxsets.push_back(hitboxset);
 			Logger::Info("HitboxSet Read: %d\n", i);
@@ -383,8 +375,8 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 				int hitboxPos = hitboxsetPos + 68 * i;
 				Stream->seek(hitboxPos);
 				mstudiobbox_t_v53 hitbox; Stream->Read(&hitbox);
-				//Logger::Info("Hitbox Read: %s\n", ReadMDLString(Stream, hitboxPos + hitbox.szhitboxnameindex).c_str());
-				//Logger::Info("Hitbox Read: %s\n", ReadMDLString(Stream, hitboxPos + hitbox.keyvalueindex).c_str());
+				Logger::Info("Hitbox Read: %s\n", ReadMDLString(Stream, hitboxPos + hitbox.szhitboxnameindex).c_str());
+				Logger::Info("Hitbox Read: %s\n", ReadMDLString(Stream, hitboxPos + hitbox.keyvalueindex).c_str());
 				hitboxes.push_back(hitbox);
 				Logger::Info("Hitbox Read: %d\n", i);
 			}
@@ -408,7 +400,7 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			mstudioanimdesc_t_v53 animdesc; Stream->Read(&animdesc);
 			animdescs.push_back(animdesc);
 
-			//Logger::Info("AnimDesc Read: %s\n", ReadMDLString(Stream, animDescPos + animdesc.sznameindex).c_str());
+			Logger::Info("AnimDesc Read: %s\n", ReadMDLString(Stream, animDescPos + animdesc.sznameindex).c_str());
 			Logger::Info("AnimDesc Read: %d\n", i);
 			//Logger::Info("strPos: %d\n", Stream->Position());
 		}
@@ -631,8 +623,8 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			Stream->seek(seqPos);
 			mstudioseqdesc_t_v53 seqDesc; Stream->Read(&seqDesc);
 			seqdescs.push_back(seqDesc);
-			//Logger::Info("SeqLabel Read: %s\n", ReadMDLString(Stream, seqPos + seqDesc.szlabelindex).c_str());
-			//Logger::Info("SeqActName Read: %s\n", ReadMDLString(Stream, seqPos + seqDesc.szactivitynameindex).c_str());
+			Logger::Info("SeqLabel Read: %s\n", ReadMDLString(Stream, seqPos + seqDesc.szlabelindex).c_str());
+			Logger::Info("SeqActName Read: %s\n", ReadMDLString(Stream, seqPos + seqDesc.szactivitynameindex).c_str());
 			Logger::Info("Seq Read: %d\n", i);
 		}
 
@@ -687,7 +679,7 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 					mstudioevent_t_v49 _event; Stream->Read(&_event);
 					events.push_back(_event);
 
-					//Logger::Info("Event Read: %s\n", ReadMDLString(Stream, seqPos + seqdescs[i].eventindex + 80 * j + _event.szeventindex).c_str());
+					Logger::Info("Event Read: %s\n", ReadMDLString(Stream, seqPos + seqdescs[i].eventindex + 80 * j + _event.szeventindex).c_str());
 					Logger::Info("Event Read: %d\n", j);
 				}
 			}
@@ -699,7 +691,7 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 				{
 					mstudioactivitymodifier_t_v53 actmod; Stream->Read(&actmod);
 					activitymodifiers.push_back(actmod);
-					//Logger::Info("ActMod Read: %s\n", ReadMDLString(Stream, seqPos + seqdescs[i].activitymodifierindex + 8 * j + actmod.sznameindex).c_str());
+					Logger::Info("ActMod Read: %s\n", ReadMDLString(Stream, seqPos + seqdescs[i].activitymodifierindex + 8 * j + actmod.sznameindex).c_str());
 					Logger::Info("ActMod Read: %d\n", j);
 				}
 			}
@@ -712,7 +704,7 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 		{
 			mstudionodename_t_v49 nodeName; Stream->Read(&nodeName);
 			nodenames.push_back(nodeName);
-			//Logger::Info("NodeName Read: %s\n", ReadMDLString(Stream, nodenames[i].sznameindex).c_str());
+			Logger::Info("NodeName Read: %s\n", ReadMDLString(Stream, nodenames[i].sznameindex).c_str());
 			Logger::Info("NodeName Read: %d\n", i);
 		}
 		Stream->seek(mdlhdr.localnodeindex);
@@ -731,7 +723,7 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			mstudiobodyparts_t_v49 bodyPart; Stream->Read(&bodyPart);
 			if (bodyPart.nummodels > 0) nummodels += bodyPart.nummodels;
 			bodyparts.push_back(bodyPart);
-			//Logger::Info("Bodypart Read: %s\n", ReadMDLString(Stream, mdlhdr.bodypartindex + 16 * i + bodyparts[i].sznameindex).c_str());
+			Logger::Info("Bodypart Read: %s\n", ReadMDLString(Stream, mdlhdr.bodypartindex + 16 * i + bodyparts[i].sznameindex).c_str());
 			Logger::Info("Bodypart Read: %d\n", i);
 		}
 	}
@@ -747,7 +739,7 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 
 			int modelPos = mdlhdr.bodypartindex + 16 * mdlhdr.numbodyparts + 148 * i;
 
-			//Logger::Info("Model Read: %s\n", ReadMDLString(Stream, modelPos).c_str());
+			Logger::Info("Model Read: %s\n", ReadMDLString(Stream, modelPos).c_str());
 			Logger::Info("Model Read: %d\n", i);
 		}
 
@@ -764,7 +756,7 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 
 			int ikChainPos = mdlhdr.ikchainindex + 32 * i;
 
-			//Logger::Info("IkChain Read: %s\n", ReadMDLString(Stream, ikChainPos + ikchains[i].sznameindex).c_str());
+			Logger::Info("IkChain Read: %s\n", ReadMDLString(Stream, ikChainPos + ikchains[i].sznameindex).c_str());
 			Logger::Info("IkChain Read: %d\n", i);
 		}
 
@@ -787,7 +779,7 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 
 			int poseParamPos = mdlhdr.localposeparamindex + 20 * i;
 
-			//Logger::Info("PoseParamDesc Read: %s\n", ReadMDLString(Stream, poseParamPos + poseparamdescs[i].sznameindex).c_str());
+			Logger::Info("PoseParamDesc Read: %s\n", ReadMDLString(Stream, poseParamPos + poseparamdescs[i].sznameindex).c_str());
 			Logger::Info("PoseParamDesc Read: %d\n", i);
 		}
 	}
@@ -806,7 +798,7 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			Stream->seek(texturePos);
 			mstudiotexture_t_v53 texture; Stream->Read(&texture);
 
-			//Logger::Info("MeshMat Read: %s\n", ReadMDLString(Stream, mdlhdr.textureindex + 44 * mesh.material + texture.sznameindex).c_str());
+			Logger::Info("MeshMat Read: %s\n", ReadMDLString(Stream, mdlhdr.textureindex + 44 * mesh.material + texture.sznameindex).c_str());
 			Logger::Info("Mesh Read: %d\n", mesh.material);
 		}
 	}
@@ -819,7 +811,7 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			includedmodels.push_back(includemodel);
 			int includedModelPos = mdlhdr.includemodelindex + 8 * i;
 
-			//Logger::Info("IncludedModel Read: %s\n", ReadMDLString(Stream, includedModelPos + includedmodels[i].sznameindex).c_str());
+			Logger::Info("IncludedModel Read: %s\n", ReadMDLString(Stream, includedModelPos + includedmodels[i].sznameindex).c_str());
 			Logger::Info("IncludedModel Read: %d\n", i);
 		}
 	}
@@ -1571,7 +1563,7 @@ int MDL::v49Mdl::ConvertFlag(int flag)
 
 	if (flag & STUDIO_ANIM_DELTA)
 	{
-		Logger::Info("Has Flag: %d\n", STUDIO_ANIM_DELTA);
+		//Logger::Info("Has Flag: %d\n", STUDIO_ANIM_DELTA);
 		test += STUDIO_ANIM_DELTA_53;
 	}
 
@@ -1723,7 +1715,7 @@ std::vector<int> MDL::v49Mdl::v53GetAnimHdrBytesAdded(bool zeroFirst)
 	{
 		int next = i + 1;
 		animBytesAdded.push_back(bytesAdded);
-		Logger::Info("BytesAdded: %d, Anim: %d\n", bytesAdded, i);
+		//Logger::Info("BytesAdded: %d, Anim: %d\n", bytesAdded, i);
 		if (animdescs[i].sectionindex == 0)
 		{
 			for (int j = lastHdr; j < anims.size(); j++)
@@ -1754,8 +1746,8 @@ std::vector<int> MDL::v49Mdl::v53GetAnimHdrBytesAdded(bool zeroFirst)
 								}
 							}
 						}
-						Logger::Info("dist:  %d\n", dist);
-						Logger::Info("finalDist:  %d\n", 32 - dist);
+						//Logger::Info("dist:  %d\n", dist);
+						//Logger::Info("finalDist:  %d\n", 32 - dist);
 						bytesAdded += 32 - dist;
 					}
 
@@ -1839,7 +1831,7 @@ int MDL::v49Mdl::v53GetTotalAnimHdrBytesAdded()
 			}
 		}
 	}
-	Logger::Info("Total BytesAdded: %d\n", bytesAdded);
+	//Logger::Info("Total BytesAdded: %d\n", bytesAdded);
 	return bytesAdded;
 }
 
@@ -1941,7 +1933,7 @@ std::vector<int> MDL::v49Mdl::v53GetSecHdrBytesAdded(bool zeroFirst)
 		int secFrames = animdescs[i].sectionframes;
 
 		bytesAddedPerAnim.push_back(bytesAdded);
-		Logger::Info("BytesAdded: %d, Anim: %d\n", bytesAdded, i);
+		//Logger::Info("BytesAdded: %d, Anim: %d\n", bytesAdded, i);
 		if (animdescs[i].sectionindex > 0)
 		{
 			int num = (frames / secFrames) + 2;
@@ -2004,8 +1996,8 @@ std::vector<int> MDL::v49Mdl::v53GetSecHdrBytesAdded(bool zeroFirst)
 									}
 								}
 							}
-							Logger::Info("secDist:  %d\n", dist);
-							Logger::Info("secFinalDist:  %d\n", 32 - dist);
+							//Logger::Info("secDist:  %d\n", dist);
+							//Logger::Info("secFinalDist:  %d\n", 32 - dist);
 							bytesAdded += 32 - dist;
 						}
 						if (i + 1 < mdlhdr.numlocalanim && j + 1 < num)
@@ -2028,8 +2020,8 @@ std::vector<int> MDL::v49Mdl::v53GetSecHdrBytesAdded(bool zeroFirst)
 									}
 								}
 							}
-							Logger::Info("secDist:  %d\n", dist);
-							Logger::Info("secFinalDist:  %d\n", 32 - dist);
+							//Logger::Info("secDist:  %d\n", dist);
+							//Logger::Info("secFinalDist:  %d\n", 32 - dist);
 							bytesAdded += 32 - dist;
 						}
 						break;
@@ -2153,7 +2145,7 @@ int MDL::v49Mdl::v53GetTotalSecHdrBytesAdded()
 			}
 		}
 	}
-	Logger::Info("Total BytesAdded: %d\n", bytesAdded);
+	//Logger::Info("Total BytesAdded: %d\n", bytesAdded);
 	return bytesAdded;
 }
 
@@ -2267,8 +2259,8 @@ int MDL::v49Mdl::v53GetSecHdrBytesAddedIdv(int anim)
 									}
 								}
 							}
-							Logger::Info("secDist:  %d\n", dist);
-							Logger::Info("secFinalDist:  %d\n", 32 - dist);
+							//Logger::Info("secDist:  %d\n", dist);
+							//Logger::Info("secFinalDist:  %d\n", 32 - dist);
 							bytesAdded += 32 - dist;
 						}
 						break;
@@ -2310,7 +2302,7 @@ std::vector<int> MDL::v49Mdl::v53GetSecBytesAdded(bool zeroFirst)
 				int nextSec = j + 1;
 				int bytesAddedPer = 0;
 				bytesAddedPerSec.push_back(bytesAdded);
-				Logger::Info("secBytesAdded: %d, Anim: %d\n", bytesAdded, i);
+				//Logger::Info("secBytesAdded: %d, Anim: %d\n", bytesAdded, i);
 				for (int k = lastHdr; k < sections.size(); k++)
 				{
 					int pos2 = sections[k].strPos;
@@ -2340,8 +2332,8 @@ std::vector<int> MDL::v49Mdl::v53GetSecBytesAdded(bool zeroFirst)
 									}
 								}
 							}
-							Logger::Info("secDist:  %d\n", dist);
-							Logger::Info("secFinalDist:  %d\n", 32 - dist);
+							//Logger::Info("secDist:  %d\n", dist);
+							//Logger::Info("secFinalDist:  %d\n", 32 - dist);
 							bytesAdded += 32 - dist;
 						}
 
@@ -2366,8 +2358,8 @@ std::vector<int> MDL::v49Mdl::v53GetSecBytesAdded(bool zeroFirst)
 									}
 								}
 							}
-							Logger::Info("secDist:  %d\n", dist);
-							Logger::Info("secFinalDist:  %d\n", 32 - dist);
+							//Logger::Info("secDist:  %d\n", dist);
+							//Logger::Info("secFinalDist:  %d\n", 32 - dist);
 							bytesAdded += 32 - dist;
 						}
 
@@ -2611,146 +2603,6 @@ studiohdr_t_v53 MDL::v49Mdl::ConvertHeader(FileInfo info)
 
 	int			unused1[60];
 
-
-	//mdlhdr.id;
-	//mdlhdr.version;
-	//mdlhdr.checksum;
-	//mdlhdr.name[64];
-	//				
-	//mdlhdr.length;
-	//
-	//mdlhdr.eyeposition;
-	//
-	//mdlhdr.illumposition;
-	//
-	//mdlhdr.hull_min;
-	//mdlhdr.hull_max;
-	//
-	//mdlhdr.view_bbmin;
-	//mdlhdr.view_bbmax;
-	//
-	//mdlhdr.flags;
-	//
-	//mdlhdr.numbones;
-	//mdlhdr.boneindex;
-	//
-	//mdlhdr.numbonecontrollers;
-	//mdlhdr.bonecontrollerindex;
-	//
-	//mdlhdr.numhitboxsets;
-	//mdlhdr.hitboxsetindex;
-	//
-	//mdlhdr.numlocalanim;
-	//mdlhdr.localanimindex;
-	//
-	//mdlhdr.numlocalseq;
-	//mdlhdr.localseqindex;
-	//
-	//mdlhdr.activitylistversion;
-	//mdlhdr.eventsindexed;
-	//
-	//mdlhdr.numtextures;
-	//mdlhdr.textureindex;
-	//
-	//mdlhdr.numcdtextures;
-	//mdlhdr.cdtextureindex;
-	//
-	//mdlhdr.numskinref;
-	//mdlhdr.numskinfamilies;
-	//mdlhdr.skinindex;
-	//
-	//mdlhdr.numbodyparts;
-	//mdlhdr.bodypartindex;
-	//
-	//mdlhdr.numlocalattachments;
-	//mdlhdr.localattachmentindex;
-	//
-	//mdlhdr.numlocalnodes;
-	//mdlhdr.localnodeindex;
-	//mdlhdr.localnodenameindex;
-	//
-	//mdlhdr.numflexdesc;
-	//mdlhdr.flexdescindex;
-	//
-	//mdlhdr.numflexcontrollers;
-	//mdlhdr.flexcontrollerindex;
-	//
-	//mdlhdr.numflexrules;
-	//mdlhdr.flexruleindex;
-	//
-	//mdlhdr.numikchains;
-	//mdlhdr.ikchainindex;
-	//
-	//mdlhdr.nummouths;
-	//mdlhdr.mouthindex;
-	//
-	//mdlhdr.numlocalposeparameters;
-	//mdlhdr.localposeparamindex;
-	//
-	//mdlhdr.surfacepropindex;
-	//
-	//mdlhdr.keyvalueindex;
-	//mdlhdr.keyvaluesize;
-	//
-	//mdlhdr.numlocalikautoplaylocks;
-	//mdlhdr.localikautoplaylockindex;
-	//
-	//
-	//mdlhdr.mass;
-	//mdlhdr.contents;
-	//
-	//mdlhdr.numincludemodels;
-	//mdlhdr.includemodelindex;
-	//
-	//mdlhdr.virtualModel;
-	//
-	//mdlhdr.szanimblocknameindex;
-	//mdlhdr.numanimblocks;
-	//mdlhdr.animblockindex;
-	//mdlhdr.animblockModel;
-	//
-	//mdlhdr.bonetablebynameindex;
-	//
-	//mdlhdr.pVertexBase;
-	//mdlhdr.pIndexBase;
-	//
-	//mdlhdr.constdirectionallightdot;
-	//
-	//mdlhdr.rootLOD;
-	//
-	//mdlhdr.numAllowedRootLODs;
-	//
-	//mdlhdr.unused;
-	//
-	//mdlhdr.unused4;
-	//
-	//mdlhdr.numflexcontrollerui;
-	//mdlhdr.flexcontrolleruiindex;
-	//
-	//mdlhdr.flVertAnimFixedPointScale;
-	//mdlhdr.surfacepropLookup;
-	//
-	//mdlhdr.studiohdr2index;
-	//
-	//mdlhdr.unused2;
-	//
-	//mdlsubhdr.numsrcbonetransform;
-	//mdlsubhdr.srcbonetransformindex;
-	//
-	//mdlsubhdr.illumpositionattachmentindex;
-	//
-	//mdlsubhdr.flMaxEyeDeflection;
-	//
-	//mdlsubhdr.linearboneindex;
-	//
-	//mdlsubhdr.sznameindex;
-	//
-	//mdlsubhdr.m_nBoneFlexDriverCount;
-	//mdlsubhdr.m_nBoneFlexDriverIndex;
-	//
-	//mdlsubhdr.reserved[56];
-	//
-	//mdlhdr.id, mdlhdr.version, mdlhdr.checksum, mdlhdr.name, mdlhdr.length, mdlhdr.eyeposition, mdlhdr.illumposition, mdlhdr.hull_min, mdlhdr.hull_max, mdlhdr.view_bbmin, mdlhdr.view_bbmax, mdlhdr.flags, mdlhdr.numbones, mdlhdr.boneindex, mdlhdr.numbonecontrollers, mdlhdr.bonecontrollerindex, mdlhdr.numhitboxsets, mdlhdr.hitboxsetindex, mdlhdr.numlocalanim, mdlhdr.localanimindex, mdlhdr.numlocalseq, mdlhdr.localseqindex, mdlhdr.activitylistversion, mdlhdr.eventsindexed, mdlhdr.numtextures, mdlhdr.textureindex, mdlhdr.numcdtextures, mdlhdr.cdtextureindex, mdlhdr.numskinref, mdlhdr.numskinfamilies, mdlhdr.skinindex, mdlhdr.numbodyparts, mdlhdr.bodypartindex, mdlhdr.numlocalattachments, mdlhdr.localattachmentindex, mdlhdr.numlocalnodes, mdlhdr.localnodeindex, mdlhdr.localnodenameindex, mdlhdr.numflexdesc, mdlhdr.flexdescindex, mdlhdr.numflexcontrollers, mdlhdr.flexcontrollerindex, mdlhdr.numflexrules, mdlhdr.flexruleindex, mdlhdr.numikchains, mdlhdr.ikchainindex, mdlhdr.nummouths, mdlhdr.mouthindex, mdlhdr.numlocalposeparameters, mdlhdr.localposeparamindex, mdlhdr.surfacepropindex, mdlhdr.keyvalueindex, mdlhdr.keyvaluesize, mdlhdr.numlocalikautoplaylocks, mdlhdr.localikautoplaylockindex, mdlhdr.mass, mdlhdr.contents, mdlhdr.numincludemodels, mdlhdr.includemodelindex, mdlhdr.virtualModel, mdlhdr.szanimblocknameindex, mdlhdr.numanimblocks, mdlhdr.animblockindex, mdlhdr.animblockModel, mdlhdr.bonetablebynameindex, mdlhdr.pVertexBase, mdlhdr.pIndexBase, mdlhdr.constdirectionallightdot, mdlhdr.rootLOD, mdlhdr.numAllowedRootLODs, mdlhdr.unused, mdlhdr.unused4, mdlhdr.numflexcontrollerui, mdlhdr.flexcontrolleruiindex, mdlhdr.flVertAnimFixedPointScale, mdlhdr.surfacepropLookup, mdlhdr.studiohdr2index, mdlhdr.unused2, mdlsubhdr.numsrcbonetransform, mdlsubhdr.srcbonetransformindex, mdlsubhdr.illumpositionattachmentindex, mdlsubhdr.flMaxEyeDeflection, mdlsubhdr.linearboneindex, mdlsubhdr.sznameindex, mdlsubhdr.m_nBoneFlexDriverCount, mdlsubhdr.m_nBoneFlexDriverIndex, mdlsubhdr.reserved;
 	studiohdr_t_v53 v53Hdr = { mdlhdr.id, 53, mdlhdr.checksum, sznameindex, ArrayToVector(mdlhdr.name, 64), mdlhdr.length, mdlhdr.eyeposition, mdlhdr.illumposition, mdlhdr.hull_min, mdlhdr.hull_max, mdlhdr.view_bbmin, mdlhdr.view_bbmax, mdlhdr.flags, mdlhdr.numbones, boneindex, mdlhdr.numbonecontrollers, bonecontrollerindex, mdlhdr.numhitboxsets, hitboxsetindex, mdlhdr.numlocalanim, localanimindex, mdlhdr.numlocalseq, localseqindex, mdlhdr.activitylistversion, mdlhdr.eventsindexed, mdlhdr.numtextures, textureindex, mdlhdr.numcdtextures, cdtextureindex, mdlhdr.numskinref, mdlhdr.numskinfamilies, skinindex, mdlhdr.numbodyparts, bodypartindex, mdlhdr.numlocalattachments, localattachmentindex, mdlhdr.numlocalnodes, localnodeindex, localnodenameindex, mdlhdr.numflexdesc, flexdescindex, mdlhdr.numflexcontrollers, flexcontrollerindex, mdlhdr.numflexrules, flexruleindex, mdlhdr.numikchains, ikchainindex, mdlhdr.nummouths, mouthindex, mdlhdr.numlocalposeparameters, localposeparamindex, surfacepropindex, keyvalueindex, mdlhdr.keyvaluesize, mdlhdr.numlocalikautoplaylocks, localikautoplaylockindex, mdlhdr.mass, mdlhdr.contents, mdlhdr.numincludemodels, includemodelindex, mdlhdr.virtualModel, bonetablebynameindex, mdlhdr.constdirectionallightdot, mdlhdr.rootLOD, mdlhdr.numAllowedRootLODs, mdlhdr.unused, fadedistance, mdlhdr.numflexcontrollerui, flexcontrolleruiindex, mdlhdr.pVertexBase, mdlhdr.pIndexBase, mayaindex, mdlsubhdr.numsrcbonetransform, srcbonetransformindex, mdlsubhdr.illumpositionattachmentindex, linearboneindex, mdlsubhdr.m_nBoneFlexDriverCount, mdlsubhdr.m_nBoneFlexDriverIndex, aabbindex, numaabb, numaabb1, numaabb2, unkstringindex, vtxindex, vvdindex, vvcindex, vphyindex, vtxsize, vvdsize, vvcsize, vphysize, unkmemberindex1, numunkmember1, unk, unkindex3, unused1 };
 
 	return v53Hdr;
@@ -3125,7 +2977,7 @@ std::vector<mstudioanim_t_v53> MDL::v49Mdl::ConvertSections()
 			_animpos = sections[i].animpos;
 		}
 
-		if ((int)sections[i].flags & STUDIO_ANIM_RAWROT) _rawrot = sections[i].rawrot;//{ anims[i].rawrot.one, anims[i].rawrot.i, anims[i].rawrot.j, anims[i].rawrot.k };
+		if ((int)sections[i].flags & STUDIO_ANIM_RAWROT) _rawrot = sections[i].rawrot;
 
 		if ((int)sections[i].flags & STUDIO_ANIM_RAWROT2) _rawrot = sections[i].rawrot2;
 
@@ -3194,7 +3046,6 @@ void MDL::v49Mdl::ConvertBodyParts()
 	int stairs = bytesAddedToTextures + bytesAddedToIkChains + textureFiller + strFiller + bytesAddedToRuiMesh;
 	for (int i = 0; i < bodyparts.size(); i++)
 	{
-		//mstudiobodyparts_t_v49 v49BodyPart = bodyparts[i];
 		if (bodyparts[i].sznameindex > 0) bodyparts[i].sznameindex += stairs;
 	}
 }
@@ -3203,7 +3054,6 @@ void MDL::v49Mdl::ConvertModels()
 {
 	for (int i = 0; i < models.size(); i++)
 	{
-		//mstudiomodel_t_v49 _model = models[i];
 		if (mdlhdr.numikchains > 0)
 		{
 			if (models[i].eyeballindex > 0) models[i].eyeballindex = 0;
@@ -3286,8 +3136,3 @@ void MDL::v49Mdl::UpdateMdl()
 	if (mdlhdr.numcdtextures > 0) ConvertCDTextures();
 	if (mdlsubhdr.numsrcbonetransform > 0) ConvertSrcBoneTransforms();
 }
-
-//void Convert()
-//{
-//
-//}
