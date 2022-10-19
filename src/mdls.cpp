@@ -2659,9 +2659,9 @@ std::vector<mstudioanimdesc_t_v53> MDL::v49Mdl::AnimDescConversion()
 	std::vector<mstudioanimdesc_t_v53> v53AnimDescs;
 	int ikRuleNum = 0;
 	int animIdx = mdlhdr.localanimindex;
-	Logger::Info("animIdx: %d\n", animIdx);
-	Logger::Info("Hdr BytesAdded: %d\n", bytesAddedToHeader);
-	Logger::Info("Bone BytesAdded: %d\n", bytesAddedToBones);
+	//Logger::Info("animIdx: %d\n", animIdx);
+	//Logger::Info("Hdr BytesAdded: %d\n", bytesAddedToHeader);
+	//Logger::Info("Bone BytesAdded: %d\n", bytesAddedToBones);
 	int bytesAddedToHeader = 52;
 	int bytesAddedToBones = mdlhdr.numbones * 28;
 	for (int i = 0; i < mdlhdr.numlocalanim; i++)
@@ -2707,9 +2707,9 @@ std::vector<mstudioseqdesc_t_v53> MDL::v49Mdl::SeqDescConversion()
 	std::vector<mstudioseqdesc_t_v53> v53SeqDescs;
 	int ikRuleNum = 0;
 	int seqIdx = mdlhdr.localseqindex;
-	Logger::Info("animIdx: %d\n", seqIdx);
-	Logger::Info("Hdr BytesAdded: %d\n", bytesAddedToHeader);
-	Logger::Info("Bone BytesAdded: %d\n", bytesAddedToBones);
+	//Logger::Info("animIdx: %d\n", seqIdx);
+	//Logger::Info("Hdr BytesAdded: %d\n", bytesAddedToHeader);
+	//Logger::Info("Bone BytesAdded: %d\n", bytesAddedToBones);
 	int bytesAddedToHeader = 52;
 	int bytesAddedToBones = mdlhdr.numbones * 28;
 	int actModNumber = 0;
