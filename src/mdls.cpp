@@ -179,7 +179,7 @@ template <typename T> int GetJiggleBoneCount(T mdl, bool debug)
 	const char* type = typeid(mdl).name(); if (debug) Logger::Info("Type: %s\n", (std::string)type);
 	int jiggleBoneCount = 0;
 
-	if (type == typeid(v53Mdl).name() || type == typeid(v49Mdl).name() || type == typeid(v49Mdl).name())
+	if (type == typeid(MDL::v53Mdl).name() || type == typeid(MDL::v49Mdl).name() || type == typeid(MDL::v49Mdl).name())
 	{
 		int version = mdl.mdlhdr.version;
 		switch (version)
@@ -202,7 +202,7 @@ template <typename T> int GetHitboxCount(T mdl, bool debug)
 	const char* type = typeid(mdl).name();
 	int hitboxCount = 0;
 
-	if (type == typeid(v53Mdl).name() || type == typeid(v49Mdl).name() || type == typeid(v49Mdl).name())
+	if (type == typeid(MDL::v53Mdl).name() || type == typeid(MDL::v49Mdl).name() || type == typeid(MDL::v49Mdl).name())
 	{
 		int version = mdl.mdlhdr.version;
 		switch (version)
@@ -225,7 +225,7 @@ template <typename T> int GetModelCount(T mdl, bool debug)
 	const char* type = typeid(mdl).name(); if (debug) Logger::Info("Type: %s\n", type);
 	int modelCount = 0;
 
-	if (type == typeid(v53Mdl).name() || type == typeid(v49Mdl).name() || type == typeid(v49Mdl).name())
+	if (type == typeid(MDL::v53Mdl).name() || type == typeid(MDL::v49Mdl).name() || type == typeid(MDL::v49Mdl).name())
 	{
 		int version = mdl.mdlhdr.version;
 		switch (version)
