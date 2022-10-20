@@ -67,16 +67,10 @@ int main(int argc, char *argv[]) {
     Logger::Notice("with extensions of vtx, vvd, and phy\n");
     Logger::Info("---------------------------------------------------\n");
     Logger::Info("args:\n");
-    Logger::Info("\"--anims\": [EXPERIMENTAL] Enables animations\n");
     Logger::Info("\"--help\": Shows this\n");
     Logger::Info("\"--noui\": Disables the UI\n");
     return 0;
     Logger::Info("\"\": \n");
-  }
-  bool anim;
-  if(cmdOptionExists(argv,argv+argc,"--anims")){
-    anim = true;
-    Logger::Info("Animations enabled\n");
   }
   
   
@@ -92,8 +86,6 @@ int main(int argc, char *argv[]) {
     inf.vtx = hh(argv[2],"vtx");
     inf.vvd = hh(argv[2],"vvd");
     inf.phy = hh(argv[2],"phy");
-    if(!anim) inf.animation_override = 0;
-    if(!anim) inf.sequence_override = 0;
     string yo = string(argv[2]);
     auto dot = yo.find_last_of('.');
     yo.resize(dot);

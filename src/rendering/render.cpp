@@ -106,13 +106,6 @@ void drop_callback(GLFWwindow* window, int count, const char** paths)
   }
     
 }
-
-
-
-int attachments, animations, flags, sequences;
-bool override_attachments, override_animations, override_flags, override_sequences;
-
-
 float conv_demo_prog;
 std::mutex conv_demo_prog_mutex;
 bool bingChilling = false;
@@ -220,9 +213,10 @@ void RenderGUI(){
 
     ImGui::PopStyleVar();
 
-    for(int i = 0; i < 4;i++){
-        files[i]->UI(viewport_width);
-    }
+    files[0]->UI(viewport_width);
+    files[1]->UI(viewport_width);
+    files[2]->UI(viewport_width);
+    files[4]->UI(viewport_width);
     
     
 
@@ -239,8 +233,23 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{0.0f,0.0f});
     ImGui::BeginChild("##ConvertSmol", {0,0},false);
     ImGui::Text("Extra Files");
+    if(ImGui::IsItemHovered()){
+      ImGui::BeginTooltip();
+      ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+      ImGui::TextWrapped("Some other files that enable extra features or supplemental data,\n not required but will assist in more complex models");
+      ImGui::PopTextWrapPos();
+      ImGui::EndTooltip();
+    }
     ImGui::Separator();
-    files[4]->UI((viewport_width/2.0f)-10);
+    files[3]->UI(viewport_width);
+    if(ImGui::IsItemHovered()){
+      ImGui::BeginTooltip();
+      ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+      ImGui::TextWrapped("Some random bullshit that rika thought we should add");
+      ImGui::PopTextWrapPos();
+      ImGui::EndTooltip();
+    }
+    files[5]->UI((viewport_width/2.0f)-10);
     if(ImGui::IsItemHovered()){
       ImGui::BeginTooltip();
       ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
@@ -248,23 +257,10 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
       ImGui::PopTextWrapPos();
       ImGui::EndTooltip();
     }
-    files[5]->UI((viewport_width/2.0f)-10);
     files[6]->UI((viewport_width/2.0f)-10);
-    /*
-    ImGui::Text("Overrides");
-    ImGui::Separator();
-    ImGui::Checkbox("Override Attachments",                   &override_attachments );
-    if(override_attachments) ImGui::InputInt("##Attachments", &attachments          );
-    ImGui::Checkbox("Override Sequences",                     &override_sequences   );
-    if(override_sequences)   ImGui::InputInt("##Sequences",   &sequences            );
-    ImGui::Checkbox("Override Animations",                    &override_animations  );
-    if(override_animations)  ImGui::InputInt("##Animations",  &animations           );
-    ImGui::Checkbox("Override Flags",                         &override_flags       );
-    if(override_flags){
-                             //ImGui::InputInt("##Flags",       &flags                );
-                             ImGui::InputScalar("##Flags", ImGuiDataType_U32, &flags, &u32_min, &u32_max, "%08X", ImGuiInputTextFlags_CharsHexadecimal);
-    }
-    */
+    files[7]->UI((viewport_width/2.0f)-10);
+    files[8]->UI((viewport_width/2.0f)-10);
+
     ImGui::Text("Disable Conversions");
     ImGui::Separator();
     ImGui::Checkbox("Bones",            &fileinfo.disable_bones         );
@@ -371,11 +367,6 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
         if(files[5]->isEnabled) fileinfo.str = files[5]->BoxBuffer;
         if(files[6]->isEnabled) fileinfo.aabb = files[6]->BoxBuffer;
         fileinfo.out = rn(files[0]->BoxBuffer,"conv");
-
-        if(override_attachments) fileinfo.attachment_override =  attachments;
-        if(override_sequences) fileinfo.sequence_override =  sequences;
-        if(override_animations) fileinfo.animation_override =  animations;
-        if(override_flags) fileinfo.flags_override =  flags;
 
         ImGui::OpenPopup("Status##ConvertModal");
         Logger::Debug("Spinning up conversion thread\n");
@@ -617,6 +608,7 @@ int UI::Run(){
 const char* mdls = "*.mdl";
 const char* vtxs = "*.vtx";
 const char* vvds = "*.vvd";
+const char* vvcs = "*.vvc";
 const char* phys = "*.phy";
 const char* pfbs = "*.bin";
 const char* json = "*.json";
@@ -624,6 +616,9 @@ const char* json = "*.json";
 files.push_back(new Widgets::File("MDL",false,mdls));
 files.push_back(new Widgets::File("VTX",true,vtxs));
 files.push_back(new Widgets::File("VVD",true,vvds));
+auto vvc_uiblock = new Widgets::File("VVC",true,pfbs);
+vvc_uiblock->isEnabled = false;
+files.push_back(vvc_uiblock);
 files.push_back(new Widgets::File("PHY",true,phys));
 auto phyblock_uiblock = new Widgets::File("PHY Block",true,pfbs);
 phyblock_uiblock->isEnabled = false;
@@ -634,6 +629,9 @@ files.push_back(extrastructs_uiblock);
 auto aabbtree_uiblock = new Widgets::File("AABB Tree",true,pfbs);
 aabbtree_uiblock->isEnabled = false;
 files.push_back(aabbtree_uiblock);
+auto rui_uiblock = new Widgets::File("RUI",true,pfbs);
+rui_uiblock->isEnabled = false;
+files.push_back(rui_uiblock);
 
 for(int i = 0; i < files.size();i++){
     files[i]->CheckErrors();

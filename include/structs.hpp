@@ -12,16 +12,13 @@ struct FileInfo {
 	std::optional<std::string> mdl; //main mdl file
 	std::optional<std::string> vtx; //vertices
 	std::optional<std::string> vvd; //vertex data
+	std::optional<std::string> vvc; //i'm gonna skin rika alive for thinking we need this shit
 	std::optional<std::string> phy; //physics data
 	std::optional<std::string> pfb; //extra physics stuff
 	std::optional<std::string> str; //extra structs
 	std::optional<std::string> aabb; //aabb tree
+	std::optional<std::string> rui; //rui shit
 	std::optional<std::string> out; //output file
-
-	std::optional<int> attachment_override;
-	std::optional<int> sequence_override;
-	std::optional<int> animation_override;
-	std::optional<int> flags_override;
 
 	bool disable_bones = false;
 	bool disable_attachments = false;
