@@ -1173,6 +1173,32 @@ struct mstudiokeyvalues_t_v49
 	std::vector<char> value;
 };
 
+struct mstudioseqstring_t_v49
+{
+	std::vector<char> szname;
+	std::vector<char> activity;
+	std::vector<char> activityevent;
+	std::vector<char> activitymodifier;
+};
+
+struct mstudiostringtable_t_v49
+{
+	std::vector<char> mdlname;
+	std::vector<char> surfaceprop;
+	std::vector<std::vector<char>> bones;
+	std::vector<std::vector<char>> attachments;
+	std::vector<std::vector<char>> anims;
+	std::vector<mstudioseqstring_t_v49> seqs;
+	std::vector<std::vector<char>> nodes;
+	std::vector<std::vector<char>> bodyparts;
+	std::vector<std::vector<char>> poseparams;
+	std::vector<std::vector<char>> ikchains;
+	std::vector<std::vector<char>> includemodel;
+	std::vector<std::vector<char>> textures;
+	std::vector<std::vector<char>> cdmaterials;
+};
+
+
 struct mstudiocompressedikerror_t_v52
 {
 	float scale[4]; // first three values are the same as what posscale (if it was used) is, fourth is similar to unkvector1.

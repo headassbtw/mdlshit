@@ -90,6 +90,7 @@ class BinaryReader{
     void Read(mstudionodename_t_v49* data);
     void Read(pertriheader_t_v49* data);
     void Read(mstudiokeyvalues_t_v49* data, int groupSize);
+    void Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 _mdl);
 
     void Read(mstudiocompressedikerror_t_v52* data);
 
@@ -189,6 +190,7 @@ class BinaryWriter{
     void Write(mstudionodename_t_v49 data);
     void Write(pertriheader_t_v49 data);
     void Write(mstudiokeyvalues_t_v49 data);
+    void Write(mstudiostringtable_t_v49 data);
     template <typename T> void Write(std::vector<T> data);
 
     void Write(mstudiocompressedikerror_t_v52 data);

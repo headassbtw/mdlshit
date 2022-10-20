@@ -147,7 +147,7 @@ template <typename T> std::vector<T> ArrayToVector(T* arry, int size)
 std::string ReadMDLString(BinaryReader* Stream, int pos)
 {
 	int startPos = Stream->Position();
-	int size = 0;
+//	int size = 0;
 
 	int defSize = 100;
 
@@ -165,7 +165,7 @@ std::string ReadMDLString(BinaryReader* Stream, int pos)
 		else
 		{
 			vec.push_back(value);
-			size++;
+//			size++;
 		}
 	}
 	std::string string(vec.begin(), vec.end());
@@ -1526,7 +1526,13 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 		Stream->Read(&linearbonedata, mdlhdr.numbones);
 		Logger::Info("LinearBone Read: %d\n", mdlhdr.numbones);
 	}
-	MDL::v49Mdl _v49mdl{ mdlhdr,mdlsubhdr,bones,jigglebones,boneflexdrivers,attachments,hitboxsets,hitboxes,bonenametable,animdescs,anims, sectionindexes, sections, ikrules,compressedikerrors,ikerrors,ikrulezeroframe,seqdescs,blends,posekeys,events,autolayers,activitymodifiers,seqweightlist,nodenames,nodes,bodyparts,models,meshes,ikchains,iklinks,poseparamdescs,includedmodels,cdtextures,textures,skingroups,keyvalues,srcbonetransforms,linearbone,linearbonedata };
+
+	Stream->seek(mdlsubhdr.sznameindex + 408);
+	mstudiostringtable_t_v49 stringTable; Stream->Read(&stringTable, mdlhdr);
+	std::string string(stringTable.mdlname.begin(), stringTable.mdlname.end());
+	Logger::Info("mldName: %s\n", string.c_str());
+
+	MDL::v49Mdl _v49mdl{ mdlhdr,mdlsubhdr,bones,jigglebones,boneflexdrivers,attachments,hitboxsets,hitboxes,bonenametable,animdescs,anims, sectionindexes, sections, ikrules,compressedikerrors,ikerrors,ikrulezeroframe,seqdescs,blends,posekeys,events,autolayers,activitymodifiers,seqweightlist,nodenames,nodes,bodyparts,models,meshes,ikchains,iklinks,poseparamdescs,includedmodels,cdtextures,textures,skingroups,keyvalues,srcbonetransforms,linearbone,linearbonedata, stringTable };
 
 	return _v49mdl;
 }
