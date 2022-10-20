@@ -169,6 +169,7 @@ namespace MDL
 		int bytesAddedToBones = 0;
 		int bytesAddedToAnims = 0;
 		int bytesAddedToAnimData = 0;
+		int bytesAddedToSections = 0;
 		int bytesAddedToSeqs = 0;
 		int bytesAddedToTextures = 0;
 		int bytesAddedToIkChains = 0;

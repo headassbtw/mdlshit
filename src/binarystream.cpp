@@ -547,7 +547,7 @@ void BinaryReader::Read(mstudioanimdata_t_v49* data, int datasize)
 {
     for (int i = 0; i < datasize; i++)
     {
-        Stream.read((char*)&data->value, sizeof(byte));
+        Stream.read((char*)&data->value, 1);
         data->arry.push_back(data->value);
     }
 }
@@ -1884,7 +1884,7 @@ void BinaryWriter::Write(mstudioanimdata_t_v49 data)
 {
     for (int i = 0; i < data.arry.size(); i++)
     {
-        Stream.write((char*)&data.arry[i], sizeof(byte));
+        Stream.write((char*)&data.arry[i], 1);
     }
 }
 

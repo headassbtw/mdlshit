@@ -245,6 +245,14 @@ template <typename T> int GetModelCount(T mdl, bool debug)
 	return 0;
 }
 
+void AddDistToAnimData(mstudioanimdata_t_v49 vec, int extra)
+{
+	for (int i = 0; i < extra; i++)
+	{
+		vec.arry.push_back((std::byte)0);
+	}
+}
+
 MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 {
 	studiohdr_t_v53										mdlhdr; Stream->Read(&mdlhdr);
@@ -1725,6 +1733,30 @@ std::vector<int> MDL::v49Mdl::v53GetAnimHdrBytesAdded(bool zeroFirst)
 				if (anims[j].nextoffset == 0)
 				{
 
+					if (animdescs[i].numikrules > 0)
+					{
+						int dist = (((animdescs[next].baseptr - animdescs[next].ikruleindex) * -1) - (anims[j].strPos + headerSize));
+
+						if (dist > 18 || dist < 0)
+						{
+							for (int l = 0; l < anims[j].animdata.arry.size(); l++)
+							{
+								short animValue{ (short)anims[j].animdata.arry[l] };
+								if (animValue == 0)
+								{
+									int newPos = l;
+									dist = anims[j].animdata.arry.size() - newPos;
+									if (dist <= 18)
+									{
+										break;
+									}
+								}
+							}
+						}
+						//AddDistToAnimData(anims[j].animdata, dist);
+						bytesAdded += 32 - dist;
+					}
+
 					if (i + 1 < mdlhdr.numlocalanim - 1 && animdescs[next].sectionindex == 0)
 					{
 						int dist = (((animdescs[next].baseptr - animdescs[next].animindex) * -1) - (anims[j].strPos + headerSize));
@@ -1747,6 +1779,33 @@ std::vector<int> MDL::v49Mdl::v53GetAnimHdrBytesAdded(bool zeroFirst)
 						}
 						//Logger::Info("dist:  %d\n", dist);
 						//Logger::Info("finalDist:  %d\n", 32 - dist);
+						//AddDistToAnimData(anims[j].animdata, dist);
+						bytesAdded += 32 - dist;
+					}
+
+					if (i + 1 < mdlhdr.numlocalanim - 1 && animdescs[next].sectionindex > 0)
+					{
+						int dist = (((animdescs[next].baseptr - animdescs[next].sectionindex) * -1) - (anims[j].strPos + headerSize));
+
+						if (dist > 18 || dist < 0)
+						{
+							for (int l = 0; l < anims[j].animdata.arry.size(); l++)
+							{
+								short animValue{ (short)anims[j].animdata.arry[l] };
+								if (animValue == 0)
+								{
+									int newPos = l;
+									dist = anims[j].animdata.arry.size() - newPos;
+									if (dist <= 18)
+									{
+										break;
+									}
+								}
+							}
+						}
+						//Logger::Info("dist:  %d\n", dist);
+						//Logger::Info("finalDist:  %d\n", 32 - dist);
+						//AddDistToAnimData(anims[j].animdata, dist);
 						bytesAdded += 32 - dist;
 					}
 
@@ -1777,6 +1836,29 @@ int MDL::v49Mdl::v53GetTotalAnimHdrBytesAdded()
 				if (anims[j].nextoffset == 0)
 				{
 
+					if (animdescs[i].numikrules > 0)
+					{
+						int dist = (((animdescs[next].baseptr - animdescs[next].ikruleindex) * -1) - (anims[j].strPos + headerSize));
+
+						if (dist > 18 || dist < 0)
+						{
+							for (int l = 0; l < anims[j].animdata.arry.size(); l++)
+							{
+								short animValue{ (short)anims[j].animdata.arry[l] };
+								if (animValue == 0)
+								{
+									int newPos = l;
+									dist = anims[j].animdata.arry.size() - newPos;
+									if (dist <= 18)
+									{
+										break;
+									}
+								}
+							}
+						}
+						bytesAdded += 32 - dist;
+					}
+
 					if (i + 1 > mdlhdr.numlocalanim - 1)
 					{
 						int dist = (mdlhdr.localseqindex - (anims[j].strPos + headerSize));
@@ -1799,6 +1881,7 @@ int MDL::v49Mdl::v53GetTotalAnimHdrBytesAdded()
 						}
 						//Logger::Info("secDist:  %d\n", dist);
 						//Logger::Info("secFinalDist:  %d\n", 32 - dist);
+						//AddDistToAnimData(anims[j].animdata, dist);
 						bytesAdded += 32 - dist;
 					}
 
@@ -1822,6 +1905,32 @@ int MDL::v49Mdl::v53GetTotalAnimHdrBytesAdded()
 								}
 							}
 						}
+						bytesAdded += 32 - dist;
+					}
+
+					if (i + 1 < mdlhdr.numlocalanim - 1 && animdescs[next].sectionindex > 0)
+					{
+						int dist = (((animdescs[next].baseptr - animdescs[next].sectionindex) * -1) - (anims[j].strPos + headerSize));
+
+						if (dist > 18 || dist < 0)
+						{
+							for (int l = 0; l < anims[j].animdata.arry.size(); l++)
+							{
+								short animValue{ (short)anims[j].animdata.arry[l] };
+								if (animValue == 0)
+								{
+									int newPos = l;
+									dist = anims[j].animdata.arry.size() - newPos;
+									if (dist <= 18)
+									{
+										break;
+									}
+								}
+							}
+						}
+						//Logger::Info("dist:  %d\n", dist);
+						//Logger::Info("finalDist:  %d\n", 32 - dist);
+						//AddDistToAnimData(anims[j].animdata, dist);
 						bytesAdded += 32 - dist;
 					}
 
@@ -1853,6 +1962,29 @@ int MDL::v49Mdl::v53GetAnimHdrBytesAddedIdv(int anim)
 				if (anims[j].nextoffset == 0)
 				{
 
+					if (animdescs[i].numikrules > 0)
+					{
+						int dist = (((animdescs[next].baseptr - animdescs[next].ikruleindex) * -1) - (anims[j].strPos + headerSize));
+
+						if (dist > 18 || dist < 0)
+						{
+							for (int l = 0; l < anims[j].animdata.arry.size(); l++)
+							{
+								short animValue{ (short)anims[j].animdata.arry[l] };
+								if (animValue == 0)
+								{
+									int newPos = l;
+									dist = anims[j].animdata.arry.size() - newPos;
+									if (dist <= 18)
+									{
+										break;
+									}
+								}
+							}
+						}
+						bytesAdded += 32 - dist;
+					}
+
 					if (i + 1 > mdlhdr.numlocalanim - 1)
 					{
 						int dist = (mdlhdr.localseqindex - (anims[j].strPos + headerSize));
@@ -1900,6 +2032,32 @@ int MDL::v49Mdl::v53GetAnimHdrBytesAddedIdv(int anim)
 						}
 						//Logger::Info("dist:  %d\n", dist);
 						//Logger::Info("finalDist:  %d\n", 32 - dist);
+						bytesAdded += 32 - dist;
+					}
+
+					if (i + 1 < mdlhdr.numlocalanim - 1 && animdescs[next].sectionindex > 0)
+					{
+						int dist = (((animdescs[next].baseptr - animdescs[next].sectionindex) * -1) - (anims[j].strPos + headerSize));
+
+						if (dist > 18 || dist < 0)
+						{
+							for (int l = 0; l < anims[j].animdata.arry.size(); l++)
+							{
+								short animValue{ (short)anims[j].animdata.arry[l] };
+								if (animValue == 0)
+								{
+									int newPos = l;
+									dist = anims[j].animdata.arry.size() - newPos;
+									if (dist <= 18)
+									{
+										break;
+									}
+								}
+							}
+						}
+						//Logger::Info("dist:  %d\n", dist);
+						//Logger::Info("finalDist:  %d\n", 32 - dist);
+						//AddDistToAnimData(anims[j].animdata, dist);
 						bytesAdded += 32 - dist;
 					}
 
@@ -1951,6 +2109,30 @@ std::vector<int> MDL::v49Mdl::v53GetSecHdrBytesAdded(bool zeroFirst)
 					if (sections[k].nextoffset == 0)
 					{
 
+						if (animdescs[i].numikrules > 0 && j + 1 > num - 1)
+						{
+							int dist = (startPos + animdescs[i].ikruleindex - (pos2 + headerSize));
+
+							if (dist > 18 || dist < 0)
+							{
+								for (int l = 0; l < sections[j].animdata.arry.size(); l++)
+								{
+									short animValue{ (short)sections[j].animdata.arry[l] };
+									if (animValue == 0)
+									{
+										int newPos = l;
+										dist = sections[j].animdata.arry.size() - newPos;
+										if (dist <= 18)
+										{
+											break;
+										}
+									}
+								}
+							}
+							//AddDistToAnimData(sections[j].animdata, dist);
+							bytesAdded += 32 - dist;
+						}
+
 						if (i + 1 > mdlhdr.numlocalanim - 1 && j + 1 > num - 1)
 						{
 							int dist = (mdlhdr.localseqindex - (pos2 + headerSize));
@@ -1973,6 +2155,7 @@ std::vector<int> MDL::v49Mdl::v53GetSecHdrBytesAdded(bool zeroFirst)
 							}
 							//Logger::Info("secDist:  %d\n", dist);
 							//Logger::Info("secFinalDist:  %d\n", 32 - dist);
+							//AddDistToAnimData(sections[j].animdata, dist);
 							bytesAdded += 32 - dist;
 						}
 
@@ -1997,6 +2180,7 @@ std::vector<int> MDL::v49Mdl::v53GetSecHdrBytesAdded(bool zeroFirst)
 							}
 							//Logger::Info("secDist:  %d\n", dist);
 							//Logger::Info("secFinalDist:  %d\n", 32 - dist);
+							//AddDistToAnimData(sections[j].animdata, dist);
 							bytesAdded += 32 - dist;
 						}
 						if (i + 1 < mdlhdr.numlocalanim && j + 1 < num)
@@ -2021,6 +2205,7 @@ std::vector<int> MDL::v49Mdl::v53GetSecHdrBytesAdded(bool zeroFirst)
 							}
 							//Logger::Info("secDist:  %d\n", dist);
 							//Logger::Info("secFinalDist:  %d\n", 32 - dist);
+							//AddDistToAnimData(sections[j].animdata, dist);
 							bytesAdded += 32 - dist;
 						}
 						break;
@@ -2065,6 +2250,28 @@ int MDL::v49Mdl::v53GetTotalSecHdrBytesAdded()
 					bytesAdded += (32 - headerSize);
 					if (sections[k].nextoffset == 0)
 					{
+						if (animdescs[i].numikrules > 0 && j + 1 > num - 1)
+						{
+							int dist = (startPos + animdescs[i].ikruleindex - (pos2 + headerSize));
+
+							if (dist > 18 || dist < 0)
+							{
+								for (int l = 0; l < sections[j].animdata.arry.size(); l++)
+								{
+									short animValue{ (short)sections[j].animdata.arry[l] };
+									if (animValue == 0)
+									{
+										int newPos = l;
+										dist = sections[j].animdata.arry.size() - newPos;
+										if (dist <= 18)
+										{
+											break;
+										}
+									}
+								}
+							}
+							bytesAdded += 32 - dist;
+						}
 
 						if (i + 1 > mdlhdr.numlocalanim - 1 && j + 1 > num - 1)
 						{
@@ -2186,6 +2393,31 @@ int MDL::v49Mdl::v53GetSecHdrBytesAddedIdv(int anim)
 					bytesAdded += (32 - headerSize);
 					if (sections[k].nextoffset == 0)
 					{
+
+						if (animdescs[i].numikrules > 0 && j + 1 > num - 1)
+						{
+							int dist = (startPos + animdescs[i].ikruleindex - (pos2 + headerSize));
+
+							if (dist > 18 || dist < 0)
+							{
+								for (int l = 0; l < sections[j].animdata.arry.size(); l++)
+								{
+									short animValue{ (short)sections[j].animdata.arry[l] };
+									if (animValue == 0)
+									{
+										int newPos = l;
+										dist = sections[j].animdata.arry.size() - newPos;
+										if (dist <= 18)
+										{
+											break;
+										}
+									}
+								}
+							}
+							//Logger::Info("secDist:  %d\n", dist);
+							//Logger::Info("secFinalDist:  %d\n", 32 - dist);
+							bytesAdded += 32 - dist;
+						}
 
 						if (i + 1 > mdlhdr.numlocalanim - 1 && j + 1 > num - 1)
 						{
@@ -2311,6 +2543,29 @@ std::vector<int> MDL::v49Mdl::v53GetSecBytesAdded(bool zeroFirst)
 					bytesAdded += (32 - headerSize);
 					if (sections[k].nextoffset == 0)
 					{
+						if (animdescs[i].numikrules > 0 && j + 1 > num - 1)
+						{
+							int dist = (startPos + animdescs[i].ikruleindex - (pos2 + headerSize));
+
+							if (dist > 18 || dist < 0)
+							{
+								for (int l = 0; l < sections[j].animdata.arry.size(); l++)
+								{
+									short animValue{ (short)sections[j].animdata.arry[l] };
+									if (animValue == 0)
+									{
+										int newPos = l;
+										dist = sections[j].animdata.arry.size() - newPos;
+										if (dist <= 18)
+										{
+											break;
+										}
+									}
+								}
+							}
+							bytesAdded += 32 - dist;
+						}
+
 						if (i + 1 < mdlhdr.numlocalanim && j + 1 > num - 1)
 						{
 							int dist = animdescs[nextAnim].sectionindex > 0 ? ((startPos + 100 + animdescs[nextAnim].sectionindex) - (pos2 + headerSize)) : ((startPos + 100 + animdescs[nextAnim].animindex) - (pos2 + headerSize));
@@ -2403,18 +2658,19 @@ void MDL::v49Mdl::SetMdlInts()
 
 	animBytesAdded = animByteAddedTotal + animSecByteAddedTotal;
 	bytesAddedToRuiMesh = 0;
-	bytesAddedToIkRules = 0;// -12 * animData->numOfIkRules;
+	bytesAddedToIkRules = -12 * ikrules.size();
 	bytesAddedToHeader = 52;
 	bytesAddedToBones = mdlhdr.numbones * 28;
 	bytesAddedToAnims = -8 * mdlhdr.numlocalanim;
-	bytesAddedToAnimData = mdlhdr.numlocalanim > 0 ? animByteAddedTotal + animSecByteAddedTotal + bytesAddedToIkRules : 0;
+	bytesAddedToAnimData = mdlhdr.numlocalanim > 0 ? animByteAddedTotal + animSecByteAddedTotal + bytesAddedToIkRules + bytesAddedToSections : 0;
+	bytesAddedToSections = -4 * secHdrBytesSecAdd.size();
 	bytesAddedToSeqs = 20 * mdlhdr.numlocalseq;
 	bytesAddedToTextures = -20 * mdlhdr.numtextures;
 	bytesAddedToIkChains = 16 * mdlhdr.numikchains;
 	bytesAddedToActMods = 4 * activitymodifiers.size();
 	textureFiller = 0;
 	strFiller = 60;
-	allBytesAdded = bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToTextures + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods + bytesAddedToIkRules + textureFiller + bytesAddedToRuiMesh;
+	allBytesAdded = bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToTextures + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + bytesAddedToRuiMesh;
 	numOfLinks = 0;
 }
 
@@ -2663,16 +2919,20 @@ std::vector<mstudioanimdesc_t_v53> MDL::v49Mdl::AnimDescConversion()
 	//Logger::Info("Bone BytesAdded: %d\n", bytesAddedToBones);
 	int bytesAddedToHeader = 52;
 	int bytesAddedToBones = mdlhdr.numbones * 28;
+	int secNum = 0;
 	for (int i = 0; i < mdlhdr.numlocalanim; i++)
 	{
 		//Logger::Info("Test\n");
 		mstudioanimdesc_t_v49 v49AnimDesc = animdescs[i];
 
-
+		int frames = v49AnimDesc.numframes;
+		int secFrames = v49AnimDesc.sectionframes;
 		int outPos = animIdx + bytesAddedToHeader + bytesAddedToBones + 92 * i;
+		int pos = animIdx + 100 * i;
 		int stairs = (-((8 * (mdlhdr.numlocalanim - i))) + bytesAddedToSeqs) + bytesAddedToTextures + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + strFiller + bytesAddedToRuiMesh;
 		int steps = -((8 * (mdlhdr.numlocalanim - i))) + hdrBytesAnimDescAdd[i] + secHdrBytesAnimDescAdd[i];
-		int ikStairs = -12 * (ikRuleNum);
+
+
 		if (v49AnimDesc.numikrules > 0)
 		{
 			int stairs = v53GetAnimHdrBytesAddedIdv(i);
@@ -2681,14 +2941,23 @@ std::vector<mstudioanimdesc_t_v53> MDL::v49Mdl::AnimDescConversion()
 			v49AnimDesc.ikruleindex += stairs + stairs2;
 			ikRuleNum += v49AnimDesc.numikrules;
 		}
+		int secStairs = -4 * secNum;
+		if (v49AnimDesc.sectionindex > 0)
+		{
+			int num = (frames / secFrames) + 2;
+			secNum += num;
+			int dist = (((pos + animdescs[i].sectionindex) + (8 * num)) - (pos + animdescs[i].animindex)) * -1;
+		}
+		int ikStairs = -12 * (ikRuleNum);
 
-		if (v49AnimDesc.animindex > 0) v49AnimDesc.animindex += steps + ikStairs;
-		if (v49AnimDesc.movementindex > 0) v49AnimDesc.movementindex += steps + ikStairs;
-		if (v49AnimDesc.ikruleindex > 0) v49AnimDesc.ikruleindex += steps + ikStairs;
-		if (v49AnimDesc.localhierarchyindex > 0) v49AnimDesc.localhierarchyindex += steps + ikStairs;
-		if (v49AnimDesc.zeroframeindex > 0) v49AnimDesc.zeroframeindex += steps + ikStairs;
-		if (v49AnimDesc.ikrulezeroframeindex > 0) v49AnimDesc.ikrulezeroframeindex += steps + ikStairs;
-		if (v49AnimDesc.sectionindex > 0) v49AnimDesc.sectionindex += steps + ikStairs;
+		if (v49AnimDesc.animindex > 0) v49AnimDesc.animindex += steps + ikStairs + secStairs;
+		if (v49AnimDesc.movementindex > 0) v49AnimDesc.movementindex += steps + ikStairs + secStairs;
+		if (v49AnimDesc.ikruleindex > 0) v49AnimDesc.ikruleindex += steps + ikStairs + secStairs;
+		if (v49AnimDesc.localhierarchyindex > 0) v49AnimDesc.localhierarchyindex += steps + ikStairs + secStairs;
+		if (v49AnimDesc.zeroframeindex > 0) v49AnimDesc.zeroframeindex += steps + ikStairs + secStairs;
+		if (v49AnimDesc.ikrulezeroframeindex > 0) v49AnimDesc.ikrulezeroframeindex += steps + ikStairs + secStairs;
+		if (v49AnimDesc.sectionindex > 0) v49AnimDesc.sectionindex += steps + ikStairs + secStairs;
+
 		int compressedIkRuleIdx = 0; //if (v49AnimDesc.numikrules > 0) compressedIkRuleIdx = ( basePtr - ( basePtr - (v49AnimDesc.ikruleindex + 140 * v49AnimDesc.numikrules) ) ) * -1 ;
 
 
@@ -2881,9 +3150,11 @@ std::vector<sectionindexes_t_v53> MDL::v49Mdl::ConvertSectionIndexes()
 	std::vector<sectionindexesindex_t_v49> _sectionIndexes = sectionindexes;
 	std::vector<sectionindexes_t_v53> v53SectionIndexes;
 	int secNum = 0;
+	int secSetNum = 0;
 	for (int i = 0; i < mdlhdr.numlocalanim; i++)
 	{
-		int stairs = -((8 * (mdlhdr.numlocalanim - i))) + hdrBytesAnimDescAdd[i] - 4;
+		int pos = mdlhdr.localanimindex + 100 * i;
+		int stairs = -((8 * (mdlhdr.numlocalanim - i))) + hdrBytesAnimDescAdd[i] - 8;
 
 		int frames = animdescs[i].numframes;
 		int secFrames = animdescs[i].sectionframes;
@@ -2891,11 +3162,15 @@ std::vector<sectionindexes_t_v53> MDL::v49Mdl::ConvertSectionIndexes()
 		if (animdescs[i].sectionindex > 0)
 		{
 			int num = (frames / secFrames) + 2;
+			secSetNum += num;
+
+			int dist = ( ( (pos + animdescs[i].sectionindex) + (8 * num) ) - (pos + animdescs[i].animindex) ) * -1;
+			//Logger::Info("Dist: %d\n", dist);
 
 			for (int j = 0; j < num; j++)
 			{
-
-				int offset = sectionindexes[secNum].sectionoffset + stairs + secHdrBytesSecAdd[secNum];
+				int steps = -4 * secSetNum;
+				int offset = sectionindexes[secNum].sectionoffset + stairs + secHdrBytesSecAdd[secNum] + steps;
 
 				sectionindexes_t_v53 v53SectionIndex{ offset };
 				v53SectionIndexes.push_back(v53SectionIndex);

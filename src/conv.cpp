@@ -106,7 +106,7 @@ int Conversion::ReadHeader(FileInfo info) {
       }
   }
 
-  int bytesAddedToIkRules = 0;// -12 * animData->numOfIkRules;
+  int bytesAddedToIkRules = -12 * mdl.iklinks.size();
   int bytesAddedToHeader = 52;
   int bytesAddedToBones = mdl.mdlhdr.numbones * 28;
   int bytesAddedToAnims = -8 * mdl.mdlhdr.numlocalanim;
@@ -117,7 +117,7 @@ int Conversion::ReadHeader(FileInfo info) {
   int bytesAddedToActMods = 4 * mdl.activitymodifiers.size();
   int textureFiller = 0;
   int strFiller = 60;
-  int allBytesAdded = bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToTextures + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods + bytesAddedToIkRules + textureFiller + bytesAddedToRuiMesh;
+  int allBytesAdded = bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToTextures + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + bytesAddedToRuiMesh;
 
   OutStream.seek(v53Hdr.boneindex);
   UI::Progress.SubTask.Begin("Converting Bones");
@@ -240,9 +240,9 @@ int Conversion::ReadHeader(FileInfo info) {
           //    }
           //}
           mstudioanimdesc_t_v53 animDesc = animdescs[i];
-          animDesc.animindex -= 4;
-          if (animDesc.sectionindex > 0) animDesc.sectionindex -= 4;
-          if (animDesc.ikruleindex > 0) animDesc.ikruleindex -= 4;
+          animDesc.animindex -= 8;
+          if (animDesc.sectionindex > 0) animDesc.sectionindex -= 8;
+          if (animDesc.ikruleindex > 0) animDesc.ikruleindex -= 8;
           OutStream.Write(animDesc);
       }
       Logger::Notice("Converted animation %d of %d\n", i + 1, mdl.mdlhdr.numlocalanim);
@@ -275,11 +275,11 @@ int Conversion::ReadHeader(FileInfo info) {
 
           mstudioanimdesc_t_v53 animDesc = animdescs[i];
           int startPos = v53Hdr.localanimindex + 92 * i;
-          OutStream.seek(startPos + animdescs[i].animindex - 4);
+          OutStream.seek(startPos + animdescs[i].animindex - 8);
 
           if (animDesc.sectionindex == 0)
           {
-              OutStream.seek(startPos + animdescs[i].animindex - 4);
+              OutStream.seek(startPos + animdescs[i].animindex - 8);
 
               for (int j = boneHdrNum; j < anims.size(); j++)
               {
@@ -288,6 +288,8 @@ int Conversion::ReadHeader(FileInfo info) {
                   boneHdrNum++;
                   if (anims[j].nextoffset == 0)
                   {
+                      //OutStream.seek(OutStream.Position() - 32);
+                      //fillerWrite(&OutStream, 32);
                       break;
                   }
               }
@@ -295,7 +297,7 @@ int Conversion::ReadHeader(FileInfo info) {
 
           if (animDesc.sectionindex > 0) //Gosh do I hate how this is setup. - Liberty //Edit: Not anymore. Could be better but I leave you with this. - Liberty
           {
-              OutStream.seek(startPos + animDesc.sectionindex - 4);
+              OutStream.seek(startPos + animDesc.sectionindex - 8);
 
               secHdrBytesSecAdd[0] = 0;
               int num = (animDesc.numframes / animDesc.sectionframes) + 2;
@@ -329,7 +331,8 @@ int Conversion::ReadHeader(FileInfo info) {
 
           if (animDesc.numikrules > 0)
           {
-              OutStream.seek(startPos + animdescs[i].ikruleindex - 4);
+              OutStream.seek(startPos + animdescs[i].ikruleindex - 8 - 32); //Issue with the 32 byte filler. - Liberty
+              fillerWrite(&OutStream, 32);
               for (int j = 0; j < animDesc.numikrules; j++)
               {
                   OutStream.Write(ikRules[ikRuleNum]);
@@ -338,6 +341,7 @@ int Conversion::ReadHeader(FileInfo info) {
               int compressedErrorNum = 0;
               if (mdl.compressedikerrors.size() > 0)
               {
+                  OutStream.seek(startPos + animdescs[i].ikruleindex + 140 * animDesc.numikrules);
                   int animStartPos = mdl.mdlhdr.localanimindex + 100 * i;
                   for (int j = 0; j < mdl.compressedikerrors.size(); j++)
                   {
