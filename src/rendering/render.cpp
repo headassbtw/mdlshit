@@ -342,7 +342,8 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
       files[0]->errors = Tests::TestMDL(files[0]->BoxBuffer);
       files[1]->errors = Tests::TestVTX(files[1]->BoxBuffer);
       files[2]->errors = Tests::TestVVD(files[2]->BoxBuffer);
-      files[3]->errors = Tests::TestPHY(files[3]->BoxBuffer);
+      files[3]->errors = Tests::TestVVC(files[3]->BoxBuffer);
+      files[4]->errors = Tests::TestPHY(files[4]->BoxBuffer);
 
       bool _block;
       for(auto f : files){
@@ -375,13 +376,15 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
     }
     if(ImGui::Button("Convert",{200,24})){
         Logger::Debug("Starting conversion\n");
-                                fileinfo.mdl = files[0]->BoxBuffer;
-        if(files[1]->isEnabled) fileinfo.vtx = files[1]->BoxBuffer;
-        if(files[2]->isEnabled) fileinfo.vvd = files[2]->BoxBuffer;
-        if(files[3]->isEnabled) fileinfo.phy = files[3]->BoxBuffer;
-        if(files[4]->isEnabled) fileinfo.pfb = files[4]->BoxBuffer;
-        if(files[5]->isEnabled) fileinfo.str = files[5]->BoxBuffer;
-        if(files[6]->isEnabled) fileinfo.aabb = files[6]->BoxBuffer;
+                                fileinfo.mdl  = files[0]->BoxBuffer;
+        if(files[1]->isEnabled) fileinfo.vtx  = files[1]->BoxBuffer;
+        if(files[2]->isEnabled) fileinfo.vvd  = files[2]->BoxBuffer;
+        if(files[3]->isEnabled) fileinfo.vvc  = files[3]->BoxBuffer;
+        if(files[4]->isEnabled) fileinfo.phy  = files[4]->BoxBuffer;
+        if(files[5]->isEnabled) fileinfo.pfb  = files[5]->BoxBuffer;
+        if(files[6]->isEnabled) fileinfo.str  = files[6]->BoxBuffer;
+        if(files[7]->isEnabled) fileinfo.aabb = files[7]->BoxBuffer;
+        if(files[8]->isEnabled) fileinfo.rui  = files[8]->BoxBuffer;
         fileinfo.out = rn(files[0]->BoxBuffer,"conv");
 
         ImGui::OpenPopup("Status##ConvertModal");
