@@ -54,11 +54,10 @@ bool hasBrowser;
 std::vector<Widgets::File*> files;
 std::vector<Error> Errors;
 
-int window_min_x = 500;
-int window_min_y = 500;
-int log_height = 200;
+int viewport_min_width = 856;
+int viewport_min_height = 500;
 
-float viewport_width = 500;
+float viewport_width = 856; //this is minecraft's default window size, but taller by 20px lmfao
 float viewport_height = 500;
 bool debugStats;
 
@@ -183,19 +182,6 @@ void RenderGUI(){
             if(!LogEnabled) if (ImGui::MenuItem("Enable Log File", "")) {Logger::Init(); LogEnabled = true;}
             if(LogEnabled) if (ImGui::MenuItem("Disable Log File", "")) {Logger::End(); LogEnabled = false;}
           }
-          
-          
-          if(ImGui::MenuItem("Show Log Output", "", &console)){
-            if(console){
-              glfwSetWindowSizeLimits(Window, 500, 700, GLFW_DONT_CARE, GLFW_DONT_CARE);
-            if(viewport_height<700)
-              glfwSetWindowSize(Window,viewport_width,700);
-            }
-            else{
-              glfwSetWindowSizeLimits(Window, 500, 500, GLFW_DONT_CARE, GLFW_DONT_CARE);
-              glfwSetWindowSize(Window,viewport_width,viewport_height);
-            }
-          }
            
           ImGui::MenuItem("Show Demo Window", "", &demoWindow);
 
@@ -213,19 +199,68 @@ void RenderGUI(){
 
     ImGui::PopStyleVar();
 
-    files[0]->UI(viewport_width);
-    files[1]->UI(viewport_width);
-    files[2]->UI(viewport_width);
-    files[4]->UI(viewport_width);
+    ImGui::BeginGroup();
+
+    files[0]->UI(viewport_width-204);
+    files[1]->UI(viewport_width-204);
+    files[2]->UI(viewport_width-204);
+    files[3]->UI(viewport_width-204);
     
+    if(ImGui::IsItemHovered()){
+      ImGui::BeginTooltip();
+      ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+      ImGui::TextWrapped("Some random bullshit that rika thought we should add");
+      ImGui::PopTextWrapPos();
+      ImGui::EndTooltip();
+    }
+    files[4]->UI(viewport_width-204);
+    static int message_count = 0;
+    ImGui::BeginChild("Logger",{viewport_width-220,0},false,ImGuiWindowFlags_AlwaysUseWindowPadding);
+    depth_border();
+    //ImFont* monospace = ImGui::GetIO().Fonts->Fonts[2];
+
+    //ImGui::PushFont(monospace);
+    ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {12.0,4.0});
+    if (ImGui::BeginTable("table1", 2,ImGuiTableFlags_BordersInnerV))
+    {
+      ImGui::TableSetupColumn("small",ImGuiTableColumnFlags_WidthFixed);
+      ImGui::TableSetupColumn("half");
+      for (int row = 0; row < LoggerMessages.size(); row++)
+      {
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::PushItemWidth(150.0f);
+        switch(LoggerMessages[row]->type){
+            case 4: ImGui::TextColored({0.1,1.0,0.1,1.0},"Debug");break;
+            case 1: ImGui::TextColored({1.0,1.0,0.2,1.0},"Notice");break;
+            case 2: ImGui::TextColored({1.0,0.1,0.1,1.0},"Error");break;
+            case 3: ImGui::TextColored({1.0,0.2,1.0,1.0},"Critical");break;
+            case 0: ImGui::TextColored({1.0,1.0,1.0,1.0},"Info");break;
+        }
+        ImGui::PopItemWidth();
+        ImGui::TableSetColumnIndex(1);
+        ImGui::Text("%s",LoggerMessages[row]->msg.c_str());
+      }
+      ImGui::EndTable();
+    }
+    if (message_count < LoggerMessages.size()) {
+      ImGui::SetScrollHereY(1.0f);
+      message_count = LoggerMessages.size();
+    }
+    ImGui::PopStyleVar();
+    //ImGui::PopFont();
+    ImGui::EndChild();
+    ImGui::EndGroup();
+    ImGui::SameLine();
+    ImGui::BeginGroup();
     
 
 const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
     
-    const ImU32 w_bg_col = ImGui::GetColorU32(ImGuiCol_WindowBg);
+  const ImU32 w_bg_col = ImGui::GetColorU32(ImGuiCol_WindowBg);
     
 
-    ImGui::BeginChild("OptionsBox",{(viewport_width/2.0f) -10, (float)((console)?-log_height:0)},false,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysUseWindowPadding);
+    ImGui::BeginChild("OptionsBox",{200, ((viewport_height-99) / 2.0f)},false,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysUseWindowPadding);
     depth_border();
     ImGui::PushStyleColor(ImGuiCol_WindowBg,ImVec4(0.0f,0.0f,0.0f,0.0f));
     ImGui::Text("Advanced Options");
@@ -241,15 +276,7 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
       ImGui::EndTooltip();
     }
     ImGui::Separator();
-    files[3]->UI(viewport_width);
-    if(ImGui::IsItemHovered()){
-      ImGui::BeginTooltip();
-      ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-      ImGui::TextWrapped("Some random bullshit that rika thought we should add");
-      ImGui::PopTextWrapPos();
-      ImGui::EndTooltip();
-    }
-    files[5]->UI((viewport_width/2.0f)-10);
+    files[5]->UI(196);
     if(ImGui::IsItemHovered()){
       ImGui::BeginTooltip();
       ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
@@ -257,9 +284,9 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
       ImGui::PopTextWrapPos();
       ImGui::EndTooltip();
     }
-    files[6]->UI((viewport_width/2.0f)-10);
-    files[7]->UI((viewport_width/2.0f)-10);
-    files[8]->UI((viewport_width/2.0f)-10);
+    files[6]->UI(196);
+    files[7]->UI(196);
+    files[8]->UI(196);
 
     ImGui::Text("Disable Conversions");
     ImGui::Separator();
@@ -272,13 +299,13 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
     ImGui::Checkbox("Include Models",   &fileinfo.disable_includemodels );
     ImGui::Checkbox("Textures",         &fileinfo.disable_textures      );
 
-    ImGui::EndChild();
+    ImGui::EndChild(); //ConvertSmol
     ImGui::PopStyleVar(1);
     ImGui::PopStyleColor();
-    ImGui::EndChild();
-    ImGui::SameLine();
+    ImGui::EndChild();//OptionsBox
+
     ImGui::BeginGroup();
-    ImGui::BeginChild("ConvertBox",{(viewport_width/2.0f) - 10,-(56 + (float)((console)?log_height:0))},false,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysUseWindowPadding);
+    ImGui::BeginChild("ConvertBox",{(200),((viewport_height-99) / 2.0f)},false,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysUseWindowPadding);
     depth_border();
     ImGui::Text("Problems");
     ImGui::Separator();
@@ -316,7 +343,7 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
     
     
     ImGui::EndChild();
-    if(ImGui::Button("Check",{(viewport_width/2.0f) - 10,24})){
+    if(ImGui::Button("Check",{200,24})){
       int total = 0;
       int bad = 0;
       int good = 0;
@@ -357,7 +384,7 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
       ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.0f, 0.7f));
       ImGui::PushStyleColor(ImGuiCol_ButtonActive,  (ImVec4)ImColor::HSV(0.0f, 0.0f, 0.8f));
     }
-    if(ImGui::Button("Convert",{(viewport_width/2.0f) - 10,24})){
+    if(ImGui::Button("Convert",{200,24})){
         Logger::Debug("Starting conversion\n");
                                 fileinfo.mdl = files[0]->BoxBuffer;
         if(files[1]->isEnabled) fileinfo.vtx = files[1]->BoxBuffer;
@@ -375,6 +402,7 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
         Logger::Debug("Conversion thread detached\n");
     }
     if(!blocked) ImGui::PopStyleColor(3);
+    ImGui::EndGroup();
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize,0.0f);
 
     if(ImGui::BeginPopupModal("Status##ConvertModal",NULL,ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)){
@@ -420,47 +448,6 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
         ImGui::EndTooltip();
     }
     */
-
-    static int message_count = 0;
-    if(console){
-      ImGui::BeginChild("Logger",{0,0},false,ImGuiWindowFlags_AlwaysUseWindowPadding);
-      depth_border();
-      //ImFont* monospace = ImGui::GetIO().Fonts->Fonts[2];
-
-      //ImGui::PushFont(monospace);
-      ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, {12.0,4.0});
-      if (ImGui::BeginTable("table1", 2,ImGuiTableFlags_BordersInnerV))
-      {
-        ImGui::TableSetupColumn("small",ImGuiTableColumnFlags_WidthFixed);
-        ImGui::TableSetupColumn("half");
-        for (int row = 0; row < LoggerMessages.size(); row++)
-        {
-          ImGui::TableNextRow();
-          ImGui::TableSetColumnIndex(0);
-          ImGui::PushItemWidth(150.0f);
-          switch(LoggerMessages[row]->type){
-              case 4: ImGui::TextColored({0.1,1.0,0.1,1.0},"Debug");break;
-              case 1: ImGui::TextColored({1.0,1.0,0.2,1.0},"Notice");break;
-              case 2: ImGui::TextColored({1.0,0.1,0.1,1.0},"Error");break;
-              case 3: ImGui::TextColored({1.0,0.2,1.0,1.0},"Critical");break;
-              case 0: ImGui::TextColored({1.0,1.0,1.0,1.0},"Info");break;
-          }
-          ImGui::PopItemWidth();
-          ImGui::TableSetColumnIndex(1);
-          ImGui::Text("%s",LoggerMessages[row]->msg.c_str());
-        }
-        ImGui::EndTable();
-      }
-      if (message_count < LoggerMessages.size()) {
-        ImGui::SetScrollHereY(1.0f);
-        message_count = LoggerMessages.size();
-      }
-      ImGui::PopStyleVar();
-      //ImGui::PopFont();
-      ImGui::EndChild();
-    }
-
-    
     ImGui::End();
     if(showAbout){
       if(ImGui::Begin("About", &showAbout,ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollWithMouse)){
@@ -516,12 +503,14 @@ int UI::Run(){
     }
     glfwMakeContextCurrent(Window);
     //glfwSwapInterval(1);
-    glfwShowWindow(Window);
+    
     glewExperimental = true;
     if(glewInit() != GLEW_OK){
         fprintf(stderr, "Failed to initialize GLEW\n");
         return -1;
     }
+
+
     
    glGenTextures(1, &GRUNT_POG);
     glBindTexture(GL_TEXTURE_2D, GRUNT_POG);
@@ -542,8 +531,10 @@ int UI::Run(){
 
     UI::SetupAboutWindow();
 
-    glfwSetWindowSizeLimits(Window, 500, 500, GLFW_DONT_CARE, GLFW_DONT_CARE);
+    glfwSetWindowSizeLimits(Window, viewport_min_width, viewport_min_height, GLFW_DONT_CARE, GLFW_DONT_CARE);
     glfwSetWindowIcon(Window, 1, images);
+    glfwSetWindowSize(Window, viewport_width, viewport_height);
+    glfwShowWindow(Window);
 
     stbi_image_free(grunt_pog);
 
