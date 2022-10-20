@@ -16,8 +16,6 @@
 #include "rapidjson/stringbuffer.h"
 #include <logger.hpp>
 
-using namespace std;
-
 int GetAnimHeaderSize(int flag)
 {
 	switch (flag)
