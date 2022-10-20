@@ -15,7 +15,7 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 #include <logger.hpp>
-using namespace std;
+
 namespace MDL
 {
 	class v53Mdl
