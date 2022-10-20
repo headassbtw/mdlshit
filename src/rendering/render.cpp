@@ -288,17 +288,6 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
     files[7]->UI(196);
     files[8]->UI(196);
 
-    ImGui::Text("Disable Conversions");
-    ImGui::Separator();
-    ImGui::Checkbox("Bones",            &fileinfo.disable_bones         );
-    ImGui::Checkbox("Attachments",      &fileinfo.disable_attachments   );
-    ImGui::Checkbox("Hitbox Sets",      &fileinfo.disable_hitboxsets    );
-    ImGui::Checkbox("Animations",       &fileinfo.disable_animations    );
-    ImGui::Checkbox("Sequences",        &fileinfo.disable_sequences     );
-    ImGui::Checkbox("Body Parts",       &fileinfo.disable_bodyparts     );
-    ImGui::Checkbox("Include Models",   &fileinfo.disable_includemodels );
-    ImGui::Checkbox("Textures",         &fileinfo.disable_textures      );
-
     ImGui::EndChild(); //ConvertSmol
     ImGui::PopStyleVar(1);
     ImGui::PopStyleColor();

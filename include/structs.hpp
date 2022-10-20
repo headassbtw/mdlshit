@@ -19,15 +19,6 @@ struct FileInfo {
 	std::optional<std::string> aabb; //aabb tree
 	std::optional<std::string> rui; //rui shit
 	std::optional<std::string> out; //output file
-
-	bool disable_bones = false;
-	bool disable_attachments = false;
-	bool disable_hitboxsets = false;
-	bool disable_animations = false;
-	bool disable_sequences = false;
-	bool disable_bodyparts = false;
-	bool disable_includemodels = false;
-	bool disable_textures = false;
 };
 
 struct sizes

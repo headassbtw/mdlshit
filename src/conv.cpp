@@ -133,23 +133,16 @@ int Conversion::ReadHeader(FileInfo info) {
   std::vector<mstudiotexture_t_v53> textures = mdl.ConvertTextures();
   std::vector<mstudioactivitymodifier_t_v53> activityModifiers = mdl.ActivityModifierConversion();
   for (int i = 0; i < mdl.mdlhdr.numbones; i++) {
-      if (info.disable_bones) 
-      {
+    mstudiobone_t_v53 bone = bones[i];
 
-      }
-      else
-      {
-          mstudiobone_t_v53 bone = bones[i];
+    for (int j = 0; j < ikChainBones.size(); j++)
+    {
+        if (i == ikChainBones[j]) bone.flags += 0x20;
+    }
+    bone.unkid = -1;
+    OutStream.Write(bone);
 
-          for (int j = 0; j < ikChainBones.size(); j++)
-          {
-              if (i == ikChainBones[j]) bone.flags += 0x20;
-          }
-          bone.unkid = -1;
-          OutStream.Write(bone);
-
-          UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numbones);
-      }
+    UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numbones);
   }
   if (mdl.jigglebones.size() > 0)
   {
@@ -163,7 +156,7 @@ int Conversion::ReadHeader(FileInfo info) {
   UI::Progress.SubTask.End();
   OutStream.seek(v53Hdr.localattachmentindex);
   UI::Progress.SubTask.Begin("Converting Attachments");
-  for (int i = 0; i < (info.disable_attachments ? 0 : v53Hdr.numlocalattachments); i++) 
+  for (int i = 0; i < (v53Hdr.numlocalattachments); i++) 
   {
       OutStream.Write(mdl.attachments[i]);
       UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numlocalattachments);
@@ -178,15 +171,10 @@ int Conversion::ReadHeader(FileInfo info) {
   OutStream.seek(v53Hdr.hitboxsetindex);
   UI::Progress.SubTask.Begin("Updating Hitbox Sets");
   for (int i = 0; i < mdl.mdlhdr.numhitboxsets; i++) {
-      if (info.disable_hitboxsets) 
-      {
-      }
-      else {
-          mstudiohitboxset_t_v49 v49HitboxSet; Stream.Read(&v49HitboxSet);
+      mstudiohitboxset_t_v49 v49HitboxSet; Stream.Read(&v49HitboxSet);
           int stairs = bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToIkChains + bytesAddedToTextures + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + strFiller + bytesAddedToRuiMesh;
           if (v49HitboxSet.sznameindex > 0) v49HitboxSet.sznameindex += stairs;
           OutStream.Write(v49HitboxSet);
-      }
       Logger::Notice("Updated hitbox set %d of %d\n", i + 1, mdl.mdlhdr.numhitboxsets);
       UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numhitboxsets);
   }
@@ -208,14 +196,8 @@ int Conversion::ReadHeader(FileInfo info) {
   OutStream.seek(v53Hdr.bonetablebynameindex);
   UI::Progress.SubTask.Begin("Converting BoneTable");
   for (int i = 0; i < mdl.mdlhdr.numbones; i++) {
-      if (info.disable_bones) {
-
-      }
-      else
-      {
-          OutStream.Write(mdl.bonenametable);
-          UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numbones);
-      }
+    OutStream.Write(mdl.bonenametable);
+    UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numbones);
   }
   UI::Progress.SubTask.End();
 
@@ -225,145 +207,129 @@ int Conversion::ReadHeader(FileInfo info) {
   std::vector<int> ikRuleStairsPerAnim = mdl.v53IkRuleStairsPerAnim();
   for (int i = 0; i < mdl.mdlhdr.numlocalanim; i++) 
   {
-      if (info.disable_animations) 
-      {
-
-      }
-      else {
-          //bool isDelta = false;
-          //for (int k = 0; k < deltaAnims.size(); k++)
-          //{
-          //    if (i == deltaAnims[k])
-          //    {
-          //        isDelta = true;
-          //        break;
-          //    }
-          //}
-          mstudioanimdesc_t_v53 animDesc = animdescs[i];
-          animDesc.animindex -= 8;
-          if (animDesc.sectionindex > 0) animDesc.sectionindex -= 8;
-          if (animDesc.ikruleindex > 0) animDesc.ikruleindex -= 8;
-          OutStream.Write(animDesc);
-      }
-      Logger::Notice("Converted animation %d of %d\n", i + 1, mdl.mdlhdr.numlocalanim);
-      UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numlocalanim);
+    //bool isDelta = false;
+        //for (int k = 0; k < deltaAnims.size(); k++)
+        //{
+        //    if (i == deltaAnims[k])
+        //    {
+        //        isDelta = true;
+        //        break;
+        //    }
+        //}
+        mstudioanimdesc_t_v53 animDesc = animdescs[i];
+        animDesc.animindex -= 8;
+        if (animDesc.sectionindex > 0) animDesc.sectionindex -= 8;
+        if (animDesc.ikruleindex > 0) animDesc.ikruleindex -= 8;
+        OutStream.Write(animDesc);
+    Logger::Notice("Converted animation %d of %d\n", i + 1, mdl.mdlhdr.numlocalanim);
+    UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numlocalanim);
   }
   UI::Progress.SubTask.End();
   Logger::Info("Finished animations\n");
-  
-  if (info.disable_animations) {
-  }
-  else
-  { 
-      int boneHdrNum = 0;
-      int secBoneHdrNum = 0;
-      int secIdxNum = 0;
-      int secNumber = 0;
+    int boneHdrNum = 0;
+    int secBoneHdrNum = 0;
+    int secIdxNum = 0;
+    int secNumber = 0;
 
-      for (int i = 0; i < mdl.mdlhdr.numlocalanim; i++)
-      {
+    for (int i = 0; i < mdl.mdlhdr.numlocalanim; i++)
+    {
 
-          //bool isDelta = false;
-          //for (int k = 0; k < deltaAnims.size(); k++)
-          //{
-          //    if (i == deltaAnims[k])
-          //    {
-          //        isDelta = true;
-          //        break;
-          //    }
-          //}
+        //bool isDelta = false;
+        //for (int k = 0; k < deltaAnims.size(); k++)
+        //{
+        //    if (i == deltaAnims[k])
+        //    {
+        //        isDelta = true;
+        //        break;
+        //    }
+        //}
 
-          mstudioanimdesc_t_v53 animDesc = animdescs[i];
-          int startPos = v53Hdr.localanimindex + 92 * i;
-          OutStream.seek(startPos + animdescs[i].animindex - 8);
+        mstudioanimdesc_t_v53 animDesc = animdescs[i];
+        int startPos = v53Hdr.localanimindex + 92 * i;
+        OutStream.seek(startPos + animdescs[i].animindex - 8);
 
-          if (animDesc.sectionindex == 0)
-          {
-              OutStream.seek(startPos + animdescs[i].animindex - 8);
+        if (animDesc.sectionindex == 0)
+        {
+            OutStream.seek(startPos + animdescs[i].animindex - 8);
 
-              for (int j = boneHdrNum; j < anims.size(); j++)
-              {
-                  OutStream.Write(anims[j]);
-                  OutStream.Write(anims[j].animdata);
-                  boneHdrNum++;
-                  if (anims[j].nextoffset == 0)
-                  {
-                      //OutStream.seek(OutStream.Position() - 32);
-                      //fillerWrite(&OutStream, 32);
-                      break;
-                  }
-              }
-          }
+            for (int j = boneHdrNum; j < anims.size(); j++)
+            {
+                OutStream.Write(anims[j]);
+                OutStream.Write(anims[j].animdata);
+                boneHdrNum++;
+                if (anims[j].nextoffset == 0)
+                {
+                    //OutStream.seek(OutStream.Position() - 32);
+                    //fillerWrite(&OutStream, 32);
+                    break;
+                }
+            }
+        }
 
-          if (animDesc.sectionindex > 0) //Gosh do I hate how this is setup. - Liberty //Edit: Not anymore. Could be better but I leave you with this. - Liberty
-          {
-              OutStream.seek(startPos + animDesc.sectionindex - 8);
+        if (animDesc.sectionindex > 0) //Gosh do I hate how this is setup. - Liberty //Edit: Not anymore. Could be better but I leave you with this. - Liberty
+        {
+            OutStream.seek(startPos + animDesc.sectionindex - 8);
 
-              secHdrBytesSecAdd[0] = 0;
-              int num = (animDesc.numframes / animDesc.sectionframes) + 2;
+            secHdrBytesSecAdd[0] = 0;
+            int num = (animDesc.numframes / animDesc.sectionframes) + 2;
 
-             for (int j = 0; j < num; j++)
-             {
+            for (int j = 0; j < num; j++)
+            {
 
-                 OutStream.Write(sectionIndexes[secIdxNum]);
-                 secIdxNum++;
-             }
+                OutStream.Write(sectionIndexes[secIdxNum]);
+                secIdxNum++;
+            }
 
-             for (int j = 0; j < num; j++)
-             {
-                 int off = sectionIndexes[secNumber].sectionoffsets;
+            for (int j = 0; j < num; j++)
+            {
+                int off = sectionIndexes[secNumber].sectionoffsets;
 
-                 OutStream.seek(startPos + off);
-                 for (int k = secBoneHdrNum; k < sections.size(); k++)
-                 {
-                     OutStream.Write(sections[k]);
-                     OutStream.Write(sections[k].animdata);
-                     secBoneHdrNum++;
-                     if (sections[k].nextoffset == 0)
-                     {
-                         break;
-                     }
-                 }
-                 secNumber++;
-             }
+                OutStream.seek(startPos + off);
+                for (int k = secBoneHdrNum; k < sections.size(); k++)
+                {
+                    OutStream.Write(sections[k]);
+                    OutStream.Write(sections[k].animdata);
+                    secBoneHdrNum++;
+                    if (sections[k].nextoffset == 0)
+                    {
+                        break;
+                    }
+                }
+                secNumber++;
+            }
 
-          }
+        }
 
-          if (animDesc.numikrules > 0)
-          {
-              OutStream.seek(startPos + animdescs[i].ikruleindex - 8 - 32); //Issue with the 32 byte filler. - Liberty
-              fillerWrite(&OutStream, 32);
-              for (int j = 0; j < animDesc.numikrules; j++)
-              {
-                  OutStream.Write(ikRules[ikRuleNum]);
-                  ikRuleNum++;
-              }
-              int compressedErrorNum = 0;
-              if (mdl.compressedikerrors.size() > 0)
-              {
-                  OutStream.seek(startPos + animdescs[i].ikruleindex + 140 * animDesc.numikrules);
-                  int animStartPos = mdl.mdlhdr.localanimindex + 100 * i;
-                  for (int j = 0; j < mdl.compressedikerrors.size(); j++)
-                  {
-                      OutStream.Write(mdl.compressedikerrors[compressedErrorNum]);
-                      OutStream.Write(mdl.compressedikerrors[compressedErrorNum].animdata);
-                      compressedErrorNum++;
+        if (animDesc.numikrules > 0)
+        {
+            OutStream.seek(startPos + animdescs[i].ikruleindex - 8 - 32); //Issue with the 32 byte filler. - Liberty
+            fillerWrite(&OutStream, 32);
+            for (int j = 0; j < animDesc.numikrules; j++)
+            {
+                OutStream.Write(ikRules[ikRuleNum]);
+                ikRuleNum++;
+            }
+            int compressedErrorNum = 0;
+            if (mdl.compressedikerrors.size() > 0)
+            {
+                OutStream.seek(startPos + animdescs[i].ikruleindex + 140 * animDesc.numikrules);
+                int animStartPos = mdl.mdlhdr.localanimindex + 100 * i;
+                for (int j = 0; j < mdl.compressedikerrors.size(); j++)
+                {
+                    OutStream.Write(mdl.compressedikerrors[compressedErrorNum]);
+                    OutStream.Write(mdl.compressedikerrors[compressedErrorNum].animdata);
+                    compressedErrorNum++;
 
-                  }
-              }
+                }
+            }
 
-          }
+        }
       }
-  }
   ////sequences
   OutStream.seek(v53Hdr.localseqindex);
   UI::Progress.SubTask.Begin("Converting Sequences");
   for (int i = 0; i < mdl.mdlhdr.numlocalseq; i++) {
-      if (info.disable_sequences) {
-      }
-      else {
-          OutStream.Write(seqdescs[i]);
-      }
+      OutStream.Write(seqdescs[i]);
       Logger::Notice("Converted sequence %d of %d\n", i + 1, mdl.mdlhdr.numlocalseq);
       UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numlocalseq);
   }
@@ -470,12 +436,8 @@ int Conversion::ReadHeader(FileInfo info) {
 
       for (int i = 0; i < mdl.mdlhdr.numbodyparts; i++) {
           //16 bytes
-          if (info.disable_bodyparts) {
-          }
-          else {
-              OutStream.seek(v53Hdr.bodypartindex + 16 * i);
+          OutStream.seek(v53Hdr.bodypartindex + 16 * i);
               OutStream.Write(mdl.bodyparts[i]);
-          }
           Logger::Notice("Converted body part %d of %d\n", i + 1, mdl.mdlhdr.numbodyparts);
           UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numbodyparts);
       }
@@ -553,12 +515,7 @@ int Conversion::ReadHeader(FileInfo info) {
   OutStream.seek(v53Hdr.includemodelindex);
   for (int i = 0; i < mdl.mdlhdr.numincludemodels; i++) {
       //8 bytes
-      if (info.disable_includemodels) {
-      }
-      else {
-          OutStream.Write(mdl.includedmodels[i]);
-      }
-
+      OutStream.Write(mdl.includedmodels[i]);
       Logger::Notice("Converted included model %d of %d\n", i + 1, mdl.mdlhdr.numincludemodels);
       UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numincludemodels);
   }
@@ -658,12 +615,7 @@ int Conversion::ReadHeader(FileInfo info) {
   OutStream.seek(v53Hdr.textureindex);
   UI::Progress.SubTask.Begin("Converting Textures");
   for (int i = 0; i < mdl.mdlhdr.numtextures; i++) {
-      if (info.disable_textures) {
-
-      }
-      else {
-          OutStream.Write(textures[i]);
-      }
+      OutStream.Write(textures[i]);
       Logger::Notice("Converted texture %d of %d\n", i + 1, mdl.mdlhdr.numtextures);
       UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numtextures);
   }
@@ -674,14 +626,7 @@ int Conversion::ReadHeader(FileInfo info) {
   UI::Progress.SubTask.Begin("Converting Cd Textures");
   OutStream.seek(v53Hdr.cdtextureindex);
   for (int i = 0; i < mdl.mdlhdr.numcdtextures; i++) {
-      if (info.disable_textures) 
-      {
-
-      }
-      else 
-      {
-          OutStream.Write(mdl.cdtextures[i]);
-      }
+      OutStream.Write(mdl.cdtextures[i]);
       Logger::Notice("Converted texture %d of %d\n", i + 1, mdl.mdlhdr.numcdtextures);
       UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numcdtextures);
   }
@@ -692,14 +637,7 @@ int Conversion::ReadHeader(FileInfo info) {
   UI::Progress.SubTask.Begin("Converting Skin Groups");
   OutStream.seek(v53Hdr.skinindex);
   for (int i = 0; i < mdl.mdlhdr.numskinfamilies; i++) {
-      if (info.disable_textures) 
-      {
-
-      }
-      else
-      {
-          OutStream.Write(mdl.skingroups[i], mdl.mdlhdr.numskinref);
-      }
+      OutStream.Write(mdl.skingroups[i], mdl.mdlhdr.numskinref);
       Logger::Notice("Converted skin group %d of %d\n", i + 1, mdl.mdlhdr.numskinfamilies);
       UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numskinfamilies);
   }
@@ -715,14 +653,7 @@ int Conversion::ReadHeader(FileInfo info) {
   UI::Progress.SubTask.Begin("Converting Src Bone Transforms");
   OutStream.seek(v53Hdr.srcbonetransformindex);
   for (int i = 0; i < mdl.mdlsubhdr.numsrcbonetransform; i++) {
-      if (info.disable_textures) 
-      {
-
-      }
-      else
-      {
-          OutStream.Write(mdl.srcbonetransforms[i]);
-      }
+      OutStream.Write(mdl.srcbonetransforms[i]);
       Logger::Notice("Converting Src Bone Transform %d of %d\n", i + 1, mdl.mdlsubhdr.numsrcbonetransform);
       UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlsubhdr.numsrcbonetransform);
   }
@@ -732,13 +663,7 @@ int Conversion::ReadHeader(FileInfo info) {
   OutStream.seek(v53Hdr.linearboneindex);
   for (int i = 0; i < mdl.mdlhdr.numbones; i++) 
   {
-      if (info.disable_bones) 
-      {
-
-      }
-      else
-      {
-          for (int j = 0; j < ikChainBones.size(); j++)
+      for (int j = 0; j < ikChainBones.size(); j++)
           {
               if (i == ikChainBones[j])
               {
@@ -746,7 +671,6 @@ int Conversion::ReadHeader(FileInfo info) {
               }
           }
           mdl.linearbonedata.posScale[i] = { 0,0,0 };
-      }
   }
   OutStream.Write(mdl.linearbone);
   OutStream.Write(mdl.linearbonedata, mdl.mdlhdr.numbones);
