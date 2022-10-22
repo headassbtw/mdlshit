@@ -81,36 +81,10 @@ int Conversion::ReadHeader(FileInfo info) {
   int bytesAddedToRuiMesh = 0;
   std::vector<int> bytesAddedPerRuiMesh;
   std::vector<mstudioruimesh_t> ruiMeshes;
-  int ruiNum = 0;
-
-  if (info.rui.has_value()) //This is a temp for rui testing. -Liberty
-  {
-      BinaryReader RUIStream = BinaryReader(info.rui.value().c_str());
-      bytesAddedToRuiMesh = RUIStream.size;
-      if (!RUIStream.Stream.good()) {
-          Logger::Error("Model's RUI file does not exist, please ensure %s exists, and is located in the same directory as the file\n", info.rui.value().c_str());
-          return 1;
-      }
-      mstudiorruiheader_t ruiHeader;
-      for (int i = 0; i < 64; i++)
-      {
-          RUIStream.Read(&ruiHeader);
-
-          if (ruiHeader.ruiunk == 0)
-          {
-              break;
-          }
-          ruiNum++;
-      }
-  }
-
   OutStream.seek(0);
-  v53Hdr.numruimeshes = ruiNum;
   OutStream.Write(v53Hdr);
-  Logger::Debug("A\n");
-  OutStream.seek(OutStream.Position() - 60 * 4);
-  Logger::Debug("B\n");
-  AddInt32(&OutStream, 0, 60);
+  //OutStream.seek(OutStream.Position() - 60 * 4);
+  //AddInt32(&OutStream, 0, 60);
 
   std::vector<int> hdrBytesAnimDescAdd = mdl.v53GetAnimHdrBytesAdded(true);
   std::vector<int> secHdrBytesAnimDescAdd = mdl.v53GetSecHdrBytesAdded(true);
