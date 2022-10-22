@@ -2695,6 +2695,7 @@ studiohdr_t_v53 MDL::v49Mdl::ConvertHeader(FileInfo info)
 		BinaryReader RUIStream = BinaryReader(info.rui.value().c_str());
 		bytesAddedToRuiMesh = RUIStream.size;
 		ruiSize = RUIStream.size;
+		bytesAddedToRuiMesh = ruiSize;
 		mstudiorruiheader_t ruiHeader;
 		for (int i = 0; i < 64; i++)
 		{
@@ -2707,7 +2708,6 @@ studiohdr_t_v53 MDL::v49Mdl::ConvertHeader(FileInfo info)
 			ruiNum++;
 		}
 	}
-	bytesAddedToRuiMesh = ruiSize;
 
 
 	if (info.mdl.has_value())
@@ -2876,12 +2876,13 @@ studiohdr_t_v53 MDL::v49Mdl::ConvertHeader(FileInfo info)
 
 	int			vtxindex = vtxSize > 0 ? mdlSize + allBytesAdded + phySize + phyBSize + strFiller + ruiSize : 0; // VTX
 	int			vvdindex = vvdSize > 0 ? mdlSize + allBytesAdded + phySize + vtxSize + phyBSize + strFiller + ruiSize : 0; // VVD / IDSV
-	int			vvcindex = 0; // VVC / IDCV 
+	int			vvdindex = vvdSize > 0 ? mdlSize + allBytesAdded + phySize + vtxSize + phyBSize + strFiller + ruiSize : 0; // VVD / IDSV
+	int			vvcindex = vvcSize > 0 ? mdlSize + allBytesAdded + phySize + vtxSize + phyBSize + strFiller + ruiSize + vvdSize : 0; // VVC / IDCV 
 	int			vphyindex = phySize > 0 ? mdlSize + allBytesAdded + strFiller + ruiSize : 0; // VPHY / IVPS
 
 	int			vtxsize = vtxSize; // VTX
 	int			vvdsize = vvdSize; // VVD / IDSV
-	int			vvcsize = 0; // VVC / IDCV 
+	int			vvcsize = vvcSize; // VVC / IDCV 
 	int			vphysize = phySize; // VPHY / IVPS
 
 	int			unkmemberindex1 = mdlSize + allBytesAdded + phySize + strFiller + ruiSize;
