@@ -1,5 +1,6 @@
 #include "structs.hpp"
 #include <binarystream.hpp>
+#include <cstdlib>
 #include <fstream>
 #include <string>
 #include <sys/stat.h>
@@ -1769,7 +1770,12 @@ BinaryWriter::BinaryWriter(const char* filename){
   else{
     fprintf(stderr,"Could not get stats of input file!\n");
   }
-
+  if(!Stream.good()){
+    Logger::Critical("BinaryWriter for file \"%s\" could not be properly initialized, aborting.\n", _filename);
+  }
+  else{
+    Logger::Info("BinaryWriter for file \"%s\" properly initialized\n", _filename);
+  }
 }
 BinaryWriter::~BinaryWriter(){
   Stream.close();
@@ -1804,9 +1810,12 @@ void BinaryWriter::Write(float data){
   Stream.write((char*)&data, sizeof(float));
 }
 int BinaryWriter::Position(){
-  if(Stream.tellp() <= -1){
-    Logger::Critical("BinaryWriter's seek position was invalid! \n");
+  if(Stream.bad()){
+    Logger::Critical("I/O error for file \"%s\"\n", _filename);
     abort();
+  }
+  if(Stream.tellp() <= -1){
+    Logger::Critical("BinaryReader for file \"%s\"'s seek position was invalid! (%i)\n", _filename, Stream.tellp());
   }
   return Stream.tellp();
 }
@@ -3182,9 +3191,17 @@ void BinaryWriter::Write(mstudioruimesh_t data)
 
 
 void BinaryWriter::seek(int pos){
+
   if(Stream.fail()){
+    Logger::Critical("I/O error on file \"%s\"\n",_filename);
+    if ( (Stream.rdstate() & std::ifstream::failbit ) != 0 ) Logger::Critical("Logical I/O error\n");
+    if ( (Stream.rdstate() & std::ifstream::badbit ) != 0 )  Logger::Critical("Read/write I/O error\n");
     Stream.close();
     Stream.open(_filename);
+    if(Stream.fail()){
+        Logger::Critical("Reopening file did not fix I/O error, cannot proceed.\n");
+        abort();
+    }
     Logger::Notice("Stream died, reopening file \"%s\"\n",_filename);
   }
 

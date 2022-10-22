@@ -107,7 +107,9 @@ int Conversion::ReadHeader(FileInfo info) {
   OutStream.seek(0);
   v53Hdr.numruimeshes = ruiNum;
   OutStream.Write(v53Hdr);
+  Logger::Debug("A\n");
   OutStream.seek(OutStream.Position() - 60 * 4);
+  Logger::Debug("B\n");
   AddInt32(&OutStream, 0, 60);
 
   std::vector<int> hdrBytesAnimDescAdd = mdl.v53GetAnimHdrBytesAdded(true);

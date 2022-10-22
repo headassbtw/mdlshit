@@ -54,7 +54,6 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
       ImGui::Text("MDLSHIT");
       ImGui::Text("- Source engine model converter, v49/47 to v53");
       ImGui::Text("By headassbtw and MasterLiberty");
-      ImGui::Text("Eat my entire ass, wanderer");
       ImGui::Text("Compiled on %s",__DATE__);
       ImGui::Text("%s, v%s",
 #ifdef __MINGW32__
@@ -74,6 +73,9 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
       ImGui::Text("OpenGL Version: %s",glGetString(GL_VERSION));
       ImGui::Text("GPU: %s",glGetString(GL_RENDERER));
       ImGui::Text("FPS: %f",ImGui::GetIO().Framerate);
+      if(ImGui::SmallButton("Project GitHub##MDLSHIT_GH")){
+        OpenLink("https://github.com/headassbtw/mdlshit");
+      }
       ImGui::EndGroup();
 
       ImGui::EndTabItem();
