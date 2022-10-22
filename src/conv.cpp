@@ -76,9 +76,8 @@ int Conversion::ReadHeader(FileInfo info) {
   }
   MDL::v49Mdl mdl = mdl._v49Mdl(&Stream, false);
   mdl.SetMdlInts();
-  mdl.UpdateMdl();
   studiohdr_t_v53 v53Hdr = mdl.ConvertHeader(info);
-
+  mdl.UpdateMdl();
   int bytesAddedToRuiMesh = 0;
   std::vector<int> bytesAddedPerRuiMesh;
   std::vector<mstudioruimesh_t> ruiMeshes;
@@ -135,20 +134,20 @@ int Conversion::ReadHeader(FileInfo info) {
   int textureFiller = 0;
   int strFiller = 60;
   int allBytesAdded = bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToTextures + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + bytesAddedToRuiMesh;
-
-  OutStream.seek(v53Hdr.boneindex);
-  UI::Progress.SubTask.Begin("Converting Bones");
+  std::vector<mstudioanim_t_v53> anims = mdl.ConvertAnims();
+  std::vector<mstudioanim_t_v53> sections = mdl.ConvertSections();
   std::vector<mstudiobone_t_v53> bones = mdl.BoneConversion();
   std::vector<mstudiobbox_t_v53> hitboxes = mdl.HitboxConversion();
   std::vector<mstudioanimdesc_t_v53> animdescs = mdl.AnimDescConversion();
-  std::vector<mstudioanim_t_v53> anims = mdl.ConvertAnims();
-  std::vector<mstudioanim_t_v53> sections = mdl.ConvertSections();
   std::vector<sectionindexes_t_v53> sectionIndexes = mdl.ConvertSectionIndexes();
   std::vector<mstudioikrule_t_v53> ikRules = mdl.IkRuleConversion();
   std::vector<mstudioseqdesc_t_v53> seqdescs = mdl.SeqDescConversion();
   std::vector<mstudioikchain_t_v53> ikChains = mdl.IkChainConversion();
   std::vector<mstudiotexture_t_v53> textures = mdl.ConvertTextures();
   std::vector<mstudioactivitymodifier_t_v53> activityModifiers = mdl.ActivityModifierConversion();
+
+  OutStream.seek(v53Hdr.boneindex);
+  UI::Progress.SubTask.Begin("Converting Bones");
   for (int i = 0; i < mdl.mdlhdr.numbones; i++) 
   {
       mstudiobone_t_v53 bone = bones[i];
@@ -705,7 +704,7 @@ if (info.rui.has_value()) {
               mdl.linearbonedata.flags[i] += 0x20;
           }
       }
-      mdl.linearbonedata.posScale[i] = { 0,0,0 };
+      //mdl.linearbonedata.posScale[i] = { 0,0,0 };
   }
   OutStream.Write(mdl.linearbone);
   OutStream.Write(mdl.linearbonedata, mdl.mdlhdr.numbones);

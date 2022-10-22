@@ -3065,6 +3065,254 @@ std::vector<mstudioikrule_t_v53> MDL::v49Mdl::IkRuleConversion()
 	return v53IkRules;
 }
 
+//void ReadBoneHeader()
+//{
+//	int pos2 = Stream->Position();
+//	std::byte bone; Stream->Read(&bone); //Logger::Info("Bone: %d, Pos:  %d\n", bone, Stream->Position() - 1);
+//	std::byte flag; Stream->Read(&flag); //Logger::Info("Flag: %d, Pos:  %d\n", flag, Stream->Position() - 1);
+//	short nextOffset; Stream->Read(&nextOffset); //Logger::Info("Next Offset: %d, Pos:  %d\n", nextOffset, Stream->Position() - 2);
+//	int strEndPos = Stream->Position();
+//	nextOffset = nextOffset > 0 ? nextOffset + (32 - GetAnimHeaderSize((int)flag)) : 0;
+//
+//	mstudiolinearbonedata_t_v49 lbd = linearbonedata;
+//
+//	switch ((int)flag)
+//	{
+//	case 0:
+//	{
+//		strEndPos = Stream->Position();
+//		boneHeaders_v53[num].translationScale = 0;
+//		boneHeaders_v53[num].bone = bone;
+//		boneHeaders_v53[num].r2Flag = flag;
+//		boneHeaders_v53[num].flags = 0;
+//		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)0; boneHeaders_v53[num].packedRotation.i = (short)0; boneHeaders_v53[num].packedRotation.j = (short)0; boneHeaders_v53[num].packedRotation.k = (short)0;
+//		boneHeaders_v53[num].rawPos; boneHeaders_v53[num].rawPos.x = (short)0; boneHeaders_v53[num].rawPos.y = (short)0; boneHeaders_v53[num].rawPos.z = (short)0;
+//		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 0; boneHeaders_v53[num].rawScale.y = 0; boneHeaders_v53[num].rawScale.z = 0;
+//		boneHeaders_v53[num].nextOffset = 0;
+//		boneHeaders_v53[num].dataSize = 0;
+//		boneHeaders_v53[num].rawStrPos = strEndPos;
+//		mstudioanim_t_v53 v53Anim{ _posscale, _bone, _flags, _unk, _rawrot, _animrot, _unused, _rawpos, _animpos, _rawscale, _animscale, _nextOffset, anims[i].animdata };
+//
+//		break;
+//	}
+//
+//	case 12:
+//	{
+//		Vector3Short rotPtr; Stream->Read(&rotPtr); rotPtr.x > 0 ? rotPtr.x += 12 : rotPtr.x = 0; rotPtr.y > 0 ? rotPtr.y += 12 : rotPtr.y = 0; rotPtr.z > 0 ? rotPtr.z += 12 : rotPtr.z = 0;
+//		Vector3Short posPtr; Stream->Read(&posPtr); posPtr.x > 0 ? posPtr.x += 10 : posPtr.x = 0; posPtr.y > 0 ? posPtr.y += 10 : posPtr.y = 0; posPtr.z > 0 ? posPtr.z += 10 : posPtr.z = 0;
+//		strEndPos = Stream->Position();
+//		LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+//		boneHeaders_v53[num].translationScale = GetLargestNumber(boneData->posScale.x, boneData->posScale.y, boneData->posScale.z);
+//		boneHeaders_v53[num].bone = bone;
+//		boneHeaders_v53[num].r2Flag = flag;
+//		boneHeaders_v53[num].flags = 0;
+//		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rotPtr.x; boneHeaders_v53[num].packedRotation.i = (short)rotPtr.y; boneHeaders_v53[num].packedRotation.j = (short)rotPtr.z; boneHeaders_v53[num].packedRotation.k = (short)0;
+//		boneHeaders_v53[num].rawPos = posPtr;
+//		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+//		boneHeaders_v53[num].nextOffset = nextOffset;
+//		boneHeaders_v53[num].dataSize = dataSize;
+//		boneHeaders_v53[num].rawStrPos = strEndPos;
+//		mstudioanim_t_v53 v53Anim{ _posscale, _bone, _flags, _unk, _rawrot, _animrot, _unused, _rawpos, _animpos, _rawscale, _animscale, _nextOffset, anims[i].animdata };
+//
+//		break;
+//	}
+//
+//	case 32:
+//	{
+//		QuaternionShort rawRot; Stream->Read(&rawRot);
+//		strEndPos = Stream->Position();
+//		LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+//		boneHeaders_v53[num].translationScale = 0;
+//		boneHeaders_v53[num].bone = bone;
+//		boneHeaders_v53[num].r2Flag = flag;
+//		boneHeaders_v53[num].flags = 0;
+//		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rawRot.one; boneHeaders_v53[num].packedRotation.i = (short)rawRot.i; boneHeaders_v53[num].packedRotation.j = (short)rawRot.j; boneHeaders_v53[num].packedRotation.k = (short)rawRot.k;
+//		boneHeaders_v53[num].rawPos; boneHeaders_v53[num].rawPos.x = (short)float_to_half(boneData->bonePos.x); boneHeaders_v53[num].rawPos.y = (short)float_to_half(boneData->bonePos.y); boneHeaders_v53[num].rawPos.z = (short)float_to_half(boneData->bonePos.z);//boneHeaders_v53[num].rawPos.x = (short)boneData->bonePos.x; boneHeaders_v53[num].rawPos.y = (short)boneData->bonePos.y; boneHeaders_v53[num].rawPos.z = (short)boneData->bonePos.z;
+//		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+//		boneHeaders_v53[num].nextOffset = nextOffset;
+//		boneHeaders_v53[num].dataSize = dataSize;
+//		boneHeaders_v53[num].rawStrPos = strEndPos;
+//		mstudioanim_t_v53 v53Anim{ _posscale, _bone, _flags, _unk, _rawrot, _animrot, _unused, _rawpos, _animpos, _rawscale, _animscale, _nextOffset, anims[i].animdata };
+//		break;
+//	}
+//
+//	case 33:
+//	{
+//		QuaternionShort rawRot; Stream->Read(&rawRot);
+//		Vector3Short rawPos; Stream->Read(&rawPos);
+//		strEndPos = Stream->Position();
+//		LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+//		boneHeaders_v53[num].translationScale = 0;
+//		boneHeaders_v53[num].bone = bone;
+//		boneHeaders_v53[num].r2Flag = flag;
+//		boneHeaders_v53[num].flags = 0;
+//		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rawRot.one; boneHeaders_v53[num].packedRotation.i = (short)rawRot.i; boneHeaders_v53[num].packedRotation.j = (short)rawRot.j; boneHeaders_v53[num].packedRotation.k = (short)rawRot.k;
+//		boneHeaders_v53[num].rawPos = rawPos;
+//		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+//		boneHeaders_v53[num].nextOffset = nextOffset;
+//		boneHeaders_v53[num].dataSize = dataSize;
+//		boneHeaders_v53[num].rawStrPos = strEndPos;
+//		mstudioanim_t_v53 v53Anim{ _posscale, _bone, _flags, _unk, _rawrot, _animrot, _unused, _rawpos, _animpos, _rawscale, _animscale, _nextOffset, anims[i].animdata };
+//		break;
+//	}
+//
+//	case 8:
+//	{
+//		Vector3Short rotPtr; Stream->Read(&rotPtr); rotPtr.x > 0 ? rotPtr.x += 18 : rotPtr.x = 0; rotPtr.y > 0 ? rotPtr.y += 18 : rotPtr.y = 0; rotPtr.z > 0 ? rotPtr.z += 18 : rotPtr.z = 0;
+//		strEndPos = Stream->Position();
+//		LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+//		boneHeaders_v53[num].translationScale = 0;
+//		boneHeaders_v53[num].bone = bone;
+//		boneHeaders_v53[num].r2Flag = flag;
+//		boneHeaders_v53[num].flags = 0;
+//		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rotPtr.x; boneHeaders_v53[num].packedRotation.i = (short)rotPtr.y; boneHeaders_v53[num].packedRotation.j = (short)rotPtr.z; boneHeaders_v53[num].packedRotation.k = (short)0;
+//		boneHeaders_v53[num].rawPos; boneHeaders_v53[num].rawPos.x = (short)float_to_half(boneData->bonePos.x); boneHeaders_v53[num].rawPos.y = (short)float_to_half(boneData->bonePos.y); boneHeaders_v53[num].rawPos.z = (short)float_to_half(boneData->bonePos.z);//boneHeaders_v53[num].rawPos.x = (short)boneData->bonePos.x; boneHeaders_v53[num].rawPos.y = (short)boneData->bonePos.y; boneHeaders_v53[num].rawPos.z = (short)boneData->bonePos.z;// = boneData->bonePos;  //boneHeaders_v53[j].rawPos.x = 0; boneHeaders_v53[j].rawPos.y = 0; boneHeaders_v53[j].rawPos.z = 0; //= boneData->bonePos;  //boneHeaders_v53[j].rawPos.x = (short)boneData->bonePos.x; boneHeaders_v53[j].rawPos.y = (short)boneData->bonePos.x; boneHeaders_v53[j].rawPos.z = (short)boneData->bonePos.z;
+//		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+//		boneHeaders_v53[num].nextOffset = nextOffset;
+//		boneHeaders_v53[num].dataSize = dataSize;
+//		boneHeaders_v53[num].rawStrPos = strEndPos;
+//		mstudioanim_t_v53 v53Anim{ _posscale, _bone, _flags, _unk, _rawrot, _animrot, _unused, _rawpos, _animpos, _rawscale, _animscale, _nextOffset, anims[i].animdata };
+//		break;
+//	}
+//
+//	case 1:
+//	{
+//		Vector3Short rawPos; Stream->Read(&rawPos);
+//		strEndPos = Stream->Position();
+//		LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+//		boneHeaders_v53[num].translationScale = 0;
+//		boneHeaders_v53[num].bone = bone;
+//		boneHeaders_v53[num].r2Flag = flag;
+//		boneHeaders_v53[num].flags = 0;
+//		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)0; boneHeaders_v53[num].packedRotation.i = (short)0; boneHeaders_v53[num].packedRotation.j = (short)0; boneHeaders_v53[num].packedRotation.k = (short)0; //boneHeaders_v53[num].packedRotation.one = (short)boneData->boneRot.x; boneHeaders_v53[num].packedRotation.i = (short)boneData->boneRot.y; boneHeaders_v53[num].packedRotation.j = (short)boneData->boneRot.z; boneHeaders_v53[num].packedRotation.k = (short)0;
+//		boneHeaders_v53[num].rawPos = rawPos;
+//		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+//		boneHeaders_v53[num].nextOffset = nextOffset;
+//		boneHeaders_v53[num].dataSize = dataSize;
+//		boneHeaders_v53[num].rawStrPos = strEndPos;
+//		mstudioanim_t_v53 v53Anim{ _posscale, _bone, _flags, _unk, _rawrot, _animrot, _unused, _rawpos, _animpos, _rawscale, _animscale, _nextOffset, anims[i].animdata };
+//		break;
+//	}
+//
+//	case 2:
+//	{
+//		Vector3Short rawRot; Stream->Read(&rawRot);
+//		strEndPos = Stream->Position();
+//		LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+//		boneHeaders_v53[num].translationScale = 0;
+//		boneHeaders_v53[num].bone = bone;
+//		boneHeaders_v53[num].r2Flag = flag;
+//		boneHeaders_v53[num].flags = 0;
+//		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rawRot.x; boneHeaders_v53[num].packedRotation.i = (short)rawRot.y; boneHeaders_v53[num].packedRotation.j = (short)rawRot.z; boneHeaders_v53[num].packedRotation.k = (short)0; //boneHeaders_v53[num].packedRotation.one = (short)boneData->boneRot.x; boneHeaders_v53[num].packedRotation.i = (short)boneData->boneRot.y; boneHeaders_v53[num].packedRotation.j = (short)boneData->boneRot.z; boneHeaders_v53[num].packedRotation.k = (short)0;
+//		boneHeaders_v53[num].rawPos; boneHeaders_v53[num].rawPos.x = (short)float_to_half(boneData->bonePos.x); boneHeaders_v53[num].rawPos.y = (short)float_to_half(boneData->bonePos.y); boneHeaders_v53[num].rawPos.z = (short)float_to_half(boneData->bonePos.z);
+//		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+//		boneHeaders_v53[num].nextOffset = nextOffset;
+//		boneHeaders_v53[num].dataSize = dataSize;
+//		boneHeaders_v53[num].rawStrPos = strEndPos;
+//		mstudioanim_t_v53 v53Anim{ _posscale, _bone, _flags, _unk, _rawrot, _animrot, _unused, _rawpos, _animpos, _rawscale, _animscale, _nextOffset, anims[i].animdata };
+//		break;
+//	}
+//
+//	case 28:
+//	{
+//		Vector3Short rotPtr; Stream->Read(&rotPtr); rotPtr.x > 0 ? rotPtr.x += 12 : rotPtr.x = 0; rotPtr.y > 0 ? rotPtr.y += 12 : rotPtr.y = 0; rotPtr.z > 0 ? rotPtr.z += 12 : rotPtr.z = 0;
+//		Vector3Short posPtr; Stream->Read(&posPtr); posPtr.x > 0 ? posPtr.x += 10 : posPtr.x = 0; posPtr.y > 0 ? posPtr.y += 10 : posPtr.y = 0; posPtr.z > 0 ? posPtr.z += 10 : posPtr.z = 0;
+//		strEndPos = Stream->Position();
+//		LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+//		boneHeaders_v53[num].translationScale = GetLargestNumber(boneData->posScale.x, boneData->posScale.y, boneData->posScale.z);
+//		boneHeaders_v53[num].bone = bone;
+//		boneHeaders_v53[num].r2Flag = flag;
+//		boneHeaders_v53[num].flags = 0;
+//		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rotPtr.x; boneHeaders_v53[num].packedRotation.i = (short)rotPtr.y; boneHeaders_v53[num].packedRotation.j = (short)rotPtr.z; boneHeaders_v53[num].packedRotation.k = (short)0;
+//		boneHeaders_v53[num].rawPos = posPtr;
+//		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+//		boneHeaders_v53[num].nextOffset = nextOffset;
+//		boneHeaders_v53[num].dataSize = dataSize;
+//		boneHeaders_v53[num].rawStrPos = strEndPos;
+//		mstudioanim_t_v53 v53Anim{ _posscale, _bone, _flags, _unk, _rawrot, _animrot, _unused, _rawpos, _animpos, _rawscale, _animscale, _nextOffset, anims[i].animdata };
+//
+//		break;
+//	}
+//
+//	case 48:
+//	{
+//		QuaternionShort rawRot; Stream->Read(&rawRot);
+//		strEndPos = Stream->Position();
+//		LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+//		boneHeaders_v53[num].translationScale = 0;
+//		boneHeaders_v53[num].bone = bone;
+//		boneHeaders_v53[num].r2Flag = flag;
+//		boneHeaders_v53[num].flags = 0;
+//		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rawRot.one; boneHeaders_v53[num].packedRotation.i = (short)rawRot.i; boneHeaders_v53[num].packedRotation.j = (short)rawRot.j; boneHeaders_v53[num].packedRotation.k = (short)rawRot.k;
+//		boneHeaders_v53[num].rawPos; boneHeaders_v53[num].rawPos.x = (short)float_to_half(boneData->bonePos.x); boneHeaders_v53[num].rawPos.y = (short)float_to_half(boneData->bonePos.y); boneHeaders_v53[num].rawPos.z = (short)float_to_half(boneData->bonePos.z);
+//		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+//		boneHeaders_v53[num].nextOffset = nextOffset;
+//		boneHeaders_v53[num].dataSize = dataSize;
+//		boneHeaders_v53[num].rawStrPos = strEndPos;
+//		mstudioanim_t_v53 v53Anim{ _posscale, _bone, _flags, _unk, _rawrot, _animrot, _unused, _rawpos, _animpos, _rawscale, _animscale, _nextOffset, anims[i].animdata };
+//		break;
+//	}
+//
+//	case 49:
+//	{
+//		QuaternionShort rawRot; Stream->Read(&rawRot);
+//		Vector3Short rawPos; Stream->Read(&rawPos);
+//		strEndPos = Stream->Position();
+//		LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+//		boneHeaders_v53[num].translationScale = 0;
+//		boneHeaders_v53[num].bone = bone;
+//		boneHeaders_v53[num].r2Flag = flag;
+//		boneHeaders_v53[num].flags = 0;
+//		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rawRot.one; boneHeaders_v53[num].packedRotation.i = (short)rawRot.i; boneHeaders_v53[num].packedRotation.j = (short)rawRot.j; boneHeaders_v53[num].packedRotation.k = (short)rawRot.k;
+//		boneHeaders_v53[num].rawPos = rawPos;
+//		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+//		boneHeaders_v53[num].nextOffset = nextOffset;
+//		boneHeaders_v53[num].dataSize = dataSize;
+//		boneHeaders_v53[num].rawStrPos = strEndPos;
+//		mstudioanim_t_v53 v53Anim{ _posscale, _bone, _flags, _unk, _rawrot, _animrot, _unused, _rawpos, _animpos, _rawscale, _animscale, _nextOffset, anims[i].animdata };
+//		break;
+//	}
+//
+//	case 24:
+//	{
+//		Vector3Short rotPtr; Stream->Read(&rotPtr); rotPtr.x > 0 ? rotPtr.x += 18 : rotPtr.x = 0; rotPtr.y > 0 ? rotPtr.y += 18 : rotPtr.y = 0; rotPtr.z > 0 ? rotPtr.z += 18 : rotPtr.z = 0;
+//		strEndPos = Stream->Position();
+//		LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+//		boneHeaders_v53[num].translationScale = 0;
+//		boneHeaders_v53[num].bone = bone;
+//		boneHeaders_v53[num].r2Flag = flag;
+//		boneHeaders_v53[num].flags = 0;
+//		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)rotPtr.x; boneHeaders_v53[num].packedRotation.i = (short)rotPtr.y; boneHeaders_v53[num].packedRotation.j = (short)rotPtr.z; boneHeaders_v53[num].packedRotation.k = (short)0;
+//		boneHeaders_v53[num].rawPos; boneHeaders_v53[num].rawPos.x = (short)float_to_half(boneData->bonePos.x); boneHeaders_v53[num].rawPos.y = (short)float_to_half(boneData->bonePos.y); boneHeaders_v53[num].rawPos.z = (short)float_to_half(boneData->bonePos.z);
+//		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+//		boneHeaders_v53[num].nextOffset = nextOffset;
+//		boneHeaders_v53[num].dataSize = dataSize;
+//		boneHeaders_v53[num].rawStrPos = strEndPos;
+//		mstudioanim_t_v53 v53Anim{ _posscale, _bone, _flags, _unk, _rawrot, _animrot, _unused, _rawpos, _animpos, _rawscale, _animscale, _nextOffset, anims[i].animdata };
+//		break;
+//	}
+//
+//	case 17:
+//	{
+//		Vector3Short rawPos; Stream->Read(&rawPos);
+//		strEndPos = Stream->Position();
+//		LinearBoneData* boneData = GetLinearBoneData(Stream, Initial_Header, Initial_Header_Part2, (int)bone);
+//		boneHeaders_v53[num].translationScale = 0;
+//		boneHeaders_v53[num].bone = bone;
+//		boneHeaders_v53[num].r2Flag = flag;
+//		boneHeaders_v53[num].flags = 0;
+//		boneHeaders_v53[num].packedRotation; boneHeaders_v53[num].packedRotation.one = (short)0; boneHeaders_v53[num].packedRotation.i = (short)0; boneHeaders_v53[num].packedRotation.j = (short)0; boneHeaders_v53[num].packedRotation.k = (short)0; //boneHeaders_v53[num].packedRotation.one = (short)boneData->boneRot.x; boneHeaders_v53[num].packedRotation.i = (short)boneData->boneRot.y; boneHeaders_v53[num].packedRotation.j = (short)boneData->boneRot.z; boneHeaders_v53[num].packedRotation.k = (short)0;
+//		boneHeaders_v53[num].rawPos = rawPos;
+//		boneHeaders_v53[num].rawScale; boneHeaders_v53[num].rawScale.x = 15360; boneHeaders_v53[num].rawScale.y = 15360; boneHeaders_v53[num].rawScale.z = 15360;
+//		boneHeaders_v53[num].nextOffset = nextOffset;
+//		boneHeaders_v53[num].dataSize = dataSize;
+//		boneHeaders_v53[num].rawStrPos = strEndPos;
+//		mstudioanim_t_v53 v53Anim{ _posscale, _bone, _flags, _unk, _rawrot, _animrot, _unused, _rawpos, _animpos, _rawscale, _animscale, _nextOffset, anims[i].animdata };
+//		break;
+//	}
+//	}
+//}
+
 std::vector<mstudioanim_t_v53> MDL::v49Mdl::ConvertAnims()
 {
 	std::vector<mstudioanim_t_v49> _anims = anims;
@@ -3073,6 +3321,14 @@ std::vector<mstudioanim_t_v53> MDL::v49Mdl::ConvertAnims()
 
 	for (int i = 0; i < anims.size(); i++)
 	{
+
+		bool hasAnimPosPtr =	(int)anims[i].flags & STUDIO_ANIM_ANIMPOS;
+		bool hasAnimRotPtr =	(int)anims[i].flags & STUDIO_ANIM_ANIMROT;
+		bool hasRawPos =		(int)anims[i].flags & STUDIO_ANIM_RAWPOS;
+		bool hasRawRot =		(int)anims[i].flags & STUDIO_ANIM_RAWROT;
+		bool hasRawRot2 =		(int)anims[i].flags & STUDIO_ANIM_RAWROT2;
+
+
 		float _posscale = 0; // does what posscale is used for
 
 		std::byte _bone; // unsigned byte, bone limit exceeds 128 so has to be. also means max bones is 255.
@@ -3099,13 +3355,11 @@ std::vector<mstudioanim_t_v53> MDL::v49Mdl::ConvertAnims()
 		_bone = anims[i].bone;
 		_flags = (std::byte)ConvertFlag((int)anims[i].flags);
 
-		if ((int)anims[i].flags == 12) _posscale = GetLargestNumber(lbd.posScale[bone].x, lbd.posScale[bone].y, lbd.posScale[bone].z);
+		if (hasAnimPosPtr && hasAnimRotPtr) _posscale = GetLargestNumber(lbd.posScale[bone].x, lbd.posScale[bone].y, lbd.posScale[bone].z);
 		if ((int)anims[i].flags & STUDIO_ANIM_ANIMROT)
 		{
 			Vector3Short rotPtr = anims[i].animrot.offset;
-			Vector3Short posPtr = anims[i].animpos.offset;
-			_animrot = anims[i].animrot;
-			if (posPtr.x == 0, posPtr.y == 0, posPtr.z == 0)
+			if (!hasAnimPosPtr)
 			{
 				rotPtr.x > 0 ? rotPtr.x += 18 : rotPtr.x = 0; rotPtr.y > 0 ? rotPtr.y += 18 : rotPtr.y = 0; rotPtr.z > 0 ? rotPtr.z += 18 : rotPtr.z = 0;
 				anims[i].animrot.offset = rotPtr;
@@ -3115,16 +3369,16 @@ std::vector<mstudioanim_t_v53> MDL::v49Mdl::ConvertAnims()
 				rotPtr.x > 0 ? rotPtr.x += 12 : rotPtr.x = 0; rotPtr.y > 0 ? rotPtr.y += 12 : rotPtr.y = 0; rotPtr.z > 0 ? rotPtr.z += 12 : rotPtr.z = 0;
 				anims[i].animrot.offset = rotPtr;
 			}
+			_animrot = anims[i].animrot;
 
 		}
 
 		if ((int)anims[i].flags & STUDIO_ANIM_ANIMPOS)
 		{
-			Vector3Short rotPtr = anims[i].animrot.offset;
 			Vector3Short posPtr = anims[i].animpos.offset;
-			if (rotPtr.x == 0, rotPtr.y == 0, rotPtr.z == 0)
+			if (!hasAnimRotPtr)
 			{
-				posPtr.x > 0 ? posPtr.x += 18 : posPtr.x = 0; posPtr.y > 0 ? posPtr.y += 18 : posPtr.y = 0; posPtr.z > 0 ? posPtr.z += 18 : posPtr.z = 0;
+				posPtr.x > 0 ? posPtr.x += 0 : posPtr.x = 0; posPtr.y > 0 ? posPtr.y += 0 : posPtr.y = 0; posPtr.z > 0 ? posPtr.z += 0 : posPtr.z = 0;
 				anims[i].animpos.offset = posPtr;
 			}
 			else
@@ -3135,7 +3389,7 @@ std::vector<mstudioanim_t_v53> MDL::v49Mdl::ConvertAnims()
 			_animpos = anims[i].animpos;
 		}
 
-		if ((int)anims[i].flags & STUDIO_ANIM_RAWROT) _rawrot = anims[i].rawrot;//{ anims[i].rawrot.one, anims[i].rawrot.i, anims[i].rawrot.j, anims[i].rawrot.k };
+		if ((int)anims[i].flags & STUDIO_ANIM_RAWROT) _rawrot = anims[i].rawrot;
 
 		if ((int)anims[i].flags & STUDIO_ANIM_RAWROT2) _rawrot = anims[i].rawrot2;
 
@@ -3193,6 +3447,14 @@ std::vector<mstudioanim_t_v53> MDL::v49Mdl::ConvertSections()
 
 	for (int i = 0; i < sections.size(); i++)
 	{
+
+
+		bool hasAnimPosPtr =	(int)sections[i].flags & STUDIO_ANIM_ANIMPOS;
+		bool hasAnimRotPtr =	(int)sections[i].flags & STUDIO_ANIM_ANIMROT;
+		bool hasRawPos =		(int)sections[i].flags & STUDIO_ANIM_RAWPOS;
+		bool hasRawRot =		(int)sections[i].flags & STUDIO_ANIM_RAWROT;
+		bool hasRawRot2 =		(int)sections[i].flags & STUDIO_ANIM_RAWROT2;
+
 		float _posscale = 0; // does what posscale is used for
 
 		std::byte _bone; // unsigned byte, bone limit exceeds 128 so has to be. also means max bones is 255.
@@ -3223,9 +3485,7 @@ std::vector<mstudioanim_t_v53> MDL::v49Mdl::ConvertSections()
 		if ((int)sections[i].flags & STUDIO_ANIM_ANIMROT)
 		{
 			Vector3Short rotPtr = sections[i].animrot.offset;
-			Vector3Short posPtr = sections[i].animpos.offset;
-			_animrot = sections[i].animrot;
-			if (posPtr.x == 0, posPtr.y == 0, posPtr.z == 0)
+			if (!hasAnimPosPtr)
 			{
 				rotPtr.x > 0 ? rotPtr.x += 18 : rotPtr.x = 0; rotPtr.y > 0 ? rotPtr.y += 18 : rotPtr.y = 0; rotPtr.z > 0 ? rotPtr.z += 18 : rotPtr.z = 0;
 				sections[i].animrot.offset = rotPtr;
@@ -3235,14 +3495,14 @@ std::vector<mstudioanim_t_v53> MDL::v49Mdl::ConvertSections()
 				rotPtr.x > 0 ? rotPtr.x += 12 : rotPtr.x = 0; rotPtr.y > 0 ? rotPtr.y += 12 : rotPtr.y = 0; rotPtr.z > 0 ? rotPtr.z += 12 : rotPtr.z = 0;
 				sections[i].animrot.offset = rotPtr;
 			}
+			_animrot = sections[i].animrot;
 
 		}
 
 		if ((int)sections[i].flags & STUDIO_ANIM_ANIMPOS)
 		{
-			Vector3Short rotPtr = sections[i].animrot.offset;
 			Vector3Short posPtr = sections[i].animpos.offset;
-			if (rotPtr.x == 0, rotPtr.y == 0, rotPtr.z == 0)
+			if (!hasAnimRotPtr)
 			{
 				posPtr.x > 0 ? posPtr.x += 18 : posPtr.x = 0; posPtr.y > 0 ? posPtr.y += 18 : posPtr.y = 0; posPtr.z > 0 ? posPtr.z += 18 : posPtr.z = 0;
 				sections[i].animpos.offset = posPtr;
@@ -3255,11 +3515,11 @@ std::vector<mstudioanim_t_v53> MDL::v49Mdl::ConvertSections()
 			_animpos = sections[i].animpos;
 		}
 
-		if ((int)sections[i].flags & STUDIO_ANIM_RAWROT) _rawrot = sections[i].rawrot;
+		if (hasRawRot) _rawrot = sections[i].rawrot;
 
-		if ((int)sections[i].flags & STUDIO_ANIM_RAWROT2) _rawrot = sections[i].rawrot2;
+		if (hasRawRot2) _rawrot = sections[i].rawrot2;
 
-		if ((int)sections[i].flags & STUDIO_ANIM_RAWPOS) _rawpos = sections[i].rawpos;
+		if (hasRawPos) _rawpos = sections[i].rawpos;
 		else
 			_rawpos = { (short)float_to_half(lbd.bonePos[bone].x), (short)float_to_half(lbd.bonePos[bone].y), (short)float_to_half(lbd.bonePos[bone].z) };
 
@@ -3332,13 +3592,14 @@ void MDL::v49Mdl::ConvertModels()
 {
 	for (int i = 0; i < models.size(); i++)
 	{
+		models[i].eyeballindex = 0;
+		models[i].unused[0] = 0;
+		models[i].unused[1] = 0;
 		if (mdlhdr.numikchains > 0)
 		{
-			if (models[i].eyeballindex > 0) models[i].eyeballindex = 0;
 			if (models[i].meshindex > 0) models[i].meshindex += bytesAddedToIkChains;
 			if (models[i].attachmentindex > 0) models[i].attachmentindex += bytesAddedToIkChains;
 		}
-		else break;
 	}
 }
 
@@ -3407,8 +3668,8 @@ void MDL::v49Mdl::UpdateMdl()
 	if (events.size() > 0) SeqEventConversion();
 	if (mdlhdr.numlocalnodes > 0) ConvertNodeNames();
 	if (mdlhdr.numbodyparts > 0) ConvertBodyParts();
-	if (mdlhdr.numikchains > 0 && models.size() > 0) ConvertModels();
-	if (mdlhdr.numikchains > 0 && meshes.size() > 0) ConvertMeshes();
+	if (models.size() > 0) ConvertModels();
+	if (meshes.size() > 0) ConvertMeshes();
 	if (mdlhdr.numlocalposeparameters > 0) ConvertPoseParamDescs();
 	if (mdlhdr.numincludemodels > 0) ConvertIncludeModel();
 	if (mdlhdr.numcdtextures > 0) ConvertCDTextures();

@@ -2591,12 +2591,12 @@ void BinaryWriter::Write(mstudiostringtable_t_v49 data)
 {
     for (int i = 0; i < data.mdlname.size(); i++)
     {
-        char value; Stream.write(&data.mdlname[i], 1);
+        Stream.write(&data.mdlname[i], 1);
     }
 
-    for (int i = 0; i < data.mdlname.size(); i++)
+    for (int i = 0; i < data.surfaceprop.size(); i++)
     {
-        Stream.write(&data.mdlname[i], 1);
+        Stream.write(&data.surfaceprop[i], 1);
     }
 
     for (int i = 0; i < data.bones.size(); i++)
@@ -2926,7 +2926,7 @@ void BinaryWriter::Write(mstudioanimdesc_t_v53 data) {
 }
 
 void BinaryWriter::Write(mstudioanim_t_v53 data) {
-    Stream.write((char*)&data.animscale, sizeof(float));
+    Stream.write((char*)&data.posscale, sizeof(float));
     Stream.write((char*)&data.bone, sizeof(byte));
     Stream.write((char*)&data.flags, sizeof(byte));
     Stream.write((char*)&data.unk, sizeof(short));
