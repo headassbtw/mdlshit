@@ -2876,7 +2876,6 @@ studiohdr_t_v53 MDL::v49Mdl::ConvertHeader(FileInfo info)
 
 	int			vtxindex = vtxSize > 0 ? mdlSize + allBytesAdded + phySize + phyBSize + strFiller + ruiSize : 0; // VTX
 	int			vvdindex = vvdSize > 0 ? mdlSize + allBytesAdded + phySize + vtxSize + phyBSize + strFiller + ruiSize : 0; // VVD / IDSV
-	int			vvdindex = vvdSize > 0 ? mdlSize + allBytesAdded + phySize + vtxSize + phyBSize + strFiller + ruiSize : 0; // VVD / IDSV
 	int			vvcindex = vvcSize > 0 ? mdlSize + allBytesAdded + phySize + vtxSize + phyBSize + strFiller + ruiSize + vvdSize : 0; // VVC / IDCV 
 	int			vphyindex = phySize > 0 ? mdlSize + allBytesAdded + strFiller + ruiSize : 0; // VPHY / IVPS
 
