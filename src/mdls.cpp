@@ -3329,6 +3329,15 @@ std::vector<mstudioikchain_t_v53> MDL::v49Mdl::IkChainConversion()
 	return v53IkChains;
 }
 
+void MDL::v49Mdl::HitboxSetConversion()
+{
+	int stairs = bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToIkChains + bytesAddedToTextures + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + strFiller + bytesAddedToRuiMesh;
+	for (int i = 0; i < hitboxsets.size(); i++)
+	{
+		hitboxsets[i].sznameindex += stairs;
+	}
+}
+
 void MDL::v49Mdl::AttachmentConversion()
 {
 	int stairs = bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToIkChains + bytesAddedToTextures + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + strFiller + bytesAddedToRuiMesh;
@@ -3447,6 +3456,7 @@ void MDL::v49Mdl::ConvertSrcBoneTransforms()
 
 void MDL::v49Mdl::UpdateMdl()
 {
+	if (hitboxsets.size() > 0) HitboxSetConversion();
 	if (attachments.size() > 0) AttachmentConversion();
 	if (events.size() > 0) SeqEventConversion();
 	if (mdlhdr.numlocalnodes > 0) ConvertNodeNames();

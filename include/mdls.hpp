@@ -225,6 +225,8 @@ namespace MDL
 
 		std::vector<mstudioikchain_t_v53> IkChainConversion();
 
+		void HitboxSetConversion();
+
 		void AttachmentConversion();
 
 		void SeqEventConversion();

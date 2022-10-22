@@ -83,7 +83,8 @@ int Conversion::ReadHeader(FileInfo info) {
   std::vector<mstudioruimesh_t> ruiMeshes;
   OutStream.seek(0);
   OutStream.Write(v53Hdr);
-  //OutStream.seek(OutStream.Position() - 60 * 4);
+  OutStream.seek(716 - 60 * 4);
+  fillerWrite(&OutStream, 60 * 4);
   //AddInt32(&OutStream, 0, 60);
 
   std::vector<int> hdrBytesAnimDescAdd = mdl.v53GetAnimHdrBytesAdded(true);
@@ -255,8 +256,8 @@ int Conversion::ReadHeader(FileInfo info) {
                   boneHdrNum++;
                   if (anims[j].nextoffset == 0)
                   {
-                      //OutStream.seek(OutStream.Position() - 32);
-                      //fillerWrite(&OutStream, 32);
+                      OutStream.seek(OutStream.Position() - 32);
+                      fillerWrite(&OutStream, 32);
                       break;
                   }
               }
@@ -281,11 +282,11 @@ int Conversion::ReadHeader(FileInfo info) {
                  int off = sectionIndexes[secNumber].sectionoffsets;
 
                  OutStream.seek(startPos + off);
-                 if(j > 0)
-                 {
-                     OutStream.seek(startPos + off - 32);
-                     fillerWrite(&OutStream, 32);
-                 }
+                 //if(j > 0)
+                 //{
+                 //    OutStream.seek(startPos + off - 32);
+                 //    fillerWrite(&OutStream, 32);
+                 //}
                  for (int k = secBoneHdrNum; k < sections.size(); k++)
                  {
                      OutStream.Write(sections[k]);
@@ -293,6 +294,8 @@ int Conversion::ReadHeader(FileInfo info) {
                      secBoneHdrNum++;
                      if (sections[k].nextoffset == 0)
                      {
+                         OutStream.seek(OutStream.Position() - 32);
+                         fillerWrite(&OutStream, 32);
                          break;
                      }
                  }
