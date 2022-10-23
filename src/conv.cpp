@@ -78,11 +78,13 @@ int Conversion::ReadHeader(FileInfo info) {
   }
   MDL::v49Mdl mdl = mdl._v49Mdl(&Stream, false);
   mdl.SetMdlInts();
-  studiohdr_t_v53 v53Hdr = mdl.ConvertHeader(info);
-  OutStream.Write(v53Hdr);
   mdl.UpdateMdl();
+
   std::vector<int> bytesAddedPerRuiMesh;
   std::vector<mstudioruimesh_t> ruiMeshes;
+
+  studiohdr_t_v53 v53Hdr = mdl.ConvertHeader(info);
+  OutStream.Write(v53Hdr);
   //OutStream.seek(476);
   //fillerWrite(&OutStream, 240);
 
@@ -793,6 +795,9 @@ if (info.rui.has_value()) {
       UI::Progress.SubTask.End();
       Logger::Info("done\n");
   }
+
+  OutStream.seek(0);
+  OutStream.Write(v53Hdr);
 
   OutStream.Stream.close();
   Stream.Stream.close();
