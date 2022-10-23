@@ -84,7 +84,7 @@ int Conversion::ReadHeader(FileInfo info) {
   std::vector<mstudioruimesh_t> ruiMeshes;
 
   studiohdr_t_v53 v53Hdr = mdl.ConvertHeader(info);
-  OutStream.Write(v53Hdr);
+  OutStream.Write(mdl.mdlhdr);
   //OutStream.seek(476);
   //fillerWrite(&OutStream, 240);
 
