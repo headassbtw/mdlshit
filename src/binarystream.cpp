@@ -2728,7 +2728,7 @@ void BinaryWriter::Write(studiohdr_t_v53 data) {
     Stream.write((char*)&data.view_bbmin, sizeof(Vector3));	
     Stream.write((char*)&data.view_bbmax, sizeof(Vector3));
 
-    Stream.read((char*)&data.flags, sizeof(int));
+    Stream.write((char*)&data.flags, sizeof(int));
 
     Stream.write((char*)&data.numbones, sizeof(int));
     Stream.write((char*)&data.boneindex, sizeof(int));
