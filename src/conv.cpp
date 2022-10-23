@@ -64,6 +64,8 @@ int Conversion::ReadHeader(FileInfo info) {
   BinaryReader Stream = BinaryReader(info.mdl.value().c_str());
   BinaryWriter OutStream = BinaryWriter(info.out.value().c_str());
 
+  OutStream.seek(0);
+
   bool readV53 = false;
   if (readV53 && info.aabb.has_value()) //This is also a temp for rui testing. -Liberty Edit: This is how I get the converter to read a v53 without adding an extra option. - Liberty
   {
@@ -76,13 +78,11 @@ int Conversion::ReadHeader(FileInfo info) {
   }
   MDL::v49Mdl mdl = mdl._v49Mdl(&Stream, false);
   mdl.SetMdlInts();
-  mdl.UpdateMdl();
   studiohdr_t_v53 v53Hdr = mdl.ConvertHeader(info);
-  int bytesAddedToRuiMesh = 0;
+  OutStream.Write(v53Hdr);
+  mdl.UpdateMdl();
   std::vector<int> bytesAddedPerRuiMesh;
   std::vector<mstudioruimesh_t> ruiMeshes;
-  //OutStream.seek(0);
-  OutStream.Write(v53Hdr);
   //OutStream.seek(716 - 60 * 4);
   //fillerWrite(&OutStream, 60 * 4);
 
@@ -97,7 +97,7 @@ int Conversion::ReadHeader(FileInfo info) {
   //std::vector<int> deltaAnims = GetDeltaAnims(&Stream, Initial_Header, false);
 
   int animBytesAdded = animByteAddedTotal + animSecByteAddedTotal;
-
+  int bytesAddedToRuiMesh = 0;
   int bytesAddedToIkRules = -12 * mdl.iklinks.size();
   int bytesAddedToHeader = 52;
   int bytesAddedToBones = mdl.mdlhdr.numbones * 28;
