@@ -84,9 +84,9 @@ int Conversion::ReadHeader(FileInfo info) {
   std::vector<mstudioruimesh_t> ruiMeshes;
 
   studiohdr_t_v53 v53Hdr = mdl.ConvertHeader(info);
-  OutStream.Write(mdl.mdlhdr);
+  OutStream.Write(v53Hdr);
   //OutStream.seek(476);
-  //fillerWrite(&OutStream, 240);
+  fillerWrite(&OutStream, 240);
 
   std::vector<int> hdrBytesAnimDescAdd = mdl.v53GetAnimHdrBytesAdded(true);
   std::vector<int> secHdrBytesAnimDescAdd = mdl.v53GetSecHdrBytesAdded(true);
