@@ -66,15 +66,15 @@ int Conversion::ReadHeader(FileInfo info) {
 
   OutStream.seek(0);
 
-  bool readV53 = false;
+  bool readV53 = true;
   if (readV53 && info.aabb.has_value()) //This is also a temp for rui testing. -Liberty Edit: This is how I get the converter to read a v53 without adding an extra option. - Liberty
   {
       BinaryReader v53Stream = BinaryReader(info.aabb.value().c_str());
       MDL::v53Mdl mdl2 = mdl2._v53Mdl(&v53Stream, false);
-      if (!v53Stream.Stream.good()) {
-          Logger::Error("Model's phy file does not exist, please ensure %s exists, and is located in the same directory as the file\n", info.aabb.value().c_str());
-          return 1;
-      }
+      //if (!v53Stream.Stream.good()) {
+      //    Logger::Error("Model's phy file does not exist, please ensure %s exists, and is located in the same directory as the file\n", info.aabb.value().c_str());
+      //    return 1;
+      //}
   }
   MDL::v49Mdl mdl = mdl._v49Mdl(&Stream, false);
   mdl.SetMdlInts();
@@ -694,8 +694,7 @@ if (info.rui.has_value()) {
   OutStream.seek(OutStream.Position() + 1);
   OutStream.Write(mdl.stringtable);
 
-  OutStream.seek(0);
-  OutStream.Write(v53Hdr);
+
 #pragma region rest of the file
   int pos = Stream.Position();
   //UI::Progress.SubTask.Begin("Copying Misc Data");

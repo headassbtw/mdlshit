@@ -142,7 +142,405 @@ template <typename T> std::vector<T> ArrayToVector(T* arry, int size)
 	return _vec;
 }
 
+int FaceType(mstudioruivertmap_t vertMap)
+{
 
+	for (int i = 0; i < 3; i++)
+	{
+		if (vertMap.vertendid == vertMap.vertstartid + 2) return 0;
+		if (vertMap.vertextraid == vertMap.vertstartid + 2) return 1;
+		if (vertMap.vertendid == vertMap.vertstartid + 2) return 0;
+	}
+
+
+	//Logger::Info("vert1: %d vert2: %d\n", vertMap.vertstartid, vertMap.vertendid);
+
+	//if (vertMap.vertendid == vertMap.vertstartid + (short)1 && vertMap.vertextraid == vertMap.vertendid + (short)1) return 2; //Is 1 2 3 pattern
+	//
+	//if (vertMap.vertendid == vertMap.vertstartid + (short)2 && vertMap.vertextraid == vertMap.vertstartid + (short)1 || vertMap.vertendid == vertMap.vertstartid - (short)2 && vertMap.vertextraid == vertMap.vertstartid - (short)1) return 2; //Is 1 3 2 pattern
+	//
+	//if (vertMap.vertendid == vertMap.vertstartid + (short)1 && vertMap.vertextraid == vertMap.vertendid + (short)1) return 2; //Is 1 2 3 pattern
+	//
+	//if (vertMap.vertendid != vertMap.vertstartid + (short)2 && vertMap.vertendid != vertMap.vertstartid + (short)1) return 1; //Is 1 3 2 pattern
+	//
+	//if (vertMap.vertendid == vertMap.vertstartid + (short)2 && vertMap.vertextraid == vertMap.vertstartid + (short)1) return 1; //Is 1 3 2 pattern
+	//
+	//if (vertMap.vertendid = vertMap.vertstartid + (short)2 && vertMap.vertextraid != vertMap.vertstartid + (short)1)
+	//{
+	//	return 0; //Is quad
+	//}
+
+
+}
+
+std::vector<short> ReadVertMap(mstudioruivertmap_t vertMap)
+{
+	//Logger::Info("RuiMesh Read: %d  %d\n", vertMap.vertstartid, vertMap.vertendid);
+	int tpye = FaceType(vertMap);
+	std::vector<short> vertOrder;
+
+	short v1 = vertMap.vertstartid;
+	short v2 = vertMap.vertendid;
+	short v3 = vertMap.vertextraid;
+
+
+	//for (int i = 0; i < 3; i++)
+	//{
+	//	//if(v2 == v1 + 2 || v2 == v1 - 2) Logger::Info("Is 1 3\n");
+	//	//if(v1 == v2 + 2 || v1 == v2 - 2) Logger::Info("Is 3 1\n");
+	//}
+
+
+	//bool _132Pos = v2 == v1 + (short)2 && v3 == v1 + (short)1;
+	//bool _123Pos = v2 == v1 + (short)1 && v3 == v2 + (short)1;
+	//bool _132Neg = v2 == v1 - (short)2 && v3 == v1 - (short)1;
+	//bool _123Neg = v2 == v1 - (short)1 && v3 == v2 - (short)1;
+	//bool _134Pos = v2 == v1 + (short)2 && v3 != v1 + (short)1;
+	//bool _134Neg = v2 == v1 - (short)2 && v3 != v1 - (short)1;
+	////bool _143Pos = v3 == v1 + (short)2 && v2 != v1 + (short)1;
+	////bool _143Neg = v3 == v1 - (short)2 && v2 != v1 - (short)1;
+	//bool _413Pos = v3 == v2 + (short)2 && v1 != v2 + (short)1;
+	//bool _413Neg = v3 == v2 - (short)2 && v1 != v2 - (short)1;
+	//bool _142Pos = v3 == v1 + (short)1 && v2 != v3 + 1;
+	//bool _142Neg = v3 == v1 - (short)1 && v2 != v3 - 1;
+	//bool _214Pos = v1 == v2 + (short)1 && v3 != v2 + (short)2 && v3 != v1 + 1;
+	//bool _214Neg = v1 == v2 - (short)1 && v3 != v2 - (short)2 && v3 != v1 - 1;
+	//bool _124Pos = v2 == v1 - (short)1 && v3 == v1 + 1;
+	//bool _124Neg = v2 == v1 - (short)1 && v3 == v1 - (short)2 && v3 == v2 - 1;
+	//bool _default = !_132Pos && !_123Pos && !_132Neg && !_123Neg && !_134Pos && !_134Neg;
+	//bool _134Pos = v2 == v1 + 2 && v3 != v1 + 1;
+	//bool _134Neg = v2 == v1 - 2 && v3 != v1 - 1;
+	//bool _142Pos = v3 == v1 + 1 && v2 != v3 + 1 && v2 != v1 + 1 && v2 != v1 - 1 && v2 < v1;
+	//bool _142Neg = v3 == v1 - 1 && v2 != v3 - 1 && v2 != v1 - 1;
+	//bool _124Pos = v2 == v1 - 1 && v3 == v1 + 1;
+	//bool _124Neg = v2 == v1 + 1 && v3 != v1 - 1;
+	//bool _241Pos = v1 == v3 - 1 && v2 > v1 && v3 == v1 + 1;
+	//bool _421Pos = v2 == v1 - 2 && v3 == v1 - 1;
+
+	bool _134Pos = v2 == v1 + 2 && v3 != v1 + 1 && v3 != v2 + 1 && v3 != v1 + 1;
+	bool _134Neg = v2 == v1 - 2 && v3 != v1 - 1 && v3 != v1 + 1;
+	bool _132Pos = v2 == v1 + 2 && v3 == v1 + 1;
+	bool _132Neg = v2 == v1 - 2 && v3 == v1 - 1;
+	bool _123Pos = v2 == v1 + 1 && v3 == v2 + 1;
+	bool _123Neg = v2 == v1 - 1 && v3 == v2 - 1;
+
+
+	bool _124Pos = v2 == v1 + 1 && v3 == v1 - 1;
+	bool _124Neg = v2 == v1 - 1 && v3 == v1 + 1;
+
+	bool _421Pos = v3 == v2 + 1 && v1 != v2 - 1 && !_132Neg;
+	bool _421Neg = v3 == v2 - 1 && v1 != v2 + 1;
+
+	bool _142Pos = v3 == v1 + 1 && v2 != v1 + 2 && !_124Neg && !_134Pos && !_134Neg && !_124Pos;
+	bool _142Neg = v3 == v1 - 1 && v2 != v1 - 2 && !_134Pos && !_134Neg && !_124Pos && !_124Neg;
+	
+	if (_132Pos) Logger::Info("//Is Quad 132POS\n");
+	if (_132Neg) Logger::Info("//Is Quad 132NEG\n");
+
+	if (_123Pos) Logger::Info("//Is Quad 123POS\n");
+	if (_123Neg) Logger::Info("//Is Quad 123NEG\n");
+
+	if (_134Pos) Logger::Info("//Is Quad 134POS\n");
+	if (_134Neg) Logger::Info("//Is Quad 134NEG\n");
+
+	if (_124Pos) Logger::Info("//Is Quad 124POS\n");
+	if (_124Neg) Logger::Info("//Is Quad 124NEG\n");
+
+	if (_421Pos) Logger::Info("//Is Quad 421POS\n");
+	if (_421Neg) Logger::Info("//Is Quad 421NEG\n");
+
+	if (_142Pos) Logger::Info("//Is Quad 142POS\n");
+	if (_142Neg) Logger::Info("//Is Quad 142NEG\n");
+
+
+	//if (_134Pos)
+	//{
+	//	Logger::Info("//Is Quad 134POS\n");
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertendid);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	//vertOrder.push_back(vertMap.vertstartid + (short)1);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	vertOrder.push_back(vertMap.vertstartid + (short)1);
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+	//	return vertOrder;
+	//}
+	//if (_134Neg)
+	//{
+	//	Logger::Info("//Is Quad 134NEG\n");
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertendid);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	//vertOrder.push_back(vertMap.vertstartid - (short)1);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	vertOrder.push_back(vertMap.vertstartid - (short)1);
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+	//	return vertOrder;
+	//}
+	//if (_142Pos)
+	//{
+	//	Logger::Info("//Is Quad 142POS\n");
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertextraid + (short)1); //vertOrder.push_back(vertMap.vertendid);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	vertOrder.push_back(vertMap.vertendid);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+	//	return vertOrder;
+	//}
+	//if (_142Neg)
+	//{
+	//	Logger::Info("//Is Quad 142NEG\n");
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertendid);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertendid);
+	//	vertOrder.push_back(vertMap.vertextraid - (short)1);
+	//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+	//	return vertOrder;
+	//}
+	//if (_124Pos)
+	//{
+	//	Logger::Info("//Is Quad 124POS\n");
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertendid);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertendid - (short)1);
+	//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+	//	return vertOrder;
+	//}
+	//if (_241Pos)
+	//{
+	//	Logger::Info("//Is Quad 241POS\n");
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertendid);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	vertOrder.push_back(vertMap.vertstartid - (short)1);
+	//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+	//	return vertOrder;
+	//}
+	//if (_421Pos)
+	//{
+	//	Logger::Info("//Is Quad 421POS\n");
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertendid);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertendid - (short)1);
+	//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+	//	return vertOrder;
+	//}
+	//if (_124Neg)
+	//{
+	//	Logger::Info("//Is Quad 124NEG\n");
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertendid);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertendid - (short)1);
+	//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+	//	return vertOrder;
+	//}
+	//if (_214Pos && !_142Neg && !_123Pos && !_123Neg && !_132Neg && !_132Pos)
+	//{
+	//	//Logger::Info("Is Quad\n");
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertendid);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	vertOrder.push_back(vertMap.vertendid);
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertstartid + (short)1);
+	//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+	//	return vertOrder;
+	//}
+	//if (_124Pos)
+	//{
+	//	//Logger::Info("Is Quad\n");
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertendid);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertendid - (short)1);
+	//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+	//	return vertOrder;
+	//}
+	//if (_124Neg && !_142Neg && !_123Pos && !_123Neg && !_132Neg && !_132Pos)
+	//{
+	//	//Logger::Info("Is Quad\n");
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertendid);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	vertOrder.push_back(vertMap.vertendid);
+	//	vertOrder.push_back(vertMap.vertendid - (short)1);
+	//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+	//	return vertOrder;
+	//}
+	//if (_214Neg && !_142Pos && !_123Pos && !_123Neg && !_132Neg && !_132Pos)
+	//{
+	//	//Logger::Info("Is Quad\n");
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertendid);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	vertOrder.push_back(vertMap.vertendid);
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertstartid - (short)1);
+	//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+	//	return vertOrder;
+	//}
+	//if (_143Pos && !_123Pos && !_123Neg && !_132Neg && !_132Pos)
+	//{
+	//	//Logger::Info("Is Quad\n");
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	vertOrder.push_back(vertMap.vertstartid + (short)1);
+	//	vertOrder.push_back(vertMap.vertendid);
+	//	vertOrder.push_back(vertMap.vertstartid + (short)1);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+	//	return vertOrder;
+	//}
+	//if (_143Neg && !_123Pos && !_123Neg && !_132Neg && !_132Pos)
+	//{
+	//	//Logger::Info("Is Quad\n");
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	vertOrder.push_back(vertMap.vertstartid - (short)1);
+	//	vertOrder.push_back(vertMap.vertendid);
+	//	vertOrder.push_back(vertMap.vertstartid - (short)1);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+	//	return vertOrder;
+	//}
+	//if (_413Pos)
+	//{
+	//	Logger::Info("//Is Quad 413POS\n");
+	//	vertOrder.push_back(vertMap.vertendid);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	vertOrder.push_back(vertMap.vertendid + (short)1);
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertendid + (short)1);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+	//	return vertOrder;
+	//}
+	//if (_413Neg)
+	//{
+	//	Logger::Info("//Is Quad 413NEG\n");
+	//	vertOrder.push_back(vertMap.vertendid);
+	//	vertOrder.push_back(vertMap.vertextraid);
+	//	vertOrder.push_back(vertMap.vertendid - (short)1);
+	//	vertOrder.push_back(vertMap.vertstartid);
+	//	vertOrder.push_back(vertMap.vertendid);
+	//	vertOrder.push_back(vertMap.vertendid - (short)1);
+	//	//Logger::Info("Vert4 Read: %d \n", vertOrder[3]);
+	//	return vertOrder;
+	//}
+
+	vertOrder.push_back(vertMap.vertstartid);
+	vertOrder.push_back(vertMap.vertendid);
+	vertOrder.push_back(vertMap.vertextraid);
+	return vertOrder;
+}
+
+void RUIMeshToSmd(mstudioruimesh_t ruiMesh)
+{
+	int faces = ruiMesh.numfaces;
+	Logger::Info("version 1\n");
+	Logger::Info("nodes\n");
+	Logger::Info("%d 'Bone' %d\n", 0, -1);
+	Logger::Info("end\n");
+	Logger::Info("skeleton\n");
+	Logger::Info("time 0\n");
+	Logger::Info("0  0.000000 0.000000 0.000000  0.000000 -0.000000 0.000000\n");
+	Logger::Info("end\n");
+	Logger::Info("triangles\n");
+	//Logger::Info("RuiMesh Read: %d  %d\n", ruiMesh.vertexmap[0].vertstartid, ruiMesh.vertexmap[0].vertendid);
+	int faceNum = 0;
+	int vertNum = 0;
+	for (int i = 0; i < ruiMesh.numvertices; i++)
+	{
+		//Logger::Info("FACE%d \n", faceNum);
+		if (vertNum >= 3)
+		{
+			Logger::Info("FACE%d \n", faceNum);
+			faceNum++;
+			vertNum = 0;
+		}
+		mstudioruivert_t vert1 = ruiMesh.vertex[i];
+		Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert1.vertexpos.x, vert1.vertexpos.y, vert1.vertexpos.z);
+		vertNum++;
+		//for (int j = 0; j < ruiMesh.numvertices; j++)
+		//{
+		//	mstudioruivert_t vert1 = ruiMesh.vertex[vertNum];
+		//	Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert1.vertexpos.x, vert1.vertexpos.y, vert1.vertexpos.z);
+		//	vertNum++;
+		//}
+		//faceNum++;
+	}
+	for (int i = 0; i < ruiMesh.numfaces; i++)
+	{
+		mstudioruivertmap_t map = ruiMesh.vertexmap[i];
+		//Logger::Info("RuiMesh Read: %d  %d\n", ruiMesh.vertexmap[i].vertstartid, ruiMesh.vertexmap[i].vertendid);
+		std::vector<short> vertMap = ReadVertMap(map);
+		Logger::Info("FACE%d \n", i);
+		if (vertMap.size() > 3)
+		{
+			int v1 = vertMap[0];
+			int v2 = vertMap[1];
+			int v3 = vertMap[2];
+			int v4 = vertMap[3];
+			int v5 = vertMap[4];
+			int v6 = vertMap[5];
+			//Logger::Info("Vert4 Read: %d \n", vertMap[3]);
+			//Logger::Info("Vert4 Read: %d \n", v4);
+
+			mstudioruivert_t vert1 = ruiMesh.vertex[v1];
+			mstudioruivert_t vert2 = ruiMesh.vertex[v2];
+			mstudioruivert_t vert3 = ruiMesh.vertex[v3];
+
+			mstudioruivert_t vert4 = ruiMesh.vertex[v4];
+			mstudioruivert_t vert5 = ruiMesh.vertex[v5];
+			mstudioruivert_t vert6 = ruiMesh.vertex[v6];
+
+			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert1.vertexpos.x, vert1.vertexpos.y, vert1.vertexpos.z);
+			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert2.vertexpos.x, vert2.vertexpos.y, vert2.vertexpos.z);
+			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert3.vertexpos.x, vert3.vertexpos.y, vert3.vertexpos.z);
+			Logger::Info("FACE%d Quad \n", i);
+			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert4.vertexpos.x, vert4.vertexpos.y, vert4.vertexpos.z);
+			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert5.vertexpos.x, vert5.vertexpos.y, vert5.vertexpos.z);
+			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert6.vertexpos.x, vert6.vertexpos.y, vert6.vertexpos.z);
+		}
+		else
+		{
+			int v1 = vertMap[0];
+			int v2 = vertMap[1];
+			int v3 = vertMap[2];
+
+			mstudioruivert_t vert1 = ruiMesh.vertex[v1];
+			mstudioruivert_t vert2 = ruiMesh.vertex[v2];
+			mstudioruivert_t vert3 = ruiMesh.vertex[v3];
+
+			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert1.vertexpos.x, vert1.vertexpos.y, vert1.vertexpos.z);
+			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert2.vertexpos.x, vert2.vertexpos.y, vert2.vertexpos.z);
+			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert3.vertexpos.x, vert3.vertexpos.y, vert3.vertexpos.z);
+		}
+	}
+	Logger::Info("end\n");
+
+
+}
 
 std::string ReadMDLString(BinaryReader* Stream, int pos)
 {
@@ -911,7 +1309,7 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			mstudioruimesh_t ruiMesh; Stream->Read(&ruiMesh);
 			ruiMeshes.push_back(ruiMesh);
 			//Logger::Info("RuiMesh Read: %d  %d\n", ruiMesh.vertexmap[0].vertstartid, ruiMesh.vertexmap[0].vertendid);
-			//RUIMeshToSmd(ruiMesh);
+			RUIMeshToSmd(ruiMesh);
 			Logger::Info("RuiMesh Read: %s\n", ReadMDLString(Stream, ruiPos + 32).c_str());
 			Logger::Info("RuiMesh Read: %d\n", j);
 		}
@@ -2744,128 +3142,128 @@ studiohdr_t_v53 MDL::v49Mdl::ConvertHeader(FileInfo info)
 
 	Logger::Notice("RuiSize %d\n", ruiSize);
 
-	int			id;
-	int			version;
-	int			checksum;
+	//int			id;
+	//int			version;
+	//int			checksum;
 	int			sznameindex = mdlsubhdr.sznameindex + allBytesAdded + strFiller + 408 + ruiSize;
-	char		name[64];
+	//char		name[64];
+	//
+	//int			length;
+	//
+	//Vector3		eyeposition;
+	//
+	//Vector3		illumposition;
+	//
+	//Vector3		hull_min;
+	//Vector3		hull_max;
+	//
+	//Vector3		view_bbmin;
+	//Vector3		view_bbmax;
+	//
+	//mdlflags_t	flags;
 
-	int			length;
-
-	Vector3		eyeposition;
-
-	Vector3		illumposition;
-
-	Vector3		hull_min;
-	Vector3		hull_max;
-
-	Vector3		view_bbmin;
-	Vector3		view_bbmax;
-
-	mdlflags_t	flags;
-
-	int			numbones;
+	//int			numbones;
 	int			boneindex = mdlhdr.boneindex + bytesAddedToHeader;
 
-	int			numbonecontrollers;
+	//int			numbonecontrollers;
 	int			bonecontrollerindex = mdlhdr.bonecontrollerindex + bytesAddedToHeader + bytesAddedToBones;
 
-	int			numhitboxsets;
+	//int			numhitboxsets;
 	int			hitboxsetindex = mdlhdr.hitboxsetindex + bytesAddedToHeader + bytesAddedToBones;
 
-	int			numlocalanim;
+	//int			numlocalanim;
 	int			localanimindex = mdlhdr.localanimindex + bytesAddedToHeader + bytesAddedToBones;
 
-	int			numlocalseq;
+	//int			numlocalseq;
 	int			localseqindex = mdlhdr.localseqindex + bytesAddedToAnims + bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnimData;
 
-	int			activitylistversion;
-	int			eventsindexed;
+	//int			activitylistversion;
+	//int			eventsindexed;
 
-	int			numtextures;
+	//int			numtextures;
 	int			textureindex = mdlhdr.textureindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + ruiSize;
 
-	int			numcdtextures;
+	//int			numcdtextures;
 	int			cdtextureindex = mdlhdr.cdtextureindex + allBytesAdded + ruiSize;
 
-	int			numskinref;
-	int			numskinfamilies;
+	//int			numskinref;
+	//int			numskinfamilies;
 	int			skinindex = mdlhdr.skinindex + allBytesAdded + ruiSize;
 
-	int			numbodyparts;
+	//int			numbodyparts;
 	int			bodypartindex = mdlhdr.bodypartindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnimData + bytesAddedToActMods;
 
-	int			numlocalattachments;
+	//int			numlocalattachments;
 	int			localattachmentindex = mdlhdr.localattachmentindex + bytesAddedToHeader + bytesAddedToBones;
 
-	int			numlocalnodes;
+	//int			numlocalnodes;
 	int			localnodeindex = mdlhdr.localnodeindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnimData + bytesAddedToActMods;
 	int			localnodenameindex = mdlhdr.localnodenameindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnimData + bytesAddedToActMods;
 
-	int			numflexdesc;
+	//int			numflexdesc;
 	int			flexdescindex = mdlhdr.flexdescindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods;
 
-	int			numflexcontrollers;
+	//int			numflexcontrollers;
 	int			flexcontrollerindex = mdlhdr.flexcontrollerindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods;
 
-	int			numflexrules;
+	//int			numflexrules;
 	int			flexruleindex = mdlhdr.flexruleindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods;
 
-	int			numikchains;
+	//int			numikchains;
 	int			ikchainindex = mdlhdr.ikchainindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnimData + bytesAddedToActMods;
 
 	int			nummouths = ruiNum;
 	int			mouthindex = mdlhdr.includemodelindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods + 8 * mdlhdr.numincludemodels;
 
-	int			numlocalposeparameters;
+	//int			numlocalposeparameters;
 	int			localposeparamindex = mdlhdr.localposeparamindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods;
 
 	int			surfacepropindex = mdlhdr.surfacepropindex + allBytesAdded + strFiller + ruiSize;
 
 	int			keyvalueindex = mdlhdr.keyvalueindex + allBytesAdded + ruiSize;
-	int			keyvaluesize;
+	//int			keyvaluesize;
 
-	int			numlocalikautoplaylocks;
+	//int			numlocalikautoplaylocks;
 	int			localikautoplaylockindex = mdlhdr.localikautoplaylockindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods;
 
 
-	float		mass;
-	int			contents;
+	//float		mass;
+	//int			contents;
 
-	int			numincludemodels;
+	//int			numincludemodels;
 	int			includemodelindex = mdlhdr.includemodelindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods;
 
-	uint32_t	virtualModel;
+	//uint32_t	virtualModel;
 
 	int			bonetablebynameindex = mdlhdr.bonetablebynameindex + bytesAddedToHeader + bytesAddedToBones;
 
-	std::byte	constdirectionallightdot;
+	//std::byte	constdirectionallightdot;
 
-	std::byte	rootLOD;
+	//std::byte	rootLOD;
 
-	std::byte	numAllowedRootLODs;
+	//std::byte	numAllowedRootLODs;
 
-	std::byte	unused;
+	//std::byte	unused;
 
-	float		fadedistance;
+	//float		fadedistance;
 
-	int			numflexcontrollerui;
+	//int			numflexcontrollerui;
 	int			flexcontrolleruiindex = mdlhdr.flexcontrolleruiindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods;
 
-	uint32_t	pVertexBase;
-	uint32_t	pIndexBase;
+	//uint32_t	pVertexBase;
+	//uint32_t	pIndexBase;
 
 	int			mayaindex = 0;
 
-	int			numsrcbonetransform;
+	//int			numsrcbonetransform;
 	int			srcbonetransformindex = mdlsubhdr.srcbonetransformindex + allBytesAdded + ruiSize;
 
-	int			illumpositionattachmentindex;
+	//int			illumpositionattachmentindex;
 
 	int			linearboneindex = mdlsubhdr.linearboneindex + allBytesAdded + 408 + ruiSize;
 
-	int			m_nBoneFlexDriverCount;
-	int			m_nBoneFlexDriverIndex;
+	//int			m_nBoneFlexDriverCount;
+	//int			m_nBoneFlexDriverIndex;
 
 	int			aabbindex = mdlsubhdr.sznameindex + allBytesAdded + strFiller + 408 - 61 + ruiSize;
 	int			numaabb = 0;
@@ -2891,9 +3289,9 @@ studiohdr_t_v53 MDL::v49Mdl::ConvertHeader(FileInfo info)
 
 	int			unkindex3 = mdlSize + allBytesAdded + phySize + strFiller + ruiSize;
 
-	int			unused1[60];
+	int			unused1[60]{};
 
-	studiohdr_t_v53 v53Hdr = { mdlhdr.id, 53, mdlhdr.checksum, sznameindex, ArrayToVector(mdlhdr.name, 64), mdlhdr.length, mdlhdr.eyeposition, mdlhdr.illumposition, mdlhdr.hull_min, mdlhdr.hull_max, mdlhdr.view_bbmin, mdlhdr.view_bbmax, mdlhdr.flags, mdlhdr.numbones, boneindex, mdlhdr.numbonecontrollers, bonecontrollerindex, mdlhdr.numhitboxsets, hitboxsetindex, mdlhdr.numlocalanim, localanimindex, mdlhdr.numlocalseq, localseqindex, mdlhdr.activitylistversion, mdlhdr.eventsindexed, mdlhdr.numtextures, textureindex, mdlhdr.numcdtextures, cdtextureindex, mdlhdr.numskinref, mdlhdr.numskinfamilies, skinindex, mdlhdr.numbodyparts, bodypartindex, mdlhdr.numlocalattachments, localattachmentindex, mdlhdr.numlocalnodes, localnodeindex, localnodenameindex, mdlhdr.numflexdesc, flexdescindex, mdlhdr.numflexcontrollers, flexcontrollerindex, mdlhdr.numflexrules, flexruleindex, mdlhdr.numikchains, ikchainindex, ruiNum, mouthindex, mdlhdr.numlocalposeparameters, localposeparamindex, surfacepropindex, keyvalueindex, mdlhdr.keyvaluesize, mdlhdr.numlocalikautoplaylocks, localikautoplaylockindex, mdlhdr.mass, mdlhdr.contents, mdlhdr.numincludemodels, includemodelindex, mdlhdr.virtualModel, bonetablebynameindex, mdlhdr.constdirectionallightdot, mdlhdr.rootLOD, mdlhdr.numAllowedRootLODs, mdlhdr.unused, fadedistance, mdlhdr.numflexcontrollerui, flexcontrolleruiindex, mdlhdr.pVertexBase, mdlhdr.pIndexBase, mayaindex, mdlsubhdr.numsrcbonetransform, srcbonetransformindex, mdlsubhdr.illumpositionattachmentindex, linearboneindex, mdlsubhdr.m_nBoneFlexDriverCount, mdlsubhdr.m_nBoneFlexDriverIndex, aabbindex, numaabb, numaabb1, numaabb2, unkstringindex, vtxindex, vvdindex, vvcindex, vphyindex, vtxsize, vvdsize, vvcsize, vphysize, unkmemberindex1, numunkmember1, unk, unkindex3, unused1 };
+	studiohdr_t_v53 v53Hdr = { mdlhdr.id, 53, mdlhdr.checksum, sznameindex, ArrayToVector(mdlhdr.name, 64), mdlhdr.length, mdlhdr.eyeposition, mdlhdr.illumposition, mdlhdr.hull_min, mdlhdr.hull_max, mdlhdr.view_bbmin, mdlhdr.view_bbmax, mdlhdr.flags, mdlhdr.numbones, boneindex, mdlhdr.numbonecontrollers, bonecontrollerindex, mdlhdr.numhitboxsets, hitboxsetindex, mdlhdr.numlocalanim, localanimindex, mdlhdr.numlocalseq, localseqindex, mdlhdr.activitylistversion, mdlhdr.eventsindexed, mdlhdr.numtextures, textureindex, mdlhdr.numcdtextures, cdtextureindex, mdlhdr.numskinref, mdlhdr.numskinfamilies, skinindex, mdlhdr.numbodyparts, bodypartindex, mdlhdr.numlocalattachments, localattachmentindex, mdlhdr.numlocalnodes, localnodeindex, localnodenameindex, mdlhdr.numflexdesc, flexdescindex, mdlhdr.numflexcontrollers, flexcontrollerindex, mdlhdr.numflexrules, flexruleindex, mdlhdr.numikchains, ikchainindex, ruiNum, mouthindex, mdlhdr.numlocalposeparameters, localposeparamindex, surfacepropindex, keyvalueindex, mdlhdr.keyvaluesize, mdlhdr.numlocalikautoplaylocks, localikautoplaylockindex, mdlhdr.mass, mdlhdr.contents, mdlhdr.numincludemodels, includemodelindex, mdlhdr.virtualModel, bonetablebynameindex, mdlhdr.constdirectionallightdot, mdlhdr.rootLOD, mdlhdr.numAllowedRootLODs, mdlhdr.unused, 0, mdlhdr.numflexcontrollerui, flexcontrolleruiindex, mdlhdr.pVertexBase, mdlhdr.pIndexBase, mayaindex, mdlsubhdr.numsrcbonetransform, srcbonetransformindex, mdlsubhdr.illumpositionattachmentindex, linearboneindex, mdlsubhdr.m_nBoneFlexDriverCount, mdlsubhdr.m_nBoneFlexDriverIndex, aabbindex, numaabb, numaabb1, numaabb2, unkstringindex, vtxindex, vvdindex, vvcindex, vphyindex, vtxsize, vvdsize, vvcsize, vphysize, unkmemberindex1, numunkmember1, unk, unkindex3, unused1 };
 
 	return v53Hdr;
 }
