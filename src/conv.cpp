@@ -693,6 +693,9 @@ if (info.rui.has_value()) {
   Stream.seek(mdl.mdlsubhdr.sznameindex + 407); //So we can just copy pasta the string table. - Liberty
   OutStream.seek(OutStream.Position() + 1);
   OutStream.Write(mdl.stringtable);
+
+  OutStream.seek(0);
+  OutStream.Write(v53Hdr);
 #pragma region rest of the file
   int pos = Stream.Position();
   //UI::Progress.SubTask.Begin("Copying Misc Data");
@@ -795,9 +798,6 @@ if (info.rui.has_value()) {
       UI::Progress.SubTask.End();
       Logger::Info("done\n");
   }
-
-  OutStream.seek(0);
-  OutStream.Write(v53Hdr);
 
   OutStream.Stream.close();
   Stream.Stream.close();
