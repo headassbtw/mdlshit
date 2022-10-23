@@ -70,7 +70,7 @@ int Conversion::ReadHeader(FileInfo info) {
   if (readV53 && info.aabb.has_value()) //This is also a temp for rui testing. -Liberty Edit: This is how I get the converter to read a v53 without adding an extra option. - Liberty
   {
       BinaryReader v53Stream = BinaryReader(info.aabb.value().c_str());
-      //v53Mdl mdl2 = Utility::mdl::_v53Mdl(&v53Stream, false);
+      MDL::v53Mdl mdl2 = mdl2._v53Mdl(&v53Stream, false);
       if (!v53Stream.Stream.good()) {
           Logger::Error("Model's phy file does not exist, please ensure %s exists, and is located in the same directory as the file\n", info.aabb.value().c_str());
           return 1;
@@ -83,8 +83,8 @@ int Conversion::ReadHeader(FileInfo info) {
   mdl.UpdateMdl();
   std::vector<int> bytesAddedPerRuiMesh;
   std::vector<mstudioruimesh_t> ruiMeshes;
-  //OutStream.seek(716 - 60 * 4);
-  //fillerWrite(&OutStream, 60 * 4);
+  //OutStream.seek(476);
+  //fillerWrite(&OutStream, 240);
 
   std::vector<int> hdrBytesAnimDescAdd = mdl.v53GetAnimHdrBytesAdded(true);
   std::vector<int> secHdrBytesAnimDescAdd = mdl.v53GetSecHdrBytesAdded(true);

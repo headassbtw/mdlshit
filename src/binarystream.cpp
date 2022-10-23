@@ -2861,7 +2861,7 @@ void BinaryWriter::Write(studiohdr_t_v53 data) {
 
     Stream.write((char*)&data.unkindex3, sizeof(int));
 
-    Stream.write((char*)&data.unused1, sizeof(int) * 60);
+    Stream.write((char*)0, sizeof(int) * 60);
 
 }
 
