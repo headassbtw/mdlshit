@@ -3111,6 +3111,7 @@ studiohdr_t_v53 MDL::v49Mdl::ConvertHeader(FileInfo info)
 	if (info.mdl.has_value())
 	{
 		BinaryReader MdlStream = BinaryReader(info.mdl.value().c_str());
+		MdlStream.Read(&mdlhdr);
 		mdlSize = MdlStream.size;
 	}
 	if (info.phy.has_value())
