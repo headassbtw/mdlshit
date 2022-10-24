@@ -557,8 +557,9 @@ void BinaryReader::Read(mstudioanimdata_t_v49* data, int datasize)
 {
     for (int i = 0; i < datasize; i++)
     {
-        Stream.read((char*)&data->value, 1);
-        data->arry.push_back(data->value);
+        char value;
+        Stream.read((char*)&value, 1);
+        data->arry.push_back( (std::byte)value);
     }
 }
 

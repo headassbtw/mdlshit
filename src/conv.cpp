@@ -315,7 +315,7 @@ int Conversion::ReadHeader(FileInfo info) {
               int compressedErrorNum = 0;
               if (mdl.compressedikerrors.size() > 0)
               {
-                  OutStream.seek(startPos + animdescs[i].ikruleindex + 140 * animDesc.numikrules);
+                  //OutStream.seek(startPos + animdescs[i].ikruleindex + 140 * animDesc.numikrules - 8);
                   int animStartPos = mdl.mdlhdr.localanimindex + 100 * i;
                   for (int j = 0; j < mdl.compressedikerrors.size(); j++)
                   {

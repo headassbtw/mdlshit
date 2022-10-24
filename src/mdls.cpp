@@ -1645,7 +1645,6 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 						int next = j + 1;
 						int pos = Stream->Position();
 						mstudiocompressedikerror_t_v49 v49CompressedIkError; Stream->Read(&v49CompressedIkError);
-						compressedikerrors.push_back(v49CompressedIkError);
 						mstudioanimdata_t_v49 animData;
 						int endPos = Stream->Position();
 						if (j + 1 > numOfCompressedIkErrors - 1)
@@ -1655,6 +1654,7 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 							if (nextAnim > mdlhdr.numlocalanim - 1) dist = mdlhdr.localseqindex - endPos;
 							Stream->Read(&animData, dist);
 							v49CompressedIkError.animdata = animData;
+							compressedikerrors.push_back(v49CompressedIkError);
 							Logger::Info("CompressedIkError Read: %d\n", j);
 							break;
 						}
@@ -1662,6 +1662,7 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 						dist = errorIdxs[next] - endPos;
 						Stream->Read(&animData, dist);
 						v49CompressedIkError.animdata = animData;
+						compressedikerrors.push_back(v49CompressedIkError);
 					}
 				}
 
