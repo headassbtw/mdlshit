@@ -2714,7 +2714,7 @@ void BinaryWriter::Write(studiohdr_t_v53 data) {
     Stream.write((char*)&data.version, sizeof(int));
     Stream.write((char*)&data.checksum, sizeof(int));
     Stream.write((char*)&data.sznameindex, sizeof(int));
-    for (int i = 0; i < 64; i++) Stream.write((char*)&data.name[i], sizeof(byte)); 
+    for (int i = 0; i < data.name.size(); i++) Stream.write((char*)&data.name[i], sizeof(byte));
 
     Stream.write((char*)&data.length, sizeof(int));
 
@@ -2861,7 +2861,7 @@ void BinaryWriter::Write(studiohdr_t_v53 data) {
 
     Stream.write((char*)&data.unkindex3, sizeof(int));
 
-    //Stream.write((char*)0, sizeof(int) * 60);
+    Stream.write((char*)&data.unused1, sizeof(int) * 60);
 
 }
 

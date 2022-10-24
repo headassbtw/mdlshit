@@ -66,7 +66,7 @@ int Conversion::ReadHeader(FileInfo info) {
 
   OutStream.seek(0);
 
-  bool readV53 = true;
+  bool readV53 = false;
   if (readV53 && info.aabb.has_value()) //This is also a temp for rui testing. -Liberty Edit: This is how I get the converter to read a v53 without adding an extra option. - Liberty
   {
       BinaryReader v53Stream = BinaryReader(info.aabb.value().c_str());
@@ -78,19 +78,17 @@ int Conversion::ReadHeader(FileInfo info) {
   }
   MDL::v49Mdl mdl = mdl._v49Mdl(&Stream, false);
   mdl.SetMdlInts();
+  studiohdr_t_v53 v53Hdr = mdl.ConvertHeader(info);
+  OutStream.Write(v53Hdr);
   mdl.UpdateMdl();
 
   std::vector<int> bytesAddedPerRuiMesh;
   std::vector<mstudioruimesh_t> ruiMeshes;
-
-  studiohdr_t_v53 v53Hdr = mdl.ConvertHeader(info);
-  OutStream.Write(v53Hdr);
   //OutStream.seek(476);
-  fillerWrite(&OutStream, 240);
+  //fillerWrite(&OutStream, 240);
 
   std::vector<int> hdrBytesAnimDescAdd = mdl.v53GetAnimHdrBytesAdded(true);
   std::vector<int> secHdrBytesAnimDescAdd = mdl.v53GetSecHdrBytesAdded(true);
-
   int animByteAddedTotal = mdl.v53GetTotalAnimHdrBytesAdded();
   int animSecByteAddedTotal = mdl.v53GetTotalSecHdrBytesAdded();
 

@@ -217,22 +217,22 @@ std::vector<short> ReadVertMap(mstudioruivertmap_t vertMap)
 	//bool _241Pos = v1 == v3 - 1 && v2 > v1 && v3 == v1 + 1;
 	//bool _421Pos = v2 == v1 - 2 && v3 == v1 - 1;
 
-	bool _134Pos = v2 == v1 + 2 && v3 != v1 + 1 && v3 != v2 + 1 && v3 != v1 + 1;
-	bool _134Neg = v2 == v1 - 2 && v3 != v1 - 1 && v3 != v1 + 1;
+	bool _134Pos = v2 == v1 + 2 && v3 != v1 + 1;
+	bool _134Neg = v2 == v1 - 2 && v3 != v1 - 1;
 	bool _132Pos = v2 == v1 + 2 && v3 == v1 + 1;
 	bool _132Neg = v2 == v1 - 2 && v3 == v1 - 1;
 	bool _123Pos = v2 == v1 + 1 && v3 == v2 + 1;
 	bool _123Neg = v2 == v1 - 1 && v3 == v2 - 1;
 
 
-	bool _124Pos = v2 == v1 + 1 && v3 == v1 - 1;
-	bool _124Neg = v2 == v1 - 1 && v3 == v1 + 1;
-
-	bool _421Pos = v3 == v2 + 1 && v1 != v2 - 1 && !_132Neg;
-	bool _421Neg = v3 == v2 - 1 && v1 != v2 + 1;
-
-	bool _142Pos = v3 == v1 + 1 && v2 != v1 + 2 && !_124Neg && !_134Pos && !_134Neg && !_124Pos;
-	bool _142Neg = v3 == v1 - 1 && v2 != v1 - 2 && !_134Pos && !_134Neg && !_124Pos && !_124Neg;
+	//bool _124Pos = v2 == v1 + 1 && v3 == v1 - 1;
+	//bool _124Neg = v2 == v1 - 1 && v3 == v1 + 1;
+	//
+	//bool _421Pos = v3 == v2 + 1 && v1 != v2 - 1 && !_132Neg;
+	//bool _421Neg = v3 == v2 - 1 && v1 != v2 + 1;
+	//
+	//bool _142Pos = v3 == v1 + 1 && v2 != v1 + 2 && !_124Neg && !_134Pos && !_134Neg && !_124Pos;
+	//bool _142Neg = v3 == v1 - 1 && v2 != v1 - 2 && !_134Pos && !_134Neg && !_124Pos && !_124Neg;
 	
 	if (_132Pos) Logger::Info("//Is Quad 132POS\n");
 	if (_132Neg) Logger::Info("//Is Quad 132NEG\n");
@@ -240,17 +240,17 @@ std::vector<short> ReadVertMap(mstudioruivertmap_t vertMap)
 	if (_123Pos) Logger::Info("//Is Quad 123POS\n");
 	if (_123Neg) Logger::Info("//Is Quad 123NEG\n");
 
-	if (_134Pos) Logger::Info("//Is Quad 134POS\n");
-	if (_134Neg) Logger::Info("//Is Quad 134NEG\n");
+	if (_134Pos) Logger::Info("//Is Quad 134POS VertOrder: %d %d %d - %d %d %d\n", v1, v2, v1 + 1, v3, v1 + 1, v2);
+	if (_134Neg) Logger::Info("//Is Quad 134NEG VertOrder: %d %d %d - %d %d %d\n", v1, v2, v1 - 1, v3, v1 - 1, v2);
 
-	if (_124Pos) Logger::Info("//Is Quad 124POS\n");
-	if (_124Neg) Logger::Info("//Is Quad 124NEG\n");
-
-	if (_421Pos) Logger::Info("//Is Quad 421POS\n");
-	if (_421Neg) Logger::Info("//Is Quad 421NEG\n");
-
-	if (_142Pos) Logger::Info("//Is Quad 142POS\n");
-	if (_142Neg) Logger::Info("//Is Quad 142NEG\n");
+	//if (_124Pos) Logger::Info("//Is Quad 124POS\n");
+	//if (_124Neg) Logger::Info("//Is Quad 124NEG\n");
+	//
+	//if (_421Pos) Logger::Info("//Is Quad 421POS\n");
+	//if (_421Neg) Logger::Info("//Is Quad 421NEG\n");
+	//
+	//if (_142Pos) Logger::Info("//Is Quad 142POS\n");
+	//if (_142Neg) Logger::Info("//Is Quad 142NEG\n");
 
 
 	//if (_134Pos)
@@ -479,7 +479,7 @@ void RUIMeshToSmd(mstudioruimesh_t ruiMesh)
 			vertNum = 0;
 		}
 		mstudioruivert_t vert1 = ruiMesh.vertex[i];
-		Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert1.vertexpos.x, vert1.vertexpos.y, vert1.vertexpos.z);
+		Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1 //vert:	%d\n", vert1.vertexpos.x, vert1.vertexpos.y, vert1.vertexpos.z, i);
 		vertNum++;
 		//for (int j = 0; j < ruiMesh.numvertices; j++)
 		//{
@@ -514,13 +514,13 @@ void RUIMeshToSmd(mstudioruimesh_t ruiMesh)
 			mstudioruivert_t vert5 = ruiMesh.vertex[v5];
 			mstudioruivert_t vert6 = ruiMesh.vertex[v6];
 
-			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert1.vertexpos.x, vert1.vertexpos.y, vert1.vertexpos.z);
-			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert2.vertexpos.x, vert2.vertexpos.y, vert2.vertexpos.z);
-			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert3.vertexpos.x, vert3.vertexpos.y, vert3.vertexpos.z);
+			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1\n", vert1.vertexpos.x, vert1.vertexpos.y, vert1.vertexpos.z);
+			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1\n", vert2.vertexpos.x, vert2.vertexpos.y, vert2.vertexpos.z);
+			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1\n", vert3.vertexpos.x, vert3.vertexpos.y, vert3.vertexpos.z);
 			Logger::Info("FACE%d Quad \n", i);
-			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert4.vertexpos.x, vert4.vertexpos.y, vert4.vertexpos.z);
-			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert5.vertexpos.x, vert5.vertexpos.y, vert5.vertexpos.z);
-			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert6.vertexpos.x, vert6.vertexpos.y, vert6.vertexpos.z);
+			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1\n", vert4.vertexpos.x, vert4.vertexpos.y, vert4.vertexpos.z);
+			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1\n", vert5.vertexpos.x, vert5.vertexpos.y, vert5.vertexpos.z);
+			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1\n", vert6.vertexpos.x, vert6.vertexpos.y, vert6.vertexpos.z);
 		}
 		else
 		{
@@ -532,9 +532,9 @@ void RUIMeshToSmd(mstudioruimesh_t ruiMesh)
 			mstudioruivert_t vert2 = ruiMesh.vertex[v2];
 			mstudioruivert_t vert3 = ruiMesh.vertex[v3];
 
-			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert1.vertexpos.x, vert1.vertexpos.y, vert1.vertexpos.z);
-			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert2.vertexpos.x, vert2.vertexpos.y, vert2.vertexpos.z);
-			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.009463 0.997711 1 9 1.000000\n", vert3.vertexpos.x, vert3.vertexpos.y, vert3.vertexpos.z);
+			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1 //vert: %d\n", vert1.vertexpos.x, vert1.vertexpos.y, vert1.vertexpos.z, v1);
+			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1 //vert: %d\n", vert2.vertexpos.x, vert2.vertexpos.y, vert2.vertexpos.z, v2);
+			Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1 //vert: %d\n", vert3.vertexpos.x, vert3.vertexpos.y, vert3.vertexpos.z, v3);
 		}
 	}
 	Logger::Info("end\n");
@@ -3111,7 +3111,6 @@ studiohdr_t_v53 MDL::v49Mdl::ConvertHeader(FileInfo info)
 	if (info.mdl.has_value())
 	{
 		BinaryReader MdlStream = BinaryReader(info.mdl.value().c_str());
-		MdlStream.Read(&mdlhdr);
 		mdlSize = MdlStream.size;
 	}
 	if (info.phy.has_value())
@@ -3143,128 +3142,128 @@ studiohdr_t_v53 MDL::v49Mdl::ConvertHeader(FileInfo info)
 
 	Logger::Notice("RuiSize %d\n", ruiSize);
 
-	//int			id;
-	//int			version;
-	//int			checksum;
+	int			id;
+	int			version;
+	int			checksum;
 	int			sznameindex = mdlsubhdr.sznameindex + allBytesAdded + strFiller + 408 + ruiSize;
-	//char		name[64];
-	//
-	//int			length;
-	//
-	//Vector3		eyeposition;
-	//
-	//Vector3		illumposition;
-	//
-	//Vector3		hull_min;
-	//Vector3		hull_max;
-	//
-	//Vector3		view_bbmin;
-	//Vector3		view_bbmax;
-	//
-	//mdlflags_t	flags;
+	char		name[64];
 
-	//int			numbones;
+	int			length;
+
+	Vector3		eyeposition;
+
+	Vector3		illumposition;
+
+	Vector3		hull_min;
+	Vector3		hull_max;
+
+	Vector3		view_bbmin;
+	Vector3		view_bbmax;
+
+	mdlflags_t	flags;
+
+	int			numbones;
 	int			boneindex = mdlhdr.boneindex + bytesAddedToHeader;
 
-	//int			numbonecontrollers;
+	int			numbonecontrollers;
 	int			bonecontrollerindex = mdlhdr.bonecontrollerindex + bytesAddedToHeader + bytesAddedToBones;
 
-	//int			numhitboxsets;
+	int			numhitboxsets;
 	int			hitboxsetindex = mdlhdr.hitboxsetindex + bytesAddedToHeader + bytesAddedToBones;
 
-	//int			numlocalanim;
+	int			numlocalanim;
 	int			localanimindex = mdlhdr.localanimindex + bytesAddedToHeader + bytesAddedToBones;
 
-	//int			numlocalseq;
+	int			numlocalseq;
 	int			localseqindex = mdlhdr.localseqindex + bytesAddedToAnims + bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnimData;
 
-	//int			activitylistversion;
-	//int			eventsindexed;
+	int			activitylistversion;
+	int			eventsindexed;
 
-	//int			numtextures;
+	int			numtextures;
 	int			textureindex = mdlhdr.textureindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + ruiSize;
 
-	//int			numcdtextures;
+	int			numcdtextures;
 	int			cdtextureindex = mdlhdr.cdtextureindex + allBytesAdded + ruiSize;
 
-	//int			numskinref;
-	//int			numskinfamilies;
+	int			numskinref;
+	int			numskinfamilies;
 	int			skinindex = mdlhdr.skinindex + allBytesAdded + ruiSize;
 
-	//int			numbodyparts;
+	int			numbodyparts;
 	int			bodypartindex = mdlhdr.bodypartindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnimData + bytesAddedToActMods;
 
-	//int			numlocalattachments;
+	int			numlocalattachments;
 	int			localattachmentindex = mdlhdr.localattachmentindex + bytesAddedToHeader + bytesAddedToBones;
 
-	//int			numlocalnodes;
+	int			numlocalnodes;
 	int			localnodeindex = mdlhdr.localnodeindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnimData + bytesAddedToActMods;
 	int			localnodenameindex = mdlhdr.localnodenameindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnimData + bytesAddedToActMods;
 
-	//int			numflexdesc;
+	int			numflexdesc;
 	int			flexdescindex = mdlhdr.flexdescindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods;
 
-	//int			numflexcontrollers;
+	int			numflexcontrollers;
 	int			flexcontrollerindex = mdlhdr.flexcontrollerindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods;
 
-	//int			numflexrules;
+	int			numflexrules;
 	int			flexruleindex = mdlhdr.flexruleindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods;
 
-	//int			numikchains;
+	int			numikchains;
 	int			ikchainindex = mdlhdr.ikchainindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnimData + bytesAddedToActMods;
 
 	int			nummouths = ruiNum;
 	int			mouthindex = mdlhdr.includemodelindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods + 8 * mdlhdr.numincludemodels;
 
-	//int			numlocalposeparameters;
+	int			numlocalposeparameters;
 	int			localposeparamindex = mdlhdr.localposeparamindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods;
 
 	int			surfacepropindex = mdlhdr.surfacepropindex + allBytesAdded + strFiller + ruiSize;
 
 	int			keyvalueindex = mdlhdr.keyvalueindex + allBytesAdded + ruiSize;
-	//int			keyvaluesize;
+	int			keyvaluesize;
 
-	//int			numlocalikautoplaylocks;
+	int			numlocalikautoplaylocks;
 	int			localikautoplaylockindex = mdlhdr.localikautoplaylockindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods;
 
 
-	//float		mass;
-	//int			contents;
+	float		mass;
+	int			contents;
 
-	//int			numincludemodels;
+	int			numincludemodels;
 	int			includemodelindex = mdlhdr.includemodelindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods;
 
-	//uint32_t	virtualModel;
+	uint32_t	virtualModel;
 
 	int			bonetablebynameindex = mdlhdr.bonetablebynameindex + bytesAddedToHeader + bytesAddedToBones;
 
-	//std::byte	constdirectionallightdot;
+	std::byte	constdirectionallightdot;
 
-	//std::byte	rootLOD;
+	std::byte	rootLOD;
 
-	//std::byte	numAllowedRootLODs;
+	std::byte	numAllowedRootLODs;
 
-	//std::byte	unused;
+	std::byte	unused;
 
-	//float		fadedistance;
+	float		fadedistance;
 
-	//int			numflexcontrollerui;
+	int			numflexcontrollerui;
 	int			flexcontrolleruiindex = mdlhdr.flexcontrolleruiindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods;
 
-	//uint32_t	pVertexBase;
-	//uint32_t	pIndexBase;
+	uint32_t	pVertexBase;
+	uint32_t	pIndexBase;
 
 	int			mayaindex = 0;
 
-	//int			numsrcbonetransform;
+	int			numsrcbonetransform;
 	int			srcbonetransformindex = mdlsubhdr.srcbonetransformindex + allBytesAdded + ruiSize;
 
-	//int			illumpositionattachmentindex;
+	int			illumpositionattachmentindex;
 
 	int			linearboneindex = mdlsubhdr.linearboneindex + allBytesAdded + 408 + ruiSize;
 
-	//int			m_nBoneFlexDriverCount;
-	//int			m_nBoneFlexDriverIndex;
+	int			m_nBoneFlexDriverCount;
+	int			m_nBoneFlexDriverIndex;
 
 	int			aabbindex = mdlsubhdr.sznameindex + allBytesAdded + strFiller + 408 - 61 + ruiSize;
 	int			numaabb = 0;
@@ -3290,9 +3289,9 @@ studiohdr_t_v53 MDL::v49Mdl::ConvertHeader(FileInfo info)
 
 	int			unkindex3 = mdlSize + allBytesAdded + phySize + strFiller + ruiSize;
 
-	int			unused1[60]{};
+	int			unused1[60];
 
-	studiohdr_t_v53 v53Hdr = { mdlhdr.id, 53, mdlhdr.checksum, sznameindex, ArrayToVector(mdlhdr.name, 64), mdlhdr.length, mdlhdr.eyeposition, mdlhdr.illumposition, mdlhdr.hull_min, mdlhdr.hull_max, mdlhdr.view_bbmin, mdlhdr.view_bbmax, mdlhdr.flags, mdlhdr.numbones, boneindex, mdlhdr.numbonecontrollers, bonecontrollerindex, mdlhdr.numhitboxsets, hitboxsetindex, mdlhdr.numlocalanim, localanimindex, mdlhdr.numlocalseq, localseqindex, mdlhdr.activitylistversion, mdlhdr.eventsindexed, mdlhdr.numtextures, textureindex, mdlhdr.numcdtextures, cdtextureindex, mdlhdr.numskinref, mdlhdr.numskinfamilies, skinindex, mdlhdr.numbodyparts, bodypartindex, mdlhdr.numlocalattachments, localattachmentindex, mdlhdr.numlocalnodes, localnodeindex, localnodenameindex, mdlhdr.numflexdesc, flexdescindex, mdlhdr.numflexcontrollers, flexcontrollerindex, mdlhdr.numflexrules, flexruleindex, mdlhdr.numikchains, ikchainindex, ruiNum, mouthindex, mdlhdr.numlocalposeparameters, localposeparamindex, surfacepropindex, keyvalueindex, mdlhdr.keyvaluesize, mdlhdr.numlocalikautoplaylocks, localikautoplaylockindex, mdlhdr.mass, mdlhdr.contents, mdlhdr.numincludemodels, includemodelindex, mdlhdr.virtualModel, bonetablebynameindex, mdlhdr.constdirectionallightdot, mdlhdr.rootLOD, mdlhdr.numAllowedRootLODs, mdlhdr.unused, 0, mdlhdr.numflexcontrollerui, flexcontrolleruiindex, mdlhdr.pVertexBase, mdlhdr.pIndexBase, mayaindex, mdlsubhdr.numsrcbonetransform, srcbonetransformindex, mdlsubhdr.illumpositionattachmentindex, linearboneindex, mdlsubhdr.m_nBoneFlexDriverCount, mdlsubhdr.m_nBoneFlexDriverIndex, aabbindex, numaabb, numaabb1, numaabb2, unkstringindex, vtxindex, vvdindex, vvcindex, vphyindex, vtxsize, vvdsize, vvcsize, vphysize, unkmemberindex1, numunkmember1, unk, unkindex3, unused1 };
+	studiohdr_t_v53 v53Hdr = { mdlhdr.id, 53, mdlhdr.checksum, sznameindex, ArrayToVector(mdlhdr.name, 64), mdlhdr.length, mdlhdr.eyeposition, mdlhdr.illumposition, mdlhdr.hull_min, mdlhdr.hull_max, mdlhdr.view_bbmin, mdlhdr.view_bbmax, mdlhdr.flags, mdlhdr.numbones, boneindex, mdlhdr.numbonecontrollers, bonecontrollerindex, mdlhdr.numhitboxsets, hitboxsetindex, mdlhdr.numlocalanim, localanimindex, mdlhdr.numlocalseq, localseqindex, mdlhdr.activitylistversion, mdlhdr.eventsindexed, mdlhdr.numtextures, textureindex, mdlhdr.numcdtextures, cdtextureindex, mdlhdr.numskinref, mdlhdr.numskinfamilies, skinindex, mdlhdr.numbodyparts, bodypartindex, mdlhdr.numlocalattachments, localattachmentindex, mdlhdr.numlocalnodes, localnodeindex, localnodenameindex, mdlhdr.numflexdesc, flexdescindex, mdlhdr.numflexcontrollers, flexcontrollerindex, mdlhdr.numflexrules, flexruleindex, mdlhdr.numikchains, ikchainindex, ruiNum, mouthindex, mdlhdr.numlocalposeparameters, localposeparamindex, surfacepropindex, keyvalueindex, mdlhdr.keyvaluesize, mdlhdr.numlocalikautoplaylocks, localikautoplaylockindex, mdlhdr.mass, mdlhdr.contents, mdlhdr.numincludemodels, includemodelindex, mdlhdr.virtualModel, bonetablebynameindex, mdlhdr.constdirectionallightdot, mdlhdr.rootLOD, mdlhdr.numAllowedRootLODs, mdlhdr.unused, fadedistance, mdlhdr.numflexcontrollerui, flexcontrolleruiindex, mdlhdr.pVertexBase, mdlhdr.pIndexBase, mayaindex, mdlsubhdr.numsrcbonetransform, srcbonetransformindex, mdlsubhdr.illumpositionattachmentindex, linearboneindex, mdlsubhdr.m_nBoneFlexDriverCount, mdlsubhdr.m_nBoneFlexDriverIndex, aabbindex, numaabb, numaabb1, numaabb2, unkstringindex, vtxindex, vvdindex, vvcindex, vphyindex, vtxsize, vvdsize, vvcsize, vphysize, unkmemberindex1, numunkmember1, unk, unkindex3, unused1 };
 
 	return v53Hdr;
 }
