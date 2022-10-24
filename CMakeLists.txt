@@ -41,7 +41,7 @@ generate_product_version(
    COMPANY_COPYRIGHT ${APP_COPYRIGHT}
    INTERNAL_NAME "fucking bitch ass model converter"
    VERSION_MAJOR 2
-   VERSION_MINOR 1
+   VERSION_MINOR 2
    VERSION_PATCH 0
 )
 set(GLFW_BUILD_EXAMPLES OFF)
@@ -75,7 +75,7 @@ elseif(APPLE)
     set(MACOSX_BUNDLE_BUNDLE_NAME ${APP_NAME})
     set(MACOSX_BUNDLE_COPYRIGHT ${APP_COPYRIGHT})
     set(MACOSX_BUNDLE_INFO_STRING ${APP_INFOSTRING})
-    set(MACOSX_BUNDLE_BUNDLE_VERSION "2.1.0")
+    set(MACOSX_BUNDLE_BUNDLE_VERSION "2.2.0")
     add_executable(mdlshit MACOSX_BUNDLE ${SRC} ${myApp_ICON})
 else()
     add_executable(mdlshit ${SRC})
