@@ -84,8 +84,9 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
       ImGui::BeginChild("PatchNotes");
 
       PatchNotesVersionHeader("2.2.0");
-      ImGui::BulletText("Complete backend overhaul/rewrite");
+      ImGui::BulletText("Complete backend rewrite");
       ImGui::BulletText("UI rework, support for more supplemental files");
+      ImGui::BulletText("RUI stitching");
 
       PatchNotesVersionHeader("2.0.1");
       ImGui::BulletText("Fixes IKrules");
