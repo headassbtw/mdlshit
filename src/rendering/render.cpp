@@ -463,7 +463,6 @@ void callback_name(GLFWwindow* window, int xpos, int ypos){
 
 
 int UI::Run(){
-    viewport_height = WINDOW_HEIGHT; viewport_width = WINDOW_WIDTH;
     glewExperimental = true;
     if(!glfwInit()){
         fprintf(stderr, "Could not initialize GLFW\n");
