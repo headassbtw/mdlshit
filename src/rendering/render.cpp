@@ -109,7 +109,7 @@ float conv_demo_prog;
 std::mutex conv_demo_prog_mutex;
 bool bingChilling = false;
 
-bool showAbout;
+bool showAbout, readMdl;
 
 
 void Convert(int a){
@@ -184,6 +184,7 @@ void RenderGUI(){
           }
            
           ImGui::MenuItem("Show Demo Window", "", &demoWindow);
+          ImGui::MenuItem("Read MDL", "", &readMdl);
 
           ImGui::EndMenu();
         }
@@ -441,6 +442,18 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
     }
     */
     ImGui::End();
+    if(readMdl){
+      if(ImGui::Begin("Read MDL", &readMdl,ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollWithMouse)){
+        UI::RenderReadMdlWindow(viewport_width-4,viewport_height-27);
+        auto sz = ImGui::GetWindowSize();
+
+
+        ImGui::SetWindowPos({2,25});
+        ImGui::SetWindowSize({viewport_width-4,viewport_height-27});
+        ImGui::End();
+      }
+      ImGui::BringWindowToDisplayFront(ImGui::FindWindowByName("About"));
+    }
     if(showAbout){
       if(ImGui::Begin("About", &showAbout,ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollWithMouse)){
         UI::RenderAboutWindow(GRUNT_POG,pog_size.x,pog_size.y);
@@ -521,6 +534,7 @@ int UI::Run(){
     pog_size.y = images[0].height;
 
     UI::SetupAboutWindow();
+    UI::SetupReadMdlWindow();
 
     glfwSetWindowSizeLimits(Window, viewport_min_width, viewport_min_height, GLFW_DONT_CARE, GLFW_DONT_CARE);
     glfwSetWindowIcon(Window, 1, images);
