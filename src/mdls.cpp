@@ -651,6 +651,7 @@ void AddDistToAnimData(mstudioanimdata_t_v49 vec, int extra)
 
 MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 {
+	Stream->seek(0);
 	studiohdr_t_v53										mdlhdr; Stream->Read(&mdlhdr);
 	std::vector<mstudiobone_t_v53>						bones;
 	std::vector<mstudiojigglebone_t_v49>				jigglebones;
@@ -691,8 +692,8 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 	std::vector<mstudioskingroup_t_v49>					skingroups;
 	mstudiokeyvalues_t_v49								keyvalues;
 	std::vector<mstudiosrcbonetransform_t_v49>			srcbonetransforms;
-	mstudiolinearbone_t_v49								linearbone;
-	mstudiolinearbonedata_t_v53							linearbonedata;
+	mstudiolinearbone_t_v49								linearbone {};
+	mstudiolinearbonedata_t_v53							linearbonedata{};
 
 	int numjigglebones = 0;
 
@@ -1220,7 +1221,7 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 		}
 	}
 
-	Logger::Info("Textureidx: %d\n", mdlhdr.textureindex);
+	//Logger::Info("Textureidx: %d\n", mdlhdr.textureindex);
 	if (mdlhdr.numtextures > 0)
 	{
 		Stream->seek(mdlhdr.textureindex);
@@ -1268,7 +1269,7 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 		Stream->Read(&keyvalues, mdlhdr.keyvaluesize);
 		Logger::Info("Keyvalues Read: %d\n", mdlhdr.keyvaluesize);
 	}
-	Logger::Info("Test\n");
+
 	if (mdlhdr.numsrcbonetransform > 0)
 	{
 		Stream->seek(mdlhdr.srcbonetransformindex);
@@ -1286,12 +1287,14 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 
 	if (mdlhdr.numbones > 0)
 	{
-
+		Stream->seek(mdlhdr.linearboneindex);
 		Stream->Read(&linearbone);
 		Stream->Read(&linearbonedata, mdlhdr.numbones);
 		Logger::Info("LinearBone Read: %d\n", mdlhdr.numbones);
 	}
-
+//	Logger::Info("Test\n");
+	Stream->seek(mdlhdr.sznameindex);
+	mstudiostringtable_t_v53 stringTable{}; Stream->Read(stringTable, mdlhdr);
 	if (mdlhdr.numruimeshes > 0)
 	{
 		Stream->seek(mdlhdr.ruimeshindex);
@@ -1301,7 +1304,7 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			ruiHdrs.push_back(ruiHdr);
 			Logger::Info("RuiHdr Read: %d\n", i);
 		}
-
+	
 		Stream->seek(mdlhdr.ruimeshindex + ruiHdrs[0].ruimeshindex);
 		for (int j = 0; j < ruiHdrs.size(); j++)
 		{
@@ -1309,14 +1312,12 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			mstudioruimesh_t ruiMesh; Stream->Read(&ruiMesh);
 			ruiMeshes.push_back(ruiMesh);
 			//Logger::Info("RuiMesh Read: %d  %d\n", ruiMesh.vertexmap[0].vertstartid, ruiMesh.vertexmap[0].vertendid);
-			RUIMeshToSmd(ruiMesh);
+			//RUIMeshToSmd(ruiMesh);
 			Logger::Info("RuiMesh Read: %s\n", ReadMDLString(Stream, ruiPos + 32).c_str());
 			Logger::Info("RuiMesh Read: %d\n", j);
 		}
 	}
-
-	MDL::v53Mdl _v53mdl{ mdlhdr,bones,jigglebones,boneflexdrivers,attachments,hitboxsets,hitboxes,bonenametable,animdescs,anims, sectionindexes, sections, ikrules,compressedikerrors,v52compressedikerrors,ikerrors,ikrulezeroframe,seqdescs,blends,posekeys,events,autolayers,activitymodifiers,seqweightlist,nodenames,nodes,bodyparts,models,meshes,ikchains,iklinks,poseparamdescs,includedmodels,textures,cdtextures,skingroups,keyvalues,srcbonetransforms,linearbone,linearbonedata };
-
+	MDL::v53Mdl _v53mdl{ mdlhdr,bones,jigglebones,boneflexdrivers,attachments,hitboxsets,hitboxes,bonenametable,animdescs,anims, sectionindexes, sections, ikrules,compressedikerrors,v52compressedikerrors,ikerrors,ikrulezeroframe,seqdescs,blends,posekeys,events,autolayers,activitymodifiers,seqweightlist,nodenames,nodes,bodyparts,models,meshes,ikchains,iklinks,poseparamdescs,includedmodels,textures,cdtextures,skingroups,keyvalues,srcbonetransforms, linearbone,linearbonedata, stringTable };
 	return _v53mdl;
 }
 
@@ -3366,7 +3367,7 @@ std::vector<mstudioanimdesc_t_v53> MDL::v49Mdl::AnimDescConversion()
 		int stairs = (-((8 * (mdlhdr.numlocalanim - i))) + bytesAddedToSeqs) + bytesAddedToTextures + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + strFiller + bytesAddedToRuiMesh;
 		int steps = -((8 * (mdlhdr.numlocalanim - i))) + hdrBytesAnimDescAdd[i] + secHdrBytesAnimDescAdd[i];
 
-
+		int ikStairs = -12 * (ikRuleNum);
 		if (v49AnimDesc.numikrules > 0)
 		{
 			int stairs = v53GetAnimHdrBytesAddedIdv(i);
@@ -3382,7 +3383,6 @@ std::vector<mstudioanimdesc_t_v53> MDL::v49Mdl::AnimDescConversion()
 			secNum += num;
 			int dist = (((pos + animdescs[i].sectionindex) + (8 * num)) - (pos + animdescs[i].animindex)) * -1;
 		}
-		int ikStairs = -12 * (ikRuleNum);
 
 		if (v49AnimDesc.animindex > 0) v49AnimDesc.animindex += steps + ikStairs + secStairs;
 		if (v49AnimDesc.movementindex > 0) v49AnimDesc.movementindex += steps + ikStairs + secStairs;
@@ -3395,7 +3395,7 @@ std::vector<mstudioanimdesc_t_v53> MDL::v49Mdl::AnimDescConversion()
 		int compressedIkRuleIdx = 0; //if (v49AnimDesc.numikrules > 0) compressedIkRuleIdx = ( basePtr - ( basePtr - (v49AnimDesc.ikruleindex + 140 * v49AnimDesc.numikrules) ) ) * -1 ;
 
 
-		mstudioanimdesc_t_v53 animDesc = { -outPos, v49AnimDesc.sznameindex + stairs + ikStairs, v49AnimDesc.fps, v49AnimDesc.flags, v49AnimDesc.numframes, v49AnimDesc.nummovements, v49AnimDesc.movementindex, compressedIkRuleIdx * -1, v49AnimDesc.animindex, v49AnimDesc.numikrules, v49AnimDesc.ikruleindex, v49AnimDesc.numlocalhierarchy, v49AnimDesc.localhierarchyindex, v49AnimDesc.sectionindex, v49AnimDesc.sectionframes, v49AnimDesc.zeroframespan, v49AnimDesc.zeroframecount, v49AnimDesc.zeroframeindex, v49AnimDesc.zeroframestalltime, 0, 0, 0, 0, 0 };
+		mstudioanimdesc_t_v53 animDesc = { -outPos, v49AnimDesc.sznameindex + stairs, v49AnimDesc.fps, v49AnimDesc.flags, v49AnimDesc.numframes, v49AnimDesc.nummovements, v49AnimDesc.movementindex, compressedIkRuleIdx * -1, v49AnimDesc.animindex, v49AnimDesc.numikrules, v49AnimDesc.ikruleindex, v49AnimDesc.numlocalhierarchy, v49AnimDesc.localhierarchyindex, v49AnimDesc.sectionindex, v49AnimDesc.sectionframes, v49AnimDesc.zeroframespan, v49AnimDesc.zeroframecount, v49AnimDesc.zeroframeindex, v49AnimDesc.zeroframestalltime, 0, 0, 0, 0, 0 };
 
 		v53AnimDescs.push_back(animDesc);
 	}
@@ -3594,7 +3594,7 @@ std::vector<sectionindexes_t_v53> MDL::v49Mdl::ConvertSectionIndexes()
 	for (int i = 0; i < mdlhdr.numlocalanim; i++)
 	{
 		int pos = mdlhdr.localanimindex + 100 * i;
-		int stairs = -((8 * (mdlhdr.numlocalanim - i))) + hdrBytesAnimDescAdd[i] - 8;
+		int stairs = -((8 * (mdlhdr.numlocalanim - i))) + hdrBytesAnimDescAdd[i];
 
 		int frames = animdescs[i].numframes;
 		int secFrames = animdescs[i].sectionframes;

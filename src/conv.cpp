@@ -212,9 +212,9 @@ int Conversion::ReadHeader(FileInfo info) {
       //    }
       //}
       mstudioanimdesc_t_v53 animDesc = animdescs[i];
-      animDesc.animindex -= 8;
-      if (animDesc.sectionindex > 0) animDesc.sectionindex -= 8;
-      if (animDesc.ikruleindex > 0) animDesc.ikruleindex -= 8;
+      //animDesc.animindex -= 8;
+      //if (animDesc.sectionindex > 0) animDesc.sectionindex -= 8;
+      //if (animDesc.ikruleindex > 0) animDesc.ikruleindex -= 8;
       OutStream.Write(animDesc);
       Logger::Notice("Converted animation %d of %d\n", i + 1, mdl.mdlhdr.numlocalanim);
       UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numlocalanim);
@@ -242,11 +242,11 @@ int Conversion::ReadHeader(FileInfo info) {
 
           mstudioanimdesc_t_v53 animDesc = animdescs[i];
           int startPos = v53Hdr.localanimindex + 92 * i;
-          OutStream.seek(startPos + animdescs[i].animindex - 8);
+          OutStream.seek(startPos + animdescs[i].animindex);
 
           if (animDesc.sectionindex == 0)
           {
-              OutStream.seek(startPos + animdescs[i].animindex - 8);
+              OutStream.seek(startPos + animdescs[i].animindex);
 
               for (int j = boneHdrNum; j < anims.size(); j++)
               {
@@ -264,7 +264,7 @@ int Conversion::ReadHeader(FileInfo info) {
 
           if (animDesc.sectionindex > 0) //Gosh do I hate how this is setup. - Liberty //Edit: Not anymore. Could be better but I leave you with this. - Liberty
           {
-              OutStream.seek(startPos + animDesc.sectionindex - 8);
+              OutStream.seek(startPos + animDesc.sectionindex);
 
               secHdrBytesSecAdd[0] = 0;
               int num = (animDesc.numframes / animDesc.sectionframes) + 2;
@@ -305,7 +305,7 @@ int Conversion::ReadHeader(FileInfo info) {
 
           if (animDesc.numikrules > 0)
           {
-              OutStream.seek(startPos + animdescs[i].ikruleindex - 8 - 32); //Issue with the 32 byte filler. - Liberty
+              OutStream.seek(startPos + animdescs[i].ikruleindex - 32); //Issue with the 32 byte filler. - Liberty
               fillerWrite(&OutStream, 32);
               for (int j = 0; j < animDesc.numikrules; j++)
               {
@@ -315,7 +315,7 @@ int Conversion::ReadHeader(FileInfo info) {
               int compressedErrorNum = 0;
               if (mdl.compressedikerrors.size() > 0)
               {
-                  //OutStream.seek(startPos + animdescs[i].ikruleindex + 140 * animDesc.numikrules - 8);
+                  OutStream.seek(startPos + animdescs[i].ikruleindex + 140 * animDesc.numikrules);
                   int animStartPos = mdl.mdlhdr.localanimindex + 100 * i;
                   for (int j = 0; j < mdl.compressedikerrors.size(); j++)
                   {
@@ -791,6 +791,24 @@ if (info.rui.has_value()) {
           VvdStream.Read(&tmp);
           OutStream.Write(tmp);
           UI::Progress.SubTask.Update((i + 1.0f) / (float)VvdStream.size);
+      }
+      UI::Progress.SubTask.End();
+      Logger::Info("done\n");
+  }
+
+  if (info.vvc.has_value()) {
+      BinaryReader VvcStream = BinaryReader(info.vvc.value().c_str());
+      if (!VvcStream.Stream.good()) {
+          Logger::Error("Model's vvc file does not exist, please ensure %s exists, and is located in the same directory as the file\n", info.vvc.value().c_str());
+          return 1;
+      }
+      Logger::Info("writing vvc at [%d]...\n", OutStream.Position());
+      UI::Progress.SubTask.Begin("Copying Vertex Color Data");
+      for (int i = 0; i < VvcStream.size; i++) {
+          byte tmp;
+          VvcStream.Read(&tmp);
+          OutStream.Write(tmp);
+          UI::Progress.SubTask.Update((i + 1.0f) / (float)VvcStream.size);
       }
       UI::Progress.SubTask.End();
       Logger::Info("done\n");

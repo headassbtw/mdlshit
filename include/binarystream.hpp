@@ -105,6 +105,7 @@ class BinaryReader{
     void Read(mstudioactivitymodifier_t_v53* data);
     void Read(mstudioikchain_t_v53* data);
     void Read(mstudiotexture_t_v53* data);
+    void Read(mstudiostringtable_t_v53 data, studiohdr_t_v53 _mdl);
 
     void Read(mstudiorruiheader_t* data);
     void Read(mstudioruivertmap_t* data);

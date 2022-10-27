@@ -1747,6 +1747,352 @@ void BinaryReader::Read(mstudioruimesh_t* data)
     Stream.read((char*)&data->facedata, sizeof(mstudioruimesface_t) * data->numfaces);
 }
 
+void BinaryReader::Read(mstudiostringtable_t_v53 data, studiohdr_t_v53 mdlhdr)
+{
+    std::vector<std::vector<char>> activites;
+    std::vector<std::vector<char>> activityEvents;
+    std::vector<std::vector<char>> activityModifiers;
+    for (int i = 0; i < 1; i++)
+    {
+        int pos = Position();
+
+        int defSize = 100;
+        seek(pos);
+        std::vector<char> vec;
+        if (defSize > size - pos) defSize = size - pos; //Prevents overflow - Liberty.
+        for (int j = 0; j < defSize; j++)
+        {
+            char value; Stream.read(&value, 1);
+            if (&value == ".")
+            {
+                break;
+            }
+            else
+            {
+                data.mdlname.push_back(value);
+            }
+        }
+        //data->mdlname = vec;
+    }
+
+
+    for (int i = 0; i < 1; i++)
+    {
+        int pos = Position();
+
+        int defSize = 100;
+
+        std::vector<char> vec;
+        if (defSize > size - pos) defSize = size - pos; //Prevents overflow - Liberty.
+
+        for (int j = 0; j < defSize; j++)
+        {
+            char value; Stream.read(&value, 1);
+            if (&value == ".")
+            {
+                break;
+            }
+            else
+            {
+                data.surfaceprop.push_back(value);
+            }
+        }
+        //data->surfaceprop = vec;
+    }
+
+    for (int i = 0; i < mdlhdr.numbones; i++)
+    {
+        int pos = Position();
+
+        int defSize = 100;
+
+        std::vector<char> vec;
+        if (defSize > size - pos) defSize = size - pos; //Prevents overflow - Liberty.
+
+        for (int j = 0; j < defSize; j++)
+        {
+            char value; Stream.read(&value, 1);
+            if (&value == ".")
+            {
+                break;
+            }
+            else
+            {
+                vec.push_back(value);
+            }
+        }
+        data.bones.push_back(vec);
+    }
+
+    for (int i = 0; i < mdlhdr.numlocalattachments; i++)
+    {
+        int pos = Position();
+
+        int defSize = 100;
+
+        std::vector<char> vec;
+        if (defSize > size - pos) defSize = size - pos; //Prevents overflow - Liberty.
+
+        for (int j = 0; j < defSize; j++)
+        {
+            char value; Stream.read(&value, 1);
+            if (&value == ".")
+            {
+                break;
+            }
+            else
+            {
+                vec.push_back(value);
+            }
+        }
+        data.attachments.push_back(vec);
+    }
+
+    for (int i = 0; i < mdlhdr.numlocalanim; i++)
+    {
+        int pos = Position();
+
+        int defSize = 100;
+
+        std::vector<char> vec;
+        if (defSize > size - pos) defSize = size - pos; //Prevents overflow - Liberty.
+
+        for (int j = 0; j < defSize; j++)
+        {
+            char value; Stream.read(&value, 1);
+            if (&value == ".")
+            {
+                break;
+            }
+            else
+            {
+                vec.push_back(value);
+            }
+        }
+        data.anims.push_back(vec);
+    }
+
+    for (int i = 0; i < mdlhdr.numlocalseq; i++)
+    {
+        std::vector<char> vec;
+        std::vector<char> vec2;
+        std::vector<char> vec3;
+        std::vector<char> vec4;
+        for (int j = 0; j < 4; j++)
+        {
+            int pos = Position();
+
+            int defSize = 100;
+
+            if (defSize > size - pos) defSize = size - pos; //Prevents overflow - Liberty.
+
+            for (int k = 0; k < defSize; k++)
+            {
+                char value; Stream.read(&value, 1);
+                if (&value == ".")
+                {
+                    break;
+                }
+                else
+                {
+                    if(k == 0) vec.push_back(value);
+                    if(k == 1) vec2.push_back(value);
+                    if(k == 2) vec3.push_back(value);
+                    if(k == 3) vec4.push_back(value);
+                }
+            }
+        }
+        if (!ContainsString(activites, vec2)) activites.push_back(vec2);
+        else
+            vec2.clear();
+
+        if (!ContainsString(activityEvents, vec3)) activityEvents.push_back(vec3);
+        else
+            vec3.clear();
+
+        if (!ContainsString(activityModifiers, vec4)) activityModifiers.push_back(vec4);
+        else
+            vec4.clear();
+
+
+        mstudioseqstring_t_v53 _seq = { vec, vec2, vec3, vec4 };
+        vec.clear();
+        vec2.clear();
+        vec3.clear();
+        vec4.clear();
+
+        data.seqs.push_back(_seq);
+    }
+
+    for (int i = 0; i < mdlhdr.numlocalnodes; i++)
+    {
+        int pos = Position();
+
+        int defSize = 100;
+
+        std::vector<char> vec;
+        if (defSize > size - pos) defSize = size - pos; //Prevents overflow - Liberty.
+
+        for (int j = 0; j < defSize; j++)
+        {
+            char value; Stream.read(&value, 1);
+            if (&value == ".")
+            {
+                break;
+            }
+            else
+            {
+                vec.push_back(value);
+            }
+        }
+        data.nodes.push_back(vec);
+    }
+
+    for (int i = 0; i < mdlhdr.numbodyparts; i++)
+    {
+        int pos = Position();
+
+        int defSize = 100;
+
+        std::vector<char> vec;
+        if (defSize > size - pos) defSize = size - pos; //Prevents overflow - Liberty.
+
+        for (int j = 0; j < defSize; j++)
+        {
+            char value; Stream.read(&value, 1);
+            if (&value == ".")
+            {
+                break;
+            }
+            else
+            {
+                vec.push_back(value);
+            }
+        }
+        data.bodyparts.push_back(vec);
+    }
+
+    for (int i = 0; i < mdlhdr.numlocalposeparameters; i++)
+    {
+        int pos = Position();
+
+        int defSize = 100;
+
+        std::vector<char> vec;
+        if (defSize > size - pos) defSize = size - pos; //Prevents overflow - Liberty.
+
+        for (int j = 0; j < defSize; j++)
+        {
+            char value; Stream.read(&value, 1);
+            if (&value == ".")
+            {
+                break;
+            }
+            else
+            {
+                vec.push_back(value);
+            }
+        }
+        data.poseparams.push_back(vec);
+    }
+
+    for (int i = 0; i < mdlhdr.numikchains; i++)
+    {
+        int pos = Position();
+
+        int defSize = 1000;
+
+        std::vector<char> vec;
+        if (defSize > size - pos) defSize = size - pos; //Prevents overflow - Liberty.
+
+        for (int j = 0; j < defSize; j++)
+        {
+            char value; Stream.read(&value, 1);
+            if (&value == ".")
+            {
+                break;
+            }
+            else
+            {
+                vec.push_back(value);
+            }
+        }
+        data.ikchains.push_back(vec);
+    }
+
+    for (int i = 0; i < mdlhdr.numincludemodels; i++)
+    {
+        int pos = Position();
+
+        int defSize = 1000;
+
+        std::vector<char> vec;
+        if (defSize > size - pos) defSize = size - pos; //Prevents overflow - Liberty.
+
+        for (int j = 0; j < defSize; j++)
+        {
+            char value; Stream.read(&value, 1);
+            if (&value == ".")
+            {
+                break;
+            }
+            else
+            {
+                vec.push_back(value);
+            }
+        }
+        data.includemodel.push_back(vec);
+    }
+
+    for (int i = 0; i < mdlhdr.numtextures; i++)
+    {
+        int pos = Position();
+
+        int defSize = 100;
+
+        std::vector<char> vec;
+        if (defSize > size - pos) defSize = size - pos; //Prevents overflow - Liberty.
+
+        for (int j = 0; j < defSize; j++)
+        {
+            char value; Stream.read(&value, 1);
+            if (&value == ".")
+            {
+                break;
+            }
+            else
+            {
+                vec.push_back(value);
+            }
+        }
+        data.textures.push_back(vec);
+    }
+
+    //for (int i = 0; i < mdlhdr.numcdtextures; i++)
+    //{
+    //    int pos = Position();
+    //
+    //    int defSize = 1000;
+    //
+    //    std::vector<char> vec;
+    //    if (defSize > size - pos) defSize = size - pos; //Prevents overflow - Liberty.
+    //
+    //    for (int j = 0; j < defSize; j++)
+    //    {
+    //        char value; Stream.read(&value, 1);
+    //        if (&value == ".")
+    //        {
+    //            break;
+    //        }
+    //        else
+    //        {
+    //            vec.push_back(value);
+    //        }
+    //    }
+    //    data->cdmaterials.push_back(vec);
+    //}
+}
+
 void BinaryReader::seek(int pos){
   Stream.seekg(pos);
   if(Stream.tellg() != pos){

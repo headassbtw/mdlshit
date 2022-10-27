@@ -35,7 +35,7 @@ struct sizes
 	int v53_Texture = 44;
 };
 
-struct Vector48
+struct Vector48 //Not correct. -Liberty
 {
 	float x;
 	float y;
@@ -816,6 +816,11 @@ struct mstudioanimdata_t_v49
 	std::vector<std::byte> arry;
 };
 
+struct mstudiofiller_t_v49
+{
+	std::vector<std::byte> arry;
+};
+
 struct mstudioanim_t_v49
 {
 	int strPos = 0;
@@ -841,6 +846,7 @@ struct mstudioanim_t_v49
 	    Vector3Short rawpos = { 0,0,0 }; // pPos
 
 	mstudioanimdata_t_v49 animdata;
+	mstudiofiller_t_v49 filler;
 };
 
 enum ikruletype
@@ -900,6 +906,7 @@ struct mstudiocompressedikerror_t_v49
 	float scale[6];
 	int16_t index[6]; //offset
 	mstudioanimdata_t_v49 animdata;
+	mstudiofiller_t_v49 filler;
 };
 
 struct mstudioikerror_t_v49
@@ -1391,6 +1398,8 @@ struct studiohdr_t_v53
 
 	int* unused1 = new int[60]; // god I hope
 
+	mstudiofiller_t_v49 filler;
+
 };
 
 struct mstudiobone_t_v53
@@ -1543,6 +1552,7 @@ struct mstudioanim_t_v53
 	int nextoffset;
 
 	mstudioanimdata_t_v49 animdata;
+	mstudiofiller_t_v49 filler;
 };
 
 struct mstudioikrule_t_v53
@@ -1668,6 +1678,31 @@ struct mstudiotexture_t_v53
 	int unused[7];
 };
 
+struct mstudioseqstring_t_v53
+{
+	std::vector<char> szname;
+	std::vector<char> activity;
+	std::vector<char> activityevent;
+	std::vector<char> activitymodifier;
+};
+
+struct mstudiostringtable_t_v53
+{
+	std::vector<char> mdlname;
+	std::vector<char> surfaceprop;
+	std::vector<std::vector<char>> bones;
+	std::vector<std::vector<char>> attachments;
+	std::vector<std::vector<char>> anims;
+	std::vector<mstudioseqstring_t_v53> seqs;
+	std::vector<std::vector<char>> nodes;
+	std::vector<std::vector<char>> bodyparts;
+	std::vector<std::vector<char>> poseparams;
+	std::vector<std::vector<char>> ikchains;
+	std::vector<std::vector<char>> includemodel;
+	std::vector<std::vector<char>> textures;
+	std::vector<std::vector<char>> cdmaterials;
+};
+
 struct mstudiorruiheader_t
 {
 	std::byte	ruiunk[4]; // unsure, it doesn't line up
@@ -1732,12 +1767,12 @@ struct mstudioruimesh_t
 
 	char*										szruimeshname[255]; // have to subtract header to get actual size (padding included)
 
-	int16_t									parent[255]; // parent(s) bone of mesh
+	int16_t										parent[255]; // parent(s) bone of mesh
 	
-	mstudioruivertmap_t						vertexmap[255]; // vertex map for each face  
+	mstudioruivertmap_t							vertexmap[255]; // vertex map for each face  
 	mstudioruivert_t							vertex[255];
 	
-	mstudioruimesface_t						facedata[255];
+	mstudioruimesface_t							facedata[255];
 
 };
 
