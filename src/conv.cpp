@@ -165,10 +165,7 @@ int Conversion::ReadHeader(FileInfo info) {
   UI::Progress.SubTask.Begin("Updating Hitbox Sets");
   for (int i = 0; i < mdl.mdlhdr.numhitboxsets; i++) 
   {
-      mstudiohitboxset_t_v49 v49HitboxSet; Stream.Read(&v49HitboxSet);
-      int stairs = bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToIkChains + bytesAddedToTextures + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + strFiller + bytesAddedToRuiMesh;
-      if (v49HitboxSet.sznameindex > 0) v49HitboxSet.sznameindex += stairs;
-      OutStream.Write(v49HitboxSet);
+      OutStream.Write(mdl.hitboxsets[i]);
       Logger::Notice("Updated hitbox set %d of %d\n", i + 1, mdl.mdlhdr.numhitboxsets);
       UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numhitboxsets);
   }
