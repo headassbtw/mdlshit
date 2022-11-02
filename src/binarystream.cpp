@@ -952,7 +952,7 @@ void BinaryReader::Read(mstudiokeyvalues_t_v49* data, int groupSize)
     }
 }
 
-void BinaryReader::Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 mdlhdr, std::vector<mstudioseqdescv49_t> seqs, std::vector<mstudiohitboxset_t_v49>	hitboxsets, std::vector<mstudioattachment_t_v49> attachments, std::vector< mstudionodename_t_v49> nodes, std::vector<mstudiobodyparts_t_v49> bodyparts)
+void BinaryReader::Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 mdlhdr, std::vector<mstudioseqdescv49_t> seqs, std::vector<mstudiohitboxset_t_v49>	hitboxsets, std::vector<mstudioattachment_t_v49> attachments, std::vector< mstudionodename_t_v49> nodes, std::vector<mstudiobodyparts_t_v49> bodyparts, std::vector<mstudioikchain_t_v49> ikchains, std::vector<mstudioanimdesc_t_v49> animdescs, std::vector<mstudiotexture_t_v49> textures, std::vector<mstudiomodelgroup_t_v49> includemodels, std::vector<mstudiotexturedir_t_v49> cdmaterials, std::vector<mstudioposeparamdesc_t_v49> poseparamdescs, std::vector<mstudiosrcbonetransform_t_v49> srcbonetransforms)
 {
     std::vector<std::string> stringsUsed;
     int startPos = Position();
@@ -983,35 +983,68 @@ void BinaryReader::Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 mdlhdr, 
 
     for (int i = 0; i < mdlhdr.numlocalattachments; i++)
     {
-        if (!ContainsString2(stringsUsed, attachments[i].szname.c_str()))
+        if (!attachments[i].szname.empty())
         {
-            std::string str = ReadNullTermStr(true);
-            Logger::Info("AttachmentName: %s\n", str.c_str());
-            data->attachments.push_back(str);
-            stringsUsed.push_back(str);
+            if (!ContainsString2(stringsUsed, attachments[i].szname.c_str()))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("AttachmentName: %s\n", str.c_str());
+                data->attachments.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("AttachmentReusedName: %s\n", attachments[i].szname.c_str());
+            }
         }
         else
         {
-            Logger::Info("AttachmentReusedName: %s\n", attachments[i].szname.c_str());
+            Logger::Info("AttachmentName: %s\n", "Empty");
         }
     }
 
     for (int i = 0; i < mdlhdr.numhitboxsets; i++)
     {
-        if (!ContainsString2(stringsUsed, hitboxsets[i].szname.c_str()))
+        if (!hitboxsets[i].szname.empty())
         {
-            std::string str = ReadNullTermStr(true);
-            Logger::Info("HitboxSetName: %s\n", str.c_str());
-            data->hitboxsets.push_back(str);
-            stringsUsed.push_back(str);
+            if (!ContainsString2(stringsUsed, hitboxsets[i].szname.c_str()))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("HitboxSetName: %s\n", str.c_str());
+                data->hitboxsets.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("HitboxSetReusedName: %s\n", hitboxsets[i].szname.c_str());
+            }
+        }
+        else
+        {
+            Logger::Info("HitboxSetName: %s\n", "Empty");
         }
     }
 
     for (int i = 0; i < mdlhdr.numlocalanim; i++)
     {
-        std::string str = ReadNullTermStr(true);
-        Logger::Info("AnimName: %s\n", str.c_str());
-        data->anims.push_back(str);
+        if (!animdescs[i].szname.empty())
+        {
+            if (!ContainsString2(stringsUsed, animdescs[i].szname))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("AnimDescName: %s\n", str.c_str());
+                data->anims.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("AnimDescReusedName: %s\n", animdescs[i].szname.c_str());
+            }
+        }
+        else
+        {
+            Logger::Info("AnimDescName: %s\n", "Empty");
+        }
     }
 
     for (int i = 0; i < mdlhdr.numlocalseq; i++)
@@ -1034,17 +1067,24 @@ void BinaryReader::Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 mdlhdr, 
         //if(test)Logger::Info("true\n");
         //else Logger::Info("false\n");
 
-
-        if (!ContainsString2(stringsUsed, szActivity) && seqs[i].szactivityname != "")
+        if (!seqs[i].szactivityname.empty())
         {
-            szActivity = ReadNullTermStr(true);
-            Logger::Info("SeqActivity: %s\n", szActivity.c_str());
-            stringsUsed.push_back(seqs[i].szactivityname);
-            _activities.push_back(seqs[i].szactivityname);
+            if (!ContainsString2(stringsUsed, szActivity))
+            {
+                szActivity = ReadNullTermStr(true);
+                Logger::Info("SeqActivity: %s\n", szActivity.c_str());
+                stringsUsed.push_back(seqs[i].szactivityname);
+                _activities.push_back(seqs[i].szactivityname);
+            }
+            else
+            {
+                szActivity = "";
+                Logger::Info("SeqActivityReusedName: %s\n", seqs[i].szactivityname.c_str());
+            }
         }
         else
         {
-            szActivity = "";
+            Logger::Info("SeqActivity: %s\n", "Empty");
         }
 
         for (int j = 0; j < seqs[i].numevents; j++)
@@ -1053,17 +1093,29 @@ void BinaryReader::Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 mdlhdr, 
             std::string eventName = seqs[i].szeventnames[j];
             //Logger::Info("TestSeqEvent: %s\n", seqs[i].szeventnames[j].c_str());
 
-            if (ContainsString2(stringsUsed, seqs[i].szeventnames[j]) || eventName == "")
+//            if (ContainsString2(stringsUsed, seqs[i].szeventnames[j]) || eventName == "")
+//            {
+//                _activityEvents.push_back("");
+//            }
+            if (!seqs[i].szeventnames[j].empty())
+            {
+                if (!ContainsString2(stringsUsed, seqs[i].szeventnames[j]))
+                {
+                    eventName = ReadNullTermStr(true);
+                    Logger::Info("eventName: %s\n", eventName.c_str());
+                    stringsUsed.push_back(seqs[i].szeventnames[j]);
+                    _activityEvents.push_back(seqs[i].szeventnames[j]);
+                }
+                else
+                {
+                    _activityEvents.push_back("");
+                    Logger::Info("eventNameReusedName: %s\n", seqs[i].szeventnames[j].c_str());
+                }
+            }
+            else
             {
                 _activityEvents.push_back("");
-            }
-
-            if (!ContainsString2(stringsUsed, seqs[i].szeventnames[j]) && eventName != "")
-            {
-                eventName = ReadNullTermStr(true);
-                Logger::Info("eventName: %s\n", eventName.c_str());
-                stringsUsed.push_back(seqs[i].szeventnames[j]);
-                _activityEvents.push_back(seqs[i].szeventnames[j]);
+                Logger::Info("SeqActivity: %s\n", "Empty");
             }
         }
 
@@ -1071,16 +1123,25 @@ void BinaryReader::Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 mdlhdr, 
         {
             int pos = Position();
             std::string actModName = seqs[i].szactivitymodifiernames[j];
-            if (!ContainsString2(stringsUsed, seqs[i].szactivitymodifiernames[j]))
+            if (!seqs[i].szactivitymodifiernames[j].empty())
             {
-                actModName = ReadNullTermStr(true);
-                Logger::Info("actModName: %s\n", actModName.c_str());
-                stringsUsed.push_back(seqs[i].szactivitymodifiernames[j]);
-                _activityModifiers.push_back(seqs[i].szactivitymodifiernames[j]);
+                if (!ContainsString2(stringsUsed, seqs[i].szactivitymodifiernames[j]))
+                {
+                    actModName = ReadNullTermStr(true);
+                    Logger::Info("actModName: %s\n", actModName.c_str());
+                    stringsUsed.push_back(seqs[i].szactivitymodifiernames[j]);
+                    _activityModifiers.push_back(seqs[i].szactivitymodifiernames[j]);
+                }
+                else
+                {
+                    _activityModifiers.push_back("");
+                    Logger::Info("actModReusedName: %s\n", seqs[i].szactivitymodifiernames[j].c_str());
+                }
             }
             else
             {
                 _activityModifiers.push_back("");
+                Logger::Info("actModName: %s\n", "Empty");
             }
         }
         mstudioseqstring_t_v49 _seq = { szName, szActivity, _activityEvents, _activityModifiers };
@@ -1090,31 +1151,45 @@ void BinaryReader::Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 mdlhdr, 
 
     for (int i = 0; i < mdlhdr.numlocalnodes; i++)
     {
-        if (!ContainsString2(stringsUsed, nodes[i].szname))
+        if (!nodes[i].szname.empty())
         {
-            std::string str = ReadNullTermStr(true);
-            Logger::Info("NodeName: %s\n", str.c_str());
-            data->nodes.push_back(str);
-            stringsUsed.push_back(str);
+            if (!ContainsString2(stringsUsed, nodes[i].szname))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("NodeName: %s\n", str.c_str());
+                data->nodes.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("NodeReusedName: %s\n", nodes[i].szname.c_str());
+            }
         }
         else
         {
-            Logger::Info("NodeReusedName: %s\n", nodes[i].szname.c_str());
+            Logger::Info("NodeName: %s\n", "Empty");
         }
     }
 
     for (int i = 0; i < mdlhdr.numbodyparts; i++)
     {
-        if (!ContainsString2(stringsUsed, bodyparts[i].szname))
+        if (!bodyparts[i].szname.empty())
         {
-            std::string str = ReadNullTermStr(true);
-            Logger::Info("BodyPartName: %s\n", str.c_str());
-            data->bodyparts.push_back(str);
-            stringsUsed.push_back(str);
+            if (!ContainsString2(stringsUsed, bodyparts[i].szname))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("BodyPartName: %s\n", str.c_str());
+                data->bodyparts.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("BodyPartReusedName: %s\n", bodyparts[i].szname.c_str());
+            }
         }
         else
         {
-            Logger::Info("BodyPartReusedName: %s\n", bodyparts[i].szname.c_str());
+            Logger::Info("BodyPartName: %s\n", "Empty");
         }
 
     }
@@ -1149,42 +1224,113 @@ void BinaryReader::Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 mdlhdr, 
 
     for (int i = 0; i < mdlhdr.numlocalposeparameters; i++)
     {
-        std::string str = ReadNullTermStr(true);
-        Logger::Info("PoseParamName: %s\n", str.c_str());
-        data->poseparams.push_back(str);
-        stringsUsed.push_back(str);
+        if (!poseparamdescs[i].szname.empty())
+        {
+            if (!ContainsString2(stringsUsed, poseparamdescs[i].szname))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("PoseParamName: %s\n", str.c_str());
+                data->poseparams.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("PoseParamReusedName: %s\n", poseparamdescs[i].szname.c_str());
+            }
+        }
+        else
+        {
+            Logger::Info("PoseParamName: %s\n", "Empty");
+        }
+
     }
 
     for (int i = 0; i < mdlhdr.numikchains; i++)
     {
-        std::string str = ReadNullTermStr(true);
-        Logger::Info("IkChainName: %s\n", str.c_str());
-        data->ikchains.push_back(str);
-        stringsUsed.push_back(str);
+        if (!ikchains[i].szname.empty())
+        {
+            if (!ContainsString2(stringsUsed, ikchains[i].szname))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("IkChainName: %s\n", str.c_str());
+                data->ikchains.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("IkChainReusedName: %s\n", ikchains[i].szname.c_str());
+            }
+        }
+        else
+        {
+            Logger::Info("IkChainName: %s\n", "Empty");
+        }
     }
 
     for (int i = 0; i < mdlhdr.numincludemodels; i++)
     {
-        std::string str = ReadNullTermStr(true);
-        Logger::Info("IncludeModelName: %s\n", str.c_str());
-        data->includemodel.push_back(str);
-        stringsUsed.push_back(str);
+        if (!includemodels[i].szname.empty())
+        {
+            if (!ContainsString2(stringsUsed, includemodels[i].szname))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("IncludeModelName: %s\n", str.c_str());
+                data->includemodel.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("IncludeModelReusedName: %s\n", includemodels[i].szname.c_str());
+            }
+        }
+        else
+        {
+            Logger::Info("IncludeModelName: %s\n", "Empty");
+        }
     }
 
     for (int i = 0; i < mdlhdr.numtextures; i++)
     {
-        std::string str = ReadNullTermStr(true);
-        Logger::Info("TextureName: %s\n", str.c_str());
-        data->textures.push_back(str);
-        stringsUsed.push_back(str);
+        if (!textures[i].szname.empty())
+        {
+            if (!ContainsString2(stringsUsed, textures[i].szname))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("TextureName: %s\n", str.c_str());
+                data->textures.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("TextureReusedName: %s\n", textures[i].szname.c_str());
+            }
+        }
+        else
+        {
+            Logger::Info("TextureName: %s\n", "Empty");
+        }
     }
 
     for (int i = 0; i < mdlhdr.numcdtextures; i++)
     {
-        std::string str = ReadNullTermStr(true);
-        Logger::Info("CdMaterialName: %s\n", str.c_str());
-        data->cdmaterials.push_back(str);
-        stringsUsed.push_back(str);
+        if (!cdmaterials[i].szname.empty())
+        {
+            if (!ContainsString2(stringsUsed, cdmaterials[i].szname))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("CdMaterialName: %s\n", str.c_str());
+                data->cdmaterials.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("CdMaterialReusedName: %s\n", cdmaterials[i].szname.c_str());
+            }
+        }
+        else
+        {
+            Logger::Info("CdMaterialName: %s\n", "Empty");
+        }
     }
 }
 

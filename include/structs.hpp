@@ -638,6 +638,8 @@ struct mstudioikchain_t_v49
 	int linktype;
 	int numlinks;
 	int linkindex;
+
+	std::string szname;
 };
 
 struct mstudioiklink_t_v49
@@ -665,6 +667,8 @@ struct mstudioposeparamdesc_t_v49
 	float start;		// starting value
 	float end;			// ending value
 	float loop;			// looping range, 0 for no looping, 360 for rotations, etc.
+
+	std::string szname;
 };
 
 struct mstudiosrcbonetransform_t_v49
@@ -673,6 +677,8 @@ struct mstudiosrcbonetransform_t_v49
 
 	matrix3x4_t	pretransform;
 	matrix3x4_t	posttransform;
+
+	std::string szname;
 };
 
 struct mstudiolinearbone_t_v49
@@ -790,6 +796,8 @@ struct mstudioanimdesc_t_v49
 	int zeroframeindex;
 
 	float zeroframestalltime;		// saved during read stalls
+
+	std::string szname;
 };
 
 struct sectionindexesindex_t_v49
@@ -1056,6 +1064,8 @@ struct mstudiomodelgroup_t_v49
 {
 	int szlabelindex;	// textual name
 	int sznameindex;	// file name
+
+	std::string szname;
 };
 
 struct mstudiobodyparts_t_v49
@@ -1152,6 +1162,8 @@ struct mstudiovertex_t_v49
 struct mstudiotexturedir_t_v49
 {
 	int sznameindex;// file name
+
+	std::string szname;
 };
 
 struct mstudiotexture_t_v49
@@ -1163,6 +1175,8 @@ struct mstudiotexture_t_v49
 	int unused1;
 
 	int unused[12];
+
+	std::string szname;
 };
 
 struct mstudioskingroup_t_v49

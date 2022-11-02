@@ -92,7 +92,7 @@ class BinaryReader{
     void Read(mstudionodename_t_v49* data);
     void Read(pertriheader_t_v49* data);
     void Read(mstudiokeyvalues_t_v49* data, int groupSize);
-    void Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 _mdl, std::vector<mstudioseqdescv49_t> seqs, std::vector<mstudiohitboxset_t_v49>	hitboxsets, std::vector<mstudioattachment_t_v49> attachments, std::vector< mstudionodename_t_v49> nodes, std::vector<mstudiobodyparts_t_v49> bodyparts);
+    void Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 _mdl, std::vector<mstudioseqdescv49_t> seqs, std::vector<mstudiohitboxset_t_v49>	hitboxsets, std::vector<mstudioattachment_t_v49> attachments, std::vector< mstudionodename_t_v49> nodes, std::vector<mstudiobodyparts_t_v49> bodyparts, std::vector<mstudioikchain_t_v49> ikchains, std::vector<mstudioanimdesc_t_v49> animdescs, std::vector<mstudiotexture_t_v49> textures, std::vector<mstudiomodelgroup_t_v49> includemodels, std::vector<mstudiotexturedir_t_v49> cdmaterials, std::vector<mstudioposeparamdesc_t_v49> poseparamdescs, std::vector<mstudiosrcbonetransform_t_v49> srcbonetransforms);
 
     void Read(mstudiocompressedikerror_t_v52* data);
 
