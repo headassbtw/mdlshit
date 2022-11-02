@@ -620,6 +620,9 @@ struct mstudioattachment_t_v49
 	matrix3x4_t localmatrix; // attachment point
 
 	int	unused[8];
+
+
+	std::string szname;
 };
 
 struct mstudiobonenametable_t_v49
@@ -710,14 +713,6 @@ struct mstudiolinearbonedata_t_v49
 	Quaternion  boneAlignment[255];
 };
 
-struct mstudiohitboxset_t_v49
-{
-	int sznameindex;
-
-	int numhitboxes;
-	int hitboxindex;
-};
-
 enum hboxgroup
 {
 	Generic = 0,
@@ -742,6 +737,20 @@ struct mstudiobbox_t_v49
 	int szhitboxnameindex;			// offset to the name of the hitbox.
 
 	int unused[8];
+
+	std::string szhitboxname;
+};
+
+struct mstudiohitboxset_t_v49
+{
+	int sznameindex;
+
+	int numhitboxes;
+	int hitboxindex;
+
+	std::string szname;
+
+	std::vector<mstudiobbox_t_v49> hitboxes;
 };
 
 struct mstudioanimdesc_t_v49
@@ -993,6 +1002,12 @@ struct mstudioseqdescv49_t
 	int numactivitymodifiers;
 
 	int unused[5];
+
+	std::string szlabel;
+	std::string szactivityname;
+	std::vector<std::string> szeventnames;
+	std::vector<std::string> szactivitymodifiernames;
+
 };
 
 struct posekey_t_v49
@@ -1049,6 +1064,8 @@ struct mstudiobodyparts_t_v49
 	int nummodels;
 	int base;
 	int modelindex;		// index into models array
+
+	std::string szname;
 };
 
 struct mstudiomodel_t_v49
@@ -1161,6 +1178,7 @@ struct mstudionodedata_v49
 struct mstudionodename_t_v49
 {
 	int sznameindex;
+	std::string szname;
 };
 
 struct pertriheader_t_v49
@@ -1182,27 +1200,31 @@ struct mstudiokeyvalues_t_v49
 
 struct mstudioseqstring_t_v49
 {
-	std::vector<char> szname;
-	std::vector<char> activity;
-	std::vector<char> activityevent;
-	std::vector<char> activitymodifier;
+	std::string szname;
+	std::string activity;
+	std::vector<std::string> activityevent;
+	std::vector<std::string> activitymodifier;
 };
 
 struct mstudiostringtable_t_v49
 {
-	std::vector<char> mdlname;
-	std::vector<char> surfaceprop;
-	std::vector<std::vector<char>> bones;
-	std::vector<std::vector<char>> attachments;
-	std::vector<std::vector<char>> anims;
+	int stringtablesize;
+
+	std::string mdlname;
+	std::string surfaceprop;
+	std::vector<std::string> bones;
+	std::vector<std::string> attachments;
+	std::vector<std::string> hitboxsets;
+	std::vector<std::string> hitboxes;
+	std::vector<std::string> anims;
 	std::vector<mstudioseqstring_t_v49> seqs;
-	std::vector<std::vector<char>> nodes;
-	std::vector<std::vector<char>> bodyparts;
-	std::vector<std::vector<char>> poseparams;
-	std::vector<std::vector<char>> ikchains;
-	std::vector<std::vector<char>> includemodel;
-	std::vector<std::vector<char>> textures;
-	std::vector<std::vector<char>> cdmaterials;
+	std::vector<std::string> nodes;
+	std::vector<std::string> bodyparts;
+	std::vector<std::string> poseparams;
+	std::vector<std::string> ikchains;
+	std::vector<std::string> includemodel;
+	std::vector<std::string> textures;
+	std::vector<std::string> cdmaterials;
 };
 
 

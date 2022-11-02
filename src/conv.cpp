@@ -16,6 +16,8 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 #include <mdls.hpp>
+#include <JsonTest.h>
+#include <MLUtil.h>
 
 using namespace std;
 using namespace rapidjson;
@@ -63,19 +65,19 @@ int Conversion::ReadHeader(FileInfo info) {
 
   BinaryReader Stream = BinaryReader(info.mdl.value().c_str());
   BinaryWriter OutStream = BinaryWriter(info.out.value().c_str());
-
+  JsonTest jsonController{}; //Made it class because why not. -Liberty
   OutStream.seek(0);
 
-  bool readV53 = false;
-  if (readV53 && info.aabb.has_value()) //This is also a temp for rui testing. -Liberty Edit: This is how I get the converter to read a v53 without adding an extra option. - Liberty
-  {
-      BinaryReader v53Stream = BinaryReader(info.aabb.value().c_str());
-      MDL::v53Mdl mdl2 = mdl2._v53Mdl(&v53Stream, false);
-      //if (!v53Stream.Stream.good()) {
-      //    Logger::Error("Model's phy file does not exist, please ensure %s exists, and is located in the same directory as the file\n", info.aabb.value().c_str());
-      //    return 1;
-      //}
-  }
+  //bool readV53 = false;
+  //if (readV53 && info.aabb.has_value()) //This is also a temp for rui testing. -Liberty Edit: This is how I get the converter to read a v53 without adding an extra option. - Liberty
+  //{
+  //    BinaryReader v53Stream = BinaryReader(info.aabb.value().c_str());
+  //    MDL::v53Mdl mdl2 = mdl2._v53Mdl(&v53Stream, false);
+  //    //if (!v53Stream.Stream.good()) {
+  //    //    Logger::Error("Model's phy file does not exist, please ensure %s exists, and is located in the same directory as the file\n", info.aabb.value().c_str());
+  //    //    return 1;
+  //    //}
+  //}
   MDL::v49Mdl mdl = mdl._v49Mdl(&Stream, false);
   mdl.SetMdlInts();
   studiohdr_t_v53 v53Hdr = mdl.ConvertHeader(info);
@@ -84,8 +86,6 @@ int Conversion::ReadHeader(FileInfo info) {
 
   std::vector<int> bytesAddedPerRuiMesh;
   std::vector<mstudioruimesh_t> ruiMeshes;
-  //OutStream.seek(476);
-  //fillerWrite(&OutStream, 240);
 
   std::vector<int> hdrBytesAnimDescAdd = mdl.v53GetAnimHdrBytesAdded(true);
   std::vector<int> secHdrBytesAnimDescAdd = mdl.v53GetSecHdrBytesAdded(true);
@@ -110,6 +110,8 @@ int Conversion::ReadHeader(FileInfo info) {
   int textureFiller = 0;
   int strFiller = 60;
   int allBytesAdded = bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToTextures + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + bytesAddedToRuiMesh;
+  
+  jsonController.ReadExtraStructs(info);
   std::vector<mstudioanim_t_v53> anims = mdl.ConvertAnims();
   std::vector<mstudioanim_t_v53> sections = mdl.ConvertSections();
   std::vector<mstudiobone_t_v53> bones = mdl.BoneConversion();
@@ -158,8 +160,6 @@ int Conversion::ReadHeader(FileInfo info) {
 
   //hitboxsets
 
-  int numOfHitboxes = 0;
-
   Stream.seek(mdl.mdlhdr.hitboxsetindex);
   OutStream.seek(v53Hdr.hitboxsetindex);
   UI::Progress.SubTask.Begin("Updating Hitbox Sets");
@@ -196,7 +196,7 @@ int Conversion::ReadHeader(FileInfo info) {
   OutStream.seek(v53Hdr.localanimindex);
   UI::Progress.SubTask.Begin("Converting Animations");
   int ikRuleNum = 0;
-  std::vector<int> ikRuleStairsPerAnim = mdl.v53IkRuleStairsPerAnim();
+  //std::vector<int> ikRuleStairsPerAnim = mdl.v53IkRuleStairsPerAnim();
   for (int i = 0; i < mdl.mdlhdr.numlocalanim; i++) 
   {
       //bool isDelta = false;
@@ -209,9 +209,6 @@ int Conversion::ReadHeader(FileInfo info) {
       //    }
       //}
       mstudioanimdesc_t_v53 animDesc = animdescs[i];
-      //animDesc.animindex -= 8;
-      //if (animDesc.sectionindex > 0) animDesc.sectionindex -= 8;
-      //if (animDesc.ikruleindex > 0) animDesc.ikruleindex -= 8;
       OutStream.Write(animDesc);
       Logger::Notice("Converted animation %d of %d\n", i + 1, mdl.mdlhdr.numlocalanim);
       UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numlocalanim);
@@ -252,8 +249,6 @@ int Conversion::ReadHeader(FileInfo info) {
                   boneHdrNum++;
                   if (anims[j].nextoffset == 0)
                   {
-                      OutStream.seek(OutStream.Position() - 32);
-                      fillerWrite(&OutStream, 32);
                       break;
                   }
               }
@@ -278,11 +273,6 @@ int Conversion::ReadHeader(FileInfo info) {
                  int off = sectionIndexes[secNumber].sectionoffsets;
 
                  OutStream.seek(startPos + off);
-                 //if(j > 0)
-                 //{
-                 //    OutStream.seek(startPos + off - 32);
-                 //    fillerWrite(&OutStream, 32);
-                 //}
                  for (int k = secBoneHdrNum; k < sections.size(); k++)
                  {
                      OutStream.Write(sections[k]);
@@ -290,8 +280,6 @@ int Conversion::ReadHeader(FileInfo info) {
                      secBoneHdrNum++;
                      if (sections[k].nextoffset == 0)
                      {
-                         OutStream.seek(OutStream.Position() - 32);
-                         fillerWrite(&OutStream, 32);
                          break;
                      }
                  }
@@ -687,8 +675,7 @@ if (info.rui.has_value()) {
 
   Stream.seek(mdl.mdlsubhdr.sznameindex + 407); //So we can just copy pasta the string table. - Liberty
   OutStream.seek(OutStream.Position() + 1);
-  OutStream.Write(mdl.stringtable);
-
+  OutStream.Write(mdl.stringtable); //How the fuck is this working? - Liberty Edit: Fixed it for v49. - Liberty
 
 #pragma region rest of the file
   int pos = Stream.Position();

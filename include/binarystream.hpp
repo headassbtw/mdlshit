@@ -24,6 +24,8 @@ class BinaryReader{
     void Read(int* data);
     void Read(int data[], int size);
     void Read(float* data);
+    std::string ReadNullTermStr(bool debug);
+    std::string ReadNullTermStrTrgt(int pos, bool debug);
 
     template <typename T> void Read(std::vector<T>* data, int groupSize);
     template <typename T> void Read(std::vector<T>* data, int groupSize, bool special);
@@ -90,7 +92,7 @@ class BinaryReader{
     void Read(mstudionodename_t_v49* data);
     void Read(pertriheader_t_v49* data);
     void Read(mstudiokeyvalues_t_v49* data, int groupSize);
-    void Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 _mdl);
+    void Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 _mdl, std::vector<mstudioseqdescv49_t> seqs, std::vector<mstudiohitboxset_t_v49>	hitboxsets, std::vector<mstudioattachment_t_v49> attachments, std::vector< mstudionodename_t_v49> nodes, std::vector<mstudiobodyparts_t_v49> bodyparts);
 
     void Read(mstudiocompressedikerror_t_v52* data);
 
@@ -131,6 +133,8 @@ class BinaryWriter{
     void Write(short data);
     void Write(int data[]);
     void Write(float data);
+    void Padding(int count);
+
     //void Write(long data);
     int Position();
     void Write(uint32_t data);
