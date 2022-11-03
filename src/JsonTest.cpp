@@ -10,8 +10,8 @@
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
-#include <JsonTest.h>
-#include <MLUtil.h>
+#include <JsonTest.hpp>
+#include <MLUtil.hpp>
 #include <rapidjson/error/error.h>
 
 using namespace rapidjson;

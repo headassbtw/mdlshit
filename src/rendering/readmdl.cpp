@@ -10,6 +10,10 @@ void UI::SetupReadMdlWindow(){
     mdl = new Widgets::File("MDL", false, "*.mdl");
 }
 
+void UI::SetReadMdlFile(const char* path){
+    strcpy(mdl->BoxBuffer, path);
+}
+
 void UI::RenderReadMdlWindow(int x, int y){
     mdl->UI(x-8);
     FileInfo info;

@@ -1,5 +1,5 @@
 #include <mdls.hpp>
-#include <JsonTest.h>
+#include <JsonTest.hpp>
 #include <conv.hpp>
 #include <rapidjson/istreamwrapper.h>
 #include <structs.hpp>

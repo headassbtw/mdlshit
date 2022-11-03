@@ -82,12 +82,17 @@ void FileMenu(std::string title){
 void AboutWindow(){
 
 }
+bool showAbout, readMdl;
 
 void drop_callback(GLFWwindow* window, int count, const char** paths)
 {
   double xpos, ypos;
   glfwGetCursorPos(window, &xpos, &ypos);
 
+  if(readMdl){
+    UI::SetReadMdlFile(paths[0]);
+    return;
+  }
   for (int i = 0;  i < count;  i++){
     for(int j = 0; j < files.size();j++){
       if(
@@ -103,13 +108,12 @@ void drop_callback(GLFWwindow* window, int count, const char** paths)
         }
     }
   }
-    
 }
 float conv_demo_prog;
 std::mutex conv_demo_prog_mutex;
 bool bingChilling = false;
 
-bool showAbout, readMdl;
+
 
 
 void Convert(int a){

@@ -16,8 +16,8 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 #include <mdls.hpp>
-#include <JsonTest.h>
-#include <MLUtil.h>
+#include <JsonTest.hpp>
+#include <MLUtil.hpp>
 
 using namespace std;
 using namespace rapidjson;
