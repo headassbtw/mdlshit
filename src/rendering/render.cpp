@@ -96,6 +96,7 @@ void drop_callback(GLFWwindow* window, int count, const char** paths)
   for (int i = 0;  i < count;  i++){
     for(int j = 0; j < files.size();j++){
       if(
+        files[j]->isEnabled &&
         files[j]->bounds.x <= xpos &&
         files[j]->bounds.z >= xpos &&
         files[j]->bounds.y <= ypos &&
