@@ -142,8 +142,10 @@ void UI::RenderReadMdlWindow(int x, int y){
       {
         if (ImGui::TreeNode((void*)(intptr_t)i, "Bone %d", i))
         {
+          ImGui::Text("Flags: %08x", _opt_v49->bones[i].flags);
           ImGui::Text("Pos: (%f , %f , %f)",_opt_v49->bones[i].pos.x,_opt_v49->bones[i].pos.y,_opt_v49->bones[i].pos.z);
           ImGui::Text("Rot: (%f , %f , %f)",_opt_v49->bones[i].rot.x,_opt_v49->bones[i].rot.y,_opt_v49->bones[i].rot.z);
+          
           ImGui::TreePop();
         }
       }
@@ -156,7 +158,7 @@ void UI::RenderReadMdlWindow(int x, int y){
       {
         if (ImGui::TreeNode((void*)(intptr_t)i, "%s", _opt_v49->attachments[i].szname.c_str()))
         {
-          ImGui::Text("Flags: %i", _opt_v49->attachments[i].flags);
+          ImGui::Text("Flags: %08x", _opt_v49->attachments[i].flags);
           ImGui::Text("LocalBone: %i", _opt_v49->attachments[i].localbone);
           ImGui::TreePop();
         }
