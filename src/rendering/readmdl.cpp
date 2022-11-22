@@ -7,6 +7,8 @@
 Widgets::File* mdl;
 std::optional<MDL::v49Mdl> _opt_v49;
 std::optional<MDL::v53Mdl> _opt_v53;
+int extract_dropdown;
+const char* extract_options[] = { "RUI Structs", "Src Bone Transforms", "AABB Trees"};
 
 void UI::SetupReadMdlWindow(){
     mdl = new Widgets::File("MDL", false, "*.mdl");
@@ -16,56 +18,9 @@ void UI::SetReadMdlFile(const char* path){
     strcpy(mdl->BoxBuffer, path);
 }
 
-void UI::RenderReadMdlWindow(int x, int y){
-    mdl->UI(x-8);
-    FileInfo info;
-    if(ImGui::Button("Read"))
-    {
 
-
-        std::vector<Error> rtn;
-        std::ifstream test(&mdl->BoxBuffer[0]);
-        if (!test)
-        {
-            rtn.push_back({ ErrorType::Blocking,std::string("File does not exist") });
-        }
-        else 
-        {
-
-            char magic[4];
-            test.read(magic, 4);
-            if (strcmp(magic, "IDST") >= 0) {
-                rtn.push_back({ ErrorType::Success,std::string("Valid MDL file") });
-
-
-                char ver[1];
-                test.read(ver, 1);
-                if ((int)ver[0] == 49)
-                {
-                    rtn.push_back({ ErrorType::Success,std::string("Version 49") });
-                    BinaryReader Stream = BinaryReader(&mdl->BoxBuffer[0]);
-                    _opt_v49 = _opt_v49->_v49Mdl(&Stream, false);
-                }
-                else if ((int)ver[0] == 53)
-                {
-                    rtn.push_back({ ErrorType::Success,std::string("Version 53") });
-                    BinaryReader Stream = BinaryReader(&mdl->BoxBuffer[0]);
-                    MDL::v53Mdl mdl = mdl._v53Mdl(&Stream, false);
-
-                }
-            }
-            else {
-                std::string err = std::string("Invalid MDL file; magic was \"") + std::string(magic) + "\"";
-                rtn.push_back({ ErrorType::Blocking,err });
-                Logger::Critical("%s\n", err.c_str());
-            }
-            test.close();
-        }
-    }
-  ImGui::SameLine();
-  if(ImGui::Button("Read RUI Structs"))
-  {
-    std::vector<Error> rtn;
+void extract_rui(){
+  std::vector<Error> rtn;
     std::ifstream test(&mdl->BoxBuffer[0]);
     if (!test)
     {
@@ -129,6 +84,64 @@ void UI::RenderReadMdlWindow(int x, int y){
       }
       test.close();
     }
+}
+
+void UI::RenderReadMdlWindow(int x, int y){
+    mdl->UI(x-8);
+    FileInfo info;
+    if(ImGui::Button("Read MDL"))
+    {
+
+
+        std::vector<Error> rtn;
+        std::ifstream test(&mdl->BoxBuffer[0]);
+        if (!test)
+        {
+            rtn.push_back({ ErrorType::Blocking,std::string("File does not exist") });
+        }
+        else 
+        {
+
+            char magic[4];
+            test.read(magic, 4);
+            if (strcmp(magic, "IDST") >= 0) {
+                rtn.push_back({ ErrorType::Success,std::string("Valid MDL file") });
+
+
+                char ver[1];
+                test.read(ver, 1);
+                if ((int)ver[0] == 49)
+                {
+                    rtn.push_back({ ErrorType::Success,std::string("Version 49") });
+                    BinaryReader Stream = BinaryReader(&mdl->BoxBuffer[0]);
+                    _opt_v49 = _opt_v49->_v49Mdl(&Stream, false);
+                }
+                else if ((int)ver[0] == 53)
+                {
+                    rtn.push_back({ ErrorType::Success,std::string("Version 53") });
+                    BinaryReader Stream = BinaryReader(&mdl->BoxBuffer[0]);
+                    MDL::v53Mdl mdl = mdl._v53Mdl(&Stream, false);
+
+                }
+            }
+            else {
+                std::string err = std::string("Invalid MDL file; magic was \"") + std::string(magic) + "\"";
+                rtn.push_back({ ErrorType::Blocking,err });
+                Logger::Critical("%s\n", err.c_str());
+            }
+            test.close();
+        }
+    }
+  ImGui::SameLine();
+  ImGui::Combo("##ExtractDropdown", &extract_dropdown, extract_options, IM_ARRAYSIZE(extract_options));
+  ImGui::SameLine();
+  if(ImGui::Button("Read"))
+  {
+    switch(extract_dropdown){
+      case 0:
+        extract_rui();
+        break;
+    }
   }
   ImGui::Separator();
   //ok actual details n shit go here
@@ -140,7 +153,8 @@ void UI::RenderReadMdlWindow(int x, int y){
     {
       for (int i = 0; i < _opt_v49->bones.size(); i++)
       {
-        if (ImGui::TreeNode((void*)(intptr_t)i, "Bone %d", i))
+        
+        if (ImGui::TreeNode((void*)(intptr_t)i, "%s", _opt_v49->stringtable.bones[i].c_str()))
         {
           ImGui::Text("Flags: %08x", _opt_v49->bones[i].flags);
           ImGui::Text("Pos: (%f , %f , %f)",_opt_v49->bones[i].pos.x,_opt_v49->bones[i].pos.y,_opt_v49->bones[i].pos.z);
