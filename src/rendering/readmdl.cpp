@@ -10,10 +10,6 @@ void UI::SetupReadMdlWindow(){
     mdl = new Widgets::File("MDL", false, "*.mdl");
 }
 
-void UI::SetReadMdlFile(const char* path){
-    strcpy(mdl->BoxBuffer, path);
-}
-
 void UI::RenderReadMdlWindow(int x, int y){
     mdl->UI(x-8);
     FileInfo info;
@@ -40,15 +36,28 @@ void UI::RenderReadMdlWindow(int x, int y){
                 test.read(ver, 1);
                 if ((int)ver[0] == 49)
                 {
+                    Logger::Debug("MDL Version: %d\n", (int)ver[0]);
                     rtn.push_back({ ErrorType::Success,std::string("Version 49") });
                     BinaryReader Stream = BinaryReader(&mdl->BoxBuffer[0]);
                     MDL::v49Mdl mdl = mdl._v49Mdl(&Stream, false);
                 }
                 else if ((int)ver[0] == 53)
                 {
+                    Logger::Debug("MDL Version: %d\n", (int)ver[0]);
                     rtn.push_back({ ErrorType::Success,std::string("Version 53") });
                     BinaryReader Stream = BinaryReader(&mdl->BoxBuffer[0]);
                     MDL::v53Mdl mdl = mdl._v53Mdl(&Stream, false);
+                    mdl.v53ExtractAABBTree(&Stream);
+                    mdl.v53ExtractSrcBoneTransforms(&Stream);
+                }
+                else if ((int)ver[0] == 52)
+                {
+                    Logger::Debug("MDL Version: %d\n", (int)ver[0]);
+                    rtn.push_back({ ErrorType::Success,std::string("Version 52") });
+                    BinaryReader Stream = BinaryReader(&mdl->BoxBuffer[0]);
+                    MDL::v52Mdl mdl = mdl._v52Mdl(&Stream, false);
+                    mdl.v52ExtractAABBTree(&Stream);
+                    mdl.v52ExtractSrcBoneTransforms(&Stream);
                 }
             }
             else {

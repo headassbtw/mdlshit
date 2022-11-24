@@ -8,6 +8,15 @@
 #include "mdls.hpp"
 using namespace std;
 
+bool Contains(std::vector<int> arry, int trgt)
+{
+    for (int i = 0; i < arry.size(); i++)
+    {
+        if (trgt == arry[i]) return true;
+    }
+    return false;
+}
+
 bool ContainsString(std::vector<std::vector<char>> arry, std::vector<char> trgt)
 {
     for (int i = 0; i < arry.size(); i++)
@@ -41,6 +50,7 @@ std::string BinaryReader::ReadNullTermStr(bool debug)
             Stream.read((char*)&value, 1);
             vec.push_back(value);
         }
+
         std::string string(vec.begin(), vec.end());
 
         //if(debug) Logger::Info("Debug_NullTermStr: %s\n", string.c_str());
@@ -61,9 +71,33 @@ std::string BinaryReader::ReadNullTermStrTrgt(int pos, bool debug)
         Stream.read((char*)&value, 1);
         vec.push_back(value);
     }
+
     std::string string(vec.begin(), vec.end());
 
    // if (debug) Logger::Info("Debug_NullTermStr: %s\n", string.c_str());
+    seek(startPos);
+    return string;
+}
+
+std::string BinaryReader::ReadNullTermStrTrgtNoSep(int pos, bool debug)
+{
+    int startPos = Position();
+    int moe = 0;
+    seek(pos);
+    std::vector<char> vec;
+    char value = Stream.get();
+    if (value != '\0') seek(Position() - 1);
+
+    while (value != '\0')
+    {
+        Stream.read((char*)&value, 1);
+        vec.push_back(value);
+    }
+    if (vec.size() > 1) moe = 1;
+
+    std::string string(vec.begin(), vec.end() - moe);
+
+    // if (debug) Logger::Info("Debug_NullTermStr: %s\n", string.c_str());
     seek(startPos);
     return string;
 }
@@ -464,6 +498,12 @@ void BinaryReader::Read(mstudioposeparamdesc_t_v49* data) {
     Stream.read((char*)&data->loop, sizeof(float));
 }
 
+void BinaryReader::Read(mstudioanimblock_t* data)
+{
+    Stream.read((char*)&data->datastart, sizeof(int));
+    Stream.read((char*)&data->dataend, sizeof(int));
+}
+
 void BinaryReader::Read(mstudiosrcbonetransform_t_v49* data) {
     Stream.read((char*)&data->sznameindex, sizeof(int));
     Stream.read((char*)&data->pretransform, sizeof(matrix3x4_t));
@@ -787,7 +827,8 @@ void BinaryReader::Read(mstudioautolayer_t_v49* data) {
 
 }
 
-void BinaryReader::Read(mstudioactivitymodifier_t_v49* data) {
+void BinaryReader::Read(mstudioactivitymodifier_t_v49* data) 
+{
     Stream.read((char*)&data->sznameindex, sizeof(int));
 }
 
@@ -971,6 +1012,7 @@ void BinaryReader::Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 mdlhdr, 
     std::string surfacePropName = ReadNullTermStr(true);
     data->surfaceprop = surfacePropName;
     Logger::Info("SurfacePropName: %s\n", surfacePropName.c_str());
+    stringsUsed.push_back(surfacePropName.c_str());
 
 
     for (int i = 0; i < mdlhdr.numbones; i++)
@@ -1334,10 +1376,702 @@ void BinaryReader::Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 mdlhdr, 
     }
 }
 
+void BinaryReader::Read(studiohdr_t_v52* data) {
+
+    Stream.read((char*)&data->id, sizeof(int));
+    Stream.read((char*)&data->version, sizeof(int));
+    Stream.read((char*)&data->checksum, sizeof(int));
+    Stream.read((char*)&data->name, 64);
+
+    Stream.read((char*)&data->length, sizeof(int));
+
+    Stream.read((char*)&data->eyeposition, sizeof(Vector3));
+
+    Stream.read((char*)&data->illumposition, sizeof(Vector3));
+
+    Stream.read((char*)&data->hull_min, sizeof(Vector3));
+    Stream.read((char*)&data->hull_max, sizeof(Vector3));
+
+    Stream.read((char*)&data->view_bbmin, sizeof(Vector3));
+    Stream.read((char*)&data->view_bbmax, sizeof(Vector3));
+
+    Stream.read((char*)&data->flags, sizeof(int));
+
+    Stream.read((char*)&data->numbones, sizeof(int));
+    Stream.read((char*)&data->boneindex, sizeof(int));
+
+    Stream.read((char*)&data->numbonecontrollers, sizeof(int));
+    Stream.read((char*)&data->bonecontrollerindex, sizeof(int));
+
+    Stream.read((char*)&data->numhitboxsets, sizeof(int));
+    Stream.read((char*)&data->hitboxsetindex, sizeof(int));
+
+    Stream.read((char*)&data->numlocalanim, sizeof(int));
+    Stream.read((char*)&data->localanimindex, sizeof(int));
+
+    Stream.read((char*)&data->numlocalseq, sizeof(int));
+    Stream.read((char*)&data->localseqindex, sizeof(int));
+
+    Stream.read((char*)&data->activitylistversion, sizeof(int));
+    Stream.read((char*)&data->eventsindexed, sizeof(int));
+
+
+    Stream.read((char*)&data->numtextures, sizeof(int));
+    Stream.read((char*)&data->textureindex, sizeof(int));
+
+
+    Stream.read((char*)&data->numcdtextures, sizeof(int));
+    Stream.read((char*)&data->cdtextureindex, sizeof(int));
+
+
+    Stream.read((char*)&data->numskinref, sizeof(int));
+    Stream.read((char*)&data->numskinfamilies, sizeof(int));
+    Stream.read((char*)&data->skinindex, sizeof(int));
+
+    Stream.read((char*)&data->numbodyparts, sizeof(int));
+    Stream.read((char*)&data->bodypartindex, sizeof(int));
+
+    Stream.read((char*)&data->numlocalattachments, sizeof(int));
+    Stream.read((char*)&data->localattachmentindex, sizeof(int));
+
+    Stream.read((char*)&data->numlocalnodes, sizeof(int));
+    Stream.read((char*)&data->localnodeindex, sizeof(int));
+    Stream.read((char*)&data->localnodenameindex, sizeof(int));
+
+    Stream.read((char*)&data->numflexdesc, sizeof(int));
+    Stream.read((char*)&data->flexdescindex, sizeof(int));
+
+    Stream.read((char*)&data->numflexcontrollers, sizeof(int));
+    Stream.read((char*)&data->flexcontrollerindex, sizeof(int));
+
+    Stream.read((char*)&data->numflexrules, sizeof(int));
+    Stream.read((char*)&data->flexruleindex, sizeof(int));
+
+    Stream.read((char*)&data->numikchains, sizeof(int));
+    Stream.read((char*)&data->ikchainindex, sizeof(int));
+
+    Stream.read((char*)&data->nummouths, sizeof(int));
+    Stream.read((char*)&data->mouthindex, sizeof(int));
+
+    Stream.read((char*)&data->numlocalposeparameters, sizeof(int));
+    Stream.read((char*)&data->localposeparamindex, sizeof(int));
+
+    Stream.read((char*)&data->surfacepropindex, sizeof(int));
+
+    Stream.read((char*)&data->keyvalueindex, sizeof(int));
+    Stream.read((char*)&data->keyvaluesize, sizeof(int));
+
+    Stream.read((char*)&data->numlocalikautoplaylocks, sizeof(int));
+    Stream.read((char*)&data->localikautoplaylockindex, sizeof(int));
+
+
+    Stream.read((char*)&data->mass, sizeof(float));
+    Stream.read((char*)&data->contents, sizeof(int));
+
+
+    Stream.read((char*)&data->numincludemodels, sizeof(int));
+    Stream.read((char*)&data->includemodelindex, sizeof(int));
+
+    Stream.read((char*)&data->virtualModel, sizeof(uint32_t));
+
+    Stream.read((char*)&data->szanimblocknameindex, sizeof(int));
+    Stream.read((char*)&data->numanimblocks, sizeof(int));
+    Stream.read((char*)&data->animblockindex, sizeof(int));
+    Stream.read((char*)&data->animblockModel, sizeof(uint32_t));
+
+    Stream.read((char*)&data->bonetablebynameindex, sizeof(int));
+
+    Stream.read((char*)&data->pVertexBase, sizeof(uint32_t));
+    Stream.read((char*)&data->pIndexBase, sizeof(uint32_t));
+
+    Stream.read((char*)&data->constdirectionallightdot, sizeof(std::byte));
+
+    Stream.read((char*)&data->rootLOD, sizeof(std::byte));
+
+    Stream.read((char*)&data->numAllowedRootLODs, sizeof(std::byte));
+
+    Stream.read((char*)&data->unused, sizeof(std::byte));
+
+    Stream.read((char*)&data->fadedistance, sizeof(int));
+
+    Stream.read((char*)&data->numflexcontrollerui, sizeof(int));
+    Stream.read((char*)&data->flexcontrolleruiindex, sizeof(int));
+
+    Stream.read((char*)&data->flVertAnimFixedPointScale, sizeof(float));
+    Stream.read((char*)&data->surfacepropLookup, sizeof(int));
+
+    Stream.read((char*)&data->studiohdr2index, sizeof(int));
+
+    Stream.read((char*)&data->mayaindex, sizeof(int));
+}
+
+void BinaryReader::Read(studiohdr2_t_v52* data) 
+{
+
+    Stream.read((char*)&data->numsrcbonetransform, sizeof(int));
+    Stream.read((char*)&data->srcbonetransformindex, sizeof(int));
+
+    Stream.read((char*)&data->illumpositionattachmentindex, sizeof(int));
+
+    Stream.read((char*)&data->flMaxEyeDeflection, sizeof(float));
+
+    Stream.read((char*)&data->linearboneindex, sizeof(int));
+
+    Stream.read((char*)&data->sznameindex, sizeof(int));
+
+    Stream.read((char*)&data->m_nBoneFlexDriverCount, sizeof(int));
+    Stream.read((char*)&data->m_nBoneFlexDriverIndex, sizeof(int));
+
+    Stream.read((char*)&data->aabbindex, sizeof(int));
+    Stream.read((char*)&data->numaabbnodes, sizeof(int));
+    Stream.read((char*)&data->numaabbleaves, sizeof(int));
+    Stream.read((char*)&data->numaabbverts, sizeof(int));
+
+    Stream.read((char*)&data->unkstringindex, sizeof(int));
+
+
+    Stream.read((char*)&data->reserved, sizeof(int) * 39);
+}
+
+void BinaryReader::Read(mayabakery_t* data, int size)
+{
+    for (int i = 0; i < size; i++)
+    {
+        char value = 0;
+        Stream.read((char*)&value, 1);
+        data->bakery.push_back(value);
+    }
+}
+
+void BinaryReader::Read(mstudiobone_t_v52* data) 
+{
+    Stream.read((char*)&data->sznameindex, sizeof(int));
+    Stream.read((char*)&data->parent, sizeof(int));
+    Stream.read((char*)&data->bonecontroller, sizeof(int) * 6);
+    Stream.read((char*)&data->pos, sizeof(Vector3));
+    Stream.read((char*)&data->quat, sizeof(Quaternion));
+    Stream.read((char*)&data->rot, sizeof(RadianEuler));
+    Stream.read((char*)&data->posscale, sizeof(Vector3));
+    Stream.read((char*)&data->rotscale, sizeof(Vector3));
+    Stream.read((char*)&data->poseToBone, sizeof(matrix3x4_t));
+    Stream.read((char*)&data->qAlignment, sizeof(Quaternion));
+    Stream.read((char*)&data->flags, sizeof(int));
+    Stream.read((char*)&data->proctype, sizeof(int));
+    Stream.read((char*)&data->procindex, sizeof(int));
+    Stream.read((char*)&data->physicsbone, sizeof(int));
+    Stream.read((char*)&data->surfacepropidx, sizeof(int));
+    Stream.read((char*)&data->contents, sizeof(int));
+    Stream.read((char*)&data->surfacepropLookup, sizeof(int));
+    Stream.read((char*)&data->unkvector, sizeof(Vector3));
+    Stream.read((char*)&data->unkvector1, sizeof(Vector3));
+    Stream.read((char*)&data->unused, sizeof(int) * 1);
+    //printf("read a Vector\n");
+}
+
+void BinaryReader::Read(mstudioanimdesc_t_v52* data) 
+{
+    Stream.read((char*)&data->baseptr, sizeof(int));
+    Stream.read((char*)&data->sznameindex, sizeof(int));
+    Stream.read((char*)&data->fps, sizeof(float));
+    Stream.read((char*)&data->flags, sizeof(int));
+    Stream.read((char*)&data->numframes, sizeof(int));
+    Stream.read((char*)&data->nummovements, sizeof(int));
+    Stream.read((char*)&data->movementindex, sizeof(int));
+    Stream.read((char*)&data->ikrulezeroframeindex, sizeof(int));
+    Stream.read((char*)&data->compressedikerrorindex, sizeof(int));
+    Stream.read((char*)&data->unused1, sizeof(int) * 4);
+    Stream.read((char*)&data->animblock, sizeof(int));
+    Stream.read((char*)&data->animindex, sizeof(int));
+    Stream.read((char*)&data->numikrules, sizeof(int));
+    Stream.read((char*)&data->ikruleindex, sizeof(int));
+    Stream.read((char*)&data->animblockikruleindex, sizeof(int));
+    Stream.read((char*)&data->numlocalhierarchy, sizeof(int));
+    Stream.read((char*)&data->localhierarchyindex, sizeof(int));
+    Stream.read((char*)&data->sectionindex, sizeof(int));
+    Stream.read((char*)&data->sectionframes, sizeof(int));
+    Stream.read((char*)&data->zeroframespan, sizeof(short));
+    Stream.read((char*)&data->zeroframecount, sizeof(short));
+    Stream.read((char*)&data->zeroframeindex, sizeof(int));
+    Stream.read((char*)&data->zeroframestalltime, sizeof(float));
+}
+
 void BinaryReader::Read(mstudiocompressedikerror_t_v52* data) 
 {
     Stream.read((char*)&data->scale, sizeof(float) * 4);
     Stream.read((char*)&data->offset, sizeof(short) * 4);
+}
+
+void BinaryReader::Read(mstudioseqdesc_t_v52* data)
+{
+
+    Stream.read((char*)&data->baseptr, sizeof(int));
+
+    Stream.read((char*)&data->szlabelindex, sizeof(int));
+
+    Stream.read((char*)&data->szactivitynameindex, sizeof(int));
+
+    Stream.read((char*)&data->flags, sizeof(int));
+
+    Stream.read((char*)&data->activity, sizeof(int));
+    Stream.read((char*)&data->actweight, sizeof(int));
+
+    Stream.read((char*)&data->numevents, sizeof(int));
+    Stream.read((char*)&data->eventindex, sizeof(int));
+
+    Stream.read((char*)&data->bbmin, sizeof(Vector3));
+    Stream.read((char*)&data->bbmax, sizeof(Vector3));
+
+    Stream.read((char*)&data->numblends, sizeof(int));
+
+
+    Stream.read((char*)&data->animindexindex, sizeof(int));
+
+    Stream.read((char*)&data->movementindex, sizeof(int));
+    Stream.read((char*)&data->groupsize, sizeof(int) * 2);
+    Stream.read((char*)&data->paramindex, sizeof(int) * 2);
+    Stream.read((char*)&data->paramstart, sizeof(float) * 2);
+    Stream.read((char*)&data->paramend, sizeof(float) * 2);
+    Stream.read((char*)&data->paramparent, sizeof(int));
+
+    Stream.read((char*)&data->fadeintime, sizeof(float));
+    Stream.read((char*)&data->fadeouttime, sizeof(float));
+
+    Stream.read((char*)&data->localentrynode, sizeof(int));
+    Stream.read((char*)&data->localexitnode, sizeof(int));
+    Stream.read((char*)&data->nodeflags, sizeof(int));
+
+    Stream.read((char*)&data->entryphase, sizeof(float));
+    Stream.read((char*)&data->exitphase, sizeof(float));
+
+    Stream.read((char*)&data->lastframe, sizeof(float));
+
+    Stream.read((char*)&data->nextseq, sizeof(int));
+    Stream.read((char*)&data->pose, sizeof(int));
+
+    Stream.read((char*)&data->numikrules, sizeof(int));
+
+    Stream.read((char*)&data->numautolayers, sizeof(int));
+    Stream.read((char*)&data->autolayerindex, sizeof(int));
+
+    Stream.read((char*)&data->weightlistindex, sizeof(int));
+
+    Stream.read((char*)&data->posekeyindex, sizeof(int));
+
+    Stream.read((char*)&data->numiklocks, sizeof(int));
+    Stream.read((char*)&data->iklockindex, sizeof(int));
+
+
+    Stream.read((char*)&data->keyvalueindex, sizeof(int));
+    Stream.read((char*)&data->keyvaluesize, sizeof(int));
+
+    Stream.read((char*)&data->cycleposeindex, sizeof(int));
+
+    Stream.read((char*)&data->activitymodifierindex, sizeof(int));
+    Stream.read((char*)&data->numactivitymodifiers, sizeof(int));
+
+    Stream.read((char*)&data->unk, sizeof(int));
+    Stream.read((char*)&data->unk1, sizeof(int));
+
+    Stream.read((char*)&data->unused, sizeof(int) * 3);
+
+}
+
+void BinaryReader::Read(mstudiostringtable_t_v52* data, studiohdr_t_v52 mdlhdr, studiohdr2_t_v52 mdlsubhdr, std::vector<mstudioseqdesc_t_v52> seqs, std::vector<mstudiohitboxset_t_v49>	hitboxsets, std::vector<mstudioattachment_t_v49> attachments, std::vector< mstudionodename_t_v49> nodes, std::vector<mstudiobodyparts_t_v49> bodyparts, std::vector<mstudioikchain_t_v49> ikchains, std::vector<mstudioanimdesc_t_v52> animdescs, std::vector<mstudiotexture_t_v49> textures, std::vector<mstudiomodelgroup_t_v49> includemodels, std::vector<mstudiotexturedir_t_v49> cdmaterials, std::vector<mstudioposeparamdesc_t_v49> poseparamdescs, std::vector<mstudiosrcbonetransform_t_v49> srcbonetransforms)
+{
+    std::vector<std::string> stringsUsed;
+    int startPos = Position();
+    int eventNum = 0;
+    int actModNum = 0;
+    int stringTableSize = mdlhdr.length - startPos;
+
+
+    data->stringtablesize = stringTableSize;
+    Logger::Info("String Table Size: %d\n", data->stringtablesize);
+
+    std::string mdlName = ReadNullTermStr(true);
+    data->mdlname = mdlName;
+    Logger::Info("MdlName: %s\n", mdlName.c_str());
+
+    std::string surfacePropName = ReadNullTermStr(true);
+    data->surfaceprop = surfacePropName;
+    Logger::Info("SurfacePropName: %s\n", surfacePropName.c_str());
+    stringsUsed.push_back(surfacePropName.c_str());
+    if (mdlsubhdr.unkstringindex + 408 > mdlsubhdr.sznameindex + 407)
+    {
+        std::string unkString = ReadNullTermStr(true); //ReadNullTermStrTrgt(mdlsubhdr.unkstringindex + 408, false);
+        data->unk = unkString;
+        Logger::Info("UnkString: %s\n", unkString.c_str());
+    }
+
+
+
+    for (int i = 0; i < mdlhdr.numbones; i++)
+    {
+        std::string str = ReadNullTermStr(true);
+        Logger::Info("BoneName: %s\n", str.c_str());
+        stringsUsed.push_back(str.c_str());
+        data->bones.push_back(str);
+    }
+
+    for (int i = 0; i < mdlhdr.numlocalattachments; i++)
+    {
+        if (!attachments[i].szname.empty())
+        {
+            if (!ContainsString2(stringsUsed, attachments[i].szname.c_str()))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("AttachmentName: %s\n", str.c_str());
+                data->attachments.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("AttachmentReusedName: %s\n", attachments[i].szname.c_str());
+            }
+        }
+        else
+        {
+            Logger::Info("AttachmentName: %s\n", "Empty");
+        }
+    }
+
+    for (int i = 0; i < mdlhdr.numhitboxsets; i++)
+    {
+        if (!hitboxsets[i].szname.empty())
+        {
+            if (!ContainsString2(stringsUsed, hitboxsets[i].szname.c_str()))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("HitboxSetName: %s\n", str.c_str());
+                data->hitboxsets.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("HitboxSetReusedName: %s\n", hitboxsets[i].szname.c_str());
+            }
+        }
+        else
+        {
+            Logger::Info("HitboxSetName: %s\n", "Empty");
+        }
+    }
+
+    for (int i = 0; i < mdlhdr.numlocalanim; i++)
+    {
+        if (!animdescs[i].szname.empty())
+        {
+            if (!ContainsString2(stringsUsed, animdescs[i].szname))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("AnimDescName: %s\n", str.c_str());
+                data->anims.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("AnimDescReusedName: %s\n", animdescs[i].szname.c_str());
+            }
+        }
+        else
+        {
+            Logger::Info("AnimDescName: %s\n", "Empty");
+        }
+    }
+
+    for (int i = 0; i < mdlhdr.numlocalseq; i++)
+    {
+        std::vector<std::string> _activities;
+        std::vector<std::string> _activityEvents;
+        std::vector<std::string> _activityModifiers;
+
+        int seqPos = (seqs[i].baseptr - seqs[i].activitymodifierindex) * -1;
+
+        std::string szName = ReadNullTermStr(true);
+        Logger::Info("SeqName: %s\n", szName.c_str());
+        std::string szActivity = seqs[i].szactivityname;
+
+        //Logger::Info("TestSeqName: %s\n", seqs[i].szlabel.c_str());
+        //Logger::Info("TestSeqActivity: %s\n", seqs[i].szactivityname.c_str());
+        //Logger::Info("TestSeqActivitySize: %d\n", seqs[i].szactivityname.size());
+        bool test = seqs[i].szactivityname.empty();
+
+        //if(test)Logger::Info("true\n");
+        //else Logger::Info("false\n");
+
+        if (!seqs[i].szactivityname.empty())
+        {
+            if (!ContainsString2(stringsUsed, szActivity))
+            {
+                szActivity = ReadNullTermStr(true);
+                Logger::Info("SeqActivity: %s\n", szActivity.c_str());
+                stringsUsed.push_back(seqs[i].szactivityname);
+                _activities.push_back(seqs[i].szactivityname);
+            }
+            else
+            {
+                szActivity = "";
+                Logger::Info("SeqActivityReusedName: %s\n", seqs[i].szactivityname.c_str());
+            }
+        }
+        else
+        {
+            Logger::Info("SeqActivity: %s\n", "Empty");
+        }
+
+        for (int j = 0; j < seqs[i].numevents; j++)
+        {
+            int pos = Position();
+            std::string eventName = seqs[i].szeventnames[j];
+            //Logger::Info("TestSeqEvent: %s\n", seqs[i].szeventnames[j].c_str());
+
+//            if (ContainsString2(stringsUsed, seqs[i].szeventnames[j]) || eventName == "")
+//            {
+//                _activityEvents.push_back("");
+//            }
+            if (!seqs[i].szeventnames[j].empty())
+            {
+                if (!ContainsString2(stringsUsed, seqs[i].szeventnames[j]))
+                {
+                    eventName = ReadNullTermStr(true);
+                    Logger::Info("eventName: %s\n", eventName.c_str());
+                    stringsUsed.push_back(seqs[i].szeventnames[j]);
+                    _activityEvents.push_back(seqs[i].szeventnames[j]);
+                }
+                else
+                {
+                    _activityEvents.push_back("");
+                    Logger::Info("eventNameReusedName: %s\n", seqs[i].szeventnames[j].c_str());
+                }
+            }
+            else
+            {
+                _activityEvents.push_back("");
+                Logger::Info("SeqActivity: %s\n", "Empty");
+            }
+        }
+
+        for (int j = 0; j < seqs[i].numactivitymodifiers; j++)
+        {
+            int pos = Position();
+            std::string actModName = seqs[i].szactivitymodifiernames[j];
+            if (!seqs[i].szactivitymodifiernames[j].empty())
+            {
+                if (!ContainsString2(stringsUsed, seqs[i].szactivitymodifiernames[j]))
+                {
+                    actModName = ReadNullTermStr(true);
+                    Logger::Info("actModName: %s\n", actModName.c_str());
+                    stringsUsed.push_back(seqs[i].szactivitymodifiernames[j]);
+                    _activityModifiers.push_back(seqs[i].szactivitymodifiernames[j]);
+                }
+                else
+                {
+                    _activityModifiers.push_back("");
+                    Logger::Info("actModReusedName: %s\n", seqs[i].szactivitymodifiernames[j].c_str());
+                }
+            }
+            else
+            {
+                _activityModifiers.push_back("");
+                Logger::Info("actModName: %s\n", "Empty");
+            }
+        }
+        mstudioseqstring_t_v49 _seq = { szName, szActivity, _activityEvents, _activityModifiers };
+
+        data->seqs.push_back(_seq);
+    }
+
+    for (int i = 0; i < mdlhdr.numlocalnodes; i++)
+    {
+        if (!nodes[i].szname.empty())
+        {
+            if (!ContainsString2(stringsUsed, nodes[i].szname))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("NodeName: %s\n", str.c_str());
+                data->nodes.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("NodeReusedName: %s\n", nodes[i].szname.c_str());
+            }
+        }
+        else
+        {
+            Logger::Info("NodeName: %s\n", "Empty");
+        }
+    }
+
+    for (int i = 0; i < mdlhdr.numbodyparts; i++)
+    {
+        if (!bodyparts[i].szname.empty())
+        {
+            if (!ContainsString2(stringsUsed, bodyparts[i].szname))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("BodyPartName: %s\n", str.c_str());
+                data->bodyparts.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("BodyPartReusedName: %s\n", bodyparts[i].szname.c_str());
+            }
+        }
+        else
+        {
+            Logger::Info("BodyPartName: %s\n", "Empty");
+        }
+
+    }
+
+    for (int i = 0; i < mdlhdr.numhitboxsets; i++)
+    {
+        if (hitboxsets[i].numhitboxes > 0)
+        {
+            for (int j = 0; j < hitboxsets[i].numhitboxes; j++)
+            {
+                if (!hitboxsets[i].hitboxes[j].szhitboxname.empty())
+                {
+                    if (!ContainsString2(stringsUsed, hitboxsets[i].hitboxes[j].szhitboxname))
+                    {
+                        std::string str2 = ReadNullTermStr(true);
+                        Logger::Info("HitboxName: %s\n", str2.c_str());
+                        data->hitboxes.push_back(str2);
+                        stringsUsed.push_back(str2);
+                    }
+                    else
+                    {
+                        Logger::Info("HitboxReusedName: %s\n", hitboxsets[i].hitboxes[j].szhitboxname.c_str());
+                    }
+                }
+                else
+                {
+                    Logger::Info("HitboxName: %s\n", "Empty");
+                }
+            }
+        }
+    }
+
+    for (int i = 0; i < mdlhdr.numlocalposeparameters; i++)
+    {
+        if (!poseparamdescs[i].szname.empty())
+        {
+            if (!ContainsString2(stringsUsed, poseparamdescs[i].szname))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("PoseParamName: %s\n", str.c_str());
+                data->poseparams.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("PoseParamReusedName: %s\n", poseparamdescs[i].szname.c_str());
+            }
+        }
+        else
+        {
+            Logger::Info("PoseParamName: %s\n", "Empty");
+        }
+
+    }
+
+    for (int i = 0; i < mdlhdr.numikchains; i++)
+    {
+        if (!ikchains[i].szname.empty())
+        {
+            if (!ContainsString2(stringsUsed, ikchains[i].szname))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("IkChainName: %s\n", str.c_str());
+                data->ikchains.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("IkChainReusedName: %s\n", ikchains[i].szname.c_str());
+            }
+        }
+        else
+        {
+            Logger::Info("IkChainName: %s\n", "Empty");
+        }
+    }
+
+    for (int i = 0; i < mdlhdr.numincludemodels; i++)
+    {
+        if (!includemodels[i].szname.empty())
+        {
+            if (!ContainsString2(stringsUsed, includemodels[i].szname))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("IncludeModelName: %s\n", str.c_str());
+                data->includemodel.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("IncludeModelReusedName: %s\n", includemodels[i].szname.c_str());
+            }
+        }
+        else
+        {
+            Logger::Info("IncludeModelName: %s\n", "Empty");
+        }
+    }
+
+    if (mdlhdr.szanimblocknameindex > mdlsubhdr.sznameindex + 407)
+    {
+        std::string str = ReadNullTermStr(true);
+        Logger::Info("AnimBlockName: %s\n", str.c_str());
+        data->animblockname = str;
+        stringsUsed.push_back(str);
+    }
+
+    for (int i = 0; i < mdlhdr.numtextures; i++)
+    {
+        if (!textures[i].szname.empty())
+        {
+            if (!ContainsString2(stringsUsed, textures[i].szname))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("TextureName: %s\n", str.c_str());
+                data->textures.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("TextureReusedName: %s\n", textures[i].szname.c_str());
+            }
+        }
+        else
+        {
+            Logger::Info("TextureName: %s\n", "Empty");
+        }
+    }
+
+    for (int i = 0; i < mdlhdr.numcdtextures; i++)
+    {
+        if (!cdmaterials[i].szname.empty())
+        {
+            if (!ContainsString2(stringsUsed, cdmaterials[i].szname))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("CdMaterialName: %s\n", str.c_str());
+                data->cdmaterials.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("CdMaterialReusedName: %s\n", cdmaterials[i].szname.c_str());
+            }
+        }
+        else
+        {
+            Logger::Info("CdMaterialName: %s\n", "Empty");
+        }
+    }
 }
 
 void BinaryReader::Read(studiohdr_t_v53* data) 
@@ -1477,9 +2211,9 @@ void BinaryReader::Read(studiohdr_t_v53* data)
     Stream.read((char*)&data->m_nBoneFlexDriverIndex, sizeof(int));
 
     Stream.read((char*)&data->aabbindex, sizeof(int));
-    Stream.read((char*)&data->numaabb, sizeof(int));
-    Stream.read((char*)&data->numaabb1, sizeof(int));
-    Stream.read((char*)&data->numaabb2, sizeof(int));
+    Stream.read((char*)&data->numaabbnodes, sizeof(int));
+    Stream.read((char*)&data->numaabbleaves, sizeof(int));
+    Stream.read((char*)&data->numaabbverts, sizeof(int));
 
     Stream.read((char*)&data->unkstringindex, sizeof(int));
 
@@ -2163,6 +2897,152 @@ void BinaryReader::Read(mstudiostringtable_t_v53 data, studiohdr_t_v53 mdlhdr)
     //}
 }
 
+void BinaryReader::Read(pertriheader_t* data)
+{
+    Stream.read((char*)&data->version, sizeof(int));
+    Stream.read((char*)&data->bbmin, sizeof(Vector3));
+    Stream.read((char*)&data->bbmax, sizeof(Vector3));
+    Stream.read((char*)&data->unused, sizeof(int) * 8);    // negative numbers are -(leafs + 1), not nodes
+}
+
+void BinaryReader::Read(aabbnode* data)
+{
+    Stream.read((char*)&data->unk, sizeof(short) * 3);
+    Stream.read((char*)&data->unk1, sizeof(short) * 3);
+    Stream.read((char*)&data->children, sizeof(int) * 2);    // negative numbers are -(leafs + 1), not nodes
+}
+
+void BinaryReader::Read(aabbcollmaskmap* data)
+{
+    Stream.read((char*)&data->collmaskid, sizeof(short) * 3);
+    Stream.read((char*)&data->unk1, sizeof(short)); //Contents?
+}
+
+void BinaryReader::Read(aabbleaf* data)
+{
+    //Logger::Info("Pos Read: %d\n", Position());
+    Stream.read((char*)&data->mins, sizeof(short) * 3);
+    Stream.read((char*)&data->maxs, sizeof(short) * 3);
+    Stream.read((char*)&data->unk, sizeof(int));
+
+    for (int i = 0; i < 12; i++)
+    {
+        Stream.read((char*)&data->map[i].collmaskid, sizeof(short) * 3);
+        Stream.read((char*)&data->map[i].unk1, sizeof(short)); //Contents?
+    }
+}
+
+void BinaryReader::Read(aabbcollisionmask* data, int numVerts)
+{
+    for (int i = 0; i < numVerts; i++)
+    {
+        QuaternionShort unk{};
+        Stream.read((char*)&unk, sizeof(Quat48));
+        data->unk.push_back(unk);
+    }
+}
+
+void BinaryReader::Read(phyheader_t* data)
+{
+    Stream.read((char*)&data->size, sizeof(int));
+    Stream.read((char*)&data->id, sizeof(int));
+    Stream.read((char*)&data->numsolids, sizeof(int));
+    Stream.read((char*)&data->checksum, sizeof(int));
+}
+
+void BinaryReader::Read(compactsurfaceheader_t* data)
+{
+    Stream.read((char*)&data->size, sizeof(int));
+    Stream.read((char*)&data->id, sizeof(int));
+    Stream.read((char*)&data->version, sizeof(short));
+    Stream.read((char*)&data->modeltype, sizeof(short));
+    Stream.read((char*)&data->surfacesize, sizeof(int));
+    Stream.read((char*)&data->dragaxisareas, sizeof(Vector3));
+    Stream.read((char*)&data->axismaparea, sizeof(int));
+}
+
+void BinaryReader::Read(legacysurfaceheader_t* data)
+{
+    Stream.read((char*)&data->mass_center, sizeof(Vector3));
+    Stream.read((char*)&data->rotation_inertia, sizeof(Vector3));
+    Stream.read((char*)&data->upper_limit_radius, sizeof(float));
+    Stream.read((char*)&data->max_deviation, sizeof(int));
+    //Stream.read((char*)&data->byte_size, sizeof(int));
+    Stream.read((char*)&data->nodeindex, sizeof(int));
+    Stream.read((char*)&data->pad, sizeof(int) * 2);
+    Stream.read((char*)&data->id, sizeof(int));
+}
+
+void BinaryReader::Read(trianglefaceheader_t* data)
+{
+    Stream.read((char*)&data->vertexindex, sizeof(int));
+    Stream.read((char*)&data->parent, sizeof(int));
+    Stream.read((char*)&data->flags, sizeof(int));
+    Stream.read((char*)&data->numfaces, sizeof(int));
+}
+
+void BinaryReader::Read(trianglevertmap_t* data)
+{
+    Stream.read((char*)&data->faceindex, sizeof(std::byte));
+    Stream.read((char*)&data->unkdata, sizeof(std::byte) * 3);
+    Stream.read((char*)&data->vertid, sizeof(short));
+    Stream.read((char*)&data->unkdata1, sizeof(std::byte) * 2);
+    Stream.read((char*)&data->vertid1, sizeof(short));
+    Stream.read((char*)&data->unkdata2, sizeof(std::byte) * 2);
+    Stream.read((char*)&data->vertid2, sizeof(short));
+    Stream.read((char*)&data->unkdata3, sizeof(std::byte) * 2);
+}
+
+void BinaryReader::Read(phyvertex_t* data)
+{
+    Stream.read((char*)&data->pos, sizeof(Vector3));
+    Stream.read((char*)&data->unk, sizeof(int));
+}
+
+void BinaryReader::Read(phynode_t* data)
+{
+    Stream.read((char*)&data->rightnodeindex, sizeof(int));
+    Stream.read((char*)&data->convexindex, sizeof(int));
+    Stream.read((char*)&data->center, sizeof(Vector3));
+    Stream.read((char*)&data->radius, sizeof(int));
+    Stream.read((char*)&data->bboxsize, sizeof(int));
+}
+
+void BinaryReader::Read(physection_t* data)
+{
+//    Logger::Info("StartPos: %d\n", Position());
+    std::vector<int> usedVerts;
+
+//    Logger::Info("Hdr1Pos: %d\n", Position());
+    Read(&data->surfaceheader);
+//    Logger::Info("Hdr2Pos: %d\n", Position());
+    Read(&data->surfaceheader2);
+//    Logger::Info("Hdr3Pos: %d\n", Position());
+    Read(&data->trihdr);
+    for (int i = 0; i < data->trihdr.numfaces; i++)
+    {
+//        Logger::Info("VertMapPos %d: %d\n", i, Position());
+        trianglevertmap_t vertmap; Read(&vertmap);
+//        Logger::Info("VertMapEndPos: %d\n", Position());
+        if(!Contains(usedVerts, vertmap.vertid))  usedVerts.push_back(vertmap.vertid);
+        if(!Contains(usedVerts, vertmap.vertid1)) usedVerts.push_back(vertmap.vertid1);
+        if(!Contains(usedVerts, vertmap.vertid2)) usedVerts.push_back(vertmap.vertid2);
+
+        data->vertmaps.push_back(vertmap);
+    }
+
+    for (int i = 0; i < usedVerts.size(); i++)
+    {
+//        Logger::Info("VertPos %d: %d\n", i, Position());
+        phyvertex_t vertex; Read(&vertex);
+//        Logger::Info("VertEndPos: %d\n", Position());
+        data->vertices.push_back(vertex);
+    }
+//    Logger::Info("NodePos: %d\n", Position());
+    Read(&data->node);
+//    Logger::Info("EndPos: %d\n", Position());
+}
+
 void BinaryReader::seek(int pos){
   Stream.seekg(pos);
   if(Stream.tellg() != pos){
@@ -2831,6 +3711,12 @@ void BinaryWriter::Write(blendgroup_t_v49 data)
 
 void BinaryWriter::Write(posekey_t_v49 data, int groupSize) 
 {
+    if (groupSize == 3)
+    {
+        Stream.write((char*)&data.unk, sizeof(float) * 2);
+        Stream.write((char*)&data.unk[0], sizeof(float));
+    }
+    else
     Stream.write((char*)&data.unk, sizeof(float) * groupSize);
 }
 
@@ -3169,9 +4055,182 @@ void BinaryWriter::Write(mstudiostringtable_t_v49 data)
 
 }
 
+void BinaryWriter::Write(mayabakery_t data)
+{
+    for (int i = 0; i < data.bakery.size(); i++)
+    {
+        Stream.write((char*)&data.bakery[i], 1);
+    }
+}
+
 void BinaryWriter::Write(mstudiocompressedikerror_t_v52 data) {
     Stream.write((char*)&data.scale, sizeof(float) * 4);
     Stream.write((char*)&data.offset, sizeof(short) * 4);
+}
+
+void BinaryWriter::Write(mstudiostringtable_t_v52 data)
+{
+    int startPos = Position();
+
+    for (int i = 0; i < data.mdlname.size(); i++)
+    {
+        Stream.write(&data.mdlname[i], 1);
+    }
+
+    for (int i = 0; i < data.surfaceprop.size(); i++)
+    {
+        Stream.write(&data.surfaceprop[i], 1);
+    }
+
+    for (int i = 0; i < data.unk.size(); i++)
+    {
+        Stream.write(&data.unk[i], 1);
+    }
+
+    for (int i = 0; i < data.bones.size(); i++)
+    {
+        for (int j = 0; j < data.bones[i].size(); j++)
+        {
+            Stream.write(&data.bones[i][j], 1);
+        }
+    }
+
+    for (int i = 0; i < data.attachments.size(); i++)
+    {
+        for (int j = 0; j < data.attachments[i].size(); j++)
+        {
+            Stream.write(&data.attachments[i][j], 1);
+        }
+    }
+
+    for (int i = 0; i < data.hitboxsets.size(); i++)
+    {
+        for (int j = 0; j < data.hitboxsets[i].size(); j++)
+        {
+            Stream.write(&data.hitboxsets[i][j], 1);
+        }
+    }
+
+    for (int i = 0; i < data.hitboxes.size(); i++)
+    {
+        for (int j = 0; j < data.hitboxes[i].size(); j++)
+        {
+            Stream.write(&data.hitboxes[i][j], 1);
+        }
+    }
+
+    for (int i = 0; i < data.anims.size(); i++)
+    {
+        for (int j = 0; j < data.anims[i].size(); j++)
+        {
+            Stream.write(&data.anims[i][j], 1);
+        }
+    }
+
+    for (int i = 0; i < data.seqs.size(); i++)
+    {
+        for (int j = 0; j < data.seqs[i].szname.size(); j++)
+        {
+            Stream.write(&data.seqs[i].szname[j], 1);
+        }
+
+        for (int j = 0; j < data.seqs[i].activity.size(); j++)
+        {
+            Stream.write(&data.seqs[i].activity[j], 1);
+        }
+
+        for (int h = 0; h < data.seqs[i].activityevent.size(); h++)
+        {
+            for (int j = 0; j < data.seqs[i].activityevent[h].size(); j++)
+            {
+                Stream.write(&data.seqs[i].activityevent[h][j], 1);
+            }
+        }
+
+        for (int h = 0; h < data.seqs[i].activitymodifier.size(); h++)
+        {
+            for (int j = 0; j < data.seqs[i].activitymodifier[h].size(); j++)
+            {
+                Stream.write(&data.seqs[i].activitymodifier[h][j], 1);
+            }
+        }
+    }
+
+    for (int i = 0; i < data.nodes.size(); i++)
+    {
+        for (int j = 0; j < data.nodes[i].size(); j++)
+        {
+            Stream.write(&data.nodes[i][j], 1);
+        }
+    }
+
+    for (int i = 0; i < data.bodyparts.size(); i++)
+    {
+        for (int j = 0; j < data.bodyparts[i].size(); j++)
+        {
+            Stream.write(&data.bodyparts[i][j], 1);
+        }
+    }
+
+    for (int i = 0; i < data.poseparams.size(); i++)
+    {
+        for (int j = 0; j < data.poseparams[i].size(); j++)
+        {
+            Stream.write(&data.poseparams[i][j], 1);
+        }
+    }
+
+    for (int i = 0; i < data.ikchains.size(); i++)
+    {
+        for (int j = 0; j < data.ikchains[i].size(); j++)
+        {
+            Stream.write(&data.ikchains[i][j], 1);
+        }
+    }
+
+    for (int i = 0; i < data.includemodel.size(); i++)
+    {
+        for (int j = 0; j < data.includemodel[i].size(); j++)
+        {
+            Stream.write(&data.includemodel[i][j], 1);
+        }
+    }
+
+    for (int i = 0; i < data.animblockname.size(); i++)
+    {
+        Stream.write(&data.animblockname[i], 1);
+    }
+
+    for (int i = 0; i < data.textures.size(); i++)
+    {
+        for (int j = 0; j < data.textures[i].size(); j++)
+        {
+            Stream.write(&data.textures[i][j], 1);
+        }
+    }
+
+    for (int i = 0; i < data.cdmaterials.size(); i++)
+    {
+        for (int j = 0; j < data.cdmaterials[i].size(); j++)
+        {
+            Stream.write(&data.cdmaterials[i][j], 1);
+        }
+    }
+
+    int endPos = Position();
+
+    Logger::Info("Stream Size: %d\n", data.stringtablesize);
+    Logger::Info("String Table StartPos: %d\n", startPos);
+    Logger::Info("String Table EndPos: %d\n", endPos);
+    Logger::Info("String Table Size: %d\n", endPos - startPos);
+
+    int stringTableSize = endPos - startPos;
+
+
+    int padding = (data.stringtablesize - stringTableSize);
+    Logger::Info("String Table Padding Size: %d\n", padding);
+    Padding(padding);
+
 }
 
 void BinaryWriter::Write(studiohdr_t_v53 data) {
@@ -3304,9 +4363,9 @@ void BinaryWriter::Write(studiohdr_t_v53 data) {
     Stream.write((char*)&data.m_nBoneFlexDriverIndex, sizeof(int));
 
     Stream.write((char*)&data.aabbindex, sizeof(int));
-    Stream.write((char*)&data.numaabb, sizeof(int));
-    Stream.write((char*)&data.numaabb1, sizeof(int));
-    Stream.write((char*)&data.numaabb2, sizeof(int));
+    Stream.write((char*)&data.numaabbnodes, sizeof(int));
+    Stream.write((char*)&data.numaabbleaves, sizeof(int));
+    Stream.write((char*)&data.numaabbverts, sizeof(int));
 
     Stream.write((char*)&data.unkstringindex, sizeof(int));
 
@@ -3354,7 +4413,8 @@ void BinaryWriter::Write(mstudiobone_t_v53 data)
     Stream.write((char*)&data.surfacepropidx, sizeof(int));
     Stream.write((char*)&data.contents, sizeof(int));
     Stream.write((char*)&data.surfacepropLookup, sizeof(int));
-    Stream.write((char*)&data.unktoggle, sizeof(int));
+    Stream.write((char*)&data.unkid, sizeof(short));
+    Stream.write((char*)&data.unktoggle, sizeof(short));
     Stream.write((char*)&data.unused, sizeof(int) * 7);
     //printf("read a Vector\n");
 }
@@ -3646,6 +4706,131 @@ void BinaryWriter::Write(mstudioruimesh_t data)
         Logger::Info("FaceData Read: %d\n", i);
     }
 
+}
+
+void BinaryWriter::Write(pertriheader_t data)
+{
+    Stream.write((char*)&data.version, sizeof(int));
+    Stream.write((char*)&data.bbmin, sizeof(Vector3));
+    Stream.write((char*)&data.bbmax, sizeof(Vector3));
+    Stream.write((char*)&data.unused, sizeof(int) * 8);
+}
+
+void BinaryWriter::Write(aabbnode data)
+{
+    Stream.write((char*)&data.unk, sizeof(short) * 3);
+    Stream.write((char*)&data.unk1, sizeof(short) * 3);
+    Stream.write((char*)&data.children, sizeof(int) * 2);    // negative numbers are -(leafs + 1), not nodes
+}
+
+void BinaryWriter::Write(aabbcollmaskmap data)
+{
+    Stream.write((char*)&data.collmaskid, sizeof(short) * 3);
+    Stream.write((char*)&data.unk1, sizeof(short)); //Contents?
+}
+
+void BinaryWriter::Write(aabbleaf data)
+{
+    Stream.write((char*)&data.mins, sizeof(short) * 3);
+    Stream.write((char*)&data.maxs, sizeof(short) * 3);
+    Stream.write((char*)&data.unk, sizeof(int));
+
+    for (int i = 0; i < 12; i++)
+    {
+        Stream.write((char*)&data.map[i].collmaskid, sizeof(short) * 3);
+        Stream.write((char*)&data.map[i].unk1, sizeof(short)); //Contents?
+    }
+}
+
+void BinaryWriter::Write(aabbcollisionmask data)
+{
+    for (int i = 0; i < data.unk.size(); i++)
+    {
+        Stream.write((char*)&data.unk[i], sizeof(Quat48));
+    }
+}
+
+void BinaryWriter::Write(phyheader_t data)
+{
+    Stream.write((char*)&data.size, sizeof(int));
+    Stream.write((char*)&data.id, sizeof(int));
+    Stream.write((char*)&data.numsolids, sizeof(int));
+    Stream.write((char*)&data.checksum, sizeof(int));
+}
+
+void BinaryWriter::Write(compactsurfaceheader_t data)
+{
+    Stream.write((char*)&data.size, sizeof(int));
+    Stream.write((char*)&data.id, sizeof(int));
+    Stream.write((char*)&data.version, sizeof(short));
+    Stream.write((char*)&data.modeltype, sizeof(short));
+    Stream.write((char*)&data.surfacesize, sizeof(int));
+    Stream.write((char*)&data.dragaxisareas, sizeof(Vector3));
+    Stream.write((char*)&data.axismaparea, sizeof(int));
+}
+
+void BinaryWriter::Write(legacysurfaceheader_t data)
+{
+    Stream.write((char*)&data.mass_center, sizeof(Vector3));
+    Stream.write((char*)&data.rotation_inertia, sizeof(Vector3));
+    Stream.write((char*)&data.upper_limit_radius, sizeof(float));
+    Stream.write((char*)&data.max_deviation, sizeof(int));
+    //Stream.write((char*)&data.byte_size, sizeof(int));
+    Stream.write((char*)&data.nodeindex, sizeof(int));
+    Stream.write((char*)&data.pad, sizeof(int) * 2);
+    Stream.write((char*)&data.id, sizeof(int));
+}
+
+void BinaryWriter::Write(trianglefaceheader_t data)
+{
+    Stream.write((char*)&data.vertexindex, sizeof(int));
+    Stream.write((char*)&data.parent, sizeof(int));
+    Stream.write((char*)&data.flags, sizeof(int));
+    Stream.write((char*)&data.numfaces, sizeof(int));
+}
+
+void BinaryWriter::Write(trianglevertmap_t data)
+{
+    Stream.write((char*)&data.faceindex, sizeof(std::byte));
+    Stream.write((char*)&data.unkdata, sizeof(std::byte) * 3);
+    Stream.write((char*)&data.vertid, sizeof(short));
+    Stream.write((char*)&data.unkdata1, sizeof(std::byte) * 3);
+    Stream.write((char*)&data.vertid1, sizeof(short));
+    Stream.write((char*)&data.unkdata2, sizeof(std::byte) * 3);
+    Stream.write((char*)&data.vertid2, sizeof(short));
+    Stream.write((char*)&data.unkdata3, sizeof(std::byte) * 3);
+}
+
+void BinaryWriter::Write(phyvertex_t data)
+{
+    Stream.write((char*)&data.pos, sizeof(Vector3));
+    Stream.write((char*)&data.unk, sizeof(int));
+}
+
+void BinaryWriter::Write(phynode_t data)
+{
+    Stream.write((char*)&data.rightnodeindex, sizeof(int));
+    Stream.write((char*)&data.convexindex, sizeof(int));
+    Stream.write((char*)&data.center, sizeof(Vector3));
+    Stream.write((char*)&data.radius, sizeof(int));
+    Stream.write((char*)&data.bboxsize, sizeof(int));
+}
+
+void BinaryWriter::Write(physection_t data)
+{
+    Write(data.surfaceheader);
+    Write(data.surfaceheader2);
+    Write(data.trihdr);
+    for (int i = 0; i < data.trihdr.numfaces; i++)
+    {
+        Write(data.vertmaps[i]);
+    }
+
+    for (int i = 0; i < data.vertices.size(); i++)
+    {
+        Write(data.vertices);
+    }
+    Write(data.node);
 }
 
 
