@@ -91,7 +91,6 @@ void drop_callback(GLFWwindow* window, int count, const char** paths)
   for (int i = 0;  i < count;  i++){
     for(int j = 0; j < files.size();j++){
       if(
-        files[j]->isEnabled &&
         files[j]->bounds.x <= xpos &&
         files[j]->bounds.z >= xpos &&
         files[j]->bounds.y <= ypos &&
@@ -444,7 +443,7 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
     */
     ImGui::End();
     if(readMdl){
-      if(ImGui::Begin("Read MDL", &readMdl,ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)){
+      if(ImGui::Begin("Read MDL", &readMdl,ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollWithMouse)){
         UI::RenderReadMdlWindow(viewport_width-4,viewport_height-27);
         auto sz = ImGui::GetWindowSize();
 
