@@ -82,7 +82,7 @@ void FileMenu(std::string title){
 void AboutWindow(){
 
 }
-bool showAbout, readMdl;
+bool showAbout, readMdl, conv;
 
 void drop_callback(GLFWwindow* window, int count, const char** paths)
 {
@@ -150,61 +150,8 @@ void depth_border(){
     //bg->AddRect(ImVec2(bounds.x+th, bounds.y+th), ImVec2(bounds.z-th, bounds.w-th), col, 0.0f, ImDrawFlags_None, th*2);      x += sz + spacing;  // Square with all rounded corners
 }
 
-
-void RenderGUI(){
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,{4.0f,4.0f});
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{8.0f,8.0f});
-
-    
-    ImGuiIO& io = ImGui::GetIO();
-    if(demoWindow) ImGui::ShowDemoWindow();
-
-    ImGui::SetNextWindowPos(
-        {ImGui::GetMainViewport()->Pos.x,
-        ImGui::GetMainViewport()->Pos.y+23}
-    );
-
-
-    ImGui::SetNextWindowSize({viewport_width,viewport_height-23});
-    ImGui::SetNextWindowBgAlpha(0.2);
-    ImGui::Begin("Box", NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings);
-
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize,0.0f);
-
-    if (ImGui::BeginMainMenuBar())
-    {
-        if (ImGui::BeginMenu("File"))
-        {
-          if (ImGui::MenuItem("Quit", "ALT+F4")) {
-            glfwSetWindowShouldClose(Window, true);
-          }
-          ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Debug"))
-        {
-          if(!LogForceEnabled){
-            if(!LogEnabled) if (ImGui::MenuItem("Enable Log File", "")) {Logger::Init(); LogEnabled = true;}
-            if(LogEnabled) if (ImGui::MenuItem("Disable Log File", "")) {Logger::End(); LogEnabled = false;}
-          }
-           
-          ImGui::MenuItem("Show Demo Window", "", &demoWindow);
-          ImGui::MenuItem("Read MDL", "", &readMdl);
-
-          ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Help"))
-        {
-            if (ImGui::MenuItem("About")) {
-                showAbout = true;
-            }
-            ImGui::EndMenu();
-        }
-        ImGui::EndMainMenuBar();
-    }
-
-    ImGui::PopStyleVar();
-
-    ImGui::BeginGroup();
+void RenderConversionPanel(){
+  ImGui::BeginGroup();
 
     files[0]->UI(viewport_width-204);
     files[1]->UI(viewport_width-204);
@@ -260,7 +207,7 @@ void RenderGUI(){
     ImGui::BeginGroup();
     
 
-const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
+  const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
     
   const ImU32 w_bg_col = ImGui::GetColorU32(ImGuiCol_WindowBg);
     
@@ -433,31 +380,99 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
 
     ImGui::EndDisabled();
     ImGui::EndGroup();
-
-    //uncomment this if tests break again
-    /*
-    if (ImGui::IsItemHovered())
-    {
-        ImGui::BeginTooltip();
-        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-        ImGui::TextWrapped("Checks to verify that the input files are correct do not work currently,\nthis may cause unusual errors.\nYOU HAVE BEEN WARNED.");
-        ImGui::PopTextWrapPos();
-        ImGui::EndTooltip();
-    }
-    */
-    ImGui::End();
-    if(readMdl){
-      if(ImGui::Begin("Read MDL", &readMdl,ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollWithMouse)){
-        UI::RenderReadMdlWindow(viewport_width-4,viewport_height-27);
-        auto sz = ImGui::GetWindowSize();
+}
 
 
-        ImGui::SetWindowPos({2,25});
-        ImGui::SetWindowSize({viewport_width-4,viewport_height-27});
-        ImGui::End();
+void RenderGUI(){
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,{4.0f,4.0f});
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{8.0f,8.0f});
+
+
+    ImGuiIO& io = ImGui::GetIO();
+    if(demoWindow) ImGui::ShowDemoWindow();
+    auto MainViewport = ImGui::GetMainViewport(); //caching this because it's needed for multi-viewport imgui stuff and i don't want to rework it later
+
+    ImGui::SetNextWindowSize({MainViewport->Size.x/2,21});
+    ImGui::SetNextWindowPos({MainViewport->Pos.x,MainViewport->Pos.y});
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize,0.0f);
+    if(ImGui::Begin("MenuBarContainer", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoResize)){
+      if(ImGui::BeginMenuBar()){
+          if (ImGui::BeginMenu("File"))
+        {
+          if (ImGui::MenuItem("Quit", "ALT+F4")) {
+            glfwSetWindowShouldClose(Window, true);
+          }
+          ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Debug"))
+        {
+          if(!LogForceEnabled){
+            if(!LogEnabled) if (ImGui::MenuItem("Enable Log File", "")) {Logger::Init(); LogEnabled = true;}
+            if(LogEnabled) if (ImGui::MenuItem("Disable Log File", "")) {Logger::End(); LogEnabled = false;}
+          }
+           
+          ImGui::MenuItem("Show Demo Window", "", &demoWindow);
+
+          ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Help"))
+        {
+            if (ImGui::MenuItem("About")) {
+                showAbout = true;
+            }
+            ImGui::EndMenu();
+        }
+        ImGui::EndMenuBar();
       }
-      ImGui::BringWindowToDisplayFront(ImGui::FindWindowByName("About"));
+      ImGui::End();
     }
+    ImGui::SetNextWindowSize({MainViewport->Size.x/2,23-16});
+    ImGui::SetNextWindowPos({MainViewport->Pos.x+(MainViewport->Size.x/2),MainViewport->Pos.y});
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{0.0f,0.0f});
+    if(ImGui::Begin("MainWindowSwapButtons", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoResize)){
+      if(ImGui::BeginTabBar("MainWindowSwapBar", ImGuiTabBarFlags_FittingPolicyMask_)){
+        
+        if(ImGui::BeginTabItem("Convert")){
+          conv = true;
+          readMdl = false;
+          ImGui::EndTabItem();
+        }
+        if(ImGui::BeginTabItem("Tools")){
+          readMdl = true;
+          conv = false;
+          ImGui::EndTabItem();
+        }
+        ImGui::EndTabBar();
+      }
+      std::string version = "v2.3.0 beta";
+      float text_width = ImGui::CalcTextSize(version.c_str()).x;
+
+      ImGui::SameLine((MainViewport->Size.x/2)-(text_width+10));
+      ImGui::Text("%s",version.c_str());
+      ImGui::End();
+    }
+    
+    ImGui::PopStyleVar(2);
+    ImGui::GetBackgroundDrawList()->AddRectFilled({MainViewport->Pos.x + (MainViewport->Size.x/2),MainViewport->Pos.y}, {MainViewport->Pos.x+MainViewport->Size.x,MainViewport->Pos.y+23}, ImGui::GetColorU32(ImGuiCol_MenuBarBg));
+    ImGui::GetForegroundDrawList()->AddLine({0,21}, {MainViewport->Size.x,MainViewport->Pos.y+21}, ImGui::GetColorU32(ImGuiCol_TabActive), 1.0f);
+    
+
+    ImGui::SetNextWindowPos(
+        {ImGui::GetMainViewport()->Pos.x,
+        ImGui::GetMainViewport()->Pos.y+23}
+    );
+
+
+    ImGui::SetNextWindowSize({viewport_width,viewport_height-23});
+    ImGui::SetNextWindowBgAlpha(0.2);
+    ImGui::Begin("Box", NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings);
+    
+    if(conv) RenderConversionPanel();
+
+    if(readMdl) UI::RenderReadMdlWindow(viewport_width-4,viewport_height-27);
+    
+
+    ImGui::End();
     if(showAbout){
       if(ImGui::Begin("About", &showAbout,ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollWithMouse)){
         UI::RenderAboutWindow(GRUNT_POG,pog_size.x,pog_size.y);
@@ -470,6 +485,8 @@ const ImU32   u32_min = 0,u32_max = UINT_MAX/2;
       }
       ImGui::BringWindowToDisplayFront(ImGui::FindWindowByName("About"));
     }
+    ImGui::BringWindowToDisplayFront(ImGui::FindWindowByName("MenuBarContainer"));
+    ImGui::BringWindowToDisplayFront(ImGui::FindWindowByName("MainWindowSwapButtons"));
     ImGui::PopStyleVar(2);
 }
 
