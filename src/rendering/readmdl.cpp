@@ -406,6 +406,33 @@ void AddMainMdlTrees()
                 }
                 ImGui::TreePop();
             }
+
+            if (ImGui::TreeNode((void*)(intptr_t)4, "RUI Meshes (%zu)", mdl->ruimeshes.size()))
+            {
+                for (int i = 0; i < mdl->ruimeshes.size(); i++)
+                {
+                    if (ImGui::TreeNode((void*)(intptr_t)i, "%s", mdl->ruimeshes[i].szruimeshname))
+                    {
+                        if (ImGui::TreeNode((void*)(intptr_t)i+1, "Faces (%zu)", mdl->ruimeshes[i].numfaces))
+                        {
+                            for (int m = 0; m < mdl->ruimeshes[i].numfaces; m++){
+                                
+                                ImGui::Text("UV: [Min: (%f, %f) Max: (%f, %f)]",mdl->ruimeshes[i].facedata[m].faceuvmin.x,mdl->ruimeshes[i].facedata[m].faceuvmin.y,mdl->ruimeshes[i].facedata[m].faceuvmax.x,mdl->ruimeshes[i].facedata[m].faceuvmax.y);
+                            }
+                            ImGui::TreePop();
+                        }
+                        if (ImGui::TreeNode((void*)(intptr_t)i+2, "Vertices (%zu)", mdl->ruimeshes[i].numvertices))
+                        {
+                            for (int m = 0; m < mdl->ruimeshes[i].numvertices; m++){
+                                ImGui::Text("Pos: (%f, %f, %f) Parent: %i",mdl->ruimeshes[i].vertex[m].vertexpos.x, mdl->ruimeshes[i].vertex[m].vertexpos.y, mdl->ruimeshes[i].vertex[m].vertexpos.z,mdl->ruimeshes[i].vertex[m].parent);
+                            }
+                            ImGui::TreePop();
+                        }
+                        ImGui::TreePop();
+                    }
+                }
+                ImGui::TreePop();
+            }
         }
 #pragma endregion
 }
