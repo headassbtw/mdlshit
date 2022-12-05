@@ -134,6 +134,15 @@ bool contains(std::vector<int> arry, int trgt)
 	return false;
 }
 
+template <typename T> int GetTrgtPosInArry(std::vector<T> arry, T trgt)
+{
+	for (int i = 0; i < arry.size(); i++)
+	{
+		if (trgt == arry[i]) return i;
+	}
+	return -1;
+}
+
 template <typename T> std::vector<T> ArrayToVector(T* arry, int size)
 {
 	std::vector<T> _vec;
@@ -512,9 +521,6 @@ std::vector<short> ReadVertMap(mstudioruivertmap_t vertMap)
 
 #pragma region MDLV53
 
-
-
-
 void RUIMeshToSmd(mstudioruimesh_t ruiMesh)
 {
 	int faces = ruiMesh.numfaces;
@@ -729,6 +735,64 @@ void AddDistToAnimData(mstudioanimdata_t_v49 vec, int extra)
 	}
 }
 
+
+MDL::v53Mdl::v53Mdl()
+{
+	Logger::Info("test\n");
+}
+
+MDL::v53Mdl::v53Mdl(studiohdr_t_v53 _mdlhdr, mayabakery_t _mayabakery, std::vector<mstudiobone_t_v53> _bones, std::vector<mstudiojigglebone_t_v49> _jigglebones, std::vector<mstudioboneflexdriver_t_v49>	_boneflexdrivers, std::vector<mstudioattachment_t_v49> _attachments, std::vector<mstudiohitboxset_t_v53> _hitboxsets, std::vector<mstudiobbox_t_v53> _hitboxes, mstudiobonenametable_t_v49 _bonenametable, std::vector<mstudioanimdesc_t_v53> _animdescs, std::vector<mstudioanim_t_v53> _anims, std::vector<sectionindexes_t_v53> _sectionindexes, std::vector<mstudioanim_t_v53> _sections, std::vector<mstudioikrule_t_v53> _ikrules, std::vector<mstudiocompressedikerror_t_v49> _compressedikerrors, std::vector<mstudiocompressedikerror_t_v52> _v52compressedikerrors, std::vector<mstudioikerror_t_v49> _ikerrors, std::vector<mstudioikrulezeroframe_t_v49> _ikrulezeroframe, std::vector<mstudioseqdesc_t_v53> _seqdescs, std::vector<blendgroup_t_v49> _blends, std::vector<posekey_t_v49> _posekeys, std::vector<mstudioevent_t_v49> _events, std::vector<mstudioautolayer_t_v49> _autolayers, std::vector<mstudioactivitymodifier_t_v53> _activitymodifiers, std::vector<seqweightlist_t_v49> _seqweightlist, std::vector<mstudionodename_t_v49> _nodenames, std::vector<mstudionodedata_v49> _nodes, std::vector<mstudiobodyparts_t_v49> _bodyparts, std::vector<mstudiomodel_t_v49>	_models, std::vector<mstudiomesh_t_v49> _meshes, std::vector<mstudioikchain_t_v53> _ikchains, std::vector<mstudioiklink_t_v49> _iklinks, std::vector<mstudioposeparamdesc_t_v49> _poseparamdescs, std::vector<mstudiomodelgroup_t_v49> _includedmodels, std::vector<mstudiorruiheader_t> _ruihdrs, std::vector<mstudioruimesh_t> _ruimeshes, std::vector<mstudiotexture_t_v53> _textures, std::vector<mstudiotexturedir_t_v49> _cdtextures, std::vector<mstudioskingroup_t_v49> _skingroups, mstudiokeyvalues_t_v49 _keyvalues, std::vector<mstudiosrcbonetransform_t_v49> _srcbonetransforms, mstudiolinearbone_t_v49 _linearbone, mstudiolinearbonedata_t_v53 _linearbonedata, mstudiostringtable_t_v52 _stringtable, pertriheader_t _pertriheader, std::vector<aabbnode> _aabbnodes, std::vector<aabbleaf> _aabbleaves, aabbcollisionmask _aabbverts)
+{
+	mdlhdr = _mdlhdr;
+	mayabakery = _mayabakery;
+	bones = _bones;
+	jigglebones = _jigglebones;
+	boneflexdrivers = _boneflexdrivers;
+	attachments = _attachments;
+	hitboxsets = _hitboxsets;
+	hitboxes = _hitboxes;
+	bonenametable = _bonenametable;
+	animdescs = _animdescs;
+	anims = _anims;
+	sectionindexes = _sectionindexes;
+	sections = _sections;
+	ikrules = _ikrules;
+	compressedikerrors = _compressedikerrors;
+	v52compressedikerrors = _v52compressedikerrors;
+	ikerrors = _ikerrors;
+	ikrulezeroframe = _ikrulezeroframe;
+	seqdescs = _seqdescs;
+	blends = _blends;
+	posekeys = _posekeys;
+	events = _events;
+	autolayers = _autolayers;
+	activitymodifiers = _activitymodifiers;
+	seqweightlist = _seqweightlist;
+	nodenames = _nodenames;
+	nodes = _nodes;
+	bodyparts = _bodyparts;
+	models = _models;
+	meshes = _meshes;
+	ikchains = _ikchains;
+	iklinks = _iklinks;
+	poseparamdescs = _poseparamdescs;
+	includedmodels = _includedmodels;
+	ruihdrs = _ruihdrs;
+	ruimeshes = _ruimeshes;
+	cdtextures = _cdtextures;
+	textures = _textures;
+	skingroups = _skingroups;
+	keyvalues = _keyvalues;
+	srcbonetransforms = _srcbonetransforms;
+	linearbone = _linearbone;
+	linearbonedata = _linearbonedata;
+	stringtable = _stringtable;
+	pertriheader = _pertriheader;
+	aabbnodes = _aabbnodes;
+	aabbleaves = _aabbleaves;
+	aabbverts = _aabbverts;
+}
+
 void MDL::v53Mdl::v53ExtractRUIMesh(BinaryReader* Stream) //There is a much much better way of doing this by just writing the file as it reads the structs and using the indexes to calculate padding. -Liberty
 {
 	Stream->seek(0);
@@ -821,17 +885,19 @@ void MDL::v53Mdl::v53ExtractAABBTree(BinaryReader* Stream)
 	}
 }
 
-
 MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 {
 	Stream->seek(0);
+	#pragma region HDR
 	studiohdr_t_v53										mdlhdr; Stream->Read(&mdlhdr);
+	#pragma endregion
+	#pragma region VARS
 	mayabakery_t										mayabakery;
 	std::vector<mstudiobone_t_v53>						bones;
 	std::vector<mstudiojigglebone_t_v49>				jigglebones;
 	std::vector<mstudioboneflexdriver_t_v49>			boneflexdrivers;
 	std::vector<mstudioattachment_t_v49>				attachments;
-	std::vector<mstudiohitboxset_t_v49>					hitboxsets;
+	std::vector<mstudiohitboxset_t_v53>					hitboxsets;
 	std::vector<mstudiobbox_t_v53>						hitboxes;
 	mstudiobonenametable_t_v49							bonenametable;
 	std::vector<mstudioanimdesc_t_v53>					animdescs;
@@ -889,6 +955,10 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 
 	int numTextures = mdlhdr.numtextures;
 
+	int numikbones = 0;
+
+	#pragma endregion
+	#pragma region MAYABAKERY
 	if (mdlhdr.boneindex > mdlhdr.mayaindex && mdlhdr.mayaindex != 0)
 	{
 		Stream->seek(mdlhdr.mayaindex);
@@ -896,7 +966,8 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 		Stream->Read(&mayabakery, mayaBakerySize);
 		Logger::Info("MayaBakery Read: \n");
 	}
-
+	#pragma endregion
+	#pragma region BONES
 	if (mdlhdr.numbones > 0)
 	{
 		Stream->seek(mdlhdr.boneindex);
@@ -906,13 +977,22 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			Stream->seek(bonePos);
 
 			mstudiobone_t_v53 bone; Stream->Read(&bone);
-			bones.push_back(bone);
 			if (bone.proctype == 5) numjigglebones++;
+			if (bone.flags & BONE_USED_BY_IKCHAIN)
+			{
+				numikbones++;
+				Logger::Info("IKBone Read: %d)", i);
+			}
+			std::string szName = Stream->ReadNullTermStrTrgt(bonePos + bone.sznameindex, false);
+			bone.szname = szName;
+			bones.push_back(bone);
 
-			Logger::Info("Bone Read: %s\n", ReadMDLString(Stream, bonePos + bone.sznameindex).c_str());
-			Logger::Info("Bone Read: %d\n", i);
+			Logger::Info("Bone Read: %s | %d\n", szName.c_str(), i);
 		}
+		Logger::Info("IkBones: %d\n", numikbones);
 	}
+	#pragma endregion
+	#pragma region JIGGLEBONES
 	if (numjigglebones > 0)
 	{
 		int jiggleBonePos = mdlhdr.boneindex + 244 * mdlhdr.numbones;
@@ -927,7 +1007,8 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 		}
 		//Logger::Info("strPos: %d\n", Stream->Position());
 	}
-
+	#pragma endregion
+	#pragma region ATTACHMENTS
 	if (mdlhdr.numlocalattachments > 0)
 	{
 		Stream->seek(mdlhdr.localattachmentindex);
@@ -940,6 +1021,8 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 
 			std::string szName = Stream->ReadNullTermStrTrgt(attachmentPos + attachment.sznameindex, false);
 
+			attachment.szname = szName;
+
 			attachments.push_back(attachment);
 
 			Logger::Info("Attachment Read: %s\n", szName.c_str());
@@ -947,20 +1030,47 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 		}
 		//Logger::Info("strPos: %d\n", Stream->Position());
 	}
+	#pragma endregion
+	#pragma region HITBOXSETS
 	if (mdlhdr.numhitboxsets > 0)
 	{
 		Stream->seek(mdlhdr.hitboxsetindex);
-		for (int i = 0; i < mdlhdr.numhitboxsets; i++)
+		if (mdlhdr.numhitboxsets > 0)
 		{
-			int hitboxsetPos = mdlhdr.hitboxsetindex + 12 * i;
-			Stream->seek(hitboxsetPos);
+			Stream->seek(mdlhdr.hitboxsetindex);
+			for (int i = 0; i < mdlhdr.numhitboxsets; i++)
+			{
+				int hitboxsetPos = mdlhdr.hitboxsetindex + 12 * i;
+				Stream->seek(hitboxsetPos);
 
-			mstudiohitboxset_t_v49 hitboxset; Stream->Read(&hitboxset);
-			Logger::Info("HitboxSet Read: %s\n", ReadMDLString(Stream, hitboxsetPos + hitboxset.sznameindex).c_str());
-			if (hitboxset.numhitboxes > 0) numhitboxes += hitboxset.numhitboxes;
-			hitboxsets.push_back(hitboxset);
-			Logger::Info("HitboxSet Read: %d\n", i);
+				mstudiohitboxset_t_v53 hitboxset; Stream->Read(&hitboxset);
+
+				if (hitboxset.numhitboxes > 0) numhitboxes += hitboxset.numhitboxes;
+
+				Stream->seek(hitboxsetPos + hitboxset.hitboxindex);
+				for (int j = 0; j < hitboxset.numhitboxes; j++)
+				{
+					int hitboxPos = hitboxsetPos + hitboxset.hitboxindex + 68 * i;
+					Stream->seek(hitboxPos);
+					mstudiobbox_t_v53 hitbox; Stream->Read(&hitbox);
+
+					std::string szHitboxName = Stream->ReadNullTermStrTrgt(hitboxPos + hitbox.szhitboxnameindex, false);
+					std::string szKvName = Stream->ReadNullTermStrTrgt(hitboxPos + hitbox.keyvalueindex, false);
+					hitbox.szname = szHitboxName;
+					hitbox.szkvname = szKvName;
+
+					hitboxset.hitboxes.push_back(hitbox);
+				}
+
+				std::string szName = Stream->ReadNullTermStrTrgt(hitboxsetPos + hitboxset.sznameindex, false);
+				hitboxset.szname = szName;
+
+				hitboxsets.push_back(hitboxset);
+				Logger::Info("HitboxSet Read: %s : %d\n", szName.c_str(), i);
+			}
 		}
+	#pragma endregion
+	#pragma region HITBOXES
 		if (numhitboxes > 0)
 		{
 			for (int i = 0; i < numhitboxes; i++)
@@ -973,6 +1083,9 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 				std::string szName = Stream->ReadNullTermStrTrgt(hitboxPos + hitbox.szhitboxnameindex, false);
 				std::string szKvName = Stream->ReadNullTermStrTrgt(hitboxPos + hitbox.keyvalueindex, false);
 
+				hitbox.szname = szName;
+				hitbox.szkvname = szKvName;
+
 				Logger::Info("Hitbox Read: %s\n", szName.c_str());
 				Logger::Info("Hitbox Read: %s\n", szKvName.c_str());
 				hitboxes.push_back(hitbox);
@@ -982,11 +1095,15 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 		//Logger::Info("strPos: %d\n", Stream->Position());
 
 	}
+	#pragma endregion
+	#pragma region BONENAMETABLE
 	if (mdlhdr.numbones > 0)
 	{
 		Stream->Read(&bonenametable, mdlhdr.numbones);
 		Logger::Info("BoneTable Read: %d\n", mdlhdr.numbones);
 	}
+	#pragma endregion
+	#pragma region ANIMDESCS
 	if (mdlhdr.numlocalanim > 0)
 	{
 		Stream->seek(mdlhdr.localanimindex);
@@ -999,13 +1116,16 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 
 			std::string szName = Stream->ReadNullTermStrTrgt(animDescPos + animdesc.sznameindex, false);
 
+			animdesc.szname = szName;
+
 			animdescs.push_back(animdesc);
 
 			Logger::Info("AnimDesc Read: %s\n", szName.c_str());
 			Logger::Info("AnimDesc Read: %d\n", i);
 			//Logger::Info("strPos: %d\n", Stream->Position());
 		}
-
+	#pragma endregion
+	#pragma region ANIMS
 
 		for (int i = 0; i < mdlhdr.numlocalanim; i++)
 		{
@@ -1064,7 +1184,8 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 				}
 
 			}
-
+	#pragma endregion
+	#pragma region SECTIONS
 			if (animdescs[i].sectionindex > 0)
 			{
 				int secBoneHeaderNum = 0;
@@ -1142,7 +1263,8 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 				}
 
 			}
-
+	#pragma endregion
+	#pragma region IKRULES
 			if (animdescs[i].numikrules > 0)
 			{
 				int numOfCompressedIkErrors = 0;
@@ -1163,7 +1285,8 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 					Logger::Info("IkRule Read: %d\n", j);
 					numikrules++;
 				}
-
+	#pragma endregion
+	#pragma region COMPRESSEDIKERRORS
 				if (numOfCompressedIkErrors > 0)
 				{
 					int animStartPos = mdlhdr.localanimindex + 92 * i;
@@ -1192,7 +1315,8 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 						Stream->Read(&animData, dist);
 					}
 				}
-
+	#pragma endregion
+	#pragma region V52COMPRESSEDERROR
 				if (animdescs[i].compressedikerrorindex > 0)
 				{
 					int animStartPos = mdlhdr.localanimindex + 92 * i;
@@ -1214,33 +1338,37 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 
 		}
 	}
-
+	#pragma endregion
+	#pragma region SEQDESCS
 	if (mdlhdr.numlocalseq > 0)
 	{
+		#pragma region SEQDESC
 		Stream->seek(mdlhdr.localseqindex);
 		for (int i = 0; i < mdlhdr.numlocalseq; i++)
 		{
 			int seqPos = mdlhdr.localseqindex + 232 * i;
 			Stream->seek(seqPos);
 			mstudioseqdesc_t_v53 seqDesc; Stream->Read(&seqDesc);
-
-			std::string szName = Stream->ReadNullTermStrTrgt(seqPos + seqDesc.szlabelindex, false);
-			std::string szActName = Stream->ReadNullTermStrTrgt(seqPos + seqDesc.szactivitynameindex, false);
+			seqDesc.szlabel = Stream->ReadNullTermStrTrgt(seqPos + seqDesc.szlabelindex, false);
+			seqDesc.szactivityname = Stream->ReadNullTermStrTrgt(seqPos + seqDesc.szactivitynameindex, false);//ReadMDLString(Stream, seqPos + seqDesc.szactivitynameindex);
 
 			seqdescs.push_back(seqDesc);
-			Logger::Info("SeqLabel Read: %s\n", szName.c_str());
-			Logger::Info("SeqActName Read: %s\n", szActName.c_str());
-			Logger::Info("Seq Read: %d\n", i);
-		}
 
+			Logger::Info("Seq Read: %s : %s : %d \n", seqDesc.szlabel.c_str(), seqDesc.szactivityname.c_str(), i);
+		}
+		#pragma endregion
+		#pragma region SEQDATA
 		for (int i = 0; i < mdlhdr.numlocalseq; i++)
 		{
+			#pragma region VARS
 			int seqPos = mdlhdr.localseqindex + 232 * i;
 			int numBlends = seqdescs[i].groupsize[0] * seqdescs[i].groupsize[1];
 			int posekeySize = seqdescs[i].groupsize[0] + seqdescs[i].groupsize[1];
 			int numAutolayers = seqdescs[i].numautolayers;
 			int numActMods = seqdescs[i].numactivitymodifiers;
 			int numEvents = seqdescs[i].numevents;
+			#pragma endregion
+			#pragma region WEIGHTLIST
 			if (seqdescs[i].weightlistindex > 0)
 			{
 				Stream->seek(seqPos + seqdescs[i].weightlistindex);
@@ -1248,23 +1376,29 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 				seqweightlist.push_back(weightlist);
 				Logger::Info("Weightlist Read: %d\n", i);
 			}
-
+			#pragma endregion
+			#pragma region BLENDS
 			if (seqdescs[i].animindexindex > 0)
 			{
 				Stream->seek(seqPos + seqdescs[i].animindexindex);
-				blendgroup_t_v49 blendgroup; Stream->Read(&blendgroup, seqdescs[i].numblends);
+				blendgroup_t_v49 blendgroup; Stream->Read(&blendgroup, numBlends);
+				seqdescs[i].blends = blendgroup;
 				blends.push_back(blendgroup);
 				Logger::Info("BlendGroup Read: %d\n", i);
 			}
-
+			#pragma endregion
+			#pragma region POSEKEYS
 			if (seqdescs[i].posekeyindex > 0)
 			{
 				Stream->seek(seqPos + seqdescs[i].posekeyindex);
 				posekey_t_v49 posekey; Stream->Read(&posekey, posekeySize);
+				if (posekeySize == 3)posekey.unk[2] == 0.0;
+				//				Logger::Info("PosekeyF Read: %f\n", posekey.unk[2]);
 				posekeys.push_back(posekey);
 				Logger::Info("Posekey Read: %d\n", i);
 			}
-
+			#pragma endregion
+			#pragma region AUTOLAYERS
 			if (numAutolayers > 0)
 			{
 				Stream->seek(seqPos + seqdescs[i].autolayerindex);
@@ -1275,23 +1409,26 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 					Logger::Info("Autolayer Read: %d\n", j);
 				}
 			}
-
+			#pragma endregion
+			#pragma region EVENTS
 			if (numEvents > 0)
 			{
 				Stream->seek(seqPos + seqdescs[i].eventindex);
 				for (int j = 0; j < seqdescs[i].numevents; j++)
 				{
 					mstudioevent_t_v49 _event; Stream->Read(&_event);
-
-					std::string szName = Stream->ReadNullTermStrTrgt(seqPos + seqdescs[i].eventindex + 80 * j + _event.szeventindex, false);
-
 					events.push_back(_event);
 
-					Logger::Info("Event Read: %s\n", szName.c_str());
-					Logger::Info("Event Read: %d\n", j);
+					std::string szEventName = Stream->ReadNullTermStrTrgt(seqPos + seqdescs[i].eventindex + 80 * j + _event.szeventindex, false);
+					std::string szName = Stream->ReadNullTermStrTrgt(seqPos + seqdescs[i].eventindex + 80 * j + 12, false);
+
+					seqdescs[i].szeventnames.push_back(szEventName);
+
+					Logger::Info("Event Read: %s : %s : %d\n", szName.c_str(), szEventName.c_str(), j);
 				}
 			}
-
+			#pragma endregion
+			#pragma region ACTIVITYMODIFIERS
 			if (numActMods > 0)
 			{
 				Stream->seek(seqPos + seqdescs[i].activitymodifierindex);
@@ -1301,26 +1438,35 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 
 					std::string szName = Stream->ReadNullTermStrTrgt(seqPos + seqdescs[i].activitymodifierindex + 8 * j + actmod.sznameindex, false);
 
+					seqdescs[i].szactivitymodifiernames.push_back(szName);
+					actmod.szname = szName;
 					activitymodifiers.push_back(actmod);
-					Logger::Info("ActMod Read: %s\n", szName.c_str());
-					Logger::Info("ActMod Read: %d\n", j);
+					Logger::Info("ActMod Read: %s : %d\n", seqdescs[i].szactivitymodifiernames[j].c_str(), i);
 				}
 			}
+			#pragma endregion
 		}
+		#pragma endregion
 	}
+	#pragma endregion
+	#pragma region NODES
 	if (mdlhdr.numlocalnodes > 0)
 	{
-		Stream->seek(mdlhdr.localnodenameindex);
-		for (int i = 0; i < mdlhdr.numlocalnodes; i++)
-		{
-			mstudionodename_t_v49 nodeName; Stream->Read(&nodeName);
+		#pragma region NODENAMES
+				Stream->seek(mdlhdr.localnodenameindex);
+				for (int i = 0; i < mdlhdr.numlocalnodes; i++)
+				{
+					mstudionodename_t_v49 nodeName; Stream->Read(&nodeName);
 
-			std::string szName = Stream->ReadNullTermStrTrgt(nodeName.sznameindex, false);
+					std::string szName = Stream->ReadNullTermStrTrgt(nodeName.sznameindex, false);
+					nodeName.szname = szName;
 
-			nodenames.push_back(nodeName);
-			Logger::Info("NodeName Read: %s\n", szName.c_str());
-			Logger::Info("NodeName Read: %d\n", i);
-		}
+					nodenames.push_back(nodeName);
+					Logger::Info("NodeName Read: %s\n", szName.c_str());
+					Logger::Info("NodeName Read: %d\n", i);
+				}
+		#pragma endregion
+		#pragma region NODEDATA
 		Stream->seek(mdlhdr.localnodeindex);
 		for (int i = 0; i < mdlhdr.numlocalnodes; i++)
 		{
@@ -1328,7 +1474,10 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			nodes.push_back(node);
 			Logger::Info("Node Read: %d\n", i);
 		}
+#pragma endregion
 	}
+	#pragma endregion
+	#pragma region BODYPARTS
 	if (mdlhdr.numbodyparts > 0)
 	{
 		Stream->seek(mdlhdr.bodypartindex);
@@ -1338,13 +1487,15 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			if (bodyPart.nummodels > 0) nummodels += bodyPart.nummodels;
 
 			std::string szName = Stream->ReadNullTermStrTrgt(mdlhdr.bodypartindex + 16 * i + bodyPart.sznameindex, false);
+			bodyPart.szname = szName;
 
 			bodyparts.push_back(bodyPart);
 			Logger::Info("Bodypart Read: %s\n", szName.c_str());
 			Logger::Info("Bodypart Read: %d\n", i);
 		}
 	}
-
+	#pragma endregion
+	#pragma region MODELS
 	if (nummodels > 0)
 	{
 		Stream->seek(mdlhdr.bodypartindex + 16 * mdlhdr.numbodyparts);
@@ -1362,7 +1513,8 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 		}
 
 	}
-
+	#pragma endregion
+	#pragma region IKCHAINS
 	if (mdlhdr.numikchains > 0)
 	{
 		Stream->seek(mdlhdr.ikchainindex);
@@ -1372,13 +1524,15 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			if (ikchain.numlinks > 0) numiklinks += ikchain.numlinks;
 			int ikChainPos = mdlhdr.ikchainindex + 32 * i;
 			std::string szName = Stream->ReadNullTermStrTrgt(ikChainPos + ikchain.sznameindex, false);
+			ikchain.szname = szName;
 
 			ikchains.push_back(ikchain);
 
 			Logger::Info("IkChain Read: %s\n", szName.c_str());
 			Logger::Info("IkChain Read: %d\n", i);
 		}
-
+	#pragma endregion
+	#pragma region IKLINKS
 		for (int i = 0; i < numiklinks; i++)
 		{
 			int ikLinkPos = mdlhdr.ikchainindex + 16 * mdlhdr.numikchains;
@@ -1388,6 +1542,8 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("IkLink Read: %d\n", i);
 		}
 	}
+	#pragma endregion
+	#pragma region POSEPARAMDESCS
 	if (mdlhdr.localposeparamindex > 0)
 	{
 		Stream->seek(mdlhdr.localposeparamindex);
@@ -1396,6 +1552,7 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			mstudioposeparamdesc_t_v49 poseparamdesc; Stream->Read(&poseparamdesc);
 			int poseParamPos = mdlhdr.localposeparamindex + 20 * i;
 			std::string szName = Stream->ReadNullTermStrTrgt(poseParamPos + poseparamdesc.sznameindex, false);
+			poseparamdesc.szname = szName;
 
 			poseparamdescs.push_back(poseparamdesc);
 
@@ -1405,7 +1562,8 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("PoseParamDesc Read: %d\n", i);
 		}
 	}
-
+	#pragma endregion
+	#pragma region MESHES
 	if (nummeshes > 0)
 	{
 		for (int i = 0; i < nummeshes; i++)
@@ -1426,6 +1584,8 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("Mesh Read: %d\n", mesh.material);
 		}
 	}
+	#pragma endregion
+	#pragma region INCLUDEMODEL
 	if (mdlhdr.numincludemodels > 0)
 	{
 		Stream->seek(mdlhdr.includemodelindex);
@@ -1434,6 +1594,7 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			mstudiomodelgroup_t_v49 includemodel; Stream->Read(&includemodel);
 			int includedModelPos = mdlhdr.includemodelindex + 8 * i;
 			std::string szName = Stream->ReadNullTermStrTrgt(includedModelPos + includemodel.sznameindex, false);
+			includemodel.szname = szName;
 
 			includedmodels.push_back(includemodel);
 
@@ -1441,7 +1602,8 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("IncludedModel Read: %d\n", i);
 		}
 	}
-
+	#pragma endregion
+	#pragma region TEXTURES
 	//Logger::Info("Textureidx: %d\n", mdlhdr.textureindex);
 	if (mdlhdr.numtextures > 0)
 	{
@@ -1451,6 +1613,7 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			mstudiotexture_t_v53 texture; Stream->Read(&texture);
 			int texturePos = mdlhdr.textureindex + 44 * i;
 			std::string szName = Stream->ReadNullTermStrTrgt(texturePos + texture.sznameindex, false);
+			texture.szname = szName;
 
 			textures.push_back(texture);
 
@@ -1458,6 +1621,8 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("Texture Read: %d\n", i);
 		}
 	}
+	#pragma endregion
+	#pragma region CDMATERIALS
 	if (mdlhdr.numcdtextures > 0)
 	{
 		Stream->seek(mdlhdr.cdtextureindex);
@@ -1466,6 +1631,7 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			mstudiotexturedir_t_v49 cdtexture; Stream->Read(&cdtexture);
 
 			std::string szName = Stream->ReadNullTermStrTrgt(cdtexture.sznameindex, false);
+			cdtexture.szname = szName;
 
 			cdtextures.push_back(cdtexture);
 
@@ -1473,6 +1639,8 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("CdTexture Read: %d\n", i);
 		}
 	}
+	#pragma endregion
+	#pragma region SKINFAMILIES
 	if (mdlhdr.numskinfamilies > 0)
 	{
 		if (mdlhdr.numskinref > 0)
@@ -1487,31 +1655,36 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 		}
 
 	}
-
+	#pragma endregion
+	#pragma region KEYVALUES
 	if (mdlhdr.keyvaluesize > 0)
 	{
 		Stream->seek(mdlhdr.keyvalueindex);
 		Stream->Read(&keyvalues, mdlhdr.keyvaluesize);
 		Logger::Info("Keyvalues Read: %d\n", mdlhdr.keyvaluesize);
 	}
-
+	#pragma endregion
+	#pragma region SRCBONETRANSFORMS
 	if (mdlhdr.numsrcbonetransform > 0)
 	{
 		Stream->seek(mdlhdr.srcbonetransformindex);
 		for (int i = 0; i < mdlhdr.numsrcbonetransform; i++)
 		{
 			mstudiosrcbonetransform_t_v49 srcbonetransform; Stream->Read(&srcbonetransform);
-			srcbonetransforms.push_back(srcbonetransform);
 
 			int srcBonePos = mdlhdr.srcbonetransformindex + 100 * i;
 
 			std::string szName = Stream->ReadNullTermStrTrgt(srcBonePos + srcbonetransform.sznameindex,false);
+			srcbonetransform.szname = szName;
+
+			srcbonetransforms.push_back(srcbonetransform);
 
 			Logger::Info("SrcBoneTransform Read: %s\n", szName.c_str());
 			Logger::Info("SrcBoneTransform Read: %d\n", i);
 		}
 	}
-
+	#pragma endregion
+	#pragma region LINEARBONE
 	if (mdlhdr.numbones > 0)
 	{
 		Stream->seek(mdlhdr.linearboneindex);
@@ -1519,6 +1692,8 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 		Stream->Read(&linearbonedata, mdlhdr.numbones);
 		Logger::Info("LinearBone Read: %d\n", mdlhdr.numbones);
 	}
+	#pragma endregion
+	#pragma region PERTRIHDR
 //	Logger::Info("Test\n");
 	if (mdlhdr.aabbindex > 0)
 	{
@@ -1526,7 +1701,8 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 		Stream->Read(&pertriheader);
 		Logger::Info("AABB Per Triangle Header Read:\n");
 	}
-
+	#pragma endregion
+	#pragma region AABBNODES
 	if (mdlhdr.numaabbnodes > 0)
 	{
 		for (int i = 0; i < mdlhdr.numaabbnodes; i++)
@@ -1538,7 +1714,8 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 //		Logger::Info("Pos Read: %d\n", Stream->Position());
 		Logger::Info("AABB Nodes Read: %d\n", mdlhdr.numaabbnodes);
 	}
-
+	#pragma endregion
+	#pragma region AABBLEAVES
 	if (mdlhdr.numaabbleaves > 0)
 	{
 
@@ -1550,52 +1727,60 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 		}
 		Logger::Info("AABB Leaves Read: %d\n", mdlhdr.numaabbleaves);
 	}
-
+	#pragma endregion
+	#pragma region AABBVERTS
 	if (mdlhdr.numaabbverts > 0)
 	{
 		Stream->Read(&aabbverts, mdlhdr.numaabbverts);
 		Logger::Info("Pos Read: %d\n", Stream->Position());
 		Logger::Info("AABB Verts Read: %d\n", mdlhdr.numaabbverts);
 	}
-
-
+	#pragma endregion
+	#pragma region STRINGTABLE
 	Stream->seek(mdlhdr.sznameindex);
-	mstudiostringtable_t_v53 stringTable{}; Stream->Read(stringTable, mdlhdr);
+	mstudiostringtable_t_v52 stringTable{}; Stream->Read(&stringTable, mdlhdr, seqdescs, hitboxsets, attachments, nodenames, bodyparts, ikchains, animdescs, textures, includedmodels, cdtextures, poseparamdescs, srcbonetransforms);
+	#pragma endregion
+	#pragma region RUIMESH
 	if (mdlhdr.numruimeshes > 0)
 	{
 		Stream->seek(mdlhdr.ruimeshindex);
+		#pragma region HDR
 		for (int i = 0; i < mdlhdr.numruimeshes; i++)
 		{
 			mstudiorruiheader_t ruiHdr; Stream->Read(&ruiHdr);
 			ruiHdrs.push_back(ruiHdr);
 			Logger::Info("RuiHdr Read: %d\n", i);
 		}
-	
-		Stream->seek(mdlhdr.ruimeshindex + ruiHdrs[0].ruimeshindex);
-		for (int j = 0; j < ruiHdrs.size(); j++)
-		{
-			int ruiPos = Stream->Position();
-			mstudioruimesh_t ruiMesh; Stream->Read(&ruiMesh);
-			ruiMeshes.push_back(ruiMesh);
-			RUIMeshToSmd(ruiMesh);
+		#pragma endregion
+		#pragma region MESH
+				Stream->seek(mdlhdr.ruimeshindex + ruiHdrs[0].ruimeshindex);
+				for (int j = 0; j < ruiHdrs.size(); j++)
+				{
+					int ruiPos = Stream->Position();
+					mstudioruimesh_t ruiMesh; Stream->Read(&ruiMesh);
+					ruiMeshes.push_back(ruiMesh);
+					RUIMeshToSmd(ruiMesh);
 
-			std::string szName = Stream->ReadNullTermStrTrgt(ruiPos + 32, false);
+					std::string szName = Stream->ReadNullTermStrTrgt(ruiPos + 32, false);
 
-			Logger::Info("RuiMesh Read: %s\n", szName.c_str());
-			Logger::Info("RuiMesh Read: %d\n", j);
-		}
-		//Logger::Info("RuiMesh5 Read: %s\n", Stream->_filename);
-		std::string fileName = Stream->_filename;
-		fileName.resize(fileName.size() - 4);
-		fileName.insert(fileName.size(), ".rui");
-		int ruiEnd = Stream->Position();
-		Stream->seek(mdlhdr.ruimeshindex);
-		BinaryWriter Bing = BinaryWriter(fileName.c_str());
-		char* data = new char[ruiEnd - mdlhdr.ruimeshindex];
-		Stream->read(data, ruiEnd - mdlhdr.ruimeshindex);
-		Bing.write(data, ruiEnd - mdlhdr.ruimeshindex);
+					Logger::Info("RuiMesh Read: %s\n", szName.c_str());
+					Logger::Info("RuiMesh Read: %d\n", j);
+				}
+		#pragma endregion
+//		Logger::Info("RuiMesh5 Read: %s\n", Stream->_filename);
+//		std::string fileName = Stream->_filename;
+//		fileName.resize(fileName.size() - 4);
+//		fileName.insert(fileName.size(), ".rui");
+//		int ruiEnd = Stream->Position();
+//		Stream->seek(mdlhdr.ruimeshindex);
+//		BinaryWriter Bing = BinaryWriter(fileName.c_str());
+//		char* data = new char[ruiEnd - mdlhdr.ruimeshindex];
+//		Stream->read(data, ruiEnd - mdlhdr.ruimeshindex);
+//		Bing.write(data, ruiEnd - mdlhdr.ruimeshindex);
 	}
-	MDL::v53Mdl _v53mdl{ mdlhdr,mayabakery,bones,jigglebones,boneflexdrivers,attachments,hitboxsets,hitboxes,bonenametable,animdescs,anims, sectionindexes, sections, ikrules,compressedikerrors,v52compressedikerrors,ikerrors,ikrulezeroframe,seqdescs,blends,posekeys,events,autolayers,activitymodifiers,seqweightlist,nodenames,nodes,bodyparts,models,meshes,ikchains,iklinks,poseparamdescs,includedmodels,textures,cdtextures,skingroups,keyvalues,srcbonetransforms, linearbone,linearbonedata, stringTable, pertriheader, aabbnodes, aabbleaves, aabbverts };
+	#pragma endregion
+
+	MDL::v53Mdl _v53mdl{ mdlhdr,mayabakery,bones,jigglebones,boneflexdrivers,attachments,hitboxsets,hitboxes,bonenametable,animdescs,anims, sectionindexes, sections, ikrules,compressedikerrors,v52compressedikerrors,ikerrors,ikrulezeroframe,seqdescs,blends,posekeys,events,autolayers,activitymodifiers,seqweightlist,nodenames,nodes,bodyparts,models,meshes,ikchains,iklinks,poseparamdescs,includedmodels,ruiHdrs,ruiMeshes,textures,cdtextures,skingroups,keyvalues,srcbonetransforms, linearbone,linearbonedata, stringTable, pertriheader, aabbnodes, aabbleaves, aabbverts };
 	return _v53mdl;
 }
 
@@ -1603,7 +1788,62 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 
 #pragma region MDLV52
 
+MDL::v52Mdl::v52Mdl()
+{
 
+}
+
+MDL::v52Mdl::v52Mdl(studiohdr_t_v52 _mdlhdr, studiohdr2_t_v52 _mdlsubhdr, mayabakery_t _mayabakery, std::vector<mstudiobone_t_v52> _bones, std::vector<mstudiojigglebone_t_v49> _jigglebones, std::vector<mstudioboneflexdriver_t_v49>	_boneflexdrivers, std::vector<mstudioattachment_t_v49> _attachments, std::vector<mstudiohitboxset_t_v49> _hitboxsets, std::vector<mstudiobbox_t_v49> _hitboxes, mstudiobonenametable_t_v49 _bonenametable, std::vector<mstudioanimdesc_t_v52> _animdescs, std::vector<mstudioanim_t_v49> _anims, std::vector<sectionindexesindex_t_v49> _sectionindexes, std::vector<mstudioanim_t_v49> _sections, std::vector<mstudioikrule_t_v49> _ikrules, std::vector<mstudiocompressedikerror_t_v49> _compressedikerrors, std::vector<mstudiocompressedikerror_t_v52>	_v52compressedikerrors, std::vector<mstudioikerror_t_v49> _ikerrors, std::vector<mstudioikrulezeroframe_t_v49> _ikrulezeroframe, std::vector<mstudioseqdesc_t_v52> _seqdescs, std::vector<blendgroup_t_v49> _blends, std::vector<posekey_t_v49> _posekeys, std::vector<mstudioevent_t_v49> _events, std::vector<mstudioautolayer_t_v49> _autolayers, std::vector<mstudioactivitymodifier_t_v53> _activitymodifiers, std::vector<seqweightlist_t_v49> _seqweightlist, std::vector<mstudionodename_t_v49> _nodenames, std::vector<mstudionodedata_v49> _nodes, std::vector<mstudiobodyparts_t_v49> _bodyparts, std::vector<mstudiomodel_t_v49>	_models, std::vector<mstudiomesh_t_v49> _meshes, std::vector<mstudioikchain_t_v49> _ikchains, std::vector<mstudioiklink_t_v49> _iklinks, std::vector<mstudioposeparamdesc_t_v49> _poseparamdescs, std::vector<mstudioanimblock_t> _animblocks, std::vector<mstudiomodelgroup_t_v49> _includedmodels, std::vector<mstudiotexturedir_t_v49> _cdtextures, std::vector<mstudiotexture_t_v49> _textures, std::vector<mstudioskingroup_t_v49> _skingroups, mstudiokeyvalues_t_v49 _keyvalues, std::vector<mstudiosrcbonetransform_t_v49> _srcbonetransforms, mstudiolinearbone_t_v49 _linearbone, mstudiolinearbonedata_t_v49 _linearbonedata, mstudiostringtable_t_v52 _stringtable, pertriheader_t _pertriheader, std::vector<aabbnode> _aabbnodes, std::vector<aabbleaf> _aabbleaves, aabbcollisionmask _aabbverts)
+{
+	mdlhdr = _mdlhdr;
+	mdlsubhdr = _mdlsubhdr;
+	mayabakery = _mayabakery;
+	bones = _bones;
+	jigglebones = _jigglebones;
+	boneflexdrivers = _boneflexdrivers;
+	attachments = _attachments;
+	hitboxsets = _hitboxsets;
+	hitboxes = _hitboxes;
+	bonenametable = _bonenametable;
+	animdescs = _animdescs;
+	anims = _anims;
+	sectionindexes = _sectionindexes;
+	sections = _sections;
+	ikrules = _ikrules;
+	compressedikerrors = _compressedikerrors;
+	v52compressedikerrors = _v52compressedikerrors;
+	ikerrors = _ikerrors;
+	ikrulezeroframe = _ikrulezeroframe;
+	seqdescs = _seqdescs;
+	blends = _blends;
+	posekeys = _posekeys;
+	events = _events;
+	autolayers = _autolayers;
+	activitymodifiers = _activitymodifiers;
+	seqweightlist = _seqweightlist;
+	nodenames = _nodenames;
+	nodes = _nodes;
+	bodyparts = _bodyparts;
+	models = _models;
+	meshes = _meshes;
+	ikchains = _ikchains;
+	iklinks = _iklinks;
+	poseparamdescs = _poseparamdescs;
+	animblocks = _animblocks;
+	includedmodels = _includedmodels;
+	cdtextures = _cdtextures;
+	textures = _textures;
+	skingroups = _skingroups;
+	keyvalues = _keyvalues;
+	srcbonetransforms = _srcbonetransforms;
+	linearbone = _linearbone;
+	linearbonedata = _linearbonedata;
+	stringtable = _stringtable;
+	pertriheader = _pertriheader;
+	aabbnodes = _aabbnodes;
+	aabbleaves = _aabbleaves;
+	aabbverts = _aabbverts;
+}
 
 void MDL::v52Mdl::v52ExtractSrcBoneTransforms(BinaryReader* Stream)
 {
@@ -1660,53 +1900,59 @@ void MDL::v52Mdl::v52ExtractAABBTree(BinaryReader* Stream)
 
 MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 {
+#pragma region HDR
 	studiohdr_t_v52	 mdlhdr; Stream->Read(&mdlhdr);
+#pragma endregion
+#pragma region SUBHDR
 	studiohdr2_t_v52 mdlsubhdr; Stream->Read(&mdlsubhdr);
-	mayabakery_t										mayabakery;
-	std::vector<mstudiobone_t_v52>						bones;
-	std::vector<mstudiojigglebone_t_v49>				jigglebones;
-	std::vector<mstudioboneflexdriver_t_v49>			boneflexdrivers;
-	std::vector<mstudioattachment_t_v49>				attachments;
-	std::vector<mstudiohitboxset_t_v49>					hitboxsets;
-	std::vector<mstudiobbox_t_v49>						hitboxes;
-	mstudiobonenametable_t_v49							bonenametable;
-	std::vector<mstudioanimdesc_t_v52>					animdescs;
-	std::vector<mstudioanim_t_v49>						anims;
-	std::vector<sectionindexesindex_t_v49>				sectionindexes;
-	std::vector<mstudioanim_t_v49>						sections;
-	std::vector<mstudioikrule_t_v49>					ikrules;
-	std::vector<mstudiocompressedikerror_t_v49>			compressedikerrors;
-	std::vector<mstudiocompressedikerror_t_v52>			v52compressedikerrors;
-	std::vector<mstudioikerror_t_v49>					ikerrors;
-	std::vector<mstudioikrulezeroframe_t_v49>			ikrulezeroframe;
-	std::vector<mstudioseqdesc_t_v52>					seqdescs;
-	std::vector<blendgroup_t_v49>						blends;
-	std::vector<posekey_t_v49>							posekeys;
-	std::vector<mstudioevent_t_v49>						events;
-	std::vector<mstudioautolayer_t_v49>					autolayers;
-	std::vector<mstudioactivitymodifier_t_v53>			activitymodifiers;
-	std::vector<seqweightlist_t_v49>					seqweightlist;
-	std::vector<mstudionodename_t_v49>					nodenames;
-	std::vector<mstudionodedata_v49>					nodes;
-	std::vector<mstudiobodyparts_t_v49>					bodyparts;
-	std::vector<mstudiomodel_t_v49>						models;
-	std::vector<mstudiomesh_t_v49>						meshes;
-	std::vector<mstudioikchain_t_v49>					ikchains;
-	std::vector<mstudioiklink_t_v49>					iklinks;
-	std::vector<mstudioposeparamdesc_t_v49>				poseparamdescs;
-	std::vector<mstudioanimblock_t>						animblocks;
-	std::vector<mstudiomodelgroup_t_v49>				includedmodels;
-	std::vector<mstudiotexturedir_t_v49>				cdtextures;
-	std::vector<mstudiotexture_t_v49>					textures;
-	std::vector<mstudioskingroup_t_v49>					skingroups;
-	mstudiokeyvalues_t_v49								keyvalues;
-	std::vector<mstudiosrcbonetransform_t_v49>			srcbonetransforms;
-	mstudiolinearbone_t_v49								linearbone;
-	mstudiolinearbonedata_t_v49							linearbonedata;
-	pertriheader_t										pertriheader;
-	std::vector<aabbnode>								aabbnodes;
-	std::vector<aabbleaf>								aabbleaves;
-	aabbcollisionmask									aabbverts;
+#pragma endregion
+#pragma region VARS
+	mayabakery_t										mayabakery{};
+	std::vector<mstudiobone_t_v52>						bones{};
+	std::vector<mstudiojigglebone_t_v49>				jigglebones{};
+	std::vector<mstudioboneflexdriver_t_v49>			boneflexdrivers{};
+	std::vector<mstudioattachment_t_v49>				attachments{};
+	std::vector<mstudiohitboxset_t_v49>					hitboxsets{};
+	std::vector<mstudiobbox_t_v49>						hitboxes{};
+	mstudiobonenametable_t_v49							bonenametable{};
+	std::vector<mstudioanimdesc_t_v52>					animdescs{};
+	std::vector<mstudioanim_t_v49>						anims{};
+	std::vector<sectionindexesindex_t_v49>				sectionindexes{};
+	std::vector<mstudioanim_t_v49>						sections{};
+	std::vector<mstudioikrule_t_v49>					ikrules{};
+	std::vector<mstudiocompressedikerror_t_v49>			compressedikerrors{};
+	std::vector<mstudiocompressedikerror_t_v52>			v52compressedikerrors{};
+	std::vector<mstudioikerror_t_v49>					ikerrors{};
+	std::vector<mstudioikrulezeroframe_t_v49>			ikrulezeroframe{};
+	std::vector<mstudioseqdesc_t_v52>					seqdescs{};
+	std::vector<blendgroup_t_v49>						blends{};
+	std::vector<posekey_t_v49>							posekeys{};
+	std::vector<mstudioevent_t_v49>						events{};
+	std::vector<mstudioautolayer_t_v49>					autolayers{};
+	std::vector<mstudioactivitymodifier_t_v53>			activitymodifiers{};
+	std::vector<seqweightlist_t_v49>					seqweightlist{};
+	std::vector<mstudionodename_t_v49>					nodenames{};
+	std::vector<mstudionodedata_v49>					nodes{};
+	std::vector<mstudiobodyparts_t_v49>					bodyparts{};
+	std::vector<mstudiomodel_t_v49>						models{};
+	std::vector<mstudiomesh_t_v49>						meshes{};
+	std::vector<mstudioikchain_t_v49>					ikchains{};
+	std::vector<mstudioiklink_t_v49>					iklinks{};
+	std::vector<mstudioposeparamdesc_t_v49>				poseparamdescs{};
+	std::vector<mstudioanimblock_t>						animblocks{};
+	std::vector<mstudiomodelgroup_t_v49>				includedmodels{};
+	std::vector<mstudiotexturedir_t_v49>				cdtextures{};
+	std::vector<mstudiotexture_t_v49>					textures{};
+	std::vector<mstudioskingroup_t_v49>					skingroups{};
+	mstudiokeyvalues_t_v49								keyvalues{};
+	std::vector<mstudiosrcbonetransform_t_v49>			srcbonetransforms{};
+	mstudiolinearbone_t_v49								linearbone{};
+	mstudiolinearbonedata_t_v49							linearbonedata{};
+	pertriheader_t										pertriheader{};
+	std::vector<aabbnode>								aabbnodes{};
+	std::vector<aabbleaf>								aabbleaves{};
+	aabbcollisionmask									aabbverts{};
+	mstudiostringtable_t_v52							stringTable{};
 
 	int numjigglebones = 0;
 
@@ -1722,6 +1968,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 
 	int numikrules = 0;
 
+#pragma endregion
+#pragma region MAYABAKERY
 	if (mdlhdr.boneindex > mdlhdr.mayaindex && mdlhdr.mayaindex != 0)
 	{
 		Stream->seek(mdlhdr.mayaindex);
@@ -1729,7 +1977,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 		Stream->Read(&mayabakery, mayaBakerySize);
 		Logger::Info("MayaBakery Read: \n");
 	}
-
+#pragma endregion
+#pragma region BONES
 	if (mdlhdr.numbones > 0)
 	{
 		Stream->seek(mdlhdr.boneindex);
@@ -1747,6 +1996,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("Bone Read: %s : %d\n", szName.c_str(), i);
 		}
 	}
+#pragma endregion
+#pragma region JIGGLEBONES
 	if (numjigglebones > 0)
 	{
 		int jiggleBonePos = mdlhdr.boneindex + 216 * mdlhdr.numbones;
@@ -1761,7 +2012,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 		}
 		//Logger::Info("strPos: %d\n", Stream->Position());
 	}
-
+#pragma endregion
+#pragma region ATTACHMENTS
 	if (mdlhdr.numlocalattachments > 0)
 	{
 		Stream->seek(mdlhdr.localattachmentindex);
@@ -1780,6 +2032,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 		}
 		//Logger::Info("strPos: %d\n", Stream->Position());
 	}
+#pragma endregion
+#pragma region HITBOXSETS
 	if (mdlhdr.numhitboxsets > 0)
 	{
 		Stream->seek(mdlhdr.hitboxsetindex);
@@ -1811,6 +2065,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 			hitboxsets.push_back(hitboxset);
 			Logger::Info("HitboxSet Read: %s : %d\n", szName.c_str(), i);
 		}
+#pragma endregion
+#pragma region HITBOXES
 		if (numhitboxes > 0)
 		{
 			for (int i = 0; i < numhitboxes; i++)
@@ -1830,11 +2086,15 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 		//Logger::Info("strPos: %d\n", Stream->Position());
 
 	}
+#pragma endregion
+#pragma region BONENAMETABLE
 	if (mdlhdr.numbones > 0)
 	{
 		Stream->Read(&bonenametable, mdlhdr.numbones);
 		Logger::Info("BoneTable Read: %d\n", mdlhdr.numbones);
 	}
+#pragma endregion
+#pragma region ANIMDESCS
 	if (mdlhdr.numlocalanim > 0)
 	{
 		Stream->seek(mdlhdr.localanimindex);
@@ -1853,7 +2113,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("AnimDesc Read: %s : %d\n", szName.c_str(), i);
 			//Logger::Info("strPos: %d\n", Stream->Position());
 		}
-
+#pragma endregion
+#pragma region ANIMS
 
 		for (int i = 0; i < mdlhdr.numlocalanim; i++)
 		{
@@ -1914,7 +2175,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 				Logger::Info("Anim Read: %d\n", i);
 
 			}
-
+#pragma endregion
+#pragma region SECTIONS
 			if (animdescs[i].sectionindex > 0)
 			{
 				int secBoneHeaderNum = 0;
@@ -1993,7 +2255,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 				Logger::Info("Section Read: %d\n", i);
 
 			}
-
+#pragma endregion
+#pragma region IKRULES
 			if (animdescs[i].numikrules > 0)
 			{
 				int numOfCompressedIkErrors = 0;
@@ -2014,7 +2277,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 					Logger::Info("IkRule Read: %d\n", j);
 					numikrules++;
 				}
-
+#pragma endregion
+#pragma region COMPRESSEDIKERROR
 				if (numOfCompressedIkErrors > 0)
 				{
 					int animStartPos = mdlhdr.localanimindex + 100 * i;
@@ -2045,7 +2309,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 						compressedikerrors.push_back(v49CompressedIkError);
 					}
 				}
-
+#pragma endregion
+#pragma region V52COMPRESSEDERROR
 				if (animdescs[i].compressedikerrorindex > 0)
 				{
 					int animStartPos = mdlhdr.localanimindex + 92 * i;
@@ -2067,9 +2332,12 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 
 		}
 	}
-
+#pragma endregion
+#pragma region SEQDESCS
 	if (mdlhdr.numlocalseq > 0)
 	{
+		int actModNum = 0;
+		int eventNum = 0;
 		Stream->seek(mdlhdr.localseqindex);
 		for (int i = 0; i < mdlhdr.numlocalseq; i++)
 		{
@@ -2077,7 +2345,7 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 			Stream->seek(seqPos);
 			mstudioseqdesc_t_v52 seqDesc; Stream->Read(&seqDesc);
 			seqDesc.szlabel = Stream->ReadNullTermStrTrgt(seqPos + seqDesc.szlabelindex, false);
-			seqDesc.szactivityname = Stream->ReadNullTermStrTrgt(seqPos + seqDesc.szactivitynameindex, false);//ReadMDLString(Stream, seqPos + seqDesc.szactivitynameindex);
+			seqDesc.szactivityname = Stream->ReadNullTermStrTrgt(seqPos + seqDesc.szactivitynameindex, false);
 
 			seqdescs.push_back(seqDesc);
 
@@ -2104,6 +2372,7 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 			{
 				Stream->seek(seqPos + seqdescs[i].animindexindex);
 				blendgroup_t_v49 blendgroup; Stream->Read(&blendgroup, numBlends);
+				seqdescs[i].blends = blendgroup;
 				blends.push_back(blendgroup);
 				Logger::Info("BlendGroup Read: %d\n", i);
 			}
@@ -2141,8 +2410,10 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 					std::string szName = Stream->ReadNullTermStrTrgt(seqPos + seqdescs[i].eventindex + 80 * j + 12, false);
 
 					seqdescs[i].szeventnames.push_back(szEventName);
+					seqdescs[i].events.push_back(eventNum);
 
 					Logger::Info("Event Read: %s : %s : %d\n", szName.c_str(), szEventName.c_str(), j);
+					eventNum++;
 				}
 			}
 
@@ -2153,16 +2424,20 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 				{
 					mstudioactivitymodifier_t_v53 actmod; Stream->Read(&actmod);
 
-					std::string szName = Stream->ReadNullTermStrTrgt(seqPos + seqdescs[i].activitymodifierindex + 4 * j + actmod.sznameindex, false);
+					std::string szName = Stream->ReadNullTermStrTrgt(seqPos + seqdescs[i].activitymodifierindex + 8 * j + actmod.sznameindex, false);
 
 					seqdescs[i].szactivitymodifiernames.push_back(szName);
 					actmod.szname = szName;
 					activitymodifiers.push_back(actmod);
+					seqdescs[i].actmods.push_back(actModNum);
 					Logger::Info("ActMod Read: %s : %d\n", seqdescs[i].szactivitymodifiernames[j].c_str(), i);
+					actModNum++;
 				}
 			}
 		}
 	}
+#pragma endregion
+#pragma region NODENAMES
 	if (mdlhdr.numlocalnodes > 0)
 	{
 		Stream->seek(mdlhdr.localnodenameindex);
@@ -2175,6 +2450,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 			nodenames.push_back(nodeName);
 			Logger::Info("NodeName Read: %s : %d\n", nodeName.szname.c_str(), i);
 		}
+#pragma endregion
+#pragma region NODEDATA
 		Stream->seek(mdlhdr.localnodeindex);
 		for (int i = 0; i < mdlhdr.numlocalnodes; i++)
 		{
@@ -2183,6 +2460,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("Node Read: %d\n", i);
 		}
 	}
+#pragma endregion
+#pragma region BODYPARTS
 	if (mdlhdr.numbodyparts > 0)
 	{
 		Stream->seek(mdlhdr.bodypartindex);
@@ -2198,6 +2477,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("Bodypart Read: %s : %d\n", bodyPart.szname.c_str(), i);
 		}
 	}
+#pragma endregion
+#pragma region MODELS
 
 	if (nummodels > 0)
 	{
@@ -2215,7 +2496,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 		}
 
 	}
-
+#pragma endregion
+#pragma region IKCHAINS
 	if (mdlhdr.numikchains > 0)
 	{
 		Stream->seek(mdlhdr.ikchainindex);
@@ -2232,7 +2514,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 			ikchains.push_back(ikchain);
 			Logger::Info("IkChain Read: %s : %d\n", szName.c_str(), i);
 		}
-
+#pragma endregion
+#pragma region IKLINKS
 		for (int i = 0; i < numiklinks; i++)
 		{
 			int ikLinkPos = (mdlhdr.ikchainindex + 16 * mdlhdr.numikchains) + 28 * i;
@@ -2242,6 +2525,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("IkLink Read: %d\n", i);
 		}
 	}
+#pragma endregion
+#pragma region POSEPARAMDESCS
 	if (mdlhdr.localposeparamindex > 0)
 	{
 		Stream->seek(mdlhdr.localposeparamindex);
@@ -2257,7 +2542,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("PoseParamDesc Read: %s : %d\n", szName.c_str(), i);
 		}
 	}
-
+#pragma endregion
+#pragma region ANIMBLOCKS
 	if (mdlhdr.numanimblocks > 0)
 	{
 		Stream->seek(mdlhdr.localnodeindex);
@@ -2268,7 +2554,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("AnimBlock Read: %d\n", i);
 		}
 	}
-
+#pragma endregion
+#pragma region MESHES
 	if (nummeshes > 0)
 	{
 		for (int i = 0; i < nummeshes; i++)
@@ -2289,6 +2576,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("Mesh Read: %d\n", i);
 		}
 	}
+#pragma endregion
+#pragma region INCLUDEMODEL
 	if (mdlhdr.numincludemodels > 0)
 	{
 		Stream->seek(mdlhdr.includemodelindex);
@@ -2304,6 +2593,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("IncludedModel Read: %s : %d\n", szName.c_str(), i);
 		}
 	}
+#pragma endregion
+#pragma region TEXTURES
 	if (mdlhdr.numtextures > 0)
 	{
 		Stream->seek(mdlhdr.textureindex);
@@ -2320,6 +2611,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("Texture Read: %s : %d\n", szName.c_str(), i);
 		}
 	}
+#pragma endregion
+#pragma region CDMATERIALS
 	if (mdlhdr.numcdtextures > 0)
 	{
 		Stream->seek(mdlhdr.cdtextureindex);
@@ -2334,6 +2627,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("CdTexture Read: %s : %d\n", szName.c_str(), i);
 		}
 	}
+#pragma endregion
+#pragma region SKINFAMILIES
 	if (mdlhdr.numskinfamilies > 0)
 	{
 		if (mdlhdr.numskinref > 0)
@@ -2347,13 +2642,16 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 			}
 		}
 	}
-
+#pragma endregion
+#pragma region KEYVALUES
 	if (mdlhdr.keyvaluesize > 0)
 	{
 		Stream->seek(mdlhdr.keyvalueindex);
 		Stream->Read(&keyvalues, mdlhdr.keyvaluesize);
 		Logger::Info("Keyvalues Read: %d\n", mdlhdr.keyvaluesize);
 	}
+#pragma endregion
+#pragma region SRCBONETRANSFORMS
 	if (mdlsubhdr.numsrcbonetransform > 0)
 	{
 		Stream->seek(mdlsubhdr.srcbonetransformindex);
@@ -2369,6 +2667,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("SrcBoneTransform Read: %s : %d\n", szName.c_str(), i);
 		}
 	}
+#pragma endregion
+#pragma region LINEARBONE
 	if (mdlhdr.numbones > 0)
 	{
 		Stream->seek(mdlsubhdr.linearboneindex + 408);
@@ -2376,14 +2676,16 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 		Stream->Read(&linearbonedata, mdlhdr.numbones);
 		Logger::Info("LinearBone Read: %d\n", mdlhdr.numbones);
 	}
-
+#pragma endregion
+#pragma region PERTRIHDR
 	if (mdlsubhdr.aabbindex > 0)
 	{
 		Stream->seek(mdlsubhdr.aabbindex + 408);
 		Stream->Read(&pertriheader);
 		Logger::Info("AABB Per Triangle Header Read:\n");
 	}
-
+#pragma endregion
+#pragma region AABBNODES
 	if (mdlsubhdr.numaabbnodes > 0)
 	{
 		for (int i = 0; i < mdlsubhdr.numaabbnodes; i++)
@@ -2395,7 +2697,8 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 		//		Logger::Info("Pos Read: %d\n", Stream->Position());
 		Logger::Info("AABB Nodes Read: %d\n", mdlsubhdr.numaabbnodes);
 	}
-
+#pragma endregion
+#pragma region AABBLEAVES
 	if (mdlsubhdr.numaabbleaves > 0)
 	{
 
@@ -2407,21 +2710,23 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 		}
 		Logger::Info("AABB Leaves Read: %d\n", mdlsubhdr.numaabbleaves);
 	}
-
+#pragma endregion
+#pragma region AABBVERTS
 	if (mdlsubhdr.numaabbverts > 0)
 	{
 		Stream->Read(&aabbverts, mdlsubhdr.numaabbverts);
 //		Logger::Info("Pos Read: %d\n", Stream->Position());
 		Logger::Info("AABB Verts Read: %d\n", mdlsubhdr.numaabbverts);
 	}
-
+#pragma endregion
+#pragma region STRINGTABLE
 	Stream->seek(mdlsubhdr.sznameindex + 408);
-	mstudiostringtable_t_v52 stringTable; Stream->Read(&stringTable, mdlhdr, mdlsubhdr, seqdescs, hitboxsets, attachments, nodenames, bodyparts, ikchains, animdescs, textures, includedmodels, cdtextures, poseparamdescs, srcbonetransforms);
+	Stream->Read(&stringTable, mdlhdr, mdlsubhdr, seqdescs, hitboxsets, attachments, nodenames, bodyparts, ikchains, animdescs, textures, includedmodels, cdtextures, poseparamdescs, srcbonetransforms);
 	std::string string(stringTable.mdlname.begin(), stringTable.mdlname.end());
 	Logger::Info("mldName: %s\n", string.c_str());
-
-	MDL::v52Mdl _v52mdl{ mdlhdr,mdlsubhdr,mayabakery,bones,jigglebones,boneflexdrivers,attachments,hitboxsets,hitboxes,bonenametable,animdescs,anims, sectionindexes, sections, ikrules,compressedikerrors,v52compressedikerrors,ikerrors,ikrulezeroframe,seqdescs,blends,posekeys,events,autolayers,activitymodifiers,seqweightlist,nodenames,nodes,bodyparts,models,meshes,ikchains,iklinks,poseparamdescs,animblocks,includedmodels,cdtextures,textures,skingroups,keyvalues,srcbonetransforms,linearbone,linearbonedata, stringTable, pertriheader, aabbnodes, aabbleaves, aabbverts };
-
+#pragma endregion
+	MDL::v52Mdl _v52mdl{mdlhdr,mdlsubhdr,mayabakery,bones,jigglebones,boneflexdrivers,attachments,hitboxsets,hitboxes,bonenametable,animdescs,anims, sectionindexes, sections, ikrules,compressedikerrors,v52compressedikerrors,ikerrors,ikrulezeroframe,seqdescs,blends,posekeys,events,autolayers,activitymodifiers,seqweightlist,nodenames,nodes,bodyparts,models,meshes,ikchains,iklinks,poseparamdescs,animblocks,includedmodels,cdtextures,textures,skingroups,keyvalues,srcbonetransforms,linearbone,linearbonedata, stringTable, pertriheader, aabbnodes, aabbleaves, aabbverts};
+	//Logger::Info("test\n");
 	return _v52mdl;
 }
 
@@ -4411,9 +4716,125 @@ void MDL::v52Mdl::UpdateMdl()
 
 #pragma region MDLV49
 
+std::vector <int> MDL::v49Mdl::GetIKBones()
+{
+	std::vector <int> chain;
+	std::vector <int> chainBones;
+	std::vector <int> roots;
+
+	for (int i = 0; i < iklinks.size(); i++)
+	{
+		mstudioiklink_t_v49 iklink = iklinks[i];
+		roots.push_back(iklink.bone);
+	}
+
+	for (int i = 0; i < roots.size(); i++)
+	{
+//		Logger::Info("Root Chain Bone Read: %d\n", roots[i]);
+		chain.push_back(roots[i]);
+	}
+
+	for (int i = 0; i < bones.size(); i++)
+	{
+		mstudiobone_t_v49 _bone = bones[i];
+
+		if ( contains(roots, _bone.parent) && !contains(chain, i))
+		{
+			chain.push_back(i);
+//			Logger::Info("Child of Root Chain Bone Read: %d | Root: %d\n", i, _bone.parent);
+		}
+
+		if (contains(chain, _bone.parent) && !contains(chain, i))
+		{
+			chain.push_back(i);
+//			Logger::Info("Child of Root Chain Bone Child Read: %d | Parent: %d\n", i, _bone.parent);
+		}
+
+	}
+
+	for (int i = 0; i < chain.size(); i++)
+	{
+		if (!contains(chainBones, chain[i]))
+		{
+			chainBones.push_back(chain[i]);
+		}
+	}
+//	Logger::Info("Total ChainBones: %d\n", chainBones.size());
+
+	return chainBones;
+}
+
+void MDL::v49Mdl::v49ExtractSrcBoneTransforms(BinaryReader* Stream)
+{
+	if (mdlsubhdr.numsrcbonetransform > 0)
+	{
+		std::string fileName = Stream->_filename;
+		fileName.resize(fileName.size() - 4);
+		fileName.insert(fileName.size(), ".srcbtf");
+		BinaryWriter Bing = BinaryWriter(fileName.c_str());
+
+		for (int i = 0; i < mdlsubhdr.numsrcbonetransform; i++)
+		{
+			Bing.Write(srcbonetransforms[i]);
+		}
+	}
+}
+
+MDL::v49Mdl::v49Mdl()
+{
+
+}
+
+MDL::v49Mdl::v49Mdl(studiohdr_t_v49 _mdlhdr, studiohdr2_t_v49 _mdlsubhdr, std::vector<mstudiobone_t_v49> _bones, std::vector<mstudiojigglebone_t_v49> _jigglebones, std::vector<mstudioboneflexdriver_t_v49>	_boneflexdrivers, std::vector<mstudioattachment_t_v49> _attachments, std::vector<mstudiohitboxset_t_v49> _hitboxsets, std::vector<mstudiobbox_t_v49> _hitboxes, mstudiobonenametable_t_v49 _bonenametable, std::vector<mstudioanimdesc_t_v49> _animdescs, std::vector<mstudioanim_t_v49> _anims, std::vector<sectionindexesindex_t_v49> _sectionindexes, std::vector<mstudioanim_t_v49> _sections, std::vector<mstudioikrule_t_v49> _ikrules, std::vector<mstudiocompressedikerror_t_v49> _compressedikerrors, std::vector<mstudioikerror_t_v49> _ikerrors, std::vector<mstudioikrulezeroframe_t_v49> _ikrulezeroframe, std::vector<mstudioseqdescv49_t> _seqdescs, std::vector<blendgroup_t_v49> _blends, std::vector<posekey_t_v49> _posekeys, std::vector<mstudioevent_t_v49> _events, std::vector<mstudioautolayer_t_v49> _autolayers, std::vector<mstudioactivitymodifier_t_v49> _activitymodifiers, std::vector<seqweightlist_t_v49> _seqweightlist, std::vector<mstudionodename_t_v49> _nodenames, std::vector<mstudionodedata_v49> _nodes, std::vector<mstudiobodyparts_t_v49> _bodyparts, std::vector<mstudiomodel_t_v49>	_models, std::vector<mstudiomesh_t_v49> _meshes, std::vector<mstudioikchain_t_v49> _ikchains, std::vector<mstudioiklink_t_v49> _iklinks, std::vector<mstudioposeparamdesc_t_v49> _poseparamdescs, std::vector<mstudioanimblock_t> _animblocks, std::vector<mstudiomodelgroup_t_v49> _includedmodels, std::vector<mstudiotexturedir_t_v49> _cdtextures, std::vector<mstudiotexture_t_v49> _textures, std::vector<mstudioskingroup_t_v49> _skingroups, mstudiokeyvalues_t_v49 _keyvalues, std::vector<mstudiosrcbonetransform_t_v49> _srcbonetransforms, mstudiolinearbone_t_v49 _linearbone, mstudiolinearbonedata_t_v49 _linearbonedata, mstudiostringtable_t_v49 _stringtable)
+{
+	mdlhdr = _mdlhdr;
+	mdlsubhdr = _mdlsubhdr;
+	bones = _bones;
+	jigglebones = _jigglebones;
+	boneflexdrivers = _boneflexdrivers;
+	attachments = _attachments;
+	hitboxsets = _hitboxsets;
+	hitboxes = _hitboxes;
+	bonenametable = _bonenametable;
+	animdescs = _animdescs;
+	anims = _anims;
+	sectionindexes = _sectionindexes;
+	sections = _sections;
+	ikrules = _ikrules;
+	compressedikerrors = _compressedikerrors;
+	ikerrors = _ikerrors;
+	ikrulezeroframe = _ikrulezeroframe;
+	seqdescs = _seqdescs;
+	blends = _blends;
+	posekeys = _posekeys;
+	events = _events;
+	autolayers = _autolayers;
+	activitymodifiers = _activitymodifiers;
+	seqweightlist = _seqweightlist;
+	nodenames = _nodenames;
+	nodes = _nodes;
+	bodyparts = _bodyparts;
+	models = _models;
+	meshes = _meshes;
+	ikchains = _ikchains;
+	iklinks = _iklinks;
+	poseparamdescs = _poseparamdescs;
+	animblocks = _animblocks;
+	includedmodels = _includedmodels;
+	cdtextures = _cdtextures;
+	textures = _textures;
+	skingroups = _skingroups;
+	keyvalues = _keyvalues;
+	srcbonetransforms = _srcbonetransforms;
+	linearbone = _linearbone;
+	linearbonedata = _linearbonedata;
+	stringtable = _stringtable;
+}
 
 MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 {
+	Stream->seek(0);
+#pragma region VARS
 	studiohdr_t_v49	 mdlhdr; Stream->Read(&mdlhdr);
 	studiohdr2_t_v49 mdlsubhdr; Stream->Read(&mdlsubhdr);
 
@@ -4457,6 +4878,12 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 	mstudiolinearbone_t_v49								linearbone;
 	mstudiolinearbonedata_t_v49							linearbonedata;
 
+	std::vector<int>									weightlistidxs;
+
+	std::vector<int>									bytesAddedToWeightLists;
+
+//	int weightListPos = 0;
+
 	int numjigglebones = 0;
 
 	int numhitboxes = 0;
@@ -4471,6 +4898,8 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 
 	int numikrules = 0;
 
+#pragma endregion
+#pragma region BONES
 	if (mdlhdr.numbones > 0)
 	{
 		Stream->seek(mdlhdr.boneindex);
@@ -4488,6 +4917,8 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("Bone Read: %s : %d\n", szName.c_str(), i);
 		}
 	}
+#pragma endregion
+#pragma region JIGGLEBONES
 	if (numjigglebones > 0)
 	{
 		int jiggleBonePos = mdlhdr.boneindex + 216 * mdlhdr.numbones;
@@ -4497,12 +4928,14 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 		for (int i = 0; i < numjigglebones; i++)
 		{
 			mstudiojigglebone_t_v49 jigglebone; Stream->Read(&jigglebone);
+			Logger::Info("JiggleBoneFlags Read: %s\n", Utility::func::ReadJiggleFlags(jigglebone.flags).c_str());
 			jigglebones.push_back(jigglebone);
 			Logger::Info("JiggleBone Read: %d\n", i);
 		}
 		//Logger::Info("strPos: %d\n", Stream->Position());
 	}
-
+#pragma endregion
+#pragma region ATTACHMENTS
 	if (mdlhdr.numlocalattachments > 0)
 	{
 		Stream->seek(mdlhdr.localattachmentindex);
@@ -4521,6 +4954,8 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 		}
 		//Logger::Info("strPos: %d\n", Stream->Position());
 	}
+#pragma endregion
+#pragma region HITBOXSETS
 	if (mdlhdr.numhitboxsets > 0)
 	{
 		Stream->seek(mdlhdr.hitboxsetindex);
@@ -4552,6 +4987,8 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 			hitboxsets.push_back(hitboxset);
 			Logger::Info("HitboxSet Read: %s : %d\n", szName.c_str(), i);
 		}
+#pragma endregion
+#pragma region HITBOXES
 		if (numhitboxes > 0)
 		{
 			for (int i = 0; i < numhitboxes; i++)
@@ -4571,11 +5008,15 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 		//Logger::Info("strPos: %d\n", Stream->Position());
 
 	}
+#pragma endregion
+#pragma region BONENAMETABLE
 	if (mdlhdr.numbones > 0)
 	{
 		Stream->Read(&bonenametable, mdlhdr.numbones);
 		Logger::Info("BoneTable Read: %d\n", mdlhdr.numbones);
 	}
+#pragma endregion
+#pragma region ANIMDESCS
 	if (mdlhdr.numlocalanim > 0)
 	{
 		Stream->seek(mdlhdr.localanimindex);
@@ -4594,8 +5035,8 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("AnimDesc Read: %s : %d\n", szName.c_str(), i);
 			//Logger::Info("strPos: %d\n", Stream->Position());
 		}
-
-
+#pragma endregion
+#pragma region ANIMS
 		for (int i = 0; i < mdlhdr.numlocalanim; i++)
 		{
 			int boneHeaderNum = 0;
@@ -4654,7 +5095,8 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 				}
 
 			}
-
+#pragma endregion
+#pragma region SECTIONS
 			if (animdescs[i].sectionindex > 0)
 			{
 				int secBoneHeaderNum = 0;
@@ -4732,7 +5174,8 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 				}
 
 			}
-
+#pragma endregion
+#pragma region IKRULES
 			if (animdescs[i].numikrules > 0)
 			{
 				int numOfCompressedIkErrors = 0;
@@ -4753,7 +5196,8 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 					Logger::Info("IkRule Read: %d\n", j);
 					numikrules++;
 				}
-
+#pragma endregion
+#pragma region COMPRESSEDIKERRORS
 				if (numOfCompressedIkErrors > 0)
 				{
 					int animStartPos = mdlhdr.localanimindex + 100 * i;
@@ -4789,103 +5233,125 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 
 		}
 	}
-
-	if (mdlhdr.numlocalseq > 0)
-	{
-		Stream->seek(mdlhdr.localseqindex);
-		for (int i = 0; i < mdlhdr.numlocalseq; i++)
+#pragma endregion
+#pragma region SEQDESCS
+	#pragma region SEQDESC
+		if (mdlhdr.numlocalseq > 0)
 		{
-			int seqPos = mdlhdr.localseqindex + 212 * i;
-			Stream->seek(seqPos);
-			mstudioseqdescv49_t seqDesc; Stream->Read(&seqDesc);
-			seqDesc.szlabel = Stream->ReadNullTermStrTrgt(seqPos + seqDesc.szlabelindex, false);
-			seqDesc.szactivityname = Stream->ReadNullTermStrTrgt(seqPos + seqDesc.szactivitynameindex, false);//ReadMDLString(Stream, seqPos + seqDesc.szactivitynameindex);
-
-			seqdescs.push_back(seqDesc);
-
-			Logger::Info("Seq Read: %s : %s : %d\n", seqDesc.szlabel.c_str(), seqDesc.szactivityname.c_str(), i);
+			int actModNum = 0;
+			int eventNum = 0;
+	
+			Stream->seek(mdlhdr.localseqindex);
+			for (int i = 0; i < mdlhdr.numlocalseq; i++)
+			{
+				int seqPos = mdlhdr.localseqindex + 212 * i;
+				Stream->seek(seqPos);
+				mstudioseqdescv49_t seqDesc; Stream->Read(&seqDesc);
+				seqDesc.szlabel = Stream->ReadNullTermStrTrgt(seqPos + seqDesc.szlabelindex, false);
+				seqDesc.szactivityname = Stream->ReadNullTermStrTrgt(seqPos + seqDesc.szactivitynameindex, false);//ReadMDLString(Stream, seqPos + seqDesc.szactivitynameindex);
+	
+				seqdescs.push_back(seqDesc);
+	
+				Logger::Info("Seq Read: %s : %s : %d\n", seqDesc.szlabel.c_str(), seqDesc.szactivityname.c_str(), i);
+			}
+	#pragma endregion
+	#pragma region SEQDATA
+			for (int i = 0; i < mdlhdr.numlocalseq; i++)
+			{
+				#pragma region VARS
+							int seqPos = mdlhdr.localseqindex + 212 * i;
+							int numBlends = seqdescs[i].groupsize[0] * seqdescs[i].groupsize[1];
+							int posekeySize = seqdescs[i].groupsize[0] + seqdescs[i].groupsize[1];
+							int numAutolayers = seqdescs[i].numautolayers;
+							int numActMods = seqdescs[i].numactivitymodifiers;
+							int numEvents = seqdescs[i].numevents;
+				#pragma endregion
+				#pragma region WEIGHTLIST
+							if (seqdescs[i].weightlistindex > 0)
+							{
+								Stream->seek(seqPos + seqdescs[i].weightlistindex);
+								seqweightlist_t_v49 weightlist; Stream->Read(&weightlist, mdlhdr.numbones);
+								seqweightlist.push_back(weightlist);
+								Logger::Info("Weightlist Read: %d\n", i);
+							}
+				#pragma endregion
+				#pragma region BLENDS
+							if (seqdescs[i].animindexindex > 0)
+							{
+								Stream->seek(seqPos + seqdescs[i].animindexindex);
+								blendgroup_t_v49 blendgroup; Stream->Read(&blendgroup, numBlends);
+								blends.push_back(blendgroup);
+								seqdescs[i].blends = blendgroup;
+								Logger::Info("BlendGroup Read: %d\n", i);
+							}
+				#pragma endregion
+				#pragma region POSEKEY
+							if (seqdescs[i].posekeyindex > 0)
+							{
+								Stream->seek(seqPos + seqdescs[i].posekeyindex);
+								posekey_t_v49 posekey; Stream->Read(&posekey, posekeySize);
+								if (posekeySize == 3)posekey.unk[2] == 0.0;
+				//				Logger::Info("PosekeyF Read: %f\n", posekey.unk[2]);
+								posekeys.push_back(posekey);
+								Logger::Info("Posekey Read: %d\n", i);
+							}
+				#pragma endregion
+				#pragma region AUTOLAYER
+							if (numAutolayers > 0)
+							{
+								Stream->seek(seqPos + seqdescs[i].autolayerindex);
+								for (int j = 0; j < numAutolayers; j++)
+								{
+									mstudioautolayer_t_v49 autolayer; Stream->Read(&autolayer);
+									autolayers.push_back(autolayer);
+									Logger::Info("Autolayer Read: %d\n", j);
+								}
+							}
+				#pragma endregion
+				#pragma region EVENTS
+							if (numEvents > 0)
+							{
+								Stream->seek(seqPos + seqdescs[i].eventindex);
+								for (int j = 0; j < seqdescs[i].numevents; j++)
+								{
+									mstudioevent_t_v49 _event; Stream->Read(&_event);
+									events.push_back(_event);
+				
+									std::string szEventName = Stream->ReadNullTermStrTrgt(seqPos + seqdescs[i].eventindex + 80 * j + _event.szeventindex, false);
+									std::string szName = Stream->ReadNullTermStrTrgt(seqPos + seqdescs[i].eventindex + 80 * j + 12, false);
+				
+									seqdescs[i].szeventnames.push_back(szEventName);
+									seqdescs[i].events.push_back(eventNum);
+				
+									Logger::Info("Event Read: %s : %s : %d\n", szName.c_str(), szEventName.c_str(), j);
+									eventNum++;
+								}
+							}
+				#pragma endregion
+				#pragma region ACTIVITYMODIFIERS
+							if (numActMods > 0)
+							{
+								Stream->seek(seqPos + seqdescs[i].activitymodifierindex);
+								for (int j = 0; j < seqdescs[i].numactivitymodifiers; j++)
+								{
+									mstudioactivitymodifier_t_v49 actmod; Stream->Read(&actmod);
+									
+									std::string szName = Stream->ReadNullTermStrTrgt(seqPos + seqdescs[i].activitymodifierindex + 4 * j + actmod.sznameindex, false);
+				
+									seqdescs[i].szactivitymodifiernames.push_back(szName);
+									actmod.szname = szName;
+									activitymodifiers.push_back(actmod);
+									seqdescs[i].actmods.push_back(actModNum);
+									Logger::Info("ActMod Read: %s : %d\n", seqdescs[i].szactivitymodifiernames[j].c_str(), j);
+									actModNum++;
+								}
+							}
+				#pragma endregion
+			}
 		}
-
-		for (int i = 0; i < mdlhdr.numlocalseq; i++)
-		{
-			int seqPos = mdlhdr.localseqindex + 212 * i;
-			int numBlends = seqdescs[i].groupsize[0] * seqdescs[i].groupsize[1];
-			int posekeySize = seqdescs[i].groupsize[0] + seqdescs[i].groupsize[1];
-			int numAutolayers = seqdescs[i].numautolayers;
-			int numActMods = seqdescs[i].numactivitymodifiers;
-			int numEvents = seqdescs[i].numevents;
-			if (seqdescs[i].weightlistindex > 0)
-			{
-				Stream->seek(seqPos + seqdescs[i].weightlistindex);
-				seqweightlist_t_v49 weightlist; Stream->Read(&weightlist, mdlhdr.numbones);
-				seqweightlist.push_back(weightlist);
-				Logger::Info("Weightlist Read: %d\n", i);
-			}
-
-			if (seqdescs[i].animindexindex > 0)
-			{
-				Stream->seek(seqPos + seqdescs[i].animindexindex);
-				blendgroup_t_v49 blendgroup; Stream->Read(&blendgroup, numBlends);
-				blends.push_back(blendgroup);
-				Logger::Info("BlendGroup Read: %d\n", i);
-			}
-
-			if (seqdescs[i].posekeyindex > 0)
-			{
-				Stream->seek(seqPos + seqdescs[i].posekeyindex);
-				posekey_t_v49 posekey; Stream->Read(&posekey, posekeySize);
-				if (posekeySize == 3)posekey.unk[2] == 0.0;
-//				Logger::Info("PosekeyF Read: %f\n", posekey.unk[2]);
-				posekeys.push_back(posekey);
-				Logger::Info("Posekey Read: %d\n", i);
-			}
-
-			if (numAutolayers > 0)
-			{
-				Stream->seek(seqPos + seqdescs[i].autolayerindex);
-				for (int j = 0; j < numAutolayers; j++)
-				{
-					mstudioautolayer_t_v49 autolayer; Stream->Read(&autolayer);
-					autolayers.push_back(autolayer);
-					Logger::Info("Autolayer Read: %d\n", j);
-				}
-			}
-
-			if (numEvents > 0)
-			{
-				Stream->seek(seqPos + seqdescs[i].eventindex);
-				for (int j = 0; j < seqdescs[i].numevents; j++)
-				{
-					mstudioevent_t_v49 _event; Stream->Read(&_event);
-					events.push_back(_event);
-
-					std::string szEventName = Stream->ReadNullTermStrTrgt(seqPos + seqdescs[i].eventindex + 80 * j + _event.szeventindex, false);
-					std::string szName = Stream->ReadNullTermStrTrgt(seqPos + seqdescs[i].eventindex + 80 * j + 12, false);
-
-					seqdescs[i].szeventnames.push_back(szEventName);
-
-					Logger::Info("Event Read: %s : %s : %d\n", szName.c_str(), szEventName.c_str(), j);
-				}
-			}
-
-			if (numActMods > 0)
-			{
-				Stream->seek(seqPos + seqdescs[i].activitymodifierindex);
-				for (int j = 0; j < seqdescs[i].numactivitymodifiers; j++)
-				{
-					mstudioactivitymodifier_t_v49 actmod; Stream->Read(&actmod);
-					
-					std::string szName = Stream->ReadNullTermStrTrgt(seqPos + seqdescs[i].activitymodifierindex + 4 * j + actmod.sznameindex, false);
-
-					seqdescs[i].szactivitymodifiernames.push_back(szName);
-					actmod.szname = szName;
-					actmod.setnum = seqdescs[i].numactivitymodifiers;
-					activitymodifiers.push_back(actmod);
-					Logger::Info("ActMod Read: %s : %d\n", seqdescs[i].szactivitymodifiernames[j].c_str(), j);
-				}
-			}
-		}
-	}
+	#pragma endregion
+#pragma endregion
+#pragma region NODENAMES
 	if (mdlhdr.numlocalnodes > 0)
 	{
 		Stream->seek(mdlhdr.localnodenameindex);
@@ -4898,6 +5364,8 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 			nodenames.push_back(nodeName);
 			Logger::Info("NodeName Read: %s : %d\n", nodeName.szname.c_str(), i);
 		}
+#pragma endregion
+#pragma region NODEDATA
 		Stream->seek(mdlhdr.localnodeindex);
 		for (int i = 0; i < mdlhdr.numlocalnodes; i++)
 		{
@@ -4906,6 +5374,8 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("Node Read: %d\n", i);
 		}
 	}
+#pragma endregion
+#pragma region BODYPARTS
 	if (mdlhdr.numbodyparts > 0)
 	{
 		Stream->seek(mdlhdr.bodypartindex);
@@ -4921,7 +5391,8 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("Bodypart Read: %s : %d\n", bodyPart.szname.c_str(), i);
 		}
 	}
-
+#pragma endregion
+#pragma region MODELS
 	if (nummodels > 0)
 	{
 		Stream->seek(mdlhdr.bodypartindex + 16 * mdlhdr.numbodyparts);
@@ -4938,9 +5409,11 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 		}
 
 	}
-
+#pragma endregion
+#pragma region IKCHAINS
 	if (mdlhdr.numikchains > 0)
 	{
+		std::vector <int> ikRoots;
 		Stream->seek(mdlhdr.ikchainindex);
 		for (int i = 0; i < mdlhdr.numikchains; i++)
 		{
@@ -4955,7 +5428,8 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 			ikchains.push_back(ikchain);
 			Logger::Info("IkChain Read: %s : %d\n", szName.c_str(), i);
 		}
-
+#pragma endregion
+#pragma region IKLINKS
 		for (int i = 0; i < numiklinks; i++)
 		{
 			int ikLinkPos = (mdlhdr.ikchainindex + 16 * mdlhdr.numikchains) + 28 * i;
@@ -4965,6 +5439,8 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("IkLink Read: %d\n", i);
 		}
 	}
+#pragma endregion
+#pragma region POSEPARAMDESCS
 	if (mdlhdr.localposeparamindex > 0)
 	{
 		Stream->seek(mdlhdr.localposeparamindex);
@@ -4980,7 +5456,8 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("PoseParamDesc Read: %s : %d\n", szName.c_str(), i);
 		}
 	}
-
+#pragma endregion
+#pragma region ANIMBLOCKS
 	if (mdlhdr.numanimblocks > 0)
 	{
 		Stream->seek(mdlhdr.localnodeindex);
@@ -4991,7 +5468,8 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("AnimBlock Read: %d\n", i);
 		}
 	}
-
+#pragma endregion
+#pragma region MESHES
 	if (nummeshes > 0)
 	{
 		for (int i = 0; i < nummeshes; i++)
@@ -5012,6 +5490,8 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("Mesh Read: %d\n", i);
 		}
 	}
+#pragma endregion
+#pragma region INCLUDEMODEL
 	if (mdlhdr.numincludemodels > 0)
 	{
 		Stream->seek(mdlhdr.includemodelindex);
@@ -5027,6 +5507,8 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("IncludedModel Read: %s : %d\n", szName.c_str(), i);
 		}
 	}
+#pragma endregion
+#pragma region TEXTURES
 	if (mdlhdr.numtextures > 0)
 	{
 		Stream->seek(mdlhdr.textureindex);
@@ -5043,6 +5525,8 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("Texture Read: %s : %d\n", szName.c_str(), i);
 		}
 	}
+#pragma endregion
+#pragma region CDMATERIALS
 	if (mdlhdr.numcdtextures > 0)
 	{
 		Stream->seek(mdlhdr.cdtextureindex);
@@ -5057,6 +5541,8 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("CdTexture Read: %s : %d\n", szName.c_str(), i);
 		}
 	}
+#pragma endregion
+#pragma region SKINFAMILIES
 	if (mdlhdr.numskinfamilies > 0)
 	{
 		if (mdlhdr.numskinref > 0)
@@ -5070,13 +5556,16 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 			}
 		}
 	}
-
+#pragma endregion
+#pragma region KEYVALUES
 	if (mdlhdr.keyvaluesize > 0)
 	{
 		Stream->seek(mdlhdr.keyvalueindex);
 		Stream->Read(&keyvalues, mdlhdr.keyvaluesize);
 		Logger::Info("Keyvalues Read: %d\n", mdlhdr.keyvaluesize);
 	}
+#pragma endregion
+#pragma region SRCBONETRANSFORMS
 	if (mdlsubhdr.numsrcbonetransform > 0)
 	{
 		Stream->seek(mdlsubhdr.srcbonetransformindex);
@@ -5091,6 +5580,8 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 			Logger::Info("SrcBoneTransform Read: %s : %d\n", szName.c_str(), i);
 		}
 	}
+#pragma endregion
+#pragma region LINEARBONE
 	if (mdlhdr.numbones > 0)
 	{
 		Stream->seek(mdlsubhdr.linearboneindex + 408);
@@ -5098,14 +5589,15 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 		Stream->Read(&linearbonedata, mdlhdr.numbones);
 		Logger::Info("LinearBone Read: %d\n", mdlhdr.numbones);
 	}
-
+#pragma endregion
+#pragma region STRINGTABLE
 	Stream->seek(mdlsubhdr.sznameindex + 408);
 	mstudiostringtable_t_v49 stringTable; Stream->Read(&stringTable, mdlhdr, seqdescs, hitboxsets, attachments, nodenames, bodyparts, ikchains,animdescs, textures, includedmodels, cdtextures, poseparamdescs, srcbonetransforms);
-	std::string string(stringTable.mdlname.begin(), stringTable.mdlname.end());
-	Logger::Info("mldName: %s\n", string.c_str());
+	//std::string string(stringTable.mdlname.begin(), stringTable.mdlname.end());
+	//Logger::Info("mldName: %s\n", string.c_str());
+#pragma endregion
 
-	MDL::v49Mdl _v49mdl{ mdlhdr,mdlsubhdr,bones,jigglebones,boneflexdrivers,attachments,hitboxsets,hitboxes,bonenametable,animdescs,anims, sectionindexes, sections, ikrules,compressedikerrors,ikerrors,ikrulezeroframe,seqdescs,blends,posekeys,events,autolayers,activitymodifiers,seqweightlist,nodenames,nodes,bodyparts,models,meshes,ikchains,iklinks,poseparamdescs,animBlocks,includedmodels,cdtextures,textures,skingroups,keyvalues,srcbonetransforms,linearbone,linearbonedata, stringTable };
-
+	MDL::v49Mdl _v49mdl = { mdlhdr, mdlsubhdr, bones, jigglebones, boneflexdrivers, attachments, hitboxsets, hitboxes, bonenametable, animdescs, anims, sectionindexes, sections, ikrules, compressedikerrors, ikerrors, ikrulezeroframe, seqdescs, blends, posekeys, events, autolayers, activitymodifiers, seqweightlist, nodenames, nodes, bodyparts, models, meshes, ikchains, iklinks, poseparamdescs, animBlocks, includedmodels, cdtextures, textures, skingroups, keyvalues, srcbonetransforms, linearbone, linearbonedata, stringTable };
 	return _v49mdl;
 }
 
@@ -6248,6 +6740,39 @@ std::vector<int> MDL::v49Mdl::v53IkRuleStairsPerAnim()
 	return ikRuleStairsPerAnim;
 }
 
+std::vector<int> MDL::v49Mdl::v53GetBytesAddedToWeightLists()
+{
+	std::vector<int> hdrBytesAnimDescAdd = v53GetAnimHdrBytesAdded(true);
+	std::vector<int> secHdrBytesAnimDescAdd = v53GetSecHdrBytesAdded(true);
+	std::vector<int> bytesAddedToWeightLists;
+	int ikRuleNum = 0;
+	int seqIdx = mdlhdr.localseqindex;
+	//Logger::Info("animIdx: %d\n", seqIdx);
+	//Logger::Info("Hdr BytesAdded: %d\n", bytesAddedToHeader);
+	//Logger::Info("Bone BytesAdded: %d\n", bytesAddedToBones);
+	int bytesAddedToHeader = 52;
+	int bytesAddedToBones = mdlhdr.numbones * 28;
+	int actModNumber = 0;
+	int bytesAdded = 0;
+
+	for (int i = 0; i < mdlhdr.numlocalseq; i++)
+	{
+		//Logger::Info("Test\n");
+		mstudioseqdescv49_t v49SeqDesc = seqdescs[i];
+		int strPos = mdlhdr.localseqindex + 212 * i;
+
+		if (!contains(weightlistidxs, strPos + seqdescs[i].weightlistindex))
+		{
+			weightlistidxs.push_back(strPos + seqdescs[i].weightlistindex);
+			bytesAdded = (4 * actModNumber);
+			bytesAddedToWeightLists.push_back(bytesAdded);
+		}
+//		Logger::Info("Bytes Added: %d \n", bytesAdded);
+		actModNumber += v49SeqDesc.numactivitymodifiers;
+	}
+	return bytesAddedToWeightLists;
+}
+
 void MDL::v49Mdl::SetMdlInts()
 {
 	ikRuleStairsPerAnim = v53IkRuleStairsPerAnim();
@@ -6257,6 +6782,7 @@ void MDL::v49Mdl::SetMdlInts()
 
 	animByteAddedTotal = v53GetTotalAnimHdrBytesAdded();
 	animSecByteAddedTotal = v53GetTotalSecHdrBytesAdded();
+	bytesAddedToWeightLists = v53GetBytesAddedToWeightLists();
 
 	animBytesAdded = animByteAddedTotal + animSecByteAddedTotal;
 	bytesAddedToRuiMesh = 0;
@@ -6660,13 +7186,19 @@ std::vector<mstudioseqdesc_t_v53> MDL::v49Mdl::SeqDescConversion()
 		//Logger::Info("Test\n");
 		mstudioseqdescv49_t v49SeqDesc = seqdescs[i];
 		int strPos = mdlhdr.localseqindex + 212 * i;
-
+		int weightList = GetTrgtPosInArry(weightlistidxs, strPos + seqdescs[i].weightlistindex);
 		int steps = 20 * (mdlhdr.numlocalseq - i);
 		int steps2 = steps + 4 * actModNumber;
-		int stairs1 = strPos + v49SeqDesc.weightlistindex == mdlhdr.localseqindex + seqdescs[0].weightlistindex ? 20 * (mdlhdr.numlocalseq - i) : 20 * (mdlhdr.numlocalseq - i) + 4 * actModNumber;
+		int stairs1 = steps + bytesAddedToWeightLists[weightList];//strPos + v49SeqDesc.weightlistindex == weightlistidxs[0] ? 20 * (mdlhdr.numlocalseq - i) : 20 * (mdlhdr.numlocalseq - i) + 4 * actModNumber;
 		int stairs = steps + bytesAddedToTextures + bytesAddedToIkChains + bytesAddedToActMods + textureFiller + bytesAddedToRuiMesh + bytesAddedToLinearBone + bytesAddedToAABBTree;
 
 		int outPos = seqIdx + stairs;
+
+		for (int j = 0; j < v49SeqDesc.numblends; j++)
+		{
+			int anim = v49SeqDesc.blends.blends[j];
+			if (animdescs[anim].numframes == 1) v49SeqDesc.flags += 0x80000;
+		}
 
 		if (v49SeqDesc.eventindex > 0)				v49SeqDesc.eventindex += steps2;
 		if (v49SeqDesc.animindexindex > 0)			v49SeqDesc.animindexindex += steps2;

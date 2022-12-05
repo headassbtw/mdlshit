@@ -1,4 +1,5 @@
 #include <MLUtil.h>
+#include <structs.hpp>
 #include <vector>
 
 namespace Utility
@@ -52,6 +53,156 @@ namespace Utility
 
 			return n1;
 		}
+
+		int GetAttachedJiggleBone(int version, int boneIdx, int bone, int jBoneIdx, int maxBones)
+		{
+			int size = 120;
+
+			switch(version)
+			{
+				case 49:
+				{
+					int boneSize = 216;
+					int pos = boneIdx + (boneSize * bone) + jBoneIdx;
+					int jiggleStart = boneIdx + (boneSize * maxBones);
+					int dist = pos - jiggleStart;
+					int curJBone = dist / size;
+
+					return curJBone;
+
+					break;
+				}
+
+				case 52:
+				{
+					int boneSize = 216;
+					int pos = boneIdx + (boneSize * bone) + jBoneIdx;
+					int jiggleStart = boneIdx + (boneSize * maxBones);
+					int dist = pos - jiggleStart;
+					int curJBone = dist / size;
+
+					return curJBone;
+
+					break;
+				}
+
+				case 53:
+				{
+					int boneSize = 244;
+					int pos = boneIdx + (boneSize * bone) + jBoneIdx;
+					int jiggleStart = boneIdx + (boneSize * maxBones);
+					int dist = pos - jiggleStart;
+					int curJBone = dist / size;
+
+					return curJBone;
+
+					break;
+				}
+
+				default:
+				{
+					return -1;
+
+					break;
+				}
+			}
+			return -1;
+		}
+
+		std::string ReadBoneFlags()
+		{
+			return "";
+		}
+
+		std::string ReadJiggleFlags(int flags)
+		{
+			std::string value = "";
+
+			if (flags == 0) return "NONE";
+
+			int flag = 0;
+
+			int flagsFound = 0;
+
+			for (int i = 0; i < 32; i++)
+			{
+				flag = flags & (1 << i);
+
+				if (flag != 0)
+				{
+					flagsFound++;
+				}
+			}
+
+			int flagCounter = 0;
+			for (int i = 0; i < 32; i++)
+			{
+				flag = flags & (1 << i);
+
+				switch (flag)
+				{
+				case 0:
+				{
+					break;
+				}
+				case JIGGLE_IS_FLEXIBLE:
+				{
+					value += "JIGGLE_IS_FLEXIBLE";
+					break;
+				}
+				case JIGGLE_IS_RIGID:
+				{
+					value += "JIGGLE_IS_RIGID";
+					break;
+				}
+				case JIGGLE_HAS_YAW_CONSTRAINT:
+					value += "JIGGLE_HAS_YAW_CONSTRAINT";
+					break;
+				case JIGGLE_HAS_PITCH_CONSTRAINT:
+					value += "JIGGLE_HAS_PITCH_CONSTRAINT";
+					break;
+				case JIGGLE_HAS_ANGLE_CONSTRAINT:
+					value += "JIGGLE_HAS_ANGLE_CONSTRAINT";
+					break;
+				case JIGGLE_HAS_LENGTH_CONSTRAINT:
+					value += "JIGGLE_HAS_LENGTH_CONSTRAINT";
+					break;
+				case JIGGLE_HAS_BASE_SPRING:
+					value += "JIGGLE_HAS_BASE_SPRING";
+					break;
+				default:
+					value += "UNK_"; value += std::to_string(flag).c_str();
+					break;
+				}
+
+				if (flag != 0)
+				{
+					flagCounter++;
+					if (flagCounter < flagsFound)
+					{
+						value += " | ";
+					}
+				}
+			}
+
+			return std::string(value);
+		}
+
+		std::string ReadAnimDescFlags()
+		{
+			return "";
+		}
+
+		std::string ReadSeqFlags()
+		{
+			return "";
+		}
+
+		std::string ReadMdlHdrFlags()
+		{
+			return "";
+		}
+
 	}
 
 	namespace math

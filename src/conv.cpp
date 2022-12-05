@@ -942,16 +942,6 @@ int ConvertV49(FileInfo info)
     if (OutStream.Position() > 0) OutStream.seek(0);
     if (Stream.Position() > 0) Stream.seek(0);
 
-    //bool readV53 = false;
-    //if (readV53 && info.aabb.has_value()) //This is also a temp for rui testing. -Liberty Edit: This is how I get the converter to read a v53 without adding an extra option. - Liberty
-    //{
-    //    BinaryReader v53Stream = BinaryReader(info.aabb.value().c_str());
-    //    MDL::v53Mdl mdl2 = mdl2._v53Mdl(&v53Stream, false);
-    //    //if (!v53Stream.Stream.good()) {
-    //    //    Logger::Error("Model's phy file does not exist, please ensure %s exists, and is located in the same directory as the file\n", info.aabb.value().c_str());
-    //    //    return 1;
-    //    //}
-    //}
     MDL::v49Mdl mdl = mdl._v49Mdl(&Stream, false);
     mdl.SetMdlInts();
     studiohdr_t_v53 v53Hdr = mdl.ConvertHeader(info);
@@ -967,7 +957,7 @@ int ConvertV49(FileInfo info)
     int animSecByteAddedTotal = mdl.v53GetTotalSecHdrBytesAdded();
 
     std::vector<int> secHdrBytesSecAdd = mdl.v53GetSecBytesAdded(true);
-    std::vector<int> ikChainBones = mdl.GetIkChainBones();
+    std::vector<int> ikChainBones = mdl.GetIKBones();
     //std::vector<int> deltaAnims = GetDeltaAnims(&Stream, Initial_Header, false);
 
     int animBytesAdded = animByteAddedTotal + animSecByteAddedTotal;
@@ -1215,6 +1205,14 @@ int ConvertV49(FileInfo info)
         Stream.seek(strPos);
         OutStream.seek(outPos);
 
+        if (seqDesc.posekeyindex > 0)
+        {
+            int posekeySize = seqdescs[i].groupsize[0] + seqdescs[i].groupsize[1];
+            OutStream.seek(outPos + seqDesc.posekeyindex);
+            OutStream.Write(mdl.posekeys[poseKeyNum], posekeySize);
+            poseKeyNum++;
+        }
+
         if (seqDesc.weightlistindex > 0)
         {
             seqweightlist_t_v49 weightList = mdl.seqweightlist[weightListNum];
@@ -1228,14 +1226,6 @@ int ConvertV49(FileInfo info)
             OutStream.seek(outPos + seqDesc.animindexindex);
             OutStream.Write(mdl.blends[blendNum]);
             blendNum++;
-        }
-
-        if (seqDesc.posekeyindex > 0)
-        {
-            int posekeySize = seqdescs[i].groupsize[0] + seqdescs[i].groupsize[1];
-            OutStream.seek(outPos + seqDesc.posekeyindex);
-            OutStream.Write(mdl.posekeys[poseKeyNum], posekeySize);
-            poseKeyNum++;
         }
 
         if (seqDesc.numautolayers > 0)
