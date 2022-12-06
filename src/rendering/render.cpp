@@ -657,6 +657,8 @@ for(int i = 0; i < files.size();i++){
 hasBrowser = true;  
     double lastTime;
     double currentTime;
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
     do{
         //https://discourse.glfw.org/t/frame-limiting/70
         //:clueless:
@@ -688,6 +690,7 @@ hasBrowser = true;
         }
     }
     while(glfwWindowShouldClose(Window) == 0);
+    UI::DestroyReadMdlWindow(); //there's some shaders and textures in here
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();

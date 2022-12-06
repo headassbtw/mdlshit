@@ -1,4 +1,5 @@
  
+
 #include "glm/ext/vector_float3.hpp"
 #include "structs.hpp"
 #include <rendering/shaders.hpp>
@@ -12,6 +13,7 @@
 #include <gl.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <GLFW/glfw3.h>
 
 Widgets::File* _mdl;
 std::optional<MDL::v49Mdl> _opt_v49;
@@ -21,7 +23,7 @@ int extract_dropdown;
 bool isReading = false;
 
 #pragma region sub-rendering
-
+int subRendererResolution;
 glm::vec3 pos;
 float fov = 90;
 float pos_gui[3] = {4,4,-4};
@@ -29,6 +31,7 @@ float lightpos_gui[3] = {-3,3,-3};
 int SelectedMesh = 0;
 GLuint Texture;
 GLuint Framebuffer;
+GLuint FramebufferDepth;
 GLuint MatrixID;
 GLuint ViewMatrixID;
 GLuint ModelMatrixID;
@@ -110,20 +113,37 @@ GLuint vao = 0;
 GLuint Shader;
 
 GLuint SetupRuiMeshRenderPipeline(){
+  GLFWmonitor* primary = glfwGetPrimaryMonitor();
+  int m_x, m_y;
+  glfwGetMonitorWorkarea(primary, nullptr,nullptr, &m_x, &m_y);
+  auto style = ImGui::GetStyle();
+  m_x -= (400+(style.WindowPadding.x*2) + style.ItemSpacing.x);
+  m_y -= (190 + (style.ItemSpacing.y*4));
+  subRendererResolution = std::min(m_x,m_y); //i'd do max but i doubt you'd actually be able to make space for it, 
+                                                  //unless you had a square monitor which then defeats the purpose
+  Logger::Info("Initializing RUI Mesh preview texture at %ipx\n",subRendererResolution);
 
+  glGenRenderbuffers(1, &FramebufferDepth);
+  glBindRenderbuffer(GL_RENDERBUFFER, FramebufferDepth);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, subRendererResolution, subRendererResolution);
 
 
   glGenFramebuffers(1,&Framebuffer);
   glBindFramebuffer(GL_FRAMEBUFFER,Framebuffer);
   glGenTextures(1, &Texture);
   glBindTexture(GL_TEXTURE_2D, Texture);
-  glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,400,400,0,GL_RGBA,GL_FLOAT,0);
+  glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,subRendererResolution,subRendererResolution,0,GL_RGBA,GL_FLOAT,0);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glFramebufferRenderbuffer(
+    GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, FramebufferDepth
+  );
+
   glFramebufferTexture(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,Texture,0);
   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+    
     Logger::Critical("Framebuffer was not ok!\n");
     abort();
   }
@@ -138,7 +158,10 @@ GLuint SetupRuiMeshRenderPipeline(){
   return Texture;
 }
 void DestroyRuiMeshRenderPipeline(){
+  glDeleteBuffers(5,vbo);
+  glDeleteVertexArrays(1,&vao);
   glDeleteTextures(1,&Texture);
+  glDeleteRenderbuffers(1,&FramebufferDepth);
   glDeleteFramebuffers(1,&Framebuffer);
   glDeleteProgram(Shader);
 }
@@ -164,22 +187,19 @@ void PushRuiMeshData(std::vector<mstudioruimesh_t> meshes){
       vertices.push_back(mltoglm(meshes[i].vertex[j].vertexpos));
       vertices.push_back(mltoglm(meshes[i].vertex[j+1].vertexpos));
       vertices.push_back(mltoglm(meshes[i].vertex[j+2].vertexpos));
-      uvs.push_back(vec2(0,0));
-      uvs.push_back(vec2(0,0));
-      uvs.push_back(vec2(0,0));
-
+      
       vec3 nml = normalize(cross(mltoglm(meshes[i].vertex[j+1].vertexpos) - mltoglm(meshes[i].vertex[j].vertexpos),
       mltoglm(meshes[i].vertex[j+2].vertexpos) - mltoglm(meshes[i].vertex[j].vertexpos)));
-      normals.push_back(nml);
-      normals.push_back(nml);
-      normals.push_back(nml);
       
+      colors.push_back(vec3(1.0f,0.0f,0.0f));
+      colors.push_back(vec3(0.0f,1.0f,0.0f));
       colors.push_back(vec3(0.0f,0.0f,1.0f));
-      colors.push_back(vec3(0.0f,0.0f,1.0f));
-      colors.push_back(vec3(0.0f,0.0f,1.0f));
-      faceids.push_back(i+1);
-      faceids.push_back(i+1);
-      faceids.push_back(i+1);
+
+      for(int k = 0; k < 3; k++){
+        faceids.push_back(i+1);
+        normals.push_back(nml);
+        uvs.push_back(vec2(0,0));
+      }
     }
   }
 
@@ -225,6 +245,7 @@ void PushRuiMeshData(std::vector<mstudioruimesh_t> meshes){
 }
 
 GLuint RenderRuiMeshes(){
+  
   glDisable(GL_CULL_FACE);
   glCullFace(GL_NONE);
 
@@ -251,7 +272,7 @@ GLuint RenderRuiMeshes(){
   glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
 
   glBindFramebuffer(GL_FRAMEBUFFER,Framebuffer);
-  glViewport(0, 0, 400, 400);
+  glViewport(0, 0, subRendererResolution, subRendererResolution);
   glClearColor(0.0, 0.0, 0.0, 0.5);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -669,32 +690,37 @@ void AddMainMdlTrees()
             }
             if (ImGui::TreeNode((void*)(intptr_t)4, "RUI Meshes (%zu)", mdl->ruimeshes.size()))
             {
-              glUniform1f(ShaderSelected,0);
+              SelectedMesh = 0;
                 for (int i = 0; i < mdl->ruimeshes.size(); i++)
                 {
-                    if (ImGui::TreeNode((void*)(intptr_t)i, "%s", mdl->ruimeshes[i].szruimeshname))
-                    {
-                      
-                        if (ImGui::TreeNode((void*)(intptr_t)i+1, "Faces (%zu)", mdl->ruimeshes[i].numfaces))
-                        {
-                            for (int m = 0; m < mdl->ruimeshes[i].numfaces; m++){
-
-                                ImGui::Text("UV: [Min: (%f, %f) Max: (%f, %f)]",mdl->ruimeshes[i].facedata[m].faceuvmin.x,mdl->ruimeshes[i].facedata[m].faceuvmin.y,mdl->ruimeshes[i].facedata[m].faceuvmax.x,mdl->ruimeshes[i].facedata[m].faceuvmax.y);
-                            }
-                            ImGui::TreePop();
-                        }
-                        if (ImGui::TreeNode((void*)(intptr_t)i+2, "Vertices (%zu)", mdl->ruimeshes[i].numvertices))
-                        {
-                            for (int m = 0; m < mdl->ruimeshes[i].numvertices; m++){
-                                ImGui::Text("Pos: (%f, %f, %f) Parent: %i",mdl->ruimeshes[i].vertex[m].vertexpos.x, mdl->ruimeshes[i].vertex[m].vertexpos.y, mdl->ruimeshes[i].vertex[m].vertexpos.z,mdl->ruimeshes[i].vertex[m].parent);
-                            }
-                            ImGui::TreePop();
-                        }
-                        ImGui::TreePop();
-                    }
+                  if (ImGui::TreeNode((void*)(intptr_t)i, "%s", mdl->ruimeshes[i].szruimeshname)){
                     if(ImGui::IsItemHovered()){
-                        SelectedMesh = i+1;
+                      SelectedMesh = i+1;
+                    }
+                    
+                    if (ImGui::TreeNode((void*)(intptr_t)i+1, "Faces (%zu)", mdl->ruimeshes[i].numfaces))
+                    {
+                      for (int m = 0; m < mdl->ruimeshes[i].numfaces; m++){
+                        ImGui::Text("UV: [Min: (%f, %f) Max: (%f, %f)]",mdl->ruimeshes[i].facedata[m].faceuvmin.x,mdl->ruimeshes[i].facedata[m].faceuvmin.y,mdl->ruimeshes[i].facedata[m].faceuvmax.x,mdl->ruimeshes[i].facedata[m].faceuvmax.y);
                       }
+                      ImGui::TreePop();
+                    }
+                    if (ImGui::TreeNode((void*)(intptr_t)i+2, "Vertices (%zu)", mdl->ruimeshes[i].numvertices))
+                    {
+                      for (int m = 0; m < mdl->ruimeshes[i].numvertices; m++){
+                        ImGui::Text("Pos: (%f, %f, %f) Parent: %i",mdl->ruimeshes[i].vertex[m].vertexpos.x, mdl->ruimeshes[i].vertex[m].vertexpos.y, mdl->ruimeshes[i].vertex[m].vertexpos.z,mdl->ruimeshes[i].vertex[m].parent);
+                      }
+                      ImGui::TreePop();
+                    }
+                    ImGui::TreePop();
+                  }
+                  else{
+                    if(ImGui::IsItemHovered()){
+                      SelectedMesh = i+1;
+                    }
+                  }
+                  
+                    
                 }
                 ImGui::TreePop();
             }
@@ -826,58 +852,81 @@ void AddExtractionOptions()
 //        test.close();
 //    }
 //}
-
+bool needsReset = false; //for the rui mesh renderer
 void UI::RenderReadMdlWindow(int x, int y)
 {
-    _mdl->UI(x-8);
-    std::ifstream test(&_mdl->BoxBuffer[0]);
-    int version = 0;
+  //if(needsReset) ImGui::Text("Needs Reset");
+  _mdl->UI(x-8);
+  std::ifstream test(&_mdl->BoxBuffer[0]);
+  int version = 0;
 
 
-    if (!test)
-    {
-        _opt_v49.reset();
-        _opt_v53.reset();
-        _opt_v52.reset();
+  if (!test)
+  {
+    _opt_v49.reset();
+    _opt_v53.reset();
+    _opt_v52.reset();
+    if(needsReset){
+      DestroyRuiMeshRenderPipeline();
+      needsReset = false;
+      renderRuiMesh = false;
     }
-    else
+  }
+  else
+  {
+    if (!isReading && ImGui::Button("Read MDL"))
     {
-        if (!isReading && ImGui::Button("Read MDL"))
-        {
-            isReading = true;
-            _opt_v49.reset();
-            _opt_v53.reset();
-            _opt_v52.reset();
+      isReading = true;
+      _opt_v49.reset();
+      _opt_v53.reset();
+      _opt_v52.reset();
+      DestroyRuiMeshRenderPipeline();
+      ReadMdl();
+      needsReset = true;
+      isReading = false;
+    }
+    AddExtractionOptions();
+    ImGui::SameLine();
+    if(_opt_v53.has_value())
+    if(!renderRuiMesh){
+      if(ImGui::Button("Render RUI Mesh")){
+        SetupRuiMeshRenderPipeline();
+        PushRuiMeshData(_opt_v53->ruimeshes);
+        renderRuiMesh = true;
+      }
+    }
+    else{
+      if(ImGui::Button("Unload RUI Mesh")){
+        DestroyRuiMeshRenderPipeline();
+        renderRuiMesh = false;
+      }
+    }
+    ImGui::Separator();
+    ImGui::BeginChildFrame((intptr_t)32, {400,0});
+    AddMainMdlTrees();
+    ImGui::EndChildFrame();
+    if(renderRuiMesh){
+      RenderRuiMeshes();
+      ImGui::SameLine();
+      auto av = ImGui::GetContentRegionAvail();
+      
+      ImGui::BeginGroup();
+      ImGui::SetNextItemWidth(av.x-100);
+      ImGui::SliderFloat3("Camera Position", pos_gui,-10,10);
+      ImGui::SetNextItemWidth(av.x-100);
+      ImGui::SliderFloat3("Light Position", lightpos_gui,-12,12);
+      ImGui::SetNextItemWidth(av.x-100);
+      ImGui::SliderFloat("FoV",&fov,20.0f,150.0f);
+      auto av2 = ImGui::GetContentRegionAvail();
+      float texSize = std::min(av2.x,av2.y);
+      ImGui::Image((void*)(intptr_t)Texture,{texSize,texSize},{0,1},{1,0});
+      ImGui::EndGroup();
+    }
+  }
+}
 
-            ReadMdl();
-            isReading = false;
-        }
-        AddExtractionOptions();
-        ImGui::SameLine();
-        if(_opt_v53.has_value())
-        if(!renderRuiMesh && ImGui::Button("Render RUI Mesh")){
-          SetupRuiMeshRenderPipeline();
-          PushRuiMeshData(_opt_v53->ruimeshes);
-          renderRuiMesh = true;
-        }
-        ImGui::Separator();
-        ImGui::BeginGroup();
-        AddMainMdlTrees();
-        ImGui::EndGroup();
-        if(renderRuiMesh){
-          RenderRuiMeshes();
-          ImGui::SameLine();
-          ImGui::SetNextItemWidth(400);
-          ImGui::BeginGroup();
-          ImGui::SetNextItemWidth(400);
-          ImGui::SliderFloat3("Camera Position", pos_gui,-10,10);
-          ImGui::SetNextItemWidth(400);
-          ImGui::SliderFloat3("Light Position", lightpos_gui,-12,12);
-          ImGui::SetNextItemWidth(400);
-          ImGui::SliderFloat("FoV",&fov,20.0f,150.0f);
-
-          ImGui::Image((void*)(intptr_t)Texture,{400,400},{0,1},{1,0});
-          ImGui::EndGroup();
-        }
+void UI::DestroyReadMdlWindow(){
+    if(!renderRuiMesh){
+        DestroyRuiMeshRenderPipeline();
     }
 }

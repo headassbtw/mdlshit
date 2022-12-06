@@ -6,4 +6,5 @@ namespace UI{
   void SetupReadMdlWindow();
   void SetReadMdlFile(const char* path);
   void RenderReadMdlWindow(int x, int y);
+  void DestroyReadMdlWindow();
 }
