@@ -665,6 +665,7 @@ hasBrowser = true;
           lastTime = currentTime;
 
           glViewport(0, 0, viewport_width, viewport_height);
+          glClearColor(0.1, 0.1, 0.1, 255);
           ImGui_ImplOpenGL3_NewFrame();
           ImGui_ImplGlfw_NewFrame();
           ImGui::NewFrame();

@@ -1,9 +1,17 @@
+ 
+#include "glm/ext/vector_float3.hpp"
+#include "structs.hpp"
+#include <rendering/shaders.hpp>
 #include <rendering/render.hpp>
 #include <imgui.h>
 #include <rendering/filewidget.hpp>
 #include <binarystream.hpp>
 #include <mdls.hpp>
 #include <MLUtil.h>
+#include <GL/glew.h>
+#include <gl.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 Widgets::File* _mdl;
 std::optional<MDL::v49Mdl> _opt_v49;
@@ -11,6 +19,259 @@ std::optional<MDL::v53Mdl> _opt_v53;
 std::optional<MDL::v52Mdl> _opt_v52;
 int extract_dropdown;
 bool isReading = false;
+
+#pragma region sub-rendering
+
+glm::vec3 pos;
+float fov = 90;
+float pos_gui[3] = {4,4,-4};
+float lightpos_gui[3] = {-3,3,-3};
+int SelectedMesh = 0;
+GLuint Texture;
+GLuint Framebuffer;
+GLuint MatrixID;
+GLuint ViewMatrixID;
+GLuint ModelMatrixID;
+GLuint ShaderSelected;
+GLuint LightID;
+
+std::vector<vec3> vertices;
+std::vector<vec2> uvs;
+std::vector<vec3> normals;
+std::vector<vec3> colors;
+std::vector<float> faceids;
+
+GLuint common_get_shader_program(
+) {
+  GLint log_length, success;
+  GLuint fragment_shader, program, vertex_shader;
+
+  /* Vertex shader */
+  vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+  glShaderSource(vertex_shader, 1, &Resources::Shaders::VertexShader, NULL);
+  glCompileShader(vertex_shader);
+  glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
+  glGetShaderiv(vertex_shader, GL_INFO_LOG_LENGTH, &log_length);
+  if (log_length > 0) {
+    Logger::Error("Vertex shader compile error:\n");
+    std::vector<char> VertError(log_length+1);
+    glGetShaderInfoLog(vertex_shader, log_length, NULL, &VertError[0]);
+    Logger::Error("%s\n", &VertError[0]);
+  }
+  if (!success) {
+    printf("vertex shader compile error\n");
+    exit(EXIT_FAILURE);
+  }
+
+  /* Fragment shader */
+  fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(fragment_shader, 1, &Resources::Shaders::FragmentShader, NULL);
+  glCompileShader(fragment_shader);
+  glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
+  glGetShaderiv(fragment_shader, GL_INFO_LOG_LENGTH, &log_length);
+  if (log_length > 0) {
+    Logger::Error("Fragment shader compile error:\n");
+    std::vector<char> FragError(log_length+1);
+    glGetShaderInfoLog(fragment_shader, log_length, NULL, &FragError[0]);
+    Logger::Error("%s\n", &FragError[0]);
+  }
+  if (!success) {
+    Logger::Critical("fragment shader compile error\n");
+    exit(EXIT_FAILURE);
+  }
+
+  /* Link shaders */
+  program = glCreateProgram();
+  glAttachShader(program, vertex_shader);
+  glAttachShader(program, fragment_shader);
+  glLinkProgram(program);
+  glGetProgramiv(program, GL_LINK_STATUS, &success);
+  glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_length);
+  if (log_length > 0) {
+    Logger::Error("Shader linking error:\n");
+    std::vector<char> ProgError(log_length+1);
+    glGetProgramInfoLog(program, log_length, NULL, &ProgError[0]);
+    Logger::Error("%s\n", &ProgError[0]);
+  }
+  if (!success) {
+    printf("shader link error");
+    exit(EXIT_FAILURE);
+  }
+  else{}
+  Logger::Info("[readmdl shaders] linked program\n");
+
+  /* Cleanup. */
+  glDeleteShader(vertex_shader);
+  glDeleteShader(fragment_shader);
+  return program;
+}
+GLuint vbo[5] = {0,0,0,0,0};
+GLuint vao = 0;
+GLuint Shader;
+
+GLuint SetupRuiMeshRenderPipeline(){
+
+
+
+  glGenFramebuffers(1,&Framebuffer);
+  glBindFramebuffer(GL_FRAMEBUFFER,Framebuffer);
+  glGenTextures(1, &Texture);
+  glBindTexture(GL_TEXTURE_2D, Texture);
+  glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,400,400,0,GL_RGBA,GL_FLOAT,0);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glFramebufferTexture(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,Texture,0);
+  if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+    Logger::Critical("Framebuffer was not ok!\n");
+    abort();
+  }
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
+
+  Shader = common_get_shader_program();
+  glBindFramebuffer(GL_FRAMEBUFFER,0);
+
+
+
+  return Texture;
+}
+void DestroyRuiMeshRenderPipeline(){
+  glDeleteTextures(1,&Texture);
+  glDeleteFramebuffers(1,&Framebuffer);
+  glDeleteProgram(Shader);
+}
+glm::vec3 mltoglm(Vector3 vec){
+  return vec3(vec.x,vec.y,vec.z);
+}
+
+
+void PushRuiMeshData(std::vector<mstudioruimesh_t> meshes){
+  
+
+
+  glUseProgram(Shader);
+  MatrixID = glGetUniformLocation(Shader, "MVP");
+  ViewMatrixID = glGetUniformLocation(Shader, "V");
+	ModelMatrixID = glGetUniformLocation(Shader, "M");
+  ShaderSelected = glGetUniformLocation(Shader, "Selected");
+  LightID = glGetUniformLocation(Shader, "LightPosition_worldspace");
+
+  for(int i = 0; i < meshes.size();i++){
+    for(int j = 0; j < meshes[i].numvertices;j+=3){
+      
+      vertices.push_back(mltoglm(meshes[i].vertex[j].vertexpos));
+      vertices.push_back(mltoglm(meshes[i].vertex[j+1].vertexpos));
+      vertices.push_back(mltoglm(meshes[i].vertex[j+2].vertexpos));
+      uvs.push_back(vec2(0,0));
+      uvs.push_back(vec2(0,0));
+      uvs.push_back(vec2(0,0));
+
+      vec3 nml = normalize(cross(mltoglm(meshes[i].vertex[j+1].vertexpos) - mltoglm(meshes[i].vertex[j].vertexpos),
+      mltoglm(meshes[i].vertex[j+2].vertexpos) - mltoglm(meshes[i].vertex[j].vertexpos)));
+      normals.push_back(nml);
+      normals.push_back(nml);
+      normals.push_back(nml);
+      
+      colors.push_back(vec3(0.0f,0.0f,1.0f));
+      colors.push_back(vec3(0.0f,0.0f,1.0f));
+      colors.push_back(vec3(0.0f,0.0f,1.0f));
+      faceids.push_back(i+1);
+      faceids.push_back(i+1);
+      faceids.push_back(i+1);
+    }
+  }
+
+
+
+
+
+  glGenBuffers(5, vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+  glBufferData(GL_ARRAY_BUFFER, 3 * vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+  glBufferData(GL_ARRAY_BUFFER, 2 * uvs.size()      * sizeof(float), uvs.data(),      GL_STATIC_DRAW);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo[2]);
+  glBufferData(GL_ARRAY_BUFFER, 3 * normals.size()  * sizeof(float), normals.data(),  GL_STATIC_DRAW);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo[3]);
+  glBufferData(GL_ARRAY_BUFFER, 3 * normals.size()  * sizeof(float), colors.data(),   GL_STATIC_DRAW);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo[4]);
+  glBufferData(GL_ARRAY_BUFFER, 1 * faceids.size()  * sizeof(float), faceids.data(),   GL_STATIC_DRAW);
+
+  glGenVertexArrays(1, &vao);
+  glBindVertexArray(vao);
+
+  glEnableVertexAttribArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+  glEnableVertexAttribArray(1);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+
+  glEnableVertexAttribArray(2);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo[2]);
+  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+  glEnableVertexAttribArray(3);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo[3]);
+  glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+  glEnableVertexAttribArray(4);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo[4]);
+  glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, 0, NULL);
+
+}
+
+GLuint RenderRuiMeshes(){
+  glDisable(GL_CULL_FACE);
+  glCullFace(GL_NONE);
+
+  pos = vec3(pos_gui[0],pos_gui[1],pos_gui[2]);
+  glm::vec3 lightPos = vec3(lightpos_gui[0],lightpos_gui[1],lightpos_gui[2]);
+  glm::mat4 Projection = glm::perspective(glm::radians(fov), 1.0f, 0.1f, 15000.0f);
+  glm::mat4 View = glm::lookAt(
+    glm::vec3(pos.x,pos.y,pos.z),                               //position
+    glm::vec3(0,0,0),    //point at a point
+    glm::vec3(0,1,0)
+  );
+  glm::mat4 Model = glm::mat4(1.0f);
+  glm::mat4 mvp = Projection * View * Model;
+  glm::mat4 ViewMatrix = mvp;
+  glm::mat4 ModelMatrix = glm::mat4(1.0);
+
+  glUseProgram(Shader);
+
+  glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
+  glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
+  glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &ViewMatrix[0][0]);
+
+    
+  glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
+
+  glBindFramebuffer(GL_FRAMEBUFFER,Framebuffer);
+  glViewport(0, 0, 400, 400);
+  glClearColor(0.0, 0.0, 0.0, 0.5);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+  
+
+  glBindVertexArray(vao);
+  glUniform1f(ShaderSelected,SelectedMesh);
+  glDrawArrays(GL_TRIANGLES,0,vertices.size());
+
+
+  glUseProgram(0);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+  return Texture;
+}
+bool renderRuiMesh = false;
+#pragma endregion
+
 
 void UI::SetupReadMdlWindow()
 {
@@ -406,17 +667,18 @@ void AddMainMdlTrees()
                 }
                 ImGui::TreePop();
             }
-
             if (ImGui::TreeNode((void*)(intptr_t)4, "RUI Meshes (%zu)", mdl->ruimeshes.size()))
             {
+              glUniform1f(ShaderSelected,0);
                 for (int i = 0; i < mdl->ruimeshes.size(); i++)
                 {
                     if (ImGui::TreeNode((void*)(intptr_t)i, "%s", mdl->ruimeshes[i].szruimeshname))
                     {
+                      
                         if (ImGui::TreeNode((void*)(intptr_t)i+1, "Faces (%zu)", mdl->ruimeshes[i].numfaces))
                         {
                             for (int m = 0; m < mdl->ruimeshes[i].numfaces; m++){
-                                
+
                                 ImGui::Text("UV: [Min: (%f, %f) Max: (%f, %f)]",mdl->ruimeshes[i].facedata[m].faceuvmin.x,mdl->ruimeshes[i].facedata[m].faceuvmin.y,mdl->ruimeshes[i].facedata[m].faceuvmax.x,mdl->ruimeshes[i].facedata[m].faceuvmax.y);
                             }
                             ImGui::TreePop();
@@ -430,9 +692,13 @@ void AddMainMdlTrees()
                         }
                         ImGui::TreePop();
                     }
+                    if(ImGui::IsItemHovered()){
+                        SelectedMesh = i+1;
+                      }
                 }
                 ImGui::TreePop();
             }
+            ImGui::Text("Selected: %i",SelectedMesh);
         }
 #pragma endregion
 }
@@ -533,7 +799,7 @@ void AddExtractionOptions()
 //        {
 //            char magic[4];
 //            test.read(magic, 4);
-//            if (strcmp(magic, "IDST") >= 0) 
+//            if (strcmp(magic, "IDST") >= 0)
 //            {
 //                rtn.push_back({ ErrorType::Success,std::string("Valid MDL file") });
 //                char ver[1];
@@ -587,7 +853,31 @@ void UI::RenderReadMdlWindow(int x, int y)
             isReading = false;
         }
         AddExtractionOptions();
+        ImGui::SameLine();
+        if(_opt_v53.has_value())
+        if(!renderRuiMesh && ImGui::Button("Render RUI Mesh")){
+          SetupRuiMeshRenderPipeline();
+          PushRuiMeshData(_opt_v53->ruimeshes);
+          renderRuiMesh = true;
+        }
         ImGui::Separator();
+        ImGui::BeginGroup();
         AddMainMdlTrees();
+        ImGui::EndGroup();
+        if(renderRuiMesh){
+          RenderRuiMeshes();
+          ImGui::SameLine();
+          ImGui::SetNextItemWidth(400);
+          ImGui::BeginGroup();
+          ImGui::SetNextItemWidth(400);
+          ImGui::SliderFloat3("Camera Position", pos_gui,-10,10);
+          ImGui::SetNextItemWidth(400);
+          ImGui::SliderFloat3("Light Position", lightpos_gui,-12,12);
+          ImGui::SetNextItemWidth(400);
+          ImGui::SliderFloat("FoV",&fov,20.0f,150.0f);
+
+          ImGui::Image((void*)(intptr_t)Texture,{400,400},{0,1},{1,0});
+          ImGui::EndGroup();
+        }
     }
 }
