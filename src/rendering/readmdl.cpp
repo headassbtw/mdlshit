@@ -2,7 +2,6 @@
 
 #include "glm/ext/vector_float3.hpp"
 #include "structs.hpp"
-#include <rendering/shaders.hpp>
 #include <rendering/render.hpp>
 #include <imgui.h>
 #include <rendering/filewidget.hpp>
@@ -10,7 +9,7 @@
 #include <mdls.hpp>
 #include <MLUtil.h>
 #include <GL/glew.h>
-#include <gl.hpp>
+#include <rendering/shaders.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
@@ -44,70 +43,6 @@ std::vector<vec3> normals;
 std::vector<vec3> colors;
 std::vector<float> faceids;
 
-GLuint common_get_shader_program(
-) {
-  GLint log_length, success;
-  GLuint fragment_shader, program, vertex_shader;
-
-  /* Vertex shader */
-  vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertex_shader, 1, &Resources::Shaders::VertexShader, NULL);
-  glCompileShader(vertex_shader);
-  glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
-  glGetShaderiv(vertex_shader, GL_INFO_LOG_LENGTH, &log_length);
-  if (log_length > 0) {
-    Logger::Error("Vertex shader compile error:\n");
-    std::vector<char> VertError(log_length+1);
-    glGetShaderInfoLog(vertex_shader, log_length, NULL, &VertError[0]);
-    Logger::Error("%s\n", &VertError[0]);
-  }
-  if (!success) {
-    printf("vertex shader compile error\n");
-    exit(EXIT_FAILURE);
-  }
-
-  /* Fragment shader */
-  fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragment_shader, 1, &Resources::Shaders::FragmentShader, NULL);
-  glCompileShader(fragment_shader);
-  glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
-  glGetShaderiv(fragment_shader, GL_INFO_LOG_LENGTH, &log_length);
-  if (log_length > 0) {
-    Logger::Error("Fragment shader compile error:\n");
-    std::vector<char> FragError(log_length+1);
-    glGetShaderInfoLog(fragment_shader, log_length, NULL, &FragError[0]);
-    Logger::Error("%s\n", &FragError[0]);
-  }
-  if (!success) {
-    Logger::Critical("fragment shader compile error\n");
-    exit(EXIT_FAILURE);
-  }
-
-  /* Link shaders */
-  program = glCreateProgram();
-  glAttachShader(program, vertex_shader);
-  glAttachShader(program, fragment_shader);
-  glLinkProgram(program);
-  glGetProgramiv(program, GL_LINK_STATUS, &success);
-  glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_length);
-  if (log_length > 0) {
-    Logger::Error("Shader linking error:\n");
-    std::vector<char> ProgError(log_length+1);
-    glGetProgramInfoLog(program, log_length, NULL, &ProgError[0]);
-    Logger::Error("%s\n", &ProgError[0]);
-  }
-  if (!success) {
-    printf("shader link error");
-    exit(EXIT_FAILURE);
-  }
-  else{}
-  Logger::Info("[readmdl shaders] linked program\n");
-
-  /* Cleanup. */
-  glDeleteShader(vertex_shader);
-  glDeleteShader(fragment_shader);
-  return program;
-}
 GLuint vbo[5] = {0,0,0,0,0};
 GLuint vao = 0;
 GLuint Shader;
@@ -126,8 +61,6 @@ GLuint SetupRuiMeshRenderPipeline(){
   glGenRenderbuffers(1, &FramebufferDepth);
   glBindRenderbuffer(GL_RENDERBUFFER, FramebufferDepth);
   glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, subRendererResolution, subRendererResolution);
-
-
   glGenFramebuffers(1,&Framebuffer);
   glBindFramebuffer(GL_FRAMEBUFFER,Framebuffer);
   glGenTextures(1, &Texture);
@@ -150,7 +83,7 @@ GLuint SetupRuiMeshRenderPipeline(){
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 
-  Shader = common_get_shader_program();
+  Shader = Resources::Shaders::CompileShaders(Resources::Shaders::VertexShader, Resources::Shaders::FragmentShader);
   glBindFramebuffer(GL_FRAMEBUFFER,0);
 
 

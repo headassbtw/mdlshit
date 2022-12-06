@@ -4,6 +4,7 @@
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
 #include "imgui_internal.h"
+#include "rendering/shaders.hpp"
 #include "resource.hpp"
 #include <cstring>
 #include <glm/common.hpp>
@@ -395,7 +396,7 @@ void RenderGUI(){
     ImGui::SetNextWindowSize({MainViewport->Size.x/2,21});
     ImGui::SetNextWindowPos({MainViewport->Pos.x,MainViewport->Pos.y});
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize,0.0f);
-    if(ImGui::Begin("MenuBarContainer", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoResize)){
+    if(ImGui::Begin("MenuBarContainer", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoNav)){
       if(ImGui::BeginMenuBar()){
           if (ImGui::BeginMenu("File"))
         {
@@ -429,7 +430,7 @@ void RenderGUI(){
     ImGui::SetNextWindowSize({MainViewport->Size.x/2,23-16});
     ImGui::SetNextWindowPos({MainViewport->Pos.x+(MainViewport->Size.x/2),MainViewport->Pos.y});
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{0.0f,0.0f});
-    if(ImGui::Begin("MainWindowSwapButtons", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoResize)){
+    if(ImGui::Begin("MainWindowSwapButtons", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoNav)){
       if(ImGui::BeginTabBar("MainWindowSwapBar", ImGuiTabBarFlags_FittingPolicyMask_)){
         
         if(ImGui::BeginTabItem("Convert")){
@@ -465,7 +466,7 @@ void RenderGUI(){
 
     ImGui::SetNextWindowSize({viewport_width,viewport_height-23});
     ImGui::SetNextWindowBgAlpha(0.2);
-    ImGui::Begin("Box", NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings);
+    ImGui::Begin("Box", NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNav);
     
     if(conv) RenderConversionPanel();
 
@@ -494,7 +495,6 @@ void callback_name(GLFWwindow* window, int xpos, int ypos){
     viewport_height = ypos;  
     viewport_width = xpos;
 }
-
 
 int UI::Run(){
     glewExperimental = true;

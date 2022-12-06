@@ -1,5 +1,7 @@
+#include <logger.hpp>
+#include <GL/glew.h>
 #include <rendering/shaders.hpp>
-
+#pragma region embedded shaders
 const char* Resources::Shaders::VertexShader = 
 "#version 330 core\n"
 
@@ -111,3 +113,68 @@ const char* Resources::Shaders::FragmentShader = "#version 330 core\n"
   "color = vec4(pre_color,1);\n"
   
 "}";
+#pragma endregion
+
+GLuint Resources::Shaders::CompileShaders(const char *vertex, const char *fragment){
+	GLint log_length, success;
+  GLuint fragment_shader, program, vertex_shader;
+
+  /* Vertex shader */
+  vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+  glShaderSource(vertex_shader, 1, &vertex, NULL);
+  glCompileShader(vertex_shader);
+  glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
+  glGetShaderiv(vertex_shader, GL_INFO_LOG_LENGTH, &log_length);
+  if (log_length > 0) {
+    Logger::Error("Vertex shader compile error:\n");
+    std::vector<char> VertError(log_length+1);
+    glGetShaderInfoLog(vertex_shader, log_length, NULL, &VertError[0]);
+    Logger::Error("%s\n", &VertError[0]);
+  }
+  if (!success) {
+    printf("vertex shader compile error\n");
+    exit(EXIT_FAILURE);
+  }
+
+  /* Fragment shader */
+  fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(fragment_shader, 1, &fragment, NULL);
+  glCompileShader(fragment_shader);
+  glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
+  glGetShaderiv(fragment_shader, GL_INFO_LOG_LENGTH, &log_length);
+  if (log_length > 0) {
+    Logger::Error("Fragment shader compile error:\n");
+    std::vector<char> FragError(log_length+1);
+    glGetShaderInfoLog(fragment_shader, log_length, NULL, &FragError[0]);
+    Logger::Error("%s\n", &FragError[0]);
+  }
+  if (!success) {
+    Logger::Critical("fragment shader compile error\n");
+    exit(EXIT_FAILURE);
+  }
+
+  /* Link shaders */
+  program = glCreateProgram();
+  glAttachShader(program, vertex_shader);
+  glAttachShader(program, fragment_shader);
+  glLinkProgram(program);
+  glGetProgramiv(program, GL_LINK_STATUS, &success);
+  glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_length);
+  if (log_length > 0) {
+    Logger::Error("Shader linking error:\n");
+    std::vector<char> ProgError(log_length+1);
+    glGetProgramInfoLog(program, log_length, NULL, &ProgError[0]);
+    Logger::Error("%s\n", &ProgError[0]);
+  }
+  if (!success) {
+    printf("shader link error");
+    exit(EXIT_FAILURE);
+  }
+  else{}
+  Logger::Info("[readmdl shaders] linked program\n");
+
+  /* Cleanup. */
+  glDeleteShader(vertex_shader);
+  glDeleteShader(fragment_shader);
+  return program;
+}
