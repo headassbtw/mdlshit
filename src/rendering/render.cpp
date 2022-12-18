@@ -154,10 +154,13 @@ void depth_border(){
 void RenderConversionPanel(){
   ImGui::BeginGroup();
 
-    files[0]->UI(viewport_width-204);
-    files[1]->UI(viewport_width-204);
-    files[2]->UI(viewport_width-204);
-    files[3]->UI(viewport_width-204);
+    int w = ImGui::GetContentRegionAvail().x*0.75;
+    float sidebarWidth = viewport_width - (w + 4);
+
+    files[0]->UI(w);
+    files[1]->UI(w);
+    files[2]->UI(w);
+    files[3]->UI(w);
     
     if(ImGui::IsItemHovered()){
       ImGui::BeginTooltip();
@@ -166,9 +169,9 @@ void RenderConversionPanel(){
       ImGui::PopTextWrapPos();
       ImGui::EndTooltip();
     }
-    files[4]->UI(viewport_width-204);
+    files[4]->UI(w);
     static int message_count = 0;
-    ImGui::BeginChild("Logger",{viewport_width-220,0},false,ImGuiWindowFlags_AlwaysUseWindowPadding);
+    ImGui::BeginChild("Logger",{(float)w-16,0},false,ImGuiWindowFlags_AlwaysUseWindowPadding);
     depth_border();
     //ImFont* monospace = ImGui::GetIO().Fonts->Fonts[2];
 
@@ -212,12 +215,19 @@ void RenderConversionPanel(){
     
   const ImU32 w_bg_col = ImGui::GetColorU32(ImGuiCol_WindowBg);
     
+    
+    if(ImGui::Button("Clear File Paths##SidebarResetButton",{sidebarWidth,22})){
+      for(auto file:files){
+        memset(file->BoxBuffer, '\0', 256);
+      }
+    }
 
-    ImGui::BeginChild("OptionsBox",{200, ((viewport_height-99) / 2.0f)},false,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysUseWindowPadding);
+    ImGui::BeginChild("OptionsBox",{sidebarWidth, ((viewport_height-(99+26)) / 2.0f)},false,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysUseWindowPadding);
     depth_border();
     ImGui::PushStyleColor(ImGuiCol_WindowBg,ImVec4(0.0f,0.0f,0.0f,0.0f));
-    ImGui::Text("Advanced Options");
-    ImGui::Separator();
+    //taking this out for now, because there's nothing there anymore besides the files
+    //ImGui::Text("Advanced Options");
+    //ImGui::Separator();
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{0.0f,0.0f});
     ImGui::BeginChild("##ConvertSmol", {0,0},false);
     ImGui::Text("Extra Files");
@@ -229,7 +239,7 @@ void RenderConversionPanel(){
       ImGui::EndTooltip();
     }
     ImGui::Separator();
-    files[5]->UI(196);
+    files[5]->UI(sidebarWidth);
     if(ImGui::IsItemHovered()){
       ImGui::BeginTooltip();
       ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
@@ -237,9 +247,9 @@ void RenderConversionPanel(){
       ImGui::PopTextWrapPos();
       ImGui::EndTooltip();
     }
-    files[6]->UI(196);
-    files[7]->UI(196);
-    files[8]->UI(196);
+    files[6]->UI(sidebarWidth);
+    files[7]->UI(sidebarWidth);
+    files[8]->UI(sidebarWidth);
 
     ImGui::EndChild(); //ConvertSmol
     ImGui::PopStyleVar(1);
@@ -247,7 +257,7 @@ void RenderConversionPanel(){
     ImGui::EndChild();//OptionsBox
 
     ImGui::BeginGroup();
-    ImGui::BeginChild("ConvertBox",{(200),((viewport_height-99) / 2.0f)},false,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysUseWindowPadding);
+    ImGui::BeginChild("ConvertBox",{(0),((viewport_height-(99+26)) / 2.0f)},false,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysUseWindowPadding);
     depth_border();
     ImGui::Text("Problems");
     ImGui::Separator();
@@ -285,7 +295,7 @@ void RenderConversionPanel(){
     
     
     ImGui::EndChild();
-    if(ImGui::Button("Check",{200,24})){
+    if(ImGui::Button("Check",{sidebarWidth,24})){
       int total = 0;
       int bad = 0;
       int good = 0;
@@ -327,7 +337,7 @@ void RenderConversionPanel(){
       ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.0f, 0.7f));
       ImGui::PushStyleColor(ImGuiCol_ButtonActive,  (ImVec4)ImColor::HSV(0.0f, 0.0f, 0.8f));
     }
-    if(ImGui::Button("Convert",{200,24})){
+    if(ImGui::Button("Convert",{sidebarWidth,24})){
         Logger::Debug("Starting conversion\n");
                                 fileinfo.mdl  = files[0]->BoxBuffer;
         if(files[1]->isEnabled) fileinfo.vtx  = files[1]->BoxBuffer;
@@ -428,7 +438,7 @@ void RenderGUI(){
       ImGui::End();
     }
     ImGui::SetNextWindowSize({MainViewport->Size.x/2,23-16});
-    ImGui::SetNextWindowPos({MainViewport->Pos.x+(MainViewport->Size.x/2),MainViewport->Pos.y});
+    ImGui::SetNextWindowPos({MainViewport->Pos.x+((MainViewport->Size.x*0.75f)-16),MainViewport->Pos.y});
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{0.0f,0.0f});
     if(ImGui::Begin("MainWindowSwapButtons", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoNav)){
       if(ImGui::BeginTabBar("MainWindowSwapBar", ImGuiTabBarFlags_FittingPolicyMask_)){
@@ -448,7 +458,7 @@ void RenderGUI(){
       std::string version = "v2.3.0 beta";
       float text_width = ImGui::CalcTextSize(version.c_str()).x;
 
-      ImGui::SameLine((MainViewport->Size.x/2)-(text_width+10));
+      ImGui::SameLine(((MainViewport->Size.x*0.25f)+16)-(text_width+10));
       ImGui::Text("%s",version.c_str());
       ImGui::End();
     }

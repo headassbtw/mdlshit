@@ -52,16 +52,18 @@ void Widgets::File::UI(float win_width){
     bg->AddRectFilled(ImVec2(bounds.x+th, bounds.y+th), ImVec2(bounds.z-th, bounds.w-th), col);
 
     
+    
     ImGui::BeginGroup();
     ImGui::BeginDisabled(!canBeDisabled);
-    ImGui::SetNextItemWidth(win_width-(16));
+    ImGui::SetNextItemWidth(win_width-(style.WindowPadding.x*2));
     ImGui::Checkbox(name.c_str(), &isEnabled);
     //ImGui::Text("%s", name.c_str());
     ImGui::EndDisabled();
     
 
     if(isEnabled){
-        ImGui::SetNextItemWidth(win_width-86);
+        
+        ImGui::SetNextItemWidth(win_width-(70+(style.WindowPadding.x*2)));
         ImGui::InputTextWithHint(boxname.c_str(), "Type path or drag file",BoxBuffer, 256);
     ImGui::EndGroup();
     ImGui::SameLine();
