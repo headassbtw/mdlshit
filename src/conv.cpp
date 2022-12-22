@@ -19,7 +19,7 @@
 #include <JsonTest.h>
 #include <MLUtil.h>
 
-using namespace std;
+//using namespace std;
 using namespace rapidjson;
 
 #pragma region helper functions
@@ -1364,20 +1364,22 @@ int ConvertV49(FileInfo info)
         UI::Progress.SubTask.End();
         Logger::Info("Finished Updating PoseParameters\n");
     }
-
-    UI::Progress.SubTask.Begin("Converting Included Models");
-
-    OutStream.seek(v53Hdr.includemodelindex);
-    for (int i = 0; i < mdl.mdlhdr.numincludemodels; i++)
+    if (mdl.mdlhdr.numincludemodels > 0)
     {
-        //8 bytes
-        OutStream.Write(mdl.includedmodels[i]);
+        UI::Progress.SubTask.Begin("Converting Included Models");
 
-        Logger::Notice("Converted included model %d of %d\n", i + 1, mdl.mdlhdr.numincludemodels);
-        UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numincludemodels);
+        OutStream.seek(v53Hdr.includemodelindex);
+        for (int i = 0; i < mdl.mdlhdr.numincludemodels; i++)
+        {
+            //8 bytes
+            OutStream.Write(mdl.includedmodels[i]);
+
+            Logger::Notice("Converted included model %d of %d\n", i + 1, mdl.mdlhdr.numincludemodels);
+            UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numincludemodels);
+        }
+        UI::Progress.SubTask.End();
+        Logger::Info("Finished included models\n");
     }
-    UI::Progress.SubTask.End();
-    Logger::Info("Finished included models\n");
 
     //RUI CODE 
 
@@ -1492,77 +1494,86 @@ int ConvertV49(FileInfo info)
 
 
 #pragma region texture conversion
-    AddInt32(&OutStream, 0, 3);  //filler Edit: I don't remember why. - Liberty
-    OutStream.seek(v53Hdr.textureindex);
-    UI::Progress.SubTask.Begin("Converting Textures");
-    for (int i = 0; i < mdl.mdlhdr.numtextures; i++)
+    if (mdl.mdlhdr.numtextures > 0)
     {
+        AddInt32(&OutStream, 0, 3);  //filler Edit: I don't remember why. - Liberty
+        OutStream.seek(v53Hdr.textureindex);
+        UI::Progress.SubTask.Begin("Converting Textures");
+        for (int i = 0; i < mdl.mdlhdr.numtextures; i++)
+        {
 
-        OutStream.Write(textures[i]);
+            OutStream.Write(textures[i]);
 
-        Logger::Notice("Converted texture %d of %d\n", i + 1, mdl.mdlhdr.numtextures);
-        UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numtextures);
+            Logger::Notice("Converted texture %d of %d\n", i + 1, mdl.mdlhdr.numtextures);
+            UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numtextures);
+        }
+        UI::Progress.SubTask.End();
+        Logger::Info("Finished textures\n");
     }
-    UI::Progress.SubTask.End();
-    Logger::Info("Finished textures\n");
 #pragma endregion
-
-    UI::Progress.SubTask.Begin("Converting Cd Textures");
-    OutStream.seek(v53Hdr.cdtextureindex);
-    for (int i = 0; i < mdl.mdlhdr.numcdtextures; i++)
+    if (mdl.mdlhdr.numcdtextures > 0)
     {
-        OutStream.Write(mdl.cdtextures[i]);
-        Logger::Notice("Converted texture %d of %d\n", i + 1, mdl.mdlhdr.numcdtextures);
-        UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numcdtextures);
+        UI::Progress.SubTask.Begin("Converting Cd Textures");
+        OutStream.seek(v53Hdr.cdtextureindex);
+        for (int i = 0; i < mdl.mdlhdr.numcdtextures; i++)
+        {
+            OutStream.Write(mdl.cdtextures[i]);
+            Logger::Notice("Converted texture %d of %d\n", i + 1, mdl.mdlhdr.numcdtextures);
+            UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numcdtextures);
+        }
+        UI::Progress.SubTask.End();
+        Logger::Info("Finished cd textures\n");
     }
-    UI::Progress.SubTask.End();
-    Logger::Info("Finished cd textures\n");
-
-
-    UI::Progress.SubTask.Begin("Converting Skin Groups");
-    OutStream.seek(v53Hdr.skinindex);
-    for (int i = 0; i < mdl.mdlhdr.numskinfamilies; i++)
+    if (mdl.mdlhdr.numskinfamilies > 0)
     {
+        UI::Progress.SubTask.Begin("Converting Skin Groups");
+        OutStream.seek(v53Hdr.skinindex);
+        for (int i = 0; i < mdl.mdlhdr.numskinfamilies; i++)
+        {
 
-        OutStream.Write(mdl.skingroups[i], mdl.mdlhdr.numskinref);
-        Logger::Notice("Converted skin group %d of %d\n", i + 1, mdl.mdlhdr.numskinfamilies);
-        UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numskinfamilies);
+            OutStream.Write(mdl.skingroups[i], mdl.mdlhdr.numskinref);
+            Logger::Notice("Converted skin group %d of %d\n", i + 1, mdl.mdlhdr.numskinfamilies);
+            UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlhdr.numskinfamilies);
+        }
+        UI::Progress.SubTask.End();
+        Logger::Info("Finished skin groups\n");
     }
-    UI::Progress.SubTask.End();
-    Logger::Info("Finished skin groups\n");
 
     if (mdl.mdlhdr.keyvaluesize > 0)
     {
         OutStream.seek(v53Hdr.keyvalueindex);
         OutStream.Write(mdl.keyvalues);
     }
-
-    UI::Progress.SubTask.Begin("Converting Src Bone Transforms");
-    OutStream.seek(v53Hdr.srcbonetransformindex);
-    for (int i = 0; i < mdl.mdlsubhdr.numsrcbonetransform; i++)
+    if (mdl.mdlsubhdr.numsrcbonetransform > 0)
     {
-        OutStream.Write(mdl.srcbonetransforms[i]);
-        Logger::Notice("Converting Src Bone Transform %d of %d\n", i + 1, mdl.mdlsubhdr.numsrcbonetransform);
-        UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlsubhdr.numsrcbonetransform);
-    }
-    UI::Progress.SubTask.End();
-    Logger::Info("Finished src bone transforms\n");
-
-    OutStream.seek(v53Hdr.linearboneindex);
-    for (int i = 0; i < mdl.mdlhdr.numbones; i++)
-    {
-        for (int j = 0; j < ikChainBones.size(); j++)
+        UI::Progress.SubTask.Begin("Converting Src Bone Transforms");
+        OutStream.seek(v53Hdr.srcbonetransformindex);
+        for (int i = 0; i < mdl.mdlsubhdr.numsrcbonetransform; i++)
         {
-            if (i == ikChainBones[j])
-            {
-                mdl.linearbonedata.flags[i] += 0x20;
-            }
+            OutStream.Write(mdl.srcbonetransforms[i]);
+            Logger::Notice("Converting Src Bone Transform %d of %d\n", i + 1, mdl.mdlsubhdr.numsrcbonetransform);
+            UI::Progress.SubTask.Update((i + 1.0f) / (float)mdl.mdlsubhdr.numsrcbonetransform);
         }
-        //mdl.linearbonedata.posScale[i] = { 0,0,0 };
+        UI::Progress.SubTask.End();
+        Logger::Info("Finished src bone transforms\n");
     }
-    OutStream.Write(mdl.linearbone);
-    OutStream.Write(linearBoneData, mdl.mdlhdr.numbones);
-//    AddInt32(&OutStream, 0, 15);  //filler. Edit: AABB Header filler. - Liberty
+    if (mdl.mdlsubhdr.linearboneindex > 0)
+    {
+        OutStream.seek(v53Hdr.linearboneindex);
+        for (int i = 0; i < mdl.mdlhdr.numbones; i++)
+        {
+            for (int j = 0; j < ikChainBones.size(); j++)
+            {
+                if (i == ikChainBones[j])
+                {
+                    mdl.linearbonedata.flags[i] += 0x20;
+                }
+            }
+            mdl.linearbonedata.posScale[i] = { 0,0,0 };
+        }
+        OutStream.Write(mdl.linearbone);
+        OutStream.Write(linearBoneData, mdl.mdlhdr.numbones);
+    }
 
     if (info.aabb.has_value())
     {
@@ -1586,7 +1597,7 @@ int ConvertV49(FileInfo info)
         AddInt32(&OutStream, 0, 15);
 
     Stream.seek(mdl.mdlsubhdr.sznameindex + 407); //So we can just copy pasta the string table. - Liberty
-    OutStream.seek(OutStream.Position() + 1);
+    OutStream.seek(v53Hdr.sznameindex);
     OutStream.Write(mdl.stringtable); //How the fuck is this working? - Liberty Edit: Fixed it for v49. - Liberty
 
 #pragma region rest of the file
