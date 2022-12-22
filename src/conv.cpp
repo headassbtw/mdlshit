@@ -1424,73 +1424,6 @@ int ConvertV49(FileInfo info)
         UI::Progress.SubTask.End();
         Logger::Info("done\n");
     }
-    //
-    //if (ruiMeshes.size() > 0 && !info.aabb.has_value() && info.str.has_value())
-    //{
-    //    for (int i = 0; i < ruiMeshes.size(); i++)
-    //    {
-    //        OutStream.Write(0);
-    //        OutStream.Write( (int)( 8 * ( ruiMeshes.size() - i ) + bytesAddedPerRuiMesh[i]));
-    //        double sizeCheck = GetRuiBytesAddedIdv(ruiMeshes, i) / 16.0;
-    //        int idk = 0;
-    //        Logger::Info("sizeCheck: %d, rui: %d\n", GetRuiBytesAddedIdv(ruiMeshes, i), i);
-    //        if (!IsWhole(sizeCheck))
-    //        {
-    //            Logger::Info("sizeCheck: %d, rui: %d\n", sizeCheck, i);
-    //            double sizeCheck2 = 16 * ( (int)sizeCheck + 1);
-    //            idk = sizeCheck2 - GetRuiBytesAddedIdv(ruiMeshes, i);
-    //        }
-    //        
-    //        int parentIdxAdd = 2 * ruiMeshes[i].numparents;
-    //        int facesIdxAdd = 32 * ruiMeshes[i].numfaces;
-    //        int verticesIdxAdd = 16 * ruiMeshes[i].numvertices;
-    //        int verticesIdxAdd2 = 6 * ruiMeshes[i].numfaces;
-    //        int meshNameIdxAdd = ruiMeshes[i].szruimeshname.size() + idk;
-    //        int unk = 0;
-    //        std::byte null = (std::byte)0;
-    //        Logger::Info("idk: %d, rui: %d\n", idk, i);
-    //        OutStream.Write(ruiMeshes[i].numparents);
-    //        OutStream.Write(ruiMeshes[i].numvertices);
-    //        OutStream.Write(ruiMeshes[i].numfaces);
-    //        OutStream.Write((int)(32 + meshNameIdxAdd));
-    //        OutStream.Write((int)(32 + meshNameIdxAdd + verticesIdxAdd2 + parentIdxAdd));
-    //        OutStream.Write((int)(32 + meshNameIdxAdd + parentIdxAdd));
-    //        OutStream.Write((int)(32 + meshNameIdxAdd + parentIdxAdd + verticesIdxAdd + verticesIdxAdd2));
-    //        OutStream.Write(unk);
-    //        OutStream.write(ruiMeshes[i].szruimeshname.c_str(), ruiMeshes[i].szruimeshname.size());
-    //        for (int j = 0; j < idk; j++) OutStream.Write(null);
-    //
-    //        for (int j = 0; j < ruiMeshes[i].numparents; j++)
-    //        {
-    //            OutStream.Write(ruiMeshes[i].parent[j]);
-    //        }
-    //
-    //        for (int j = 0; j < ruiMeshes[i].numfaces; j++)
-    //        {
-    //            OutStream.Write(ruiMeshes[i].vertexmap[j].vertstartid);
-    //            OutStream.Write(ruiMeshes[i].vertexmap[j].vertendid);
-    //            OutStream.Write(ruiMeshes[i].vertexmap[j].vertextraid);
-    //        }
-    //
-    //        for (int j = 0; j < ruiMeshes[i].numvertices; j++)
-    //        {
-    //            OutStream.Write(ruiMeshes[i].vertex[j].parent);
-    //            OutStream.Write(ruiMeshes[i].vertex[j].vertexpos);
-    //        }
-    //
-    //        for (int j = 0; j < ruiMeshes[i].numfaces; j++)
-    //        {
-    //            OutStream.Write(ruiMeshes[i].facedata[j].faceuvmin.x);
-    //            OutStream.Write(ruiMeshes[i].facedata[j].faceuvmin.y);
-    //            OutStream.Write(ruiMeshes[i].facedata[j].faceuvmax.x);
-    //            OutStream.Write(ruiMeshes[i].facedata[j].faceuvmax.y);
-    //            OutStream.Write(ruiMeshes[i].facedata[j].facescalemin.x);
-    //            OutStream.Write(ruiMeshes[i].facedata[j].facescalemin.y);
-    //            OutStream.Write(ruiMeshes[i].facedata[j].facescalemax.x);
-    //            OutStream.Write(ruiMeshes[i].facedata[j].facescalemax.y);
-    //        }
-    //    }
-    //}
 
 
 #pragma region texture conversion
@@ -1596,20 +1529,12 @@ int ConvertV49(FileInfo info)
     else
         AddInt32(&OutStream, 0, 15);
 
-    Stream.seek(mdl.mdlsubhdr.sznameindex + 407); //So we can just copy pasta the string table. - Liberty
     OutStream.seek(v53Hdr.sznameindex);
     OutStream.Write(mdl.stringtable); //How the fuck is this working? - Liberty Edit: Fixed it for v49. - Liberty
 
 #pragma region rest of the file
     int pos = Stream.Position();
-    //UI::Progress.SubTask.Begin("Copying Misc Data");
-    //for (int i = 0; i < Stream.size - pos; i++) {
-    //    byte tmp;
-    //    Stream.Read(&tmp);
-    //    OutStream.Write(tmp);
-    //    UI::Progress.SubTask.Update((i + 1.0f) / (float)(Stream.size - pos));
-    //}
-    //UI::Progress.SubTask.End();
+
     if (OutStream.Position() < Stream.size + allBytesAdded) {
         Logger::Critical("Not enough of the file was written\n");
         Logger::Critical("(%d vs %d)\n", OutStream.Position(), Stream.size + allBytesAdded);
