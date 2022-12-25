@@ -24,6 +24,9 @@ std::vector<Error> Tests::TestMDL(std::string path){
         if((int)ver[0] == 49){
           rtn.push_back({ErrorType::Success,std::string("Version 49")});
         }
+        else if ((int)ver[0] == 52) {
+            rtn.push_back({ ErrorType::Success,std::string("Version 52") });
+        }
         else if((int)ver[0] == 48){
           rtn.push_back({ErrorType::Warning,std::string("Version 48")});
         }

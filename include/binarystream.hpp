@@ -7,12 +7,14 @@
 #include <half.hpp>
 using namespace std;
 class BinaryReader{
-  const char* _filename;
+  //const char* _filename;
   public:
   std::fstream Stream;
+  const char* _filename;
     BinaryReader(const char* filename);
     BinaryReader(const BinaryReader&);
     ~BinaryReader();
+    const char* _pathName = _filename;
     int size;
     void read(char* data, int size);
     void seek(int pos);
@@ -26,6 +28,7 @@ class BinaryReader{
     void Read(float* data);
     std::string ReadNullTermStr(bool debug);
     std::string ReadNullTermStrTrgt(int pos, bool debug);
+    std::string ReadNullTermStrTrgtNoSep(int pos, bool debug);
 
     template <typename T> void Read(std::vector<T>* data, int groupSize);
     template <typename T> void Read(std::vector<T>* data, int groupSize, bool special);
@@ -52,8 +55,9 @@ class BinaryReader{
     void Read(mstudioattachment_t_v49* data);
     void Read(mstudioikchain_t_v49* data);
     void Read(mstudioiklink_t_v49* data);
-    void Read(mstudioiklock_t_v49* data);
+    void Read(mstudioiklock_t_v49* data); 
     void Read(mstudioposeparamdesc_t_v49* data);
+    void Read(mstudioanimblock_t* data);
     void Read(mstudiosrcbonetransform_t_v49* data);
     void Read(mstudiolinearbone_t_v49* data);
     void Read(mstudiolinearbonedata_t_v49* data, int numbones);
@@ -94,11 +98,19 @@ class BinaryReader{
     void Read(mstudiokeyvalues_t_v49* data, int groupSize);
     void Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 _mdl, std::vector<mstudioseqdescv49_t> seqs, std::vector<mstudiohitboxset_t_v49>	hitboxsets, std::vector<mstudioattachment_t_v49> attachments, std::vector< mstudionodename_t_v49> nodes, std::vector<mstudiobodyparts_t_v49> bodyparts, std::vector<mstudioikchain_t_v49> ikchains, std::vector<mstudioanimdesc_t_v49> animdescs, std::vector<mstudiotexture_t_v49> textures, std::vector<mstudiomodelgroup_t_v49> includemodels, std::vector<mstudiotexturedir_t_v49> cdmaterials, std::vector<mstudioposeparamdesc_t_v49> poseparamdescs, std::vector<mstudiosrcbonetransform_t_v49> srcbonetransforms);
 
+    void Read(studiohdr_t_v52* data);
+    void Read(studiohdr2_t_v52* data);
+    void Read(mayabakery_t* data, int groupSize);
+    void Read(mstudiobone_t_v52* data);
+    void Read(mstudioanimdesc_t_v52* data);
     void Read(mstudiocompressedikerror_t_v52* data);
+    void Read(mstudioseqdesc_t_v52* data);
+    void Read(mstudiostringtable_t_v52* data, studiohdr_t_v52 _mdl, studiohdr2_t_v52 mdlsubhdr, std::vector<mstudioseqdesc_t_v52> seqs, std::vector<mstudiohitboxset_t_v49>	hitboxsets, std::vector<mstudioattachment_t_v49> attachments, std::vector< mstudionodename_t_v49> nodes, std::vector<mstudiobodyparts_t_v49> bodyparts, std::vector<mstudioikchain_t_v49> ikchains, std::vector<mstudioanimdesc_t_v52> animdescs, std::vector<mstudiotexture_t_v49> textures, std::vector<mstudiomodelgroup_t_v49> includemodels, std::vector<mstudiotexturedir_t_v49> cdmaterials, std::vector<mstudioposeparamdesc_t_v49> poseparamdescs, std::vector<mstudiosrcbonetransform_t_v49> srcbonetransforms);
 
     void Read(studiohdr_t_v53* data);
     void Read(mstudiobone_t_v53* data);
     void Read(mstudiobbox_t_v53* data);
+    void Read(mstudiohitboxset_t_v53* data);
     void Read(mstudioanimdesc_t_v53* data);
     void Read(mstudioanim_t_v53* data);
     void Read(sectionindexes_t_v53* data);
@@ -108,12 +120,27 @@ class BinaryReader{
     void Read(mstudioikchain_t_v53* data);
     void Read(mstudiotexture_t_v53* data);
     void Read(mstudiostringtable_t_v53 data, studiohdr_t_v53 _mdl);
+    void Read(mstudiostringtable_t_v52* data, studiohdr_t_v53 mdlhdr, std::vector<mstudioseqdesc_t_v53> seqs, std::vector<mstudiohitboxset_t_v53>	hitboxsets, std::vector<mstudioattachment_t_v49> attachments, std::vector< mstudionodename_t_v49> nodes, std::vector<mstudiobodyparts_t_v49> bodyparts, std::vector<mstudioikchain_t_v53> ikchains, std::vector<mstudioanimdesc_t_v53> animdescs, std::vector<mstudiotexture_t_v53> textures, std::vector<mstudiomodelgroup_t_v49> includemodels, std::vector<mstudiotexturedir_t_v49> cdmaterials, std::vector<mstudioposeparamdesc_t_v49> poseparamdescs, std::vector<mstudiosrcbonetransform_t_v49> srcbonetransforms);
 
     void Read(mstudiorruiheader_t* data);
     void Read(mstudioruivertmap_t* data);
     void Read(mstudioruivert_t* data);
     void Read(mstudioruimesface_t* data);
     void Read(mstudioruimesh_t* data);
+    void Read(pertriheader_t* data);
+    void Read(aabbnode* data);
+    void Read(aabbcollmaskmap* data);
+    void Read(aabbleaf* data);
+    void Read(aabbcollisionmask* data, int numVerts);
+
+    void Read(phyheader_t* data);
+    void Read(compactsurfaceheader_t* data);
+    void Read(legacysurfaceheader_t* data);
+    void Read(trianglefaceheader_t* data);
+    void Read(trianglevertmap_t* data);
+    void Read(phyvertex_t* data);
+    void Read(phynode_t* data);
+    void Read(physection_t* data);
 
 
 };
@@ -198,7 +225,14 @@ class BinaryWriter{
     void Write(mstudiostringtable_t_v49 data);
     template <typename T> void Write(std::vector<T> data);
 
+    //void Write(studiohdr_t_v52 data);
+    //void Write(studiohdr2_t_v52 data);
+    void Write(mayabakery_t data);
+    //void Write(mstudiobone_t_v52 data);
+    //void Write(mstudioanimdesc_t_v52 data);
     void Write(mstudiocompressedikerror_t_v52 data);
+    //void Write(mstudioseqdesc_t_v52 data);
+    void Write(mstudiostringtable_t_v52 data);
 
     void Write(studiohdr_t_v53 data);
     void Write(mstudiobone_t_v53 data);
@@ -219,6 +253,20 @@ class BinaryWriter{
     void Write(mstudioruimesh_t data);
     void Write(mstudiolinearbonedata_t_v53 data, int numbones);
 
+    void Write(pertriheader_t data);
+    void Write(aabbnode data);
+    void Write(aabbcollmaskmap data);
+    void Write(aabbleaf data);
+    void Write(aabbcollisionmask data);
+
+    void Write(phyheader_t data);
+    void Write(compactsurfaceheader_t data);
+    void Write(legacysurfaceheader_t data);
+    void Write(trianglefaceheader_t data);
+    void Write(trianglevertmap_t data);
+    void Write(phyvertex_t data);
+    void Write(phynode_t data);
+    void Write(physection_t data);
 
     void Write(std::string data);
 };
