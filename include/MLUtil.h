@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include <cstdint>
+#include <string>
 namespace Utility
 {
 	namespace debug
@@ -10,7 +10,7 @@ namespace Utility
 
 	namespace check
 	{
-		template <typename T>  bool contains(T* arry, T trgt);
+		template <typename T, typename T2>  bool contains(T arry, T2 trgt);
 	}
 
 	namespace func
@@ -20,6 +20,10 @@ namespace Utility
 		float GetSecondLargest(float n1, float n2, float n3);
 
 		float GetLargestNumber(float n1, float n2, float n3);
+
+		int GetAttachedJiggleBone(int version, int boneIdx, int bone, int jBoneIdx, int maxBones);
+
+		std::string ReadJiggleFlags(int flags);
 	}
 
 	namespace math
