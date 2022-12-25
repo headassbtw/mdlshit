@@ -154,12 +154,6 @@ void depth_border(){
 void RenderConversionPanel(){
   ImGui::BeginGroup();
 
-<<<<<<< HEAD
-    files[0]->UI(viewport_width-204);
-    files[1]->UI(viewport_width-204);
-    files[2]->UI(viewport_width-204);
-    files[3]->UI(viewport_width-204);
-=======
     int w = ImGui::GetContentRegionAvail().x*0.75;
     float sidebarWidth = viewport_width - (w + 4);
 
@@ -167,7 +161,6 @@ void RenderConversionPanel(){
     files[1]->UI(w);
     files[2]->UI(w);
     files[3]->UI(w);
->>>>>>> Testing
     
     if(ImGui::IsItemHovered()){
       ImGui::BeginTooltip();
@@ -413,13 +406,9 @@ void RenderGUI(){
     ImGui::SetNextWindowSize({MainViewport->Size.x/2,21});
     ImGui::SetNextWindowPos({MainViewport->Pos.x,MainViewport->Pos.y});
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize,0.0f);
-<<<<<<< HEAD
-    if(ImGui::Begin("MenuBarContainer", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoResize)){
-=======
     static auto u32_transparent_menubar_bg = ImGui::GetColorU32(ImGuiCol_WindowBg,0.0f);
     ImGui::PushStyleColor(ImGuiCol_MenuBarBg,u32_transparent_menubar_bg);
     if(ImGui::Begin("MenuBarContainer", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoNav)){
->>>>>>> Testing
       if(ImGui::BeginMenuBar()){
           if (ImGui::BeginMenu("File"))
         {
@@ -450,18 +439,11 @@ void RenderGUI(){
       }
       ImGui::End();
     }
-<<<<<<< HEAD
-    ImGui::SetNextWindowSize({MainViewport->Size.x/2,23-16});
-    ImGui::SetNextWindowPos({MainViewport->Pos.x+(MainViewport->Size.x/2),MainViewport->Pos.y});
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{0.0f,0.0f});
-    if(ImGui::Begin("MainWindowSwapButtons", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoResize)){
-=======
     ImGui::PopStyleColor();
     ImGui::SetNextWindowSize({MainViewport->Size.x/2,23-16});
     ImGui::SetNextWindowPos({MainViewport->Pos.x+((MainViewport->Size.x*0.75f)-16),MainViewport->Pos.y});
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{0.0f,0.0f});
     if(ImGui::Begin("MainWindowSwapButtons", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoNav)){
->>>>>>> Testing
       if(ImGui::BeginTabBar("MainWindowSwapBar", ImGuiTabBarFlags_FittingPolicyMask_)){
         
         if(ImGui::BeginTabItem("Convert")){
@@ -476,29 +458,17 @@ void RenderGUI(){
         }
         ImGui::EndTabBar();
       }
-<<<<<<< HEAD
-      std::string version = "v2.3.0 beta";
-      float text_width = ImGui::CalcTextSize(version.c_str()).x;
-
-      ImGui::SameLine((MainViewport->Size.x/2)-(text_width+10));
-=======
       std::string version = "v2.3.0";
       float text_width = ImGui::CalcTextSize(version.c_str()).x;
 
       ImGui::SameLine(((MainViewport->Size.x*0.25f)+16)-(text_width+10));
->>>>>>> Testing
       ImGui::Text("%s",version.c_str());
       ImGui::End();
     }
     
     ImGui::PopStyleVar(2);
-<<<<<<< HEAD
-    ImGui::GetBackgroundDrawList()->AddRectFilled({MainViewport->Pos.x + (MainViewport->Size.x/2),MainViewport->Pos.y}, {MainViewport->Pos.x+MainViewport->Size.x,MainViewport->Pos.y+23}, ImGui::GetColorU32(ImGuiCol_MenuBarBg));
-    ImGui::GetForegroundDrawList()->AddLine({0,21}, {MainViewport->Size.x,MainViewport->Pos.y+21}, ImGui::GetColorU32(ImGuiCol_TabActive), 1.0f);
-=======
     ImGui::GetBackgroundDrawList()->AddRectFilled({MainViewport->Pos.x,MainViewport->Pos.y}, {MainViewport->Pos.x+MainViewport->Size.x,MainViewport->Pos.y+23}, ImGui::GetColorU32(ImGuiCol_MenuBarBg));
     ImGui::GetBackgroundDrawList()->AddLine({0,21}, {MainViewport->Size.x,MainViewport->Pos.y+21}, ImGui::GetColorU32(ImGuiCol_TabActive), 1.0f);
->>>>>>> Testing
     
 
     ImGui::SetNextWindowPos(
@@ -509,11 +479,7 @@ void RenderGUI(){
 
     ImGui::SetNextWindowSize({viewport_width,viewport_height-23});
     ImGui::SetNextWindowBgAlpha(0.2);
-<<<<<<< HEAD
-    ImGui::Begin("Box", NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings);
-=======
     ImGui::Begin("Box", NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNav);
->>>>>>> Testing
     
     if(conv) RenderConversionPanel();
 
@@ -533,13 +499,8 @@ void RenderGUI(){
       }
       ImGui::BringWindowToDisplayFront(ImGui::FindWindowByName("About"));
     }
-<<<<<<< HEAD
-    ImGui::BringWindowToDisplayFront(ImGui::FindWindowByName("MenuBarContainer"));
-    ImGui::BringWindowToDisplayFront(ImGui::FindWindowByName("MainWindowSwapButtons"));
-=======
     //ImGui::BringWindowToDisplayFront(ImGui::FindWindowByName("MenuBarContainer"));
     //ImGui::BringWindowToDisplayFront(ImGui::FindWindowByName("MainWindowSwapButtons"));
->>>>>>> Testing
     ImGui::PopStyleVar(2);
 }
 
