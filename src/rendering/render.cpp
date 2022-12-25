@@ -406,6 +406,8 @@ void RenderGUI(){
     ImGui::SetNextWindowSize({MainViewport->Size.x/2,21});
     ImGui::SetNextWindowPos({MainViewport->Pos.x,MainViewport->Pos.y});
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize,0.0f);
+    static auto u32_transparent_menubar_bg = ImGui::GetColorU32(ImGuiCol_WindowBg,0.0f);
+    ImGui::PushStyleColor(ImGuiCol_MenuBarBg,u32_transparent_menubar_bg);
     if(ImGui::Begin("MenuBarContainer", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoNav)){
       if(ImGui::BeginMenuBar()){
           if (ImGui::BeginMenu("File"))
@@ -437,6 +439,7 @@ void RenderGUI(){
       }
       ImGui::End();
     }
+    ImGui::PopStyleColor();
     ImGui::SetNextWindowSize({MainViewport->Size.x/2,23-16});
     ImGui::SetNextWindowPos({MainViewport->Pos.x+((MainViewport->Size.x*0.75f)-16),MainViewport->Pos.y});
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{0.0f,0.0f});
@@ -455,7 +458,7 @@ void RenderGUI(){
         }
         ImGui::EndTabBar();
       }
-      std::string version = "v2.3.0 beta";
+      std::string version = "v2.3.0";
       float text_width = ImGui::CalcTextSize(version.c_str()).x;
 
       ImGui::SameLine(((MainViewport->Size.x*0.25f)+16)-(text_width+10));
@@ -464,8 +467,8 @@ void RenderGUI(){
     }
     
     ImGui::PopStyleVar(2);
-    ImGui::GetBackgroundDrawList()->AddRectFilled({MainViewport->Pos.x + (MainViewport->Size.x/2),MainViewport->Pos.y}, {MainViewport->Pos.x+MainViewport->Size.x,MainViewport->Pos.y+23}, ImGui::GetColorU32(ImGuiCol_MenuBarBg));
-    ImGui::GetForegroundDrawList()->AddLine({0,21}, {MainViewport->Size.x,MainViewport->Pos.y+21}, ImGui::GetColorU32(ImGuiCol_TabActive), 1.0f);
+    ImGui::GetBackgroundDrawList()->AddRectFilled({MainViewport->Pos.x,MainViewport->Pos.y}, {MainViewport->Pos.x+MainViewport->Size.x,MainViewport->Pos.y+23}, ImGui::GetColorU32(ImGuiCol_MenuBarBg));
+    ImGui::GetBackgroundDrawList()->AddLine({0,21}, {MainViewport->Size.x,MainViewport->Pos.y+21}, ImGui::GetColorU32(ImGuiCol_TabActive), 1.0f);
     
 
     ImGui::SetNextWindowPos(
@@ -496,8 +499,8 @@ void RenderGUI(){
       }
       ImGui::BringWindowToDisplayFront(ImGui::FindWindowByName("About"));
     }
-    ImGui::BringWindowToDisplayFront(ImGui::FindWindowByName("MenuBarContainer"));
-    ImGui::BringWindowToDisplayFront(ImGui::FindWindowByName("MainWindowSwapButtons"));
+    //ImGui::BringWindowToDisplayFront(ImGui::FindWindowByName("MenuBarContainer"));
+    //ImGui::BringWindowToDisplayFront(ImGui::FindWindowByName("MainWindowSwapButtons"));
     ImGui::PopStyleVar(2);
 }
 

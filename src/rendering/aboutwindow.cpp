@@ -83,6 +83,9 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
     if(ImGui::BeginTabItem("Patch Notes")){
       ImGui::BeginChild("PatchNotes");
 
+      PatchNotesVersionHeader("2.3.0");
+      ImGui::BulletText("Various QoL UI tweaks");
+
       PatchNotesVersionHeader("2.2.0");
       ImGui::BulletText("Complete backend rewrite");
       ImGui::BulletText("UI rework, support for more supplemental files");
