@@ -1490,7 +1490,7 @@ int ConvertV49(FileInfo info)
         UI::Progress.SubTask.End();
         Logger::Info("Finished src bone transforms\n");
     }
-    if (v53Hdr.linearboneindex > 0)
+    if (v53Hdr.linearboneindex > 0 || mdl.mdlhdr.numbones > 1)
     {
         OutStream.seek(v53Hdr.linearboneindex);
         for (int i = 0; i < mdl.mdlhdr.numbones; i++)
