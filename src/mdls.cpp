@@ -7027,7 +7027,7 @@ studiohdr_t_v53 MDL::v49Mdl::ConvertHeader(FileInfo info)
 
 	int			illumpositionattachmentindex;
 
-	int			linearboneindex = linearboneindex > 0 ? mdlsubhdr.linearboneindex + allBytesAdded + 408 + ruiSize : 0;
+	int			linearboneindex = linearboneindex > 0 || mdlhdr.numbones > 1 ? mdlsubhdr.linearboneindex + allBytesAdded + 408 + ruiSize : 0;
 
 	int			m_nBoneFlexDriverCount;
 	int			m_nBoneFlexDriverIndex;
