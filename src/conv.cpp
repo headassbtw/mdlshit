@@ -1490,7 +1490,7 @@ int ConvertV49(FileInfo info)
         UI::Progress.SubTask.End();
         Logger::Info("Finished src bone transforms\n");
     }
-    if (mdl.mdlsubhdr.linearboneindex > 0)
+    if (v53Hdr.linearboneindex > 0)
     {
         OutStream.seek(v53Hdr.linearboneindex);
         for (int i = 0; i < mdl.mdlhdr.numbones; i++)
@@ -1502,7 +1502,7 @@ int ConvertV49(FileInfo info)
                     mdl.linearbonedata.flags[i] += 0x20;
                 }
             }
-            mdl.linearbonedata.posScale[i] = { 0,0,0 };
+            //mdl.linearbonedata.posScale[i] = { 0,0,0 };
         }
         OutStream.Write(mdl.linearbone);
         OutStream.Write(linearBoneData, mdl.mdlhdr.numbones);
