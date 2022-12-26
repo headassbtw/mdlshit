@@ -42,7 +42,7 @@ generate_product_version(
    COMPANY_COPYRIGHT ${APP_COPYRIGHT}
    INTERNAL_NAME "fucking bitch ass model converter"
    VERSION_MAJOR 2
-   VERSION_MINOR 2
+   VERSION_MINOR 3
    VERSION_PATCH 0
 )
 set(GLFW_BUILD_EXAMPLES OFF)
