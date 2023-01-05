@@ -629,7 +629,7 @@ void AddMainMdlTrees()
                     SelectedMesh = i + 1;
                   }
 
-                  if (ImGui::TreeNode((void *) (intptr_t) i + 1, "Faces (%zu)", mdl->ruimeshes[i].numfaces)) {
+                  if (ImGui::TreeNode((void *) (intptr_t) (i + 1), "Faces (%zu)", mdl->ruimeshes[i].numfaces)) {
                     for (int m = 0; m < mdl->ruimeshes[i].numfaces; m++) {
                       ImGui::Text("UV: [Min: (%f, %f) Max: (%f, %f)]", mdl->ruimeshes[i].facedata[m].faceuvmin.x,
                                   mdl->ruimeshes[i].facedata[m].faceuvmin.y, mdl->ruimeshes[i].facedata[m].faceuvmax.x,
@@ -637,7 +637,7 @@ void AddMainMdlTrees()
                     }
                     ImGui::TreePop();
                   }
-                  if (ImGui::TreeNode((void *) (intptr_t) i + 2, "Vertices (%zu)", mdl->ruimeshes[i].numvertices)) {
+                  if (ImGui::TreeNode((void *) (intptr_t) (i + 2), "Vertices (%zu)", mdl->ruimeshes[i].numvertices)) {
                     for (int m = 0; m < mdl->ruimeshes[i].numvertices; m++) {
                       ImGui::Text("Pos: (%f, %f, %f) Parent: %i", mdl->ruimeshes[i].vertex[m].vertexpos.x,
                                   mdl->ruimeshes[i].vertex[m].vertexpos.y, mdl->ruimeshes[i].vertex[m].vertexpos.z,
@@ -675,7 +675,8 @@ void AddExtractionOptions()
                 {
                 case 0:
                 {
-                    mdl->v49ExtractSrcBoneTransforms(&BinaryReader(&_mdl->BoxBuffer[0]));
+                    auto reader = BinaryReader(&_mdl->BoxBuffer[0]);
+                    mdl->v49ExtractSrcBoneTransforms(&reader);
                     break;
                 }
                 }
@@ -695,19 +696,22 @@ void AddExtractionOptions()
                 {
                 case 0:
                 {
-                    mdl->v53ExtractRUIMesh(&BinaryReader(&_mdl->BoxBuffer[0]));
+                    auto reader = BinaryReader(&_mdl->BoxBuffer[0]);
+                    mdl->v53ExtractRUIMesh(&reader);
                     break;
                 }
 
                 case 1:
                 {
-                    mdl->v53ExtractSrcBoneTransforms(&BinaryReader(&_mdl->BoxBuffer[0]));
+                    auto reader = BinaryReader(&_mdl->BoxBuffer[0]);
+                    mdl->v53ExtractSrcBoneTransforms(&reader);
                     break;
                 }
 
                 case 2:
                 {
-                    mdl->v53ExtractAABBTree(&BinaryReader(&_mdl->BoxBuffer[0]));
+                    auto reader = BinaryReader(&_mdl->BoxBuffer[0]);
+                    mdl->v53ExtractAABBTree(&reader);
                     break;
                 }
                 }
@@ -727,13 +731,15 @@ void AddExtractionOptions()
                 {
                 case 0:
                 {
-                    mdl->v52ExtractSrcBoneTransforms(&BinaryReader(&_mdl->BoxBuffer[0]));
+                    auto reader = BinaryReader(&_mdl->BoxBuffer[0]);
+                    mdl->v52ExtractSrcBoneTransforms(&reader);
                     break;
                 }
 
                 case 1:
                 {
-                    mdl->v52ExtractAABBTree(&BinaryReader(&_mdl->BoxBuffer[0]));
+                    auto reader = BinaryReader(&_mdl->BoxBuffer[0]);
+                    mdl->v52ExtractAABBTree(&reader);
                     break;
                 }
                 }

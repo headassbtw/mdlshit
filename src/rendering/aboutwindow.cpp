@@ -2,7 +2,7 @@
 #include <imgui.h>
 #include <resource.hpp>
 #include <cstdint>
-#include <GL/gl.h>
+#include <gl.hpp>
 #include <string>
 #include "stb_image.h"
 
@@ -17,8 +17,10 @@ void PatchNotesVersionHeader(std::string VersionID){
 }
 
 void OpenLink(const char* site){
-#ifdef WIN32
+#if defined(WIN32)
   ShellExecute(NULL, "open", site, NULL, NULL, SW_SHOWNORMAL);
+#elif defined(__APPLE__)
+  system(("open " + std::string(site)).c_str());
 #else
   system(("xdg-open " + std::string(site)).c_str());
 #endif
