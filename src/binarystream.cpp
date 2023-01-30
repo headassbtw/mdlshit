@@ -3524,6 +3524,12 @@ void BinaryReader::Read(physection_t* data)
 
 void BinaryReader::seek(int pos)
 {
+    if(pos > size){
+        Logger::Critical("BinaryReader tried to seek beyond the limits of the file!\n");
+    }
+    Stream.clear(std::_S_goodbit); //lmao
+    Stream.clear(std::_S_failbit);
+    Stream.clear(std::_S_eofbit);
     Stream.seekg(pos);
     if (Stream.tellg() != pos) {
         Logger::Critical("BinaryReader failed to seek the read cursor!\n");

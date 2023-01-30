@@ -13,6 +13,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
+#include <thread>
 
 Widgets::File* _mdl;
 std::optional<MDL::v49Mdl> _opt_v49;
@@ -696,8 +697,11 @@ void AddExtractionOptions()
                 {
                 case 0:
                 {
-                    auto reader = BinaryReader(&_mdl->BoxBuffer[0]);
-                    mdl->v53ExtractRUIMesh(&reader);
+                    //auto reader = BinaryReader(&);
+                    std::thread extract_rui_thread([&mdl]{
+                      mdl->v53ExtractRUIMesh(&_mdl->BoxBuffer[0]);
+                    });
+                    extract_rui_thread.detach();
                     break;
                 }
 
@@ -747,48 +751,7 @@ void AddExtractionOptions()
         }
 }
 
-//void UI::RenderReadMdlWindow(int x, int y)
-//{
-//    _mdl->UI(x - 8);
-//    std::vector<Error> rtn;
-//    std::ifstream test(&_mdl->BoxBuffer[0]);
-//    if (ImGui::Button("Read MDL"))
-//    {
-//        if (!test)
-//        {
-//            rtn.push_back({ ErrorType::Blocking,std::string("File does not exist") });
-//        }
-//        else
-//        {
-//            char magic[4];
-//            test.read(magic, 4);
-//            if (strcmp(magic, "IDST") >= 0)
-//            {
-//                rtn.push_back({ ErrorType::Success,std::string("Valid MDL file") });
-//                char ver[1];
-//                test.read(ver, 1);
-//
-//                if ((int)ver[0] == 49)
-//                {
-//                    isReading = true;
-//                    Logger::Debug("MDL Version: %d\n", (int)ver[0]);
-//                    rtn.push_back({ ErrorType::Success,std::string("Version 49") });
-//                    BinaryReader Stream = BinaryReader(&_mdl->BoxBuffer[0]);
-//                    MDL::v49Mdl mdl = {};
-//                    mdl = mdl._v49Mdl(&Stream, false);
-//                    Logger::Debug("MDL READ: %d\n", (int)ver[0]);
-//                    //_opt_v49 = _opt_v49->_v49Mdl(&Stream, false);
-//                }
-//            }
-//            else {
-//                std::string err = std::string("Invalid MDL file; magic was \"") + std::string(magic) + "\"";
-//                rtn.push_back({ ErrorType::Blocking,err });
-//                Logger::Critical("%s\n", err.c_str());
-//            }
-//        }
-//        test.close();
-//    }
-//}
+
 bool needsReset = false; //for the rui mesh renderer
 void UI::RenderReadMdlWindow(int x, int y)
 {
@@ -818,9 +781,14 @@ void UI::RenderReadMdlWindow(int x, int y)
       _opt_v53.reset();
       _opt_v52.reset();
       DestroyRuiMeshRenderPipeline();
-      ReadMdl();
+      std::thread mdl_read_thread([]{
+        isReading = true;
+        ReadMdl();
+        isReading = false;
+      });
+      mdl_read_thread.detach();
+      
       needsReset = true;
-      isReading = false;
     }
     AddExtractionOptions();
     ImGui::SameLine();
@@ -839,9 +807,12 @@ void UI::RenderReadMdlWindow(int x, int y)
       }
     }
     ImGui::Separator();
-    ImGui::BeginChildFrame((intptr_t)32, {400,0});
-    AddMainMdlTrees();
-    ImGui::EndChildFrame();
+    if(!isReading){
+      ImGui::BeginChildFrame((intptr_t)32, {400,0});
+      AddMainMdlTrees();
+      ImGui::EndChildFrame();
+    }
+    
     if(renderRuiMesh){
       RenderRuiMeshes();
       ImGui::SameLine();

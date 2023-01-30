@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 project(mdlshit)
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "-fpermissive")
+set(CMAKE_CXX_FLAGS "-fpermissive -g")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/CMake_Modules)
 
 find_package(OpenGL REQUIRED)
@@ -30,7 +30,7 @@ file(GLOB IM_SRC CONFIGURE_DEPENDS
 include(generate_product_version)
 
 
-set(APP_COPYRIGHT "MasterLiberty & headassbtw (C) Copyright 2022") #2678 for shitpost
+set(APP_COPYRIGHT "MasterLiberty & headassbtw (C) Copyright 2023") #2678 for shitpost
 set(APP_NAME "Titanfall 2 .MDL converter")
 set(APP_INFOSTRING "Fuck you Respawn!")
 generate_product_version(
@@ -43,7 +43,7 @@ generate_product_version(
    INTERNAL_NAME "fucking bitch ass model converter"
    VERSION_MAJOR 2
    VERSION_MINOR 3
-   VERSION_PATCH 0
+   VERSION_PATCH 2
 )
 set(GLFW_BUILD_EXAMPLES OFF)
 set(GLFW_BUILD_DOCS OFF)
@@ -55,6 +55,8 @@ set(GLFW_LIBRARY_TYPE STATIC)
 add_subdirectory(external/glfw)
 add_subdirectory(external/glew/build/cmake)
 
+
+set(CMAKE_BUILD_TYPE Debug)
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden -Wall")
 if(WIN32)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/Windows)
@@ -76,7 +78,7 @@ elseif(APPLE)
     set(MACOSX_BUNDLE_BUNDLE_NAME ${APP_NAME})
     set(MACOSX_BUNDLE_COPYRIGHT ${APP_COPYRIGHT})
     set(MACOSX_BUNDLE_INFO_STRING ${APP_INFOSTRING})
-    set(MACOSX_BUNDLE_BUNDLE_VERSION "2.2.0")
+    set(MACOSX_BUNDLE_BUNDLE_VERSION "2.3.2")
     add_executable(mdlshit MACOSX_BUNDLE ${SRC} ${myApp_ICON})
 else()
     add_executable(mdlshit ${SRC})

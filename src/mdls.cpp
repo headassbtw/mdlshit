@@ -793,19 +793,28 @@ MDL::v53Mdl::v53Mdl(studiohdr_t_v53 _mdlhdr, mayabakery_t _mayabakery, std::vect
 	aabbverts = _aabbverts;
 }
 
-void MDL::v53Mdl::v53ExtractRUIMesh(BinaryReader* Stream) //There is a much much better way of doing this by just writing the file as it reads the structs and using the indexes to calculate padding. -Liberty
+void MDL::v53Mdl::v53ExtractRUIMesh(char* filename) //There is a much much better way of doing this by just writing the file as it reads the structs and using the indexes to calculate padding. -Liberty
 {
+	BinaryReader* Stream = new BinaryReader(filename);
 	Stream->seek(0);
+	Logger::Debug("0\n");
 	studiohdr_t_v53										mdlhdr; Stream->Read(&mdlhdr);
+	Logger::Debug("0\n");
 	std::vector<mstudiorruiheader_t>					ruiHdrs;
+	Logger::Debug("0\n");
 
 	if (mdlhdr.numruimeshes > 0)
 	{
+		Logger::Debug("seek (%i)\n",mdlhdr.ruimeshindex);
 		Stream->seek(mdlhdr.ruimeshindex);
+		Logger::Debug("0.5\n");
 		for (int i = 0; i < mdlhdr.numruimeshes; i++)
 		{
+			Logger::Debug("1\n");
 			mstudiorruiheader_t ruiHdr; Stream->Read(&ruiHdr);
+			Logger::Debug("1\n");
 			ruiHdrs.push_back(ruiHdr);
+			Logger::Debug("1\n");
 			Logger::Info("RuiHdr Read: %d\n", i);
 		}
 
@@ -821,15 +830,27 @@ void MDL::v53Mdl::v53ExtractRUIMesh(BinaryReader* Stream) //There is a much much
 			Logger::Info("RuiMesh Read: %d\n", j);
 		}
 		std::string fileName = Stream->_filename;
+		Logger::Debug("0_cache\n");
 		fileName.resize(fileName.size() - 4);
+		Logger::Debug("0_resize\n");
 		fileName.insert(fileName.size(), ".rui");
+		Logger::Debug("0_insert\n");
 		int ruiEnd = Stream->Position();
+		Logger::Debug("0_cache\n");
 		Stream->seek(mdlhdr.ruimeshindex);
+		Logger::Debug("0_seek\n");
 		BinaryWriter Bing = BinaryWriter(fileName.c_str());
+		Logger::Debug("0_ctor\n");
 		char* data = new char[ruiEnd - mdlhdr.ruimeshindex];
 		Stream->read(data, ruiEnd - mdlhdr.ruimeshindex);
+		Logger::Debug("0_read\n");
 		Bing.write(data, ruiEnd - mdlhdr.ruimeshindex);
+		Logger::Debug("0_write\n");
 	}
+	else{
+		Logger::Debug("No RUI Meshes!\n");
+	}
+	delete Stream;
 }
 
 void MDL::v53Mdl::v53ExtractSrcBoneTransforms(BinaryReader* Stream)

@@ -1,6 +1,6 @@
 #!/bin/bash
-mkdir winbuild
-cd winbuild
+mkdir build-windows
+cd build-windows
 cmake -DCMAKE_TOOLCHAIN_FILE=./../CMake_Modules/Toolchain-cross-mingw32-linux.cmake ..
-make
+make -j$(nproc)
 cd ..

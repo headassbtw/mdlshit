@@ -77,7 +77,7 @@ namespace MDL
 		aabbcollisionmask									aabbverts;
 
 
-		void v53ExtractRUIMesh(BinaryReader* Stream);
+		void v53ExtractRUIMesh(char* filename);
 
 		void v53ExtractSrcBoneTransforms(BinaryReader* Stream);
 

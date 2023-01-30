@@ -85,6 +85,10 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
     if(ImGui::BeginTabItem("Patch Notes")){
       ImGui::BeginChild("PatchNotes");
 
+      PatchNotesVersionHeader("2.3.2");
+      ImGui::BulletText("Fixed RUI extraction/insertion on Windows (Other platforms unaffected)");
+      ImGui::BulletText("Moved RUI extraction to another thread to avoid hitching the GUI");
+
       PatchNotesVersionHeader("2.3.0");
       ImGui::BulletText("Various QoL UI tweaks");
 
