@@ -14,6 +14,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
 #include <thread>
+#include <pthread.h>
 
 Widgets::File* _mdl;
 std::optional<MDL::v49Mdl> _opt_v49;
@@ -21,6 +22,7 @@ std::optional<MDL::v53Mdl> _opt_v53;
 std::optional<MDL::v52Mdl> _opt_v52;
 int extract_dropdown;
 bool isReading = false;
+bool isReadingRui = false;
 
 #pragma region sub-rendering
 int subRendererResolution;
@@ -691,17 +693,23 @@ void AddExtractionOptions()
             ImGui::SameLine();
             ImGui::Combo("##ExtractDropdown", &extract_dropdown, extract_options, IM_ARRAYSIZE(extract_options));
             ImGui::SameLine();
-            if (ImGui::Button("Extract"))
+            if (!isReadingRui && ImGui::Button("Extract"))
             {
                 switch (extract_dropdown)
                 {
                 case 0:
                 {
-                    //auto reader = BinaryReader(&);
-                    std::thread extract_rui_thread([&mdl]{
+
+                    //void* thread_func = [&mdl]{
+                      isReadingRui = true;
                       mdl->v53ExtractRUIMesh(&_mdl->BoxBuffer[0]);
-                    });
-                    extract_rui_thread.detach();
+                      isReadingRui = false;
+                    //};
+
+                    //thread_func();
+
+                    
+                    
                     break;
                 }
 
@@ -771,6 +779,10 @@ void UI::RenderReadMdlWindow(int x, int y)
       needsReset = false;
       renderRuiMesh = false;
     }
+  }
+  if(isReading || isReadingRui){
+    if (isReading) ImGui::Text("Loading MDL");
+    if (isReadingRui) ImGui::Text("Dumping RUI Mesh");
   }
   else
   {

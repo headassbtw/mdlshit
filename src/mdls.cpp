@@ -796,19 +796,20 @@ MDL::v53Mdl::v53Mdl(studiohdr_t_v53 _mdlhdr, mayabakery_t _mayabakery, std::vect
 void MDL::v53Mdl::v53ExtractRUIMesh(char* filename) //There is a much much better way of doing this by just writing the file as it reads the structs and using the indexes to calculate padding. -Liberty
 {
 	BinaryReader* Stream = new BinaryReader(filename);
+	
 	Stream->seek(0);
-	Logger::Debug("0\n");
-	studiohdr_t_v53										mdlhdr; Stream->Read(&mdlhdr);
-	Logger::Debug("0\n");
 	std::vector<mstudiorruiheader_t>					ruiHdrs;
-	Logger::Debug("0\n");
-
-	if (mdlhdr.numruimeshes > 0)
+	if (this->mdlhdr.numruimeshes > 0)
 	{
-		Logger::Debug("seek (%i)\n",mdlhdr.ruimeshindex);
-		Stream->seek(mdlhdr.ruimeshindex);
+		Logger::Debug("seek (%i)\n",this->mdlhdr.ruimeshindex);
+		Stream->seek(0);
 		Logger::Debug("0.5\n");
-		for (int i = 0; i < mdlhdr.numruimeshes; i++)
+		Stream->seek(this->mdlhdr.ruimeshindex);
+		Logger::Debug("0.5\n");
+		Logger::Info("%i RUI Meshes\n",ruimeshes.size());
+		Logger::Info("%i RUI Meshes\n",this->mdlhdr.numruimeshes);
+		Logger::Info("%i RUI Meshes\n",mdlhdr.numruimeshes);
+		for (int i = 0; i < ruimeshes.size(); i++)
 		{
 			Logger::Debug("1\n");
 			mstudiorruiheader_t ruiHdr; Stream->Read(&ruiHdr);
@@ -818,7 +819,7 @@ void MDL::v53Mdl::v53ExtractRUIMesh(char* filename) //There is a much much bette
 			Logger::Info("RuiHdr Read: %d\n", i);
 		}
 
-		Stream->seek(mdlhdr.ruimeshindex + ruiHdrs[0].ruimeshindex);
+		Stream->seek(this->mdlhdr.ruimeshindex + ruiHdrs[0].ruimeshindex);
 		for (int j = 0; j < ruiHdrs.size(); j++)
 		{
 			int ruiPos = Stream->Position();
@@ -837,20 +838,22 @@ void MDL::v53Mdl::v53ExtractRUIMesh(char* filename) //There is a much much bette
 		Logger::Debug("0_insert\n");
 		int ruiEnd = Stream->Position();
 		Logger::Debug("0_cache\n");
-		Stream->seek(mdlhdr.ruimeshindex);
+		Stream->seek(this->mdlhdr.ruimeshindex);
 		Logger::Debug("0_seek\n");
 		BinaryWriter Bing = BinaryWriter(fileName.c_str());
 		Logger::Debug("0_ctor\n");
-		char* data = new char[ruiEnd - mdlhdr.ruimeshindex];
-		Stream->read(data, ruiEnd - mdlhdr.ruimeshindex);
+		char* data = new char[ruiEnd - this->mdlhdr.ruimeshindex];
+		Stream->read(data, ruiEnd - this->mdlhdr.ruimeshindex);
 		Logger::Debug("0_read\n");
-		Bing.write(data, ruiEnd - mdlhdr.ruimeshindex);
+		Bing.write(data, ruiEnd - this->mdlhdr.ruimeshindex);
 		Logger::Debug("0_write\n");
+		
 	}
 	else{
 		Logger::Debug("No RUI Meshes!\n");
 	}
 	delete Stream;
+	Logger::Info("Finished dumping RUI Mesh\n");
 }
 
 void MDL::v53Mdl::v53ExtractSrcBoneTransforms(BinaryReader* Stream)

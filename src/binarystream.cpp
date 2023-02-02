@@ -1,6 +1,7 @@
 #include "structs.hpp"
 #include <binarystream.hpp>
 #include <fstream>
+#include <ios>
 #include <string>
 #include <sys/stat.h>
 #include <logger.hpp>
