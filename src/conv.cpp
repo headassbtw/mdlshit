@@ -1383,7 +1383,9 @@ int ConvertV49(FileInfo info)
 
     //RUI CODE 
 
-    if (info.rui.has_value()) {
+    if (info.rui.has_value()) 
+    {
+        OutStream.seek(v53Hdr.ruimeshindex);
         BinaryReader RUIStream = BinaryReader(info.rui.value().c_str());
         if (!RUIStream.Stream.good()) {
             Logger::Error("Model's RUI file does not exist, please ensure %s exists, and is located in the same directory as the file\n", info.rui.value().c_str());
@@ -1429,7 +1431,7 @@ int ConvertV49(FileInfo info)
 #pragma region texture conversion
     if (mdl.mdlhdr.numtextures > 0)
     {
-        AddInt32(&OutStream, 0, 3);  //filler Edit: I don't remember why. - Liberty
+        AddInt32(&OutStream, 0, 3);  //filler. Edit: I don't remember why. - Liberty
         OutStream.seek(v53Hdr.textureindex);
         UI::Progress.SubTask.Begin("Converting Textures");
         for (int i = 0; i < mdl.mdlhdr.numtextures; i++)

@@ -801,21 +801,12 @@ void MDL::v53Mdl::v53ExtractRUIMesh(char* filename) //There is a much much bette
 	std::vector<mstudiorruiheader_t>					ruiHdrs;
 	if (this->mdlhdr.numruimeshes > 0)
 	{
-		Logger::Debug("seek (%i)\n",this->mdlhdr.ruimeshindex);
 		Stream->seek(0);
-		Logger::Debug("0.5\n");
 		Stream->seek(this->mdlhdr.ruimeshindex);
-		Logger::Debug("0.5\n");
-		Logger::Info("%i RUI Meshes\n",ruimeshes.size());
-		Logger::Info("%i RUI Meshes\n",this->mdlhdr.numruimeshes);
-		Logger::Info("%i RUI Meshes\n",mdlhdr.numruimeshes);
 		for (int i = 0; i < ruimeshes.size(); i++)
 		{
-			Logger::Debug("1\n");
 			mstudiorruiheader_t ruiHdr; Stream->Read(&ruiHdr);
-			Logger::Debug("1\n");
 			ruiHdrs.push_back(ruiHdr);
-			Logger::Debug("1\n");
 			Logger::Info("RuiHdr Read: %d\n", i);
 		}
 
@@ -831,22 +822,14 @@ void MDL::v53Mdl::v53ExtractRUIMesh(char* filename) //There is a much much bette
 			Logger::Info("RuiMesh Read: %d\n", j);
 		}
 		std::string fileName = Stream->_filename;
-		Logger::Debug("0_cache\n");
 		fileName.resize(fileName.size() - 4);
-		Logger::Debug("0_resize\n");
 		fileName.insert(fileName.size(), ".rui");
-		Logger::Debug("0_insert\n");
 		int ruiEnd = Stream->Position();
-		Logger::Debug("0_cache\n");
 		Stream->seek(this->mdlhdr.ruimeshindex);
-		Logger::Debug("0_seek\n");
 		BinaryWriter Bing = BinaryWriter(fileName.c_str());
-		Logger::Debug("0_ctor\n");
 		char* data = new char[ruiEnd - this->mdlhdr.ruimeshindex];
 		Stream->read(data, ruiEnd - this->mdlhdr.ruimeshindex);
-		Logger::Debug("0_read\n");
 		Bing.write(data, ruiEnd - this->mdlhdr.ruimeshindex);
-		Logger::Debug("0_write\n");
 		
 	}
 	else{

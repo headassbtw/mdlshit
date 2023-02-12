@@ -92,9 +92,8 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
 
       PatchNotesVersionHeader("2.3.2");
       ImGui::BulletText("Threaded MDL reading");
-      ImGui::BulletText("Fixed jiggle bones (probably)");
+      ImGui::BulletText("Fixed jiggle bones");
       ImGui::BulletText("Fixed RUI extraction/insertion on Windows (Other platforms unaffected)");
-      ImGui::BulletText("Moved RUI extraction to another thread to avoid hitching the GUI");
 
       PatchNotesVersionHeader("2.3.0");
       ImGui::BulletText("Various QoL UI tweaks");
@@ -196,11 +195,13 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
       ImGui::SameLine(); SmallLinkButton("GitHub##Oltrex_GH","https://github.com/Oltrex");
 
       ImGui::BulletText("Titan Ok");
+      ImGui::SameLine(); SmallLinkButton("YouTube##TitanOk_YT","https://www.youtube.com/channel/UC-3O8WyLynkPIOcwHDq4v9A");
 
 
       PatchNotesVersionHeader("Moral Anti-Support");
 
       ImGui::BulletText("Titan Ok");
+      ImGui::SameLine(); SmallLinkButton("YouTube##TitanOk_YT","https://www.youtube.com/channel/UC-3O8WyLynkPIOcwHDq4v9A");
 
       ImGui::EndChild();
       ImGui::EndTabItem();
