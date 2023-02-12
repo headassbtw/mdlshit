@@ -6907,7 +6907,7 @@ studiohdr_t_v53 MDL::v49Mdl::ConvertHeader(FileInfo info)
 	else
 		bytesAddedToAABBTree = 60;
 
-	//Logger::Notice("RuiSize %d\n", ruiSize);
+	Logger::Notice("RuiSize %d\n", ruiSize);
 
 	int			id;
 	int			version;
@@ -7080,7 +7080,7 @@ std::vector<mstudiobone_t_v53> MDL::v49Mdl::BoneConversion()
 
 		Vector3 posscale{ 0,0,0 };
 
-		if (v49Bone.procindex > 0) v49Bone.procindex += stairs;
+		if (v49Bone.procindex > 0) v49Bone.procindex += ( (28 * mdlhdr.numbones) - (28 * i) );
 		if (v49Bone.surfacepropidx > 0) v49Bone.surfacepropidx += stairs;
 		if (v49Bone.surfacepropLookup > 0) v49Bone.surfacepropLookup += stairs;
 
