@@ -126,6 +126,7 @@ void Convert(int a){
 GLuint GRUNT_POG;
 ImVec2 pog_size;
 
+bool _isBlockingTabSwitch = false; //this is so the invidual tabs can block switching, to prevent the user from reading the same file more than once
 
 void depth_border(){
     auto bg = ImGui::GetBackgroundDrawList();
@@ -361,9 +362,10 @@ void RenderConversionPanel(){
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize,0.0f);
 
     if(ImGui::BeginPopupModal("Status##ConvertModal",NULL,ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)){
-        auto sz = ImGui::GetWindowSize();
-        ImGui::SetWindowSize({300,200});
-        ImGui::SetWindowPos({(viewport_width/2) - (150),(viewport_height/2) - (50)});
+      _isBlockingTabSwitch = true;
+      auto sz = ImGui::GetWindowSize();
+      ImGui::SetWindowSize({300,200});
+      ImGui::SetWindowPos({(viewport_width/2) - (150),(viewport_height/2) - (50)});
 
       if(UI::Progress.MainTask.Show()){
         ImGui::Text("%s",UI::Progress.MainTask.Name().c_str());
@@ -383,6 +385,7 @@ void RenderConversionPanel(){
           }
           blocked = true;
           ImGui::CloseCurrentPopup();
+          _isBlockingTabSwitch = false;
         }
       }
       ImGui::EndPopup();
@@ -392,6 +395,7 @@ void RenderConversionPanel(){
     ImGui::EndDisabled();
     ImGui::EndGroup();
 }
+
 
 
 void RenderGUI(){
@@ -443,6 +447,7 @@ void RenderGUI(){
     ImGui::SetNextWindowSize({MainViewport->Size.x/2,23-16});
     ImGui::SetNextWindowPos({MainViewport->Pos.x+((MainViewport->Size.x*0.75f)-16),MainViewport->Pos.y});
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{0.0f,0.0f});
+    ImGui::BeginDisabled(_isBlockingTabSwitch);
     if(ImGui::Begin("MainWindowSwapButtons", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoNav)){
       if(ImGui::BeginTabBar("MainWindowSwapBar", ImGuiTabBarFlags_FittingPolicyMask_)){
         
@@ -465,6 +470,7 @@ void RenderGUI(){
       ImGui::Text("%s",version.c_str());
       ImGui::End();
     }
+    ImGui::EndDisabled();
     
     ImGui::PopStyleVar(2);
     ImGui::GetBackgroundDrawList()->AddRectFilled({MainViewport->Pos.x,MainViewport->Pos.y}, {MainViewport->Pos.x+MainViewport->Size.x,MainViewport->Pos.y+23}, ImGui::GetColorU32(ImGuiCol_MenuBarBg));
@@ -483,7 +489,7 @@ void RenderGUI(){
     
     if(conv) RenderConversionPanel();
 
-    if(readMdl) UI::RenderReadMdlWindow(viewport_width-4,viewport_height-27);
+    if(readMdl) _isBlockingTabSwitch =  UI::RenderReadMdlWindow(viewport_width-4,viewport_height-27);
     
 
     ImGui::End();

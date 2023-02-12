@@ -26,6 +26,11 @@ void OpenLink(const char* site){
 #endif
 }
 
+void SmallLinkButton(std::string id, std::string link){
+  if(ImGui::SmallButton(id.c_str())){
+    OpenLink(link.c_str());
+  }
+}
 
 void UI::SetupAboutWindow() {
   auto klules = stbi_load_from_memory(Resources::Klules, 4067, &klules_width, &klules_height, 0, 4);
@@ -83,9 +88,11 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
       ImGui::EndTabItem();
     }
     if(ImGui::BeginTabItem("Patch Notes")){
-      ImGui::BeginChild("PatchNotes");
+      ImGui::BeginChild("PatchNotes##PATCHNOTES_SUBCHILD");
 
       PatchNotesVersionHeader("2.3.2");
+      ImGui::BulletText("Threaded MDL reading");
+      ImGui::BulletText("Fixed jiggle bones (probably)");
       ImGui::BulletText("Fixed RUI extraction/insertion on Windows (Other platforms unaffected)");
       ImGui::BulletText("Moved RUI extraction to another thread to avoid hitching the GUI");
 
@@ -155,13 +162,47 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
       ImGui::EndTabItem();
     }
     if(ImGui::BeginTabItem("Contrubutors")){
+      ImGui::BeginChild("Contributors##CONTRIB_SUBCHILD");
 
       PatchNotesVersionHeader("Programming");
+
       ImGui::BulletText("headassbtw");
-      ImGui::BulletText("MasterLiberty (Won't accept my windows key)");
+      ImGui::SameLine(); SmallLinkButton("GitHub##headassbtw_GH","https://github.com/headassbtw");
+
+
+      ImGui::BulletText("MasterLiberty");
+      ImGui::SameLine(); SmallLinkButton("GitHub##MasterLiberty_GH","https://github.com/MasterLiberty");
+
+
       PatchNotesVersionHeader("Research");
-      ImGui::BulletText("MasterLiberty (Still won't accept my windows key)");
+
+      ImGui::BulletText("MasterLiberty");
+      ImGui::SameLine(); SmallLinkButton("GitHub##MasterLiberty_GH","https://github.com/MasterLiberty");
+
+
       ImGui::BulletText("Rika");
+      ImGui::SameLine(); SmallLinkButton("GitHub##Rika_GH","https://github.com/IJARika");
+
+
+      PatchNotesVersionHeader("Testing");
+
+      ImGui::BulletText("Spoon");
+      ImGui::SameLine(); SmallLinkButton("GitHub##Spoon_GH","https://github.com/ASpoonPlaysGames");
+
+      ImGui::BulletText("Salmon");
+      ImGui::SameLine(); SmallLinkButton("GitHub##Salmon_GH","https://github.com/TH3-S4LM0N");
+
+      ImGui::BulletText("Oltrex");
+      ImGui::SameLine(); SmallLinkButton("GitHub##Oltrex_GH","https://github.com/Oltrex");
+
+      ImGui::BulletText("Titan Ok");
+
+
+      PatchNotesVersionHeader("Moral Anti-Support");
+
+      ImGui::BulletText("Titan Ok");
+
+      ImGui::EndChild();
       ImGui::EndTabItem();
     }
     if(ImGui::BeginTabItem("Special Thanks")){

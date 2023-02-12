@@ -761,7 +761,7 @@ void AddExtractionOptions()
 
 
 bool needsReset = false; //for the rui mesh renderer
-void UI::RenderReadMdlWindow(int x, int y)
+bool UI::RenderReadMdlWindow(int x, int y)
 {
   //if(needsReset) ImGui::Text("Needs Reset");
   _mdl->UI(x-8);
@@ -843,6 +843,7 @@ void UI::RenderReadMdlWindow(int x, int y)
       ImGui::EndGroup();
     }
   }
+  return isReading || isReadingRui; //block using the other UI panels if we're reading an mdl or rui
 }
 
 void UI::DestroyReadMdlWindow(){
