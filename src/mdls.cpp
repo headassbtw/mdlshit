@@ -6914,7 +6914,7 @@ studiohdr_t_v53 MDL::v49Mdl::ConvertHeader(FileInfo info)
 	else
 		bytesAddedToAABBTree = 60;
 
-	//Logger::Notice("RuiSize %d\n", ruiSize);
+	Logger::Notice("RuiSize %d\n", ruiSize);
 
 	int			id;
 	int			version;

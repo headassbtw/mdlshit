@@ -981,10 +981,10 @@ int ConvertV49(FileInfo info)
     std::vector<mstudioanim_t_v53> sections = mdl.ConvertSections();
     std::vector<mstudiobone_t_v53> bones = mdl.BoneConversion();
     std::vector<mstudiobbox_t_v53> hitboxes = mdl.HitboxConversion();
+    std::vector<mstudioseqdesc_t_v53> seqdescs = mdl.SeqDescConversion();
     std::vector<mstudioanimdesc_t_v53> animdescs = mdl.AnimDescConversion();
     std::vector<sectionindexes_t_v53> sectionIndexes = mdl.ConvertSectionIndexes();
     std::vector<mstudioikrule_t_v53> ikRules = mdl.IkRuleConversion();
-    std::vector<mstudioseqdesc_t_v53> seqdescs = mdl.SeqDescConversion();
     std::vector<mstudioikchain_t_v53> ikChains = mdl.IkChainConversion();
     std::vector<mstudiotexture_t_v53> textures = mdl.ConvertTextures();
     std::vector<mstudioactivitymodifier_t_v53> activityModifiers = mdl.ActivityModifierConversion();
@@ -1110,6 +1110,19 @@ int ConvertV49(FileInfo info)
 
             for (int j = boneHdrNum; j < anims.size(); j++)
             {
+                //bool isEmpty = anims[j].animrot.offset.x == 0 && anims[j].animrot.offset.y == 0 && anims[j].animrot.offset.z == 0 && anims[j].animpos.offset.x == 0 && anims[j].animpos.offset.y == 0 && anims[j].animpos.offset.z == 0;
+                //if (isEmpty)
+                //{
+                //    anims[j].flags = (std::byte)(STUDIO_ANIM_RAWSCALE_53 + STUDIO_ANIM_RAWPOS_53 + STUDIO_ANIM_RAWROT_53);//(STUDIO_ANIM_RAWSCALE_53 + STUDIO_ANIM_READBONE_53);
+                //    //anims[j].bone = (std::byte)-1;
+                //}
+                //if ((int)anims[j].flags & STUDIO_ANIM_READBONE_53)
+                //{
+                //    anims[j].flags = (std::byte)0;//(STUDIO_ANIM_RAWSCALE_53 + STUDIO_ANIM_READBONE_53);
+                //    anims[j].bone = (std::byte)-1;
+                //}
+                int test = (int)anims[j].flags;
+                //if (animdescs[i].flags & STUDIO_DELTA && !((int)anims[j].flags & STUDIO_ANIM_READBONE_53) && anims[j].bone != (std::byte)-1) anims[j].flags = (std::byte)(test + 0x1);
                 OutStream.Write(anims[j]);
                 OutStream.Write(anims[j].animdata);
                 boneHdrNum++;
@@ -1141,6 +1154,20 @@ int ConvertV49(FileInfo info)
                 OutStream.seek(startPos + off);
                 for (int k = secBoneHdrNum; k < sections.size(); k++)
                 {
+                    //bool isEmpty = sections[k].animrot.offset.x == 0 && sections[k].animrot.offset.y == 0 && sections[k].animrot.offset.z == 0 && sections[k].animpos.offset.x == 0 && sections[k].animpos.offset.y == 0 && sections[k].animpos.offset.z == 0;
+                    //if (isEmpty)
+                    //{
+                    //    sections[k].flags = (std::byte)(STUDIO_ANIM_RAWSCALE_53 + STUDIO_ANIM_RAWPOS_53 + STUDIO_ANIM_RAWROT_53);
+                    //    //sections[k].bone = (std::byte)-1;
+                    //}
+
+                    //if ((int)sections[k].flags & STUDIO_ANIM_READBONE_53)
+                    //{
+                    //    sections[k].flags = (std::byte)0;//(STUDIO_ANIM_RAWSCALE_53 + STUDIO_ANIM_READBONE_53);
+                    //    sections[k].bone = (std::byte)-1;
+                    //}
+                    int test = (int)sections[k].flags;
+                    //if (animdescs[i].flags & STUDIO_DELTA && !((int)sections[k].flags & STUDIO_ANIM_READBONE_53) && sections[k].bone != (std::byte)-1) sections[k].flags = (std::byte)(test + 0x1);
                     OutStream.Write(sections[k]);
                     OutStream.Write(sections[k].animdata);
                     secBoneHdrNum++;
@@ -1531,7 +1558,9 @@ int ConvertV49(FileInfo info)
     else
         AddInt32(&OutStream, 0, 15);
 
-    OutStream.seek(v53Hdr.sznameindex);
+    OutStream.seek(v53Hdr.sznameindex - 1);
+    std::byte bullshitFix = (std::byte)0; //fixes the null term
+    OutStream.Write(bullshitFix);
     OutStream.Write(mdl.stringtable); //How the fuck is this working? - Liberty Edit: Fixed it for v49. - Liberty
 
 #pragma region rest of the file
