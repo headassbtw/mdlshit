@@ -6,7 +6,41 @@ namespace Utility
 {
 	namespace debug
 	{
+		int GetAnimHeaderSize(int flag)
+		{
+			switch (flag)
+			{
+			case 33: return 18;
+			case 32: return 12;
+			case 8: return 10;
+			case 1: return 10;
+			case 12: return 16;
+			case 49: return 18;
+			case 48: return 12;
+			case 24: return 10;
+			case 17: return 10;
+			case 28: return 16;
+			case 0: return 4;
 
+			default: return 0;
+			}
+		}
+
+		bool IsWhole(double n) {
+			if (n == (int)n)
+				return true;
+			else
+				return false;
+		}
+
+		//bool contains(std::vector<int> arry, int trgt)
+		//{
+		//	for (int i = 0; i < arry.size(); i++)
+		//	{
+		//		if (trgt == arry[i]) return true;
+		//	}
+		//	return false;
+		//}
 	}
 
 	namespace check
@@ -109,9 +143,237 @@ namespace Utility
 			return -1;
 		}
 
-		std::string ReadBoneFlags()
+		//std::string ReadBoneFlags()
+		//{
+		//	return "";
+		//}
+
+		std::string ReadProcFlags(unsigned int flags)
 		{
-			return "";
+			std::string value = "";
+
+			if (flags == 0)
+				return "NONE";
+
+			switch (flags)
+			{
+			case 0:
+				break;
+			case STUDIO_PROC_AXISINTERP:
+				value += "STUDIO_PROC_AXISINTERP";
+				break;
+			case STUDIO_PROC_QUATINTERP:
+				value += "STUDIO_PROC_QUATINTERP";
+				break;
+			case STUDIO_PROC_AIMATBONE:
+				value += "STUDIO_PROC_AIMATBONE";
+				break;
+			case STUDIO_PROC_AIMATATTACH:
+				value += "STUDIO_PROC_AIMATATTACH";
+				break;
+			case STUDIO_PROC_JIGGLE:
+				value += "STUDIO_PROC_JIGGLE";
+				break;
+			case STUDIO_PROC_TWIST_MASTER:
+				value += "STUDIO_PROC_TWIST_MASTER";
+				break;
+			case STUDIO_PROC_TWIST_SLAVE:
+				value += "STUDIO_PROC_TWIST_SLAVE";
+				break;
+			default:
+				value += std::string("UNK_%d", flags);
+				break;
+			}
+
+			return value;
+		}
+
+		std::string ReadContents(int flags)
+		{
+			std::string value = "";
+
+			if (flags == CONTENTS_EMPTY)
+				return "CONTENTS_EMPTY";
+
+			int i = 0;
+			int flag = 0;
+
+			int flagsFound = 0;
+
+			for (i = 0; i < 32; i++)
+			{
+				flag = flags & (1 << i);
+
+				if (flag != 0)
+				{
+					flagsFound++;
+				}
+			}
+
+			int flagCounter = 0;
+			for (i = 0; i < 32; i++)
+			{
+				flag = flags & (1 << i);
+
+				switch (flag)
+				{
+				case CONTENTS_EMPTY:
+					break;
+				case CONTENTS_SOLID:
+					value += "CONTENTS_SOLID";
+					break;
+				case CONTENTS_GRATE:
+					value += "CONTENTS_GRATE";
+					break;
+				case CONTENTS_MONSTER:
+					value += "CONTENTS_MONSTER";
+					break;
+				case CONTENTS_LADDER:
+					value += "CONTENTS_LADDER";
+					break;
+				default:
+					value += std::string("UNK_%d", flag);
+					break;
+				}
+
+				if (flag != 0)
+				{
+					flagCounter++;
+					if (flagCounter < flagsFound)
+					{
+						value += " | ";
+					}
+				}
+			}
+
+			return value;
+		}
+
+		std::string ReadBoneFlags(int flags) //Borrowed from Rika's structs and modified a bit. Will be modified more for debug purposes. -Liberty
+		{
+			string value = "";
+
+			if (flags == 0)
+				return "NONE";
+
+			int i = 0;
+			int flag = 0;
+
+			int flagsFound = 0;
+
+			for (i = 0; i < 32; i++)
+			{
+				flag = flags & (1 << i);
+
+				if (flag != 0)
+				{
+					flagsFound++;
+				}
+			}
+
+			int flagCounter = 0;
+			for (i = 0; i < 32; i++)
+			{
+				flag = flags & (1 << i);
+
+				switch (flag)
+				{
+				case 0:
+					break;
+				case BONE_CALCULATE_MASK:
+					value += "BONE_CALCULATE_MASK";
+					break;
+				case BONE_PHYSICALLY_SIMULATED:
+					value += "BONE_PHYSICALLY_SIMULATED";
+					break;
+				case BONE_PHYSICS_PROCEDURAL:
+					value += "BONE_PHYSICS_PROCEDURAL";
+					break;
+				case BONE_ALWAYS_PROCEDURAL:
+					value += "BONE_ALWAYS_PROCEDURAL";
+					break;
+				case BONE_SCREEN_ALIGN_SPHERE:
+					value += "BONE_SCREEN_ALIGN_SPHERE";
+					break;
+				case BONE_SCREEN_ALIGN_CYLINDER:
+					value += "BONE_SCREEN_ALIGN_CYLINDER";
+					break;
+				case BONE_USED_BY_IKCHAIN:
+					value += "BONE_USED_BY_IKCHAIN";
+					break;
+				case BONE_USED_BY_ANYTHING:
+					value += "BONE_USED_BY_ANYTHING";
+					break;
+				case BONE_USED_BY_HITBOX:
+					value += "BONE_USED_BY_HITBOX";
+					break;
+				case BONE_USED_BY_ATTACHMENT:
+					value += "BONE_USED_BY_ATTACHMENT";
+					break;
+				case BONE_USED_BY_VERTEX_MASK:
+					value += "BONE_USED_BY_VERTEX_MASK";
+					break;
+				case BONE_USED_BY_VERTEX_LOD0:
+					value += "BONE_USED_BY_VERTEX_LOD0";
+					break;
+				case BONE_USED_BY_VERTEX_LOD1:
+					value += "BONE_USED_BY_VERTEX_LOD1";
+					break;
+				case BONE_USED_BY_VERTEX_LOD2:
+					value += "BONE_USED_BY_VERTEX_LOD2";
+					break;
+				case BONE_USED_BY_VERTEX_LOD3:
+					value += "BONE_USED_BY_VERTEX_LOD3";
+					break;
+				case BONE_USED_BY_VERTEX_LOD4:
+					value += "BONE_USED_BY_VERTEX_LOD4";
+					break;
+				case BONE_USED_BY_VERTEX_LOD5:
+					value += "BONE_USED_BY_VERTEX_LOD5";
+					break;
+				case BONE_USED_BY_VERTEX_LOD6:
+					value += "BONE_USED_BY_VERTEX_LOD6";
+					break;
+				case BONE_USED_BY_VERTEX_LOD7:
+					value += "BONE_USED_BY_VERTEX_LOD7";
+					break;
+				case BONE_USED_BY_BONE_MERGE:
+					value += "BONE_USED_BY_BONE_MERGE";
+					break;
+				case BONE_FLAG_UNK_53:
+					value += "BONE_FLAG_UNK_53";
+					break;
+				case BONE_TYPE_MASK:
+					value += "BONE_TYPE_MASK";
+					break;
+				case BONE_FIXED_ALIGNMENT:
+					value += "BONE_FIXED_ALIGNMENT";
+					break;
+				case BONE_HAS_SAVEFRAME_POS:
+					value += "BONE_HAS_SAVEFRAME_POS";
+					break;
+				case BONE_HAS_SAVEFRAME_ROT64:
+					value += "BONE_HAS_SAVEFRAME_ROT64";
+					break;
+				case BONE_HAS_SAVEFRAME_ROT32:
+					value += "BONE_HAS_SAVEFRAME_ROT32";
+					break;
+				default:
+					value += string("UNK_%d", flag);
+					break;
+				}
+
+				if (flag != 0)
+				{
+					flagCounter++;
+					if (flagCounter < flagsFound)
+					{
+						value += " | ";
+					}
+				}
+			}
+
+			return value;
 		}
 
 		std::string ReadJiggleFlags(int flags)
@@ -188,9 +450,113 @@ namespace Utility
 			return std::string(value);
 		}
 
-		std::string ReadAnimDescFlags()
+		std::string ReadAnimDescFlags(int flags)
 		{
-			return "";
+			string value = "";
+
+			if (flags == 0)
+				return "NONE";
+
+			int i = 0;
+			int flag = 0;
+
+			int flagsFound = 0;
+
+			for (i = 0; i < 32; i++)
+			{
+				flag = flags & (1 << i);
+
+				if (flag != 0)
+				{
+					flagsFound++;
+				}
+			}
+
+			int flagCounter = 0;
+			for (i = 0; i < 32; i++)
+			{
+				flag = flags & (1 << i);
+
+				switch (flag)
+				{
+				case 0:
+					break;
+				case 0x1:
+					value += "STUDIO_LOOPING";
+					break;
+				case 0x2:
+					value += "STUDIO_SNAP";
+					break;
+				case 0x4:
+					value += "STUDIO_DELTA";
+					break;
+				case 0x8:
+					value += "STUDIO_AUTOPLAY";
+					break;
+				case 0x10:
+					value += "STUDIO_POST";
+					break;
+				case 0x20:
+					value += "STUDIO_ALLZEROS";
+					break;
+				case 0x40:
+					value += "STUDIO_FRAMEANIM";
+					break;
+				case 0x80:
+					value += "STUDIO_CYCLEPOSE";
+					break;
+				case 0x100:
+					value += "STUDIO_REALTIME";
+					break;
+				case 0x200:
+					value += "STUDIO_LOCAL";
+					break;
+				case 0x400:
+					value += "STUDIO_HIDDEN";
+					break;
+				case 0x800:
+					value += "STUDIO_OVERRIDE";
+					break;
+				case 0x1000:
+					value += "STUDIO_ACTIVITY";
+					break;
+				case 0x2000:
+					value += "STUDIO_EVENT";
+					break;
+				case 0x4000:
+					value += "STUDIO_WORLD";
+					break;
+				case 0x8000:
+					value += "STUDIO_NOFORCELOOP";
+					break;
+				case 0x10000:
+					value += "STUDIO_EVENT_CLIENT";
+					break;
+				case 0x20000:
+					value += "STUDIO_ANIM_UNK";
+					break;
+				case STUDIO_FRAMEMOVEMENT:
+					value += "STUDIO_FRAMEMOVEMENT";
+					break;
+				case STUDIO_ANIMDESC_53_UNK1:
+					value += "STUDIO_ANIMDESC_53_UNK1";
+					break;
+				default:
+					value += std::string("UNK_%x", flag);
+					break;
+				}
+
+				if (flag != 0)
+				{
+					flagCounter++;
+					if (flagCounter < flagsFound)
+					{
+						value += " | ";
+					}
+				}
+			}
+
+			return value;
 		}
 
 		std::string ReadSeqFlags()
@@ -201,6 +567,15 @@ namespace Utility
 		std::string ReadMdlHdrFlags()
 		{
 			return "";
+		}
+
+		template <typename T> int GetTrgtPosInArry(std::vector<T> arry, T trgt)
+		{
+			for (int i = 0; i < arry.size(); i++)
+			{
+				if (trgt == arry[i]) return i;
+			}
+			return -1;
 		}
 
 	}

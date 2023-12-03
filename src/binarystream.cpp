@@ -5,8 +5,7 @@
 #include <sys/stat.h>
 #include <logger.hpp>
 #include <half.hpp>
-#include "mdls.hpp"
-using namespace std;
+using std::byte;
 
 bool Contains(std::vector<int> arry, int trgt)
 {
@@ -78,6 +77,27 @@ std::string BinaryReader::ReadNullTermStrTrgt(int pos, bool debug)
 
    // if (debug) Logger::Info("Debug_NullTermStr: %s\n", string.c_str());
     seek(startPos);
+    return string;
+}
+
+std::string BinaryReader::ReadNullTermStrTrgtNoReturn(int pos, bool debug)
+{
+    int startPos = Position();
+    seek(pos);
+    std::vector<char> vec;
+    char value = Stream.get();
+    if (value != '\0') seek(Position() - 1);
+
+    while (value != '\0')
+    {
+        Stream.read((char*)&value, 1);
+        vec.push_back(value);
+    }
+
+    std::string string(vec.begin(), vec.end());
+
+    // if (debug) Logger::Info("Debug_NullTermStr: %s\n", string.c_str());
+    //seek(startPos);
     return string;
 }
 
@@ -626,11 +646,21 @@ void BinaryReader::Read(mstudiobbox_t_v49* data)
 
 void BinaryReader::Read(mstudiobonenametable_t_v49* data, int numbones) 
 {
+    byte* _temp = new byte[numbones];
+
     for (int i = 0; i < numbones; i++)
     {
         Stream.read((char*)&data->bone, sizeof(byte));
-        data->bones.push_back(data->bone);
+        _temp[i] = data->bone;
     }
+
+    // If data->bones is already allocated, deallocate it first
+    if (data->bones != nullptr) {
+        delete[] data->bones;
+    }
+
+    // Assign the new dynamic array to data->bones
+    data->bones = _temp;
 }
 
 void BinaryReader::Read(mstudioanimdesc_t_v49* data) 
@@ -667,6 +697,7 @@ void BinaryReader::Read(sectionindexesindex_t_v49* data)
 
 void BinaryReader::Read(mstudioanim_valueptr_t_v49* data) 
 {
+    data->ptrPos = Position();
     Stream.read((char*)&data->offset, sizeof(Vector3Short));
 }
 
@@ -676,9 +707,15 @@ void BinaryReader::Read(mstudioanim_t_v49* data)
     Stream.read((char*)&data->bone, sizeof(std::byte));
     Stream.read((char*)&data->flags, sizeof(std::byte));
     Stream.read((char*)&data->nextoffset, sizeof(short));
-    if((int)data->flags & STUDIO_ANIM_ANIMROT) Stream.read((char*)&data->animrot, sizeof(Vector3Short));
+    if ((int)data->flags & STUDIO_ANIM_ANIMROT)
+    {
+       Read(&data->animrot);
+    }
 
-    if((int)data->flags & STUDIO_ANIM_ANIMPOS) Stream.read((char*)&data->animpos, sizeof(Vector3Short));
+    if ((int)data->flags & STUDIO_ANIM_ANIMPOS)
+    {
+       Read(&data->animpos);
+    }
 
     if((int)data->flags & STUDIO_ANIM_RAWROT) Stream.read((char*)&data->rawrot, sizeof(QuaternionShort));
 
@@ -687,13 +724,255 @@ void BinaryReader::Read(mstudioanim_t_v49* data)
     if((int)data->flags & STUDIO_ANIM_RAWPOS) Stream.read((char*)&data->rawpos, sizeof(Vector3Short));
 }
 
+void BinaryReader::Read(mstudioanimvalue_t* data, mstudioanim_t_v49* hdr)
+{
+    Stream.read((char*)&data->num.valid, sizeof(byte));
+    Stream.read((char*)&data->num.total, sizeof(byte));
+    
+    for (int i = 0; i < data->num.valid; i++)
+    {
+        short value;
+        Stream.read((char*)&value, sizeof(short));
+        data->value.push_back(value);
+    }
+}
+
+bool TestCheck(BinaryReader* Stream, int pCurrentPos, int target)
+{
+    unsigned char test;
+    Stream->seek(pCurrentPos);
+    Stream->read((char*)&test, sizeof(byte));
+    return test <= target;
+}
+
+void BinaryReader::Read(mstudioanimvalues_t_v49* data, mstudioanim_t_v49* hdr, int maxFrames)
+{
+    vector<int> usedPositions;
+
+    if ((int)hdr->flags & STUDIO_ANIM_ANIMROT)
+    {
+        mstudioanim_valueptr_t_v49 valueptr = hdr->animrot;
+        for (int g = 0; g < 3; g++)
+        {
+
+            if (valueptr.offset[g])
+            {
+                int pAnimValue = valueptr.ptrPos + valueptr.offset[g];
+                int k = maxFrames;
+                int pCurrentPos = pAnimValue;
+                seek(pCurrentPos);
+                unsigned char test; read((char*)&test, sizeof(byte));
+
+                while (TestCheck(this, pCurrentPos, k))
+                {
+                    seek(pCurrentPos);
+                    //if(hdr->animpos.offset.x == 70 && hdr->animpos.offset.y == 0 && hdr->animpos.offset.z == 0) Logger::Info("nextOffset: %d | %d\n", hdr->strPos + hdr->nextoffset, pCurrentPos);
+                    mstudioanimvalue_t _data;
+
+                    seek(pCurrentPos + 1);
+                    unsigned char test2; Stream.read((char*)&test2, sizeof(byte));
+
+                    if (test2 == 0)
+                        return;
+
+                    seek(pCurrentPos);
+                    Stream.read((char*)&_data.num.valid, sizeof(byte));
+                    Stream.read((char*)&_data.num.total, sizeof(byte));
+                    for (int i = 0; i < _data.num.valid; i++)
+                    {
+                        short value;
+                        Stream.read((char*)&value, sizeof(short));
+                        _data.value.push_back(value);
+                    }
+
+                    if (_data.value.size() != _data.num.valid)
+                    {
+                        Logger::Error("THIS SHOULD NOT BE HAPPENING!!!!\n");
+                    }
+
+
+                    if (!Contains(usedPositions, pCurrentPos))
+                    {
+                        usedPositions.push_back(pCurrentPos);
+
+                        pCurrentPos += (_data.num.valid + 1) * 2;
+                        k -= _data.num.total;
+
+                        data->rot.push_back(_data);
+                    }
+                    else
+                    {
+                        pCurrentPos += (_data.num.valid + 1) * 2;
+                        k -= _data.num.total;
+                    }
+                }
+            }
+        }
+    }
+    if ((int)hdr->flags & STUDIO_ANIM_ANIMPOS)
+    {
+        mstudioanim_valueptr_t_v49 valueptr = hdr->animpos;
+        for (int g = 0; g < 3; g++)
+        {
+    
+            if (valueptr.offset[g])
+            {
+                int pAnimValue = valueptr.ptrPos + valueptr.offset[g];
+                int k = maxFrames;
+                int pCurrentPos = pAnimValue;
+                seek(pCurrentPos);
+                unsigned char test; read((char*)&test, sizeof(byte));
+    
+                while (TestCheck(this, pCurrentPos, k))
+                {
+                    mstudioanimvalue_t _data;
+    
+                    seek(pCurrentPos + 1);
+                    unsigned char test2; Stream.read((char*)&test2, sizeof(byte));
+    
+                    if (test2 == 0)
+                        return;
+    
+                    seek(pCurrentPos);
+                    Stream.read((char*)&_data.num.valid, sizeof(byte));
+                    Stream.read((char*)&_data.num.total, sizeof(byte));
+                    for (int i = 0; i < _data.num.valid; i++)
+                    {
+                        short value{};
+                        Stream.read((char*)&value, sizeof(short));
+                        _data.value.push_back(value);
+                    }
+    
+                    if (_data.value.size() != _data.num.valid)
+                    {
+                        Logger::Error("THIS SHOULD NOT BE HAPPENING!!!!\n");
+                    }
+    
+                    if (!Contains(usedPositions, pCurrentPos))
+                    {
+                        usedPositions.push_back(pCurrentPos);
+
+                        pCurrentPos += (_data.num.valid + 1) * 2;
+                        k -= _data.num.total;
+
+                        data->pos.push_back(_data);
+                    }
+                    else
+                    {
+                        pCurrentPos += (_data.num.valid + 1) * 2;
+                        k -= _data.num.total;
+                    }
+                }
+            }
+        }
+    }
+    ////Printf("remaining frames %i\n", k);
+    //int k = maxFrames;
+    //
+    //if ((int)hdr->flags & STUDIO_ANIM_ANIMROT)
+    //{
+    //    int pCurrentPos = hdr->animrot.ptrPos + hdr->animrot.offset[0];
+    //    unsigned char test{};
+    //    unsigned char test2{};
+    //    for (int i = 0; i < 3; i++)
+    //    {
+    //        if (hdr->animrot.offset[i] == 0) continue;
+    //        k = maxFrames;
+    //        pCurrentPos = hdr->animrot.ptrPos + hdr->animrot.offset[i];
+    //        seek(pCurrentPos);
+    //
+    //        while (TestCheck(this, pCurrentPos, k))
+    //        {
+    //            Logger::Info("rot frameStart: valid %d\n", k);
+    //            seek(pCurrentPos + 1);
+    //            Stream.read((char*)&test2, sizeof(byte));
+    //
+    //            //Logger::Info("rot: test1 %d | test2 %d\n", test, test2);
+    //
+    //            mstudioanimvalue_t animValue = {};
+    //
+    //            if (test2 == 0)
+    //                return;
+    //
+    //            seek(pCurrentPos);
+    //            Stream.read((char*)&animValue.num.valid, sizeof(byte));
+    //            Stream.read((char*)&animValue.num.total, sizeof(byte));
+    //            //Logger::Info("rot: valid %d\n", animValue.num.valid);
+    //            //Logger::Info("rot: total %d\n", animValue.num.total);
+    //            for (int j = 0; j < animValue.num.valid; j++)
+    //            {
+    //                short value{};
+    //                Stream.read((char*)&value, sizeof(short));
+    //                animValue.value.push_back(value);
+    //                //Logger::Info("value[%d] %d\n", j, animValue.num.total);
+    //            }
+    //            data->rot.push_back(animValue);
+    //
+    //            int addedPos = (animValue.num.valid + 1) * 2;
+    //
+    //            pCurrentPos += addedPos;
+    //            k -= animValue.num.total;
+    //            Logger::Info("rot frameEnd: valid %d\n", k);
+    //        }
+    //    }
+    //}
+    //
+    //if ((int)hdr->flags & STUDIO_ANIM_ANIMPOS)
+    //{
+    //    int pCurrentPos = hdr->animpos.ptrPos + hdr->animpos.offset[0];
+    //    unsigned char test{};
+    //    unsigned char test2{};
+    //    for (int i = 0; i < 3; i++)
+    //    {
+    //        if (hdr->animpos.offset[i] == 0) continue;
+    //        k = maxFrames;
+    //        pCurrentPos = hdr->animpos.ptrPos + hdr->animpos.offset[i];
+    //        seek(pCurrentPos);
+    //
+    //        while (TestCheck(this, pCurrentPos, k))
+    //        {
+    //            //Logger::Info("pos frameStart: valid %d\n", k);
+    //            seek(pCurrentPos + 1);
+    //            Stream.read((char*)&test2, sizeof(byte));
+    //
+    //            //Logger::Info("pos: test1 %d | test2 %d\n", test, test2);
+    //
+    //            mstudioanimvalue_t animValue;
+    //
+    //            if (test2 == 0)
+    //                return;
+    //
+    //            seek(pCurrentPos);
+    //            Stream.read((char*)&animValue.num.valid, sizeof(byte));
+    //            Stream.read((char*)&animValue.num.total, sizeof(byte));
+    //            //Logger::Info("pos: valid %d\n", animValue.num.valid);
+    //            //Logger::Info("pos: total %d\n", animValue.num.total);
+    //            for (int j = 0; j < animValue.num.valid; j++)
+    //            {
+    //                short value;
+    //                Stream.read((char*)&value, sizeof(short));
+    //                animValue.value.push_back(value);
+    //                //Logger::Info("value[%d] %d\n", j, animValue.num.total);
+    //            }
+    //            data->pos.push_back(animValue);
+    //
+    //            int addedPos = (animValue.num.valid + 1) * 2;
+    //
+    //            pCurrentPos += addedPos;
+    //            k -= animValue.num.total;
+    //            //Logger::Info("pos frameEnd: valid %d\n", k);
+    //        }
+    //    }
+    //}
+}
+
 void BinaryReader::Read(mstudioanimdata_t_v49* data, int datasize)
 {
     for (int i = 0; i < datasize; i++)
     {
-        char value;
+        byte value;
         Stream.read((char*)&value, 1);
-        data->arry.push_back( (std::byte)value);
+        data->arry.push_back(value);
     }
 }
 
@@ -740,8 +1019,61 @@ void BinaryReader::Read(mstudioikrule_t_v49* data)
 
 }
 
-void BinaryReader::Read(mstudiocompressedikerror_t_v49* data) 
+void BinaryReader::Read(mstudiocompressedikerror_t_v49* data, int maxFrames)
 {
+    int startPos = Position();
+    Stream.read((char*)&data->scale, sizeof(float) * 6);
+    Stream.read((char*)&data->index, sizeof(short) * 6);
+    int k = maxFrames;
+    int pCurrentPos = startPos + data->index[0];
+    unsigned char test{};
+    unsigned char test2{};
+    for (int i = 0; i < 6; i++)
+    {
+        if (data->index[i] == 0) continue;
+        k = maxFrames;
+        pCurrentPos = startPos + data->index[i];
+        seek(pCurrentPos);
+
+        while (TestCheck(this, pCurrentPos, k))
+        {
+            //Logger::Info("rot frameStart: valid %d\n", k);
+            seek(pCurrentPos + 1);
+            Stream.read((char*)&test2, sizeof(byte));
+
+            //Logger::Info("rot: test1 %d | test2 %d\n", test, test2);
+
+            mstudioanimvalue_t animValue = {};
+
+            if (test2 == 0)
+                return;
+
+            seek(pCurrentPos);
+            Stream.read((char*)&animValue.num.valid, sizeof(byte));
+            Stream.read((char*)&animValue.num.total, sizeof(byte));
+            //Logger::Info("rot: valid %d\n", animValue.num.valid);
+            //Logger::Info("rot: total %d\n", animValue.num.total);
+            for (int j = 0; j < animValue.num.valid; j++)
+            {
+                short value{};
+                Stream.read((char*)&value, sizeof(short));
+                animValue.value.push_back(value);
+                //Logger::Info("value[%d] %d\n", j, animValue.num.total);
+            }
+            data->animvalues.push_back(animValue);
+
+            int addedPos = (animValue.num.valid + 1) * 2;
+
+            pCurrentPos += addedPos;
+            k -= animValue.num.total;
+            //Logger::Info("rot frameEnd: valid %d\n", k);
+        }
+    }
+}
+
+void BinaryReader::Read(mstudiocompressedikerror_t_v49* data)
+{
+    int startPos = Position();
     Stream.read((char*)&data->scale, sizeof(float) * 6);
     Stream.read((char*)&data->index, sizeof(short) * 6);
 }
@@ -760,6 +1092,78 @@ void BinaryReader::Read(mstudioikrulezeroframe_t_v49* data)
     Stream.read((char*)&data->peak, sizeof(short));
     Stream.read((char*)&data->tail, sizeof(short));
     Stream.read((char*)&data->end, sizeof(short));
+
+}
+
+void BinaryReader::Read(mstudioseqdesc_t_v49* data)
+{
+
+    Stream.read((char*)&data->baseptr, sizeof(int));
+
+    Stream.read((char*)&data->szlabelindex, sizeof(int));
+
+    Stream.read((char*)&data->szactivitynameindex, sizeof(int));
+
+    Stream.read((char*)&data->flags, sizeof(int));
+
+    Stream.read((char*)&data->activity, sizeof(int));
+    Stream.read((char*)&data->actweight, sizeof(int));
+
+    Stream.read((char*)&data->numevents, sizeof(int));
+    Stream.read((char*)&data->eventindex, sizeof(int));
+
+    Stream.read((char*)&data->bbmin, sizeof(Vector3));
+    Stream.read((char*)&data->bbmax, sizeof(Vector3));
+
+    Stream.read((char*)&data->numblends, sizeof(int));
+
+
+    Stream.read((char*)&data->animindexindex, sizeof(int));
+
+    Stream.read((char*)&data->movementindex, sizeof(int));
+    Stream.read((char*)&data->groupsize, sizeof(int) * 2);
+    Stream.read((char*)&data->paramindex, sizeof(int) * 2);
+    Stream.read((char*)&data->paramstart, sizeof(float) * 2);
+    Stream.read((char*)&data->paramend, sizeof(float) * 2);
+    Stream.read((char*)&data->paramparent, sizeof(int));
+
+    Stream.read((char*)&data->fadeintime, sizeof(float));
+    Stream.read((char*)&data->fadeouttime, sizeof(float));
+
+    Stream.read((char*)&data->localentrynode, sizeof(int));
+    Stream.read((char*)&data->localexitnode, sizeof(int));
+    Stream.read((char*)&data->nodeflags, sizeof(int));
+
+    Stream.read((char*)&data->entryphase, sizeof(float));
+    Stream.read((char*)&data->exitphase, sizeof(float));
+
+    Stream.read((char*)&data->lastframe, sizeof(float));
+
+    Stream.read((char*)&data->nextseq, sizeof(int));
+    Stream.read((char*)&data->pose, sizeof(int));
+
+    Stream.read((char*)&data->numikrules, sizeof(int));
+
+    Stream.read((char*)&data->numautolayers, sizeof(int));
+    Stream.read((char*)&data->autolayerindex, sizeof(int));
+
+    Stream.read((char*)&data->weightlistindex, sizeof(int));
+
+    Stream.read((char*)&data->posekeyindex, sizeof(int));
+
+    Stream.read((char*)&data->numiklocks, sizeof(int));
+    Stream.read((char*)&data->iklockindex, sizeof(int));
+
+
+    Stream.read((char*)&data->keyvalueindex, sizeof(int));
+    Stream.read((char*)&data->keyvaluesize, sizeof(int));
+
+    Stream.read((char*)&data->cycleposeindex, sizeof(int));
+
+    Stream.read((char*)&data->activitymodifierindex, sizeof(int));
+    Stream.read((char*)&data->numactivitymodifiers, sizeof(int));
+
+    Stream.read((char*)&data->unused, sizeof(int) * 5);
 
 }
 
@@ -837,19 +1241,22 @@ void BinaryReader::Read(mstudioseqdescv49_t* data)
 
 void BinaryReader::Read(blendgroup_t_v49* data, int groupSize)
 {
-    if (groupSize > 1)
+    for (int i = 0; i < groupSize; i++)
     {
-        Stream.read((char*)&data->blends, sizeof(short) * groupSize);
-    }
-    else
-    {
-        Stream.read((char*)&data->blends, sizeof(short) * 2);
+        short value;
+        Stream.read((char*)&value, sizeof(short));
+        data->blends.push_back(value);
     }
 }
 
 void BinaryReader::Read(posekey_t_v49* data, int groupSize) 
 {
-    Stream.read((char*)&data->unk, sizeof(float) * groupSize);
+    for (int i = 0; i < groupSize; i++)
+    {
+        float value;
+        Stream.read((char*)&value, sizeof(float));
+        data->unk.push_back(value);
+    }
 }
 
 void BinaryReader::Read(mstudioevent_t_v49* data) 
@@ -1053,14 +1460,13 @@ void BinaryReader::Read(mstudiokeyvalues_t_v49* data, int groupSize)
     }
 }
 
-void BinaryReader::Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 mdlhdr, std::vector<mstudioseqdescv49_t> seqs, std::vector<mstudiohitboxset_t_v49>	hitboxsets, std::vector<mstudioattachment_t_v49> attachments, std::vector< mstudionodename_t_v49> nodes, std::vector<mstudiobodyparts_t_v49> bodyparts, std::vector<mstudioikchain_t_v49> ikchains, std::vector<mstudioanimdesc_t_v49> animdescs, std::vector<mstudiotexture_t_v49> textures, std::vector<mstudiomodelgroup_t_v49> includemodels, std::vector<mstudiotexturedir_t_v49> cdmaterials, std::vector<mstudioposeparamdesc_t_v49> poseparamdescs, std::vector<mstudiosrcbonetransform_t_v49> srcbonetransforms)
+void BinaryReader::Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 mdlhdr, std::vector<mstudioseqdescv49_t> seqs, std::vector<mstudiohitboxset_t_v49>	hitboxsets, mstudioattachment_t_v49* attachments, std::vector< mstudionodename_t_v49> nodes, std::vector<mstudiobodyparts_t_v49> bodyparts, std::vector<mstudioikchain_t_v49> ikchains, std::vector<mstudioanimdesc_t_v49> animdescs, std::vector<mstudiotexture_t_v49> textures, std::vector<mstudiomodelgroup_t_v49> includemodels, std::vector<mstudiotexturedir_t_v49> cdmaterials, std::vector<mstudioposeparamdesc_t_v49> poseparamdescs, std::vector<mstudiosrcbonetransform_t_v49> srcbonetransforms)
 {
     std::vector<std::string> stringsUsed;
     int startPos = Position();
     int eventNum = 0;
     int actModNum = 0;
     int stringTableSize = mdlhdr.length - startPos;
-
 
     data->stringtablesize = stringTableSize;
     Logger::Info("String Table Size: %d\n", data->stringtablesize);
@@ -1074,14 +1480,25 @@ void BinaryReader::Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 mdlhdr, 
     Logger::Info("SurfacePropName: %s\n", surfacePropName.c_str());
     stringsUsed.push_back(surfacePropName.c_str());
 
+    std::string* _tempBones = new std::string[mdlhdr.numbones];
+    std::string* _tempAttachments = new std::string[mdlhdr.numlocalattachments];
+
 
     for (int i = 0; i < mdlhdr.numbones; i++)
     {
         std::string str = ReadNullTermStr(true);
         Logger::Info("BoneName: %s\n", str.c_str());
         stringsUsed.push_back(str.c_str());
-        data->bones.push_back(str);
+        _tempBones[i] = str;//data->bones.push_back(str);
     }
+
+    // If data->bones is already allocated, deallocate it first
+    if (data->bones != nullptr) {
+        delete[] data->bones;
+    }
+
+    // Assign the new dynamic array to data->bones
+    data->bones = _tempBones;
 
     for (int i = 0; i < mdlhdr.numlocalattachments; i++)
     {
@@ -1091,7 +1508,7 @@ void BinaryReader::Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 mdlhdr, 
             {
                 std::string str = ReadNullTermStr(true);
                 Logger::Info("AttachmentName: %s\n", str.c_str());
-                data->attachments.push_back(str);
+                _tempAttachments[i] = str;//data->attachments.push_back(str);
                 stringsUsed.push_back(str);
             }
             else
@@ -1104,6 +1521,14 @@ void BinaryReader::Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 mdlhdr, 
             Logger::Info("AttachmentName: %s\n", "Empty");
         }
     }
+    // If data->attachments is already allocated, deallocate it first
+    if (data->attachments != nullptr) {
+        delete[] data->attachments;
+    }
+
+    // Assign the new dynamic array to data->bones
+    data->attachments = _tempAttachments;
+
 
     for (int i = 0; i < mdlhdr.numhitboxsets; i++)
     {
@@ -1148,7 +1573,7 @@ void BinaryReader::Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 mdlhdr, 
             Logger::Info("AnimDescName: %s\n", "Empty");
         }
     }
-
+    
     for (int i = 0; i < mdlhdr.numlocalseq; i++)
     {
         std::vector<std::string> _activities;
@@ -1156,11 +1581,12 @@ void BinaryReader::Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 mdlhdr, 
         std::vector<std::string> _activityModifiers;
 
         int seqPos = (seqs[i].baseptr - seqs[i].activitymodifierindex) * -1;
+        //int seqPos = mdlhdr.localseqindex + 212 * i;
 
-        std::string szName = ReadNullTermStr(true);
-        Logger::Info("SeqName: %s\n", szName.c_str());
+        std::string szName = ReadNullTermStr(true);//ReadNullTermStrTrgtNoReturn(seqPos, false); //;// ReadNullTermStrTrgtNoReturn(seqPos + seqs[i].szlabelindex, false);
+        Logger::Info("SeqName: %s : %d\n", szName.c_str(), i);
         std::string szActivity = seqs[i].szactivityname;
-
+        Logger::Info("Pos: %d\n", Position());
         //Logger::Info("TestSeqName: %s\n", seqs[i].szlabel.c_str());
         //Logger::Info("TestSeqActivity: %s\n", seqs[i].szactivityname.c_str());
         //Logger::Info("TestSeqActivitySize: %d\n", seqs[i].szactivityname.size());
@@ -1174,7 +1600,7 @@ void BinaryReader::Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 mdlhdr, 
             if (!ContainsString2(stringsUsed, szActivity))
             {
                 szActivity = ReadNullTermStr(true);
-                Logger::Info("SeqActivity: %s\n", szActivity.c_str());
+                Logger::Info("SeqActivity: %s : Pos: %d\n", szActivity.c_str(), Position());
                 stringsUsed.push_back(seqs[i].szactivityname);
                 _activities.push_back(seqs[i].szactivityname);
             }
@@ -1186,11 +1612,13 @@ void BinaryReader::Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 mdlhdr, 
         }
         else
         {
+            //szActivity = "";
             Logger::Info("SeqActivity: %s\n", "Empty");
         }
-
+        Logger::Info("Eventnum: %d\n", seqs[i].numevents);
         for (int j = 0; j < seqs[i].numevents; j++)
         {
+            Logger::Info("Eventnum2: %d\n", j);
             int pos = Position();
             std::string eventName = seqs[i].szeventnames[j];
             //Logger::Info("TestSeqEvent: %s\n", seqs[i].szeventnames[j].c_str());
@@ -1435,6 +1863,832 @@ void BinaryReader::Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 mdlhdr, 
         }
     }
 }
+
+void BinaryReader::Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 mdlhdr, std::vector<mstudioseqdesc_t_v49> seqs, mstudiohitboxset_t_v49*	hitboxsets, mstudioattachment_t_v49* attachments, mstudionodename_t_v49* nodes, mstudiobodyparts_t_v49* bodyparts, mstudioikchain_t_v49* ikchains, mstudioanimdesc_t_v49* animdescs, mstudiotexture_t_v49* textures, mstudiomodelgroup_t_v49* includemodels, mstudiotexturedir_t_v49* cdmaterials, mstudioposeparamdesc_t_v49* poseparamdescs, mstudiosrcbonetransform_t_v49* srcbonetransforms)
+{
+    std::vector<std::string> stringsUsed;
+    int startPos = Position();
+    int eventNum = 0;
+    int actModNum = 0;
+    int stringTableSize = mdlhdr.length - startPos;
+
+    data->stringtablesize = stringTableSize;
+    Logger::Info("String Table Size: %d\n", data->stringtablesize);
+
+    std::string mdlName = ReadNullTermStr(true);
+    data->mdlname = mdlName;
+    Logger::Info("MdlName: %s\n", mdlName.c_str());
+
+    std::string surfacePropName = ReadNullTermStr(true);
+    data->surfaceprop = surfacePropName;
+    Logger::Info("SurfacePropName: %s\n", surfacePropName.c_str());
+    stringsUsed.push_back(surfacePropName.c_str());
+
+    std::string* _tempBones = new std::string[mdlhdr.numbones];
+    std::string* _tempAttachments = new std::string[mdlhdr.numlocalattachments];
+
+
+    for (int i = 0; i < mdlhdr.numbones; i++)
+    {
+        std::string str = ReadNullTermStr(true);
+        Logger::Info("BoneName: %s\n", str.c_str());
+        stringsUsed.push_back(str.c_str());
+        _tempBones[i] = str;//data->bones.push_back(str);
+    }
+    // If data->bones is already allocated, deallocate it first
+    //if (data->bones != nullptr) {
+    //    delete[] data->bones;
+    //}
+
+    // Assign the new dynamic array to data->bones
+    data->bones = _tempBones;
+    for (int i = 0; i < mdlhdr.numlocalattachments; i++)
+    {
+        if (!attachments[i].szname.empty())
+        {
+            if (!ContainsString2(stringsUsed, attachments[i].szname.c_str()))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("AttachmentName: %s\n", str.c_str());
+                _tempAttachments[i] = str;//data->attachments.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("AttachmentReusedName: %s\n", attachments[i].szname.c_str());
+            }
+        }
+        else
+        {
+            Logger::Info("AttachmentName: %s\n", "Empty");
+        }
+    }
+    // If data->attachments is already allocated, deallocate it first
+    //if (data->attachments != nullptr) {
+    //    delete[] data->attachments;
+    //}
+
+    // Assign the new dynamic array to data->bones
+    data->attachments = _tempAttachments;
+
+
+    for (int i = 0; i < mdlhdr.numhitboxsets; i++)
+    {
+        if (!hitboxsets[i].szname.empty())
+        {
+            if (!ContainsString2(stringsUsed, hitboxsets[i].szname.c_str()))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("HitboxSetName: %s\n", str.c_str());
+                data->hitboxsets.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("HitboxSetReusedName: %s\n", hitboxsets[i].szname.c_str());
+            }
+        }
+        else
+        {
+            Logger::Info("HitboxSetName: %s\n", "Empty");
+        }
+    }
+
+    for (int i = 0; i < mdlhdr.numlocalanim; i++)
+    {
+        if (!animdescs[i].szname.empty())
+        {
+            if (!ContainsString2(stringsUsed, animdescs[i].szname))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("AnimDescName: %s\n", str.c_str());
+                data->anims.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("AnimDescReusedName: %s\n", animdescs[i].szname.c_str());
+            }
+        }
+        else
+        {
+            Logger::Info("AnimDescName: %s\n", "Empty");
+        }
+    }
+
+    for (int i = 0; i < mdlhdr.numlocalseq; i++)
+    {
+        std::vector<std::string> _activities;
+        std::vector<std::string> _activityEvents;
+        std::vector<std::string> _activityModifiers;
+    
+        //int seqPos = (seqs[i].baseptr - seqs[i].activitymodifierindex) * -1;
+        int seqPos = mdlhdr.localseqindex + 212 * i;
+    
+        std::string szName = ReadNullTermStr(true);//ReadNullTermStrTrgtNoReturn(seqPos, false); //;// ReadNullTermStrTrgtNoReturn(seqPos + seqs[i].szlabelindex, false);
+        Logger::Info("SeqName: %s : %d\n", szName.c_str(), i);
+        std::string szActivity = ReadNullTermStrTrgt(seqPos + seqs[i].szactivitynameindex, false);//seqs[i].szactivityname;
+
+        //Logger::Info("TestSeqName: %s\n", seqs[i].szlabel.c_str());
+        //Logger::Info("TestSeqActivity: %s\n", seqs[i].szactivityname.c_str());
+        //Logger::Info("TestSeqActivitySize: %d\n", seqs[i].szactivityname.size());
+        bool test = szActivity.empty();
+    
+        //if(test)Logger::Info("true\n");
+        //else Logger::Info("false\n");
+    
+        if (!test)
+        {
+            if (!ContainsString2(stringsUsed, szActivity))
+            {
+                szActivity = ReadNullTermStr(true);
+                Logger::Info("SeqActivity: %s : Pos: %d\n", szActivity.c_str(), Position());
+                stringsUsed.push_back(szActivity);
+                _activities.push_back(szActivity);
+            }
+            else
+            {
+                szActivity = "";
+                Logger::Info("SeqActivityReusedName: %s\n", szActivity.c_str());
+            }
+        }
+        else
+        {
+            //szActivity = "";
+            Logger::Info("SeqActivity: %s\n", "Empty");
+        }
+        Logger::Info("Eventnum: %d\n", seqs[i].numevents);
+        for (int j = 0; j < seqs[i].numevents; j++)
+        {
+            Logger::Info("Eventnum2: %d\n", j);
+            int pos = Position();
+            std::string szEventName = ReadNullTermStrTrgt(seqPos + seqs[i].eventindex + 80 * j + seqs[i].seqdata.events[j].szeventindex, false);
+            std::string szName = ReadNullTermStrTrgt(seqPos + seqs[i].eventindex + 80 * j + 12, false);
+            std::string eventName = szEventName;//seqs[i].szeventnames[j];
+            //Logger::Info("TestSeqEvent: %s\n", seqs[i].szeventnames[j].c_str());
+    
+              if (ContainsString2(stringsUsed, eventName) || eventName == "")
+              {
+                  _activityEvents.push_back("");
+              }
+            if (!szEventName.empty())
+            {
+                if (!ContainsString2(stringsUsed, szEventName))
+                {
+                    eventName = ReadNullTermStr(true);
+                    Logger::Info("eventName: %s\n", eventName.c_str());
+                    stringsUsed.push_back(szEventName);
+                    _activityEvents.push_back(szEventName);
+                }
+                else
+                {
+                    _activityEvents.push_back("");
+                    Logger::Info("eventNameReusedName: %s\n", szEventName.c_str());
+                }
+            }
+            else
+            {
+                _activityEvents.push_back("");
+                Logger::Info("SeqActivity: %s\n", "Empty");
+            }
+        }
+
+        for (int j = 0; j < seqs[i].numactivitymodifiers; j++)
+        {
+            int pos = Position();
+            std::string actModName = ReadNullTermStrTrgt(seqPos + seqs[i].activitymodifierindex + 4 * j + seqs[i].seqdata.actmods[j].sznameindex, false);
+            if (!actModName.empty())
+            {
+                if (!ContainsString2(stringsUsed, actModName))
+                {
+                    actModName = ReadNullTermStr(true);
+                    Logger::Info("actModName: %s\n", actModName.c_str());
+                    stringsUsed.push_back(actModName);
+                    _activityModifiers.push_back(actModName);
+                }
+                else
+                {
+                    _activityModifiers.push_back("");
+                    Logger::Info("actModReusedName: %s\n", actModName.c_str());
+                }
+            }
+            else
+            {
+                _activityModifiers.push_back("");
+                Logger::Info("actModName: %s\n", "Empty");
+            }
+        }
+        mstudioseqstring_t_v49 _seq = { szName, szActivity, _activityEvents, _activityModifiers };
+    
+        data->seqs.push_back(_seq);
+    }
+    if (mdlhdr.numlocalnodes > 0)
+    {
+        for (int i = 0; i < mdlhdr.numlocalnodes; i++)
+        {
+            if (!nodes[i].szname.empty())
+            {
+                if (!ContainsString2(stringsUsed, nodes[i].szname))
+                {
+                    std::string str = ReadNullTermStr(true);
+                    Logger::Info("NodeName: %s\n", str.c_str());
+                    data->nodes.push_back(str);
+                    stringsUsed.push_back(str);
+                }
+                else
+                {
+                    Logger::Info("NodeReusedName: %s\n", nodes[i].szname.c_str());
+                }
+            }
+            else
+            {
+                Logger::Info("NodeName: %s\n", "Empty");
+            }
+        }
+    }
+
+    for (int i = 0; i < mdlhdr.numbodyparts; i++)
+    {
+        if (!bodyparts[i].szname.empty())
+        {
+            if (!ContainsString2(stringsUsed, bodyparts[i].szname))
+            {
+                std::string str = ReadNullTermStr(true);
+                Logger::Info("BodyPartName: %s\n", str.c_str());
+                data->bodyparts.push_back(str);
+                stringsUsed.push_back(str);
+            }
+            else
+            {
+                Logger::Info("BodyPartReusedName: %s\n", bodyparts[i].szname.c_str());
+            }
+        }
+        else
+        {
+            Logger::Info("BodyPartName: %s\n", "Empty");
+        }
+
+    }
+    if (mdlhdr.numhitboxsets > 0)
+    {
+        for (int i = 0; i < mdlhdr.numhitboxsets; i++)
+        {
+            if (hitboxsets[i].numhitboxes > 0)
+            {
+                for (int j = 0; j < hitboxsets[i].numhitboxes; j++)
+                {
+                    if (!hitboxsets[i].hitboxes[j].szhitboxname.empty())
+                    {
+                        if (!ContainsString2(stringsUsed, hitboxsets[i].hitboxes[j].szhitboxname))
+                        {
+                            std::string str2 = ReadNullTermStr(true);
+                            Logger::Info("HitboxName: %s\n", str2.c_str());
+                            data->hitboxes.push_back(str2);
+                            stringsUsed.push_back(str2);
+                        }
+                        else
+                        {
+                            Logger::Info("HitboxReusedName: %s\n", hitboxsets[i].hitboxes[j].szhitboxname.c_str());
+                        }
+                    }
+                    else
+                    {
+                        Logger::Info("HitboxName: %s\n", "Empty");
+                    }
+                }
+            }
+        }
+    }
+    if (mdlhdr.numlocalposeparameters > 0)
+    {
+        for (int i = 0; i < mdlhdr.numlocalposeparameters; i++)
+        {
+            if (!poseparamdescs[i].szname.empty())
+            {
+                if (!ContainsString2(stringsUsed, poseparamdescs[i].szname))
+                {
+                    std::string str = ReadNullTermStr(true);
+                    Logger::Info("PoseParamName: %s\n", str.c_str());
+                    data->poseparams.push_back(str);
+                    stringsUsed.push_back(str);
+                }
+                else
+                {
+                    Logger::Info("PoseParamReusedName: %s\n", poseparamdescs[i].szname.c_str());
+                }
+            }
+            else
+            {
+                Logger::Info("PoseParamName: %s\n", "Empty");
+            }
+
+        }
+    }
+    if (mdlhdr.numikchains > 0)
+    {
+        for (int i = 0; i < mdlhdr.numikchains; i++)
+        {
+            if (!ikchains[i].szname.empty())
+            {
+                if (!ContainsString2(stringsUsed, ikchains[i].szname))
+                {
+                    std::string str = ReadNullTermStr(true);
+                    Logger::Info("IkChainName: %s\n", str.c_str());
+                    data->ikchains.push_back(str);
+                    stringsUsed.push_back(str);
+                }
+                else
+                {
+                    Logger::Info("IkChainReusedName: %s\n", ikchains[i].szname.c_str());
+                }
+            }
+            else
+            {
+                Logger::Info("IkChainName: %s\n", "Empty");
+            }
+        }
+    }
+    if (mdlhdr.numincludemodels > 0)
+    {
+        for (int i = 0; i < mdlhdr.numincludemodels; i++)
+        {
+            if (!includemodels[i].szname.empty())
+            {
+                if (!ContainsString2(stringsUsed, includemodels[i].szname))
+                {
+                    std::string str = ReadNullTermStr(true);
+                    Logger::Info("IncludeModelName: %s\n", str.c_str());
+                    data->includemodel.push_back(str);
+                    stringsUsed.push_back(str);
+                }
+                else
+                {
+                    Logger::Info("IncludeModelReusedName: %s\n", includemodels[i].szname.c_str());
+                }
+            }
+            else
+            {
+                Logger::Info("IncludeModelName: %s\n", "Empty");
+            }
+        }
+    }
+
+
+    if (mdlhdr.numtextures > 0)
+    {
+        for (int i = 0; i < mdlhdr.numtextures; i++)
+        {
+            if (!textures[i].szname.empty())
+            {
+                if (!ContainsString2(stringsUsed, textures[i].szname))
+                {
+                    std::string str = ReadNullTermStr(true);
+                    Logger::Info("TextureName: %s\n", str.c_str());
+                    data->textures.push_back(str);
+                    stringsUsed.push_back(str);
+                }
+                else
+                {
+                    Logger::Info("TextureReusedName: %s\n", textures[i].szname.c_str());
+                }
+            }
+            else
+            {
+                Logger::Info("TextureName: %s\n", "Empty");
+            }
+        }
+    }
+    if (mdlhdr.numcdtextures > 0)
+    {
+        for (int i = 0; i < mdlhdr.numcdtextures; i++)
+        {
+            if (!cdmaterials[i].szname.empty())
+            {
+                if (!ContainsString2(stringsUsed, cdmaterials[i].szname))
+                {
+                    std::string str = ReadNullTermStr(true);
+                    Logger::Info("CdMaterialName: %s\n", str.c_str());
+                    data->cdmaterials.push_back(str);
+                    stringsUsed.push_back(str);
+                }
+                else
+                {
+                    Logger::Info("CdMaterialReusedName: %s\n", cdmaterials[i].szname.c_str());
+                }
+            }
+            else
+            {
+                Logger::Info("CdMaterialName: %s\n", "Empty");
+            }
+        }
+    }
+}
+
+//void BinaryReader::Read(mstudiostringtable_t_v49* data, studiohdr_t_v49 mdlhdr, std::vector<mstudioseqdescv49_t> seqs, std::vector<mstudiohitboxset_t_v49>	hitboxsets, mstudioattachment_t_v49* attachments, std::vector< mstudionodename_t_v49> nodes, std::vector<mstudiobodyparts_t_v49> bodyparts, std::vector<mstudioikchain_t_v49> ikchains, std::vector<mstudioanimdesc_t_v49> animdescs, std::vector<mstudiotexture_t_v49> textures, std::vector<mstudiomodelgroup_t_v49> includemodels, std::vector<mstudiotexturedir_t_v49> cdmaterials, std::vector<mstudioposeparamdesc_t_v49> poseparamdescs, std::vector<mstudiosrcbonetransform_t_v49> srcbonetransforms)
+//{
+//    std::vector<std::string> stringsUsed;
+//    int startPos = Position();
+//    int eventNum = 0;
+//    int actModNum = 0;
+//    int stringTableSize = mdl.mdlhdr.length - startPos;
+//
+//    data->stringtablesize = stringTableSize;
+//    Logger::Info("String Table Size: %d\n", data->stringtablesize);
+//
+//    std::string mdlName = ReadNullTermStr(true);
+//    data->mdlname = mdlName;
+//    Logger::Info("MdlName: %s\n", mdlName.c_str());
+//
+//    std::string surfacePropName = ReadNullTermStr(true);
+//    data->surfaceprop = surfacePropName;
+//    Logger::Info("SurfacePropName: %s\n", surfacePropName.c_str());
+//    stringsUsed.push_back(surfacePropName.c_str());
+//
+//    std::string* _tempBones = new std::string[mdl.mdlhdr.numbones];
+//    std::string* _tempAttachments = new std::string[mdl.mdlhdr.numlocalattachments];
+//
+//
+//    for (int i = 0; i < mdl.mdlhdr.numbones; i++)
+//    {
+//        std::string str = ReadNullTermStr(true);
+//        Logger::Info("BoneName: %s\n", str.c_str());
+//        stringsUsed.push_back(str.c_str());
+//        _tempBones[i] = str;//data->bones.push_back(str);
+//    }
+//
+//    // If data->bones is already allocated, deallocate it first
+//    if (data->bones != nullptr) {
+//        delete[] data->bones;
+//    }
+//
+//    // Assign the new dynamic array to data->bones
+//    data->bones = _tempBones;
+//
+//    for (int i = 0; i < mdl.mdlhdr.numlocalattachments; i++)
+//    {
+//        if (!mdl.attachments[i].szname.empty())
+//        {
+//            if (!ContainsString2(stringsUsed, mdl.attachments[i].szname.c_str()))
+//            {
+//                std::string str = ReadNullTermStr(true);
+//                Logger::Info("AttachmentName: %s\n", str.c_str());
+//                _tempAttachments[i] = str;//data->attachments.push_back(str);
+//                stringsUsed.push_back(str);
+//            }
+//            else
+//            {
+//                Logger::Info("AttachmentReusedName: %s\n", mdl.attachments[i].szname.c_str());
+//            }
+//        }
+//        else
+//        {
+//            Logger::Info("AttachmentName: %s\n", "Empty");
+//        }
+//    }
+//    // If data->attachments is already allocated, deallocate it first
+//    if (data->attachments != nullptr) {
+//        delete[] data->attachments;
+//    }
+//
+//    // Assign the new dynamic array to data->bones
+//    data->attachments = _tempAttachments;
+//
+//
+//    for (int i = 0; i < mdl.mdlhdr.numhitboxsets; i++)
+//    {
+//        if (!mdl.hitboxsets[i].szname.empty())
+//        {
+//            if (!ContainsString2(stringsUsed, mdl.hitboxsets[i].szname.c_str()))
+//            {
+//                std::string str = ReadNullTermStr(true);
+//                Logger::Info("HitboxSetName: %s\n", str.c_str());
+//                data->hitboxsets.push_back(str);
+//                stringsUsed.push_back(str);
+//            }
+//            else
+//            {
+//                Logger::Info("HitboxSetReusedName: %s\n", mdl.hitboxsets[i].szname.c_str());
+//            }
+//        }
+//        else
+//        {
+//            Logger::Info("HitboxSetName: %s\n", "Empty");
+//        }
+//    }
+//
+//    for (int i = 0; i < mdl.mdlhdr.numlocalanim; i++)
+//    {
+//        if (!mdl.animdescs[i].szname.empty())
+//        {
+//            if (!ContainsString2(stringsUsed, mdl.animdescs[i].szname))
+//            {
+//                std::string str = ReadNullTermStr(true);
+//                Logger::Info("AnimDescName: %s\n", str.c_str());
+//                data->anims.push_back(str);
+//                stringsUsed.push_back(str);
+//            }
+//            else
+//            {
+//                Logger::Info("AnimDescReusedName: %s\n", mdl.animdescs[i].szname.c_str());
+//            }
+//        }
+//        else
+//        {
+//            Logger::Info("AnimDescName: %s\n", "Empty");
+//        }
+//    }
+//
+//    for (int i = 0; i < mdl.mdlhdr.numlocalseq; i++)
+//    {
+//        std::vector<std::string> _activities;
+//        std::vector<std::string> _activityEvents;
+//        std::vector<std::string> _activityModifiers;
+//
+//        int seqPos = (mdl.seqdescs[i].baseptr - mdl.seqdescs[i].activitymodifierindex) * -1;
+//        //int seqPos = mdlhdr.localseqindex + 212 * i;
+//
+//        std::string szName = ReadNullTermStr(true);//ReadNullTermStrTrgtNoReturn(seqPos, false); //;// ReadNullTermStrTrgtNoReturn(seqPos + seqs[i].szlabelindex, false);
+//        Logger::Info("SeqName: %s : %d\n", szName.c_str(), i);
+//        std::string szActivity = ReadNullTermStrTrgt(seqPos + mdl.seqdescs[i].szactivitynameindex, false);//mdl.seqdescs[i].szactivityname;
+//        Logger::Info("Pos: %d\n", Position());
+//        //Logger::Info("TestSeqName: %s\n", seqs[i].szlabel.c_str());
+//        //Logger::Info("TestSeqActivity: %s\n", seqs[i].szactivityname.c_str());
+//        //Logger::Info("TestSeqActivitySize: %d\n", seqs[i].szactivityname.size());
+//        bool test = szActivity.empty();
+//
+//        //if(test)Logger::Info("true\n");
+//        //else Logger::Info("false\n");
+//
+//        if (!test)
+//        {
+//            if (!ContainsString2(stringsUsed, szActivity))
+//            {
+//                szActivity = ReadNullTermStr(true);
+//                Logger::Info("SeqActivity: %s : Pos: %d\n", szActivity.c_str(), Position());
+//                stringsUsed.push_back(szActivity);
+//                _activities.push_back(szActivity);
+//            }
+//            else
+//            {
+//                szActivity = "";
+//                Logger::Info("SeqActivityReusedName: %s\n", szActivity.c_str());
+//            }
+//        }
+//        else
+//        {
+//            //szActivity = "";
+//            Logger::Info("SeqActivity: %s\n", "Empty");
+//        }
+//        Logger::Info("Eventnum: %d\n", mdl.seqdescs[i].numevents);
+//        for (int j = 0; j < mdl.seqdescs[i].numevents; j++)
+//        {
+//            Logger::Info("Eventnum2: %d\n", j);
+//            int pos = Position();
+//            std::string szEventName = ReadNullTermStrTrgt(seqPos + mdl.seqdescs[i].eventindex + 80 * j + mdl.seqdescs[i].seqdata.events[j].szeventindex, false);
+//            std::string szName = ReadNullTermStrTrgt(seqPos + mdl.seqdescs[i].eventindex + 80 * j + 12, false);
+//            std::string eventName = szEventName;//mdl.seqdescs[i].szeventnames[j];
+//            //Logger::Info("TestSeqEvent: %s\n", seqs[i].szeventnames[j].c_str());
+//
+////            if (ContainsString2(stringsUsed, seqs[i].szeventnames[j]) || eventName == "")
+////            {
+////                _activityEvents.push_back("");
+////            }
+//            if (!szEventName.empty())
+//            {
+//                if (!ContainsString2(stringsUsed, szEventName))
+//                {
+//                    eventName = ReadNullTermStr(true);
+//                    Logger::Info("eventName: %s\n", eventName.c_str());
+//                    stringsUsed.push_back(szEventName);
+//                    _activityEvents.push_back(szEventName);
+//                }
+//                else
+//                {
+//                    _activityEvents.push_back("");
+//                    Logger::Info("eventNameReusedName: %s\n", szEventName.c_str());
+//                }
+//            }
+//            else
+//            {
+//                _activityEvents.push_back("");
+//                Logger::Info("SeqActivity: %s\n", "Empty");
+//            }
+//        }
+//
+//        for (int j = 0; j < mdl.seqdescs[i].numactivitymodifiers; j++)
+//        {
+//            int pos = Position();
+//            std::string actModName = ReadNullTermStrTrgt(seqPos + mdl.seqdescs[i].activitymodifierindex + 4 * j + mdl.seqdescs[i].seqdata.actmods[j].sznameindex, false);
+//            if (!actModName.empty())
+//            {
+//                if (!ContainsString2(stringsUsed, actModName))
+//                {
+//                    actModName = ReadNullTermStr(true);
+//                    Logger::Info("actModName: %s\n", actModName.c_str());
+//                    stringsUsed.push_back(actModName);
+//                    _activityModifiers.push_back(actModName);
+//                }
+//                else
+//                {
+//                    _activityModifiers.push_back("");
+//                    Logger::Info("actModReusedName: %s\n", actModName.c_str());
+//                }
+//            }
+//            else
+//            {
+//                _activityModifiers.push_back("");
+//                Logger::Info("actModName: %s\n", "Empty");
+//            }
+//        }
+//        mstudioseqstring_t_v49 _seq = { szName, szActivity, _activityEvents, _activityModifiers };
+//
+//        data->seqs.push_back(_seq);
+//    }
+//
+//    for (int i = 0; i < mdl.mdlhdr.numlocalnodes; i++)
+//    {
+//        if (!mdl.nodenames[i].szname.empty())
+//        {
+//            if (!ContainsString2(stringsUsed, mdl.nodenames[i].szname))
+//            {
+//                std::string str = ReadNullTermStr(true);
+//                Logger::Info("NodeName: %s\n", str.c_str());
+//                data->nodes.push_back(str);
+//                stringsUsed.push_back(str);
+//            }
+//            else
+//            {
+//                Logger::Info("NodeReusedName: %s\n", mdl.nodenames[i].szname.c_str());
+//            }
+//        }
+//        else
+//        {
+//            Logger::Info("NodeName: %s\n", "Empty");
+//        }
+//    }
+//
+//    for (int i = 0; i < mdl.mdlhdr.numbodyparts; i++)
+//    {
+//        if (!mdl.bodyparts[i].szname.empty())
+//        {
+//            if (!ContainsString2(stringsUsed, mdl.bodyparts[i].szname))
+//            {
+//                std::string str = ReadNullTermStr(true);
+//                Logger::Info("BodyPartName: %s\n", str.c_str());
+//                data->bodyparts.push_back(str);
+//                stringsUsed.push_back(str);
+//            }
+//            else
+//            {
+//                Logger::Info("BodyPartReusedName: %s\n", mdl.bodyparts[i].szname.c_str());
+//            }
+//        }
+//        else
+//        {
+//            Logger::Info("BodyPartName: %s\n", "Empty");
+//        }
+//
+//    }
+//
+//    for (int i = 0; i < mdl.mdlhdr.numhitboxsets; i++)
+//    {
+//        if (mdl.hitboxsets[i].numhitboxes > 0)
+//        {
+//            for (int j = 0; j < mdl.hitboxsets[i].numhitboxes; j++)
+//            {
+//                if (!mdl.hitboxsets[i].hitboxes[j].szhitboxname.empty())
+//                {
+//                    if (!ContainsString2(stringsUsed, mdl.hitboxsets[i].hitboxes[j].szhitboxname))
+//                    {
+//                        std::string str2 = ReadNullTermStr(true);
+//                        Logger::Info("HitboxName: %s\n", str2.c_str());
+//                        data->hitboxes.push_back(str2);
+//                        stringsUsed.push_back(str2);
+//                    }
+//                    else
+//                    {
+//                        Logger::Info("HitboxReusedName: %s\n", mdl.hitboxsets[i].hitboxes[j].szhitboxname.c_str());
+//                    }
+//                }
+//                else
+//                {
+//                    Logger::Info("HitboxName: %s\n", "Empty");
+//                }
+//            }
+//        }
+//    }
+//
+//    for (int i = 0; i < mdl.mdlhdr.numlocalposeparameters; i++)
+//    {
+//        if (!mdl.poseparamdescs[i].szname.empty())
+//        {
+//            if (!ContainsString2(stringsUsed, mdl.poseparamdescs[i].szname))
+//            {
+//                std::string str = ReadNullTermStr(true);
+//                Logger::Info("PoseParamName: %s\n", str.c_str());
+//                data->poseparams.push_back(str);
+//                stringsUsed.push_back(str);
+//            }
+//            else
+//            {
+//                Logger::Info("PoseParamReusedName: %s\n", mdl.poseparamdescs[i].szname.c_str());
+//            }
+//        }
+//        else
+//        {
+//            Logger::Info("PoseParamName: %s\n", "Empty");
+//        }
+//
+//    }
+//
+//    for (int i = 0; i < mdl.mdlhdr.numikchains; i++)
+//    {
+//        if (!mdl.ikchains[i].szname.empty())
+//        {
+//            if (!ContainsString2(stringsUsed, mdl.ikchains[i].szname))
+//            {
+//                std::string str = ReadNullTermStr(true);
+//                Logger::Info("IkChainName: %s\n", str.c_str());
+//                data->ikchains.push_back(str);
+//                stringsUsed.push_back(str);
+//            }
+//            else
+//            {
+//                Logger::Info("IkChainReusedName: %s\n", mdl.ikchains[i].szname.c_str());
+//            }
+//        }
+//        else
+//        {
+//            Logger::Info("IkChainName: %s\n", "Empty");
+//        }
+//    }
+//
+//    for (int i = 0; i < mdl.mdlhdr.numincludemodels; i++)
+//    {
+//        if (!mdl.includedmodels[i].szname.empty())
+//        {
+//            if (!ContainsString2(stringsUsed, mdl.includedmodels[i].szname))
+//            {
+//                std::string str = ReadNullTermStr(true);
+//                Logger::Info("IncludeModelName: %s\n", str.c_str());
+//                data->includemodel.push_back(str);
+//                stringsUsed.push_back(str);
+//            }
+//            else
+//            {
+//                Logger::Info("IncludeModelReusedName: %s\n", mdl.includedmodels[i].szname.c_str());
+//            }
+//        }
+//        else
+//        {
+//            Logger::Info("IncludeModelName: %s\n", "Empty");
+//        }
+//    }
+//
+//    for (int i = 0; i < mdl.mdlhdr.numtextures; i++)
+//    {
+//        if (!mdl.textures[i].szname.empty())
+//        {
+//            if (!ContainsString2(stringsUsed, mdl.textures[i].szname))
+//            {
+//                std::string str = ReadNullTermStr(true);
+//                Logger::Info("TextureName: %s\n", str.c_str());
+//                data->textures.push_back(str);
+//                stringsUsed.push_back(str);
+//            }
+//            else
+//            {
+//                Logger::Info("TextureReusedName: %s\n", mdl.textures[i].szname.c_str());
+//            }
+//        }
+//        else
+//        {
+//            Logger::Info("TextureName: %s\n", "Empty");
+//        }
+//    }
+//
+//    for (int i = 0; i < mdl.mdlhdr.numcdtextures; i++)
+//    {
+//        if (!mdl.cdtextures[i].szname.empty())
+//        {
+//            if (!ContainsString2(stringsUsed, mdl.cdtextures[i].szname))
+//            {
+//                std::string str = ReadNullTermStr(true);
+//                Logger::Info("CdMaterialName: %s\n", str.c_str());
+//                data->cdmaterials.push_back(str);
+//                stringsUsed.push_back(str);
+//            }
+//            else
+//            {
+//                Logger::Info("CdMaterialReusedName: %s\n", mdl.cdtextures[i].szname.c_str());
+//            }
+//        }
+//        else
+//        {
+//            Logger::Info("CdMaterialName: %s\n", "Empty");
+//        }
+//    }
+//}
 
 #pragma endregion
 
@@ -3091,7 +4345,7 @@ void BinaryReader::Read(mstudiostringtable_t_v52* data, studiohdr_t_v53 mdlhdr, 
         int seqPos = (seqs[i].baseptr - seqs[i].activitymodifierindex) * -1;
 
         std::string szName = ReadNullTermStr(true);
-        Logger::Info("SeqName: %s\n", szName.c_str());
+        Logger::Info("SeqName: %s : %d\n", szName.c_str(), i);
         std::string szActivity = seqs[i].szactivityname;
 
         //Logger::Info("TestSeqName: %s\n", seqs[i].szlabel.c_str());
@@ -3156,10 +4410,9 @@ void BinaryReader::Read(mstudiostringtable_t_v52* data, studiohdr_t_v53 mdlhdr, 
 
         for (int j = 0; j < seqs[i].numactivitymodifiers; j++)
         {
-            int pos = Position();
-            std::string actModName = seqs[i].szactivitymodifiernames[j];
             if (!seqs[i].szactivitymodifiernames[j].empty())
             {
+                std::string actModName = seqs[i].szactivitymodifiernames[j];
                 if (!ContainsString2(stringsUsed, seqs[i].szactivitymodifiernames[j]))
                 {
                     actModName = ReadNullTermStr(true);
@@ -4023,11 +5276,10 @@ void BinaryWriter::Write(mstudiobbox_t_v49 data)
 
 }
 
-void BinaryWriter::Write(mstudiobonenametable_t_v49 data) 
+void BinaryWriter::Write(mstudiobonenametable_t_v49 data, int numbones) 
 {
-
     short fill = 0;
-    for (int i = 0; i < data.bones.size(); i++)
+    for (int i = 0; i < numbones; i++)
     {
         Stream.write((char*)&data.bones[i], sizeof(byte));
     }
@@ -4076,15 +5328,40 @@ void BinaryWriter::Write(mstudioanim_t_v49 data)
     Stream.write((char*)&data.bone, sizeof(byte));
     Stream.write((char*)&data.flags, sizeof(byte));
     Stream.write((char*)&data.nextoffset, sizeof(short));
-    if ((int)data.flags & STUDIO_ANIM_ANIMROT) Stream.write((char*)&data.animrot, sizeof(Vector3Short));
+    if ((int)data.flags & STUDIO_ANIM_ANIMROT) Stream.write((char*)&data.animrot.offset, sizeof(Vector3Short));
 
-    if ((int)data.flags & STUDIO_ANIM_ANIMPOS) Stream.write((char*)&data.animpos, sizeof(Vector3Short));
+    if ((int)data.flags & STUDIO_ANIM_ANIMPOS) Stream.write((char*)&data.animpos.offset, sizeof(Vector3Short));
 
     if ((int)data.flags & STUDIO_ANIM_RAWROT) Stream.write((char*)&data.rawrot, sizeof(QuaternionShort));
 
     if ((int)data.flags & STUDIO_ANIM_RAWROT2) Stream.write((char*)&data.rawrot2, sizeof(QuaternionShort));
 
     if ((int)data.flags & STUDIO_ANIM_RAWPOS) Stream.write((char*)&data.rawpos, sizeof(Vector3Short));
+}
+
+void BinaryWriter::Write(mstudioanimvalue_t data)
+{
+    Stream.write((char*)&data.num.valid, sizeof(byte));
+    Stream.write((char*)&data.num.total, sizeof(byte));
+
+    for (int i = 0; i < data.num.valid; i++)
+    {
+        Stream.write((char*)&data.value[i], sizeof(short));
+    }
+}
+
+void BinaryWriter::Write(mstudioanimvalues_t_v49 data)
+{
+    for (int i = 0; i < data.rot.size(); i++)
+    {
+        Write(data.rot[i]);
+    }
+
+    for (int i = 0; i < data.pos.size(); i++)
+    {
+        //Logger::Info("Pos[%d]: %d\n",i, Position());
+        Write(data.pos[i]);
+    }
 }
 
 void BinaryWriter::Write(mstudioanimdata_t_v49 data)
@@ -4141,6 +5418,10 @@ void BinaryWriter::Write(mstudiocompressedikerror_t_v49 data)
 {
     Stream.write((char*)&data.scale, sizeof(float) * 6);
     Stream.write((char*)&data.index, sizeof(short) * 6);
+    for (int i = 0; i < data.animvalues.size(); i++)
+    {
+        Write(data.animvalues[i]);
+    }
 }
 
 void BinaryWriter::Write(mstudioikerror_t_v49 data) 
@@ -4157,6 +5438,78 @@ void BinaryWriter::Write(mstudioikrulezeroframe_t_v49 data)
     Stream.write((char*)&data.peak, sizeof(short));
     Stream.write((char*)&data.tail, sizeof(short));
     Stream.write((char*)&data.end, sizeof(short));
+
+}
+
+void BinaryWriter::Write(mstudioseqdesc_t_v49 data)
+{
+
+    Stream.write((char*)&data.baseptr, sizeof(int));
+
+    Stream.write((char*)&data.szlabelindex, sizeof(int));
+
+    Stream.write((char*)&data.szactivitynameindex, sizeof(int));
+
+    Stream.write((char*)&data.flags, sizeof(int));
+
+    Stream.write((char*)&data.activity, sizeof(int));
+    Stream.write((char*)&data.actweight, sizeof(int));
+
+    Stream.write((char*)&data.numevents, sizeof(int));
+    Stream.write((char*)&data.eventindex, sizeof(int));
+
+    Stream.write((char*)&data.bbmin, sizeof(Vector3));
+    Stream.write((char*)&data.bbmax, sizeof(Vector3));
+
+    Stream.write((char*)&data.numblends, sizeof(int));
+
+
+    Stream.write((char*)&data.animindexindex, sizeof(int));
+
+    Stream.write((char*)&data.movementindex, sizeof(int));
+    Stream.write((char*)&data.groupsize, sizeof(int) * 2);
+    Stream.write((char*)&data.paramindex, sizeof(int) * 2);
+    Stream.write((char*)&data.paramstart, sizeof(float) * 2);
+    Stream.write((char*)&data.paramend, sizeof(float) * 2);
+    Stream.write((char*)&data.paramparent, sizeof(int));
+
+    Stream.write((char*)&data.fadeintime, sizeof(float));
+    Stream.write((char*)&data.fadeouttime, sizeof(float));
+
+    Stream.write((char*)&data.localentrynode, sizeof(int));
+    Stream.write((char*)&data.localexitnode, sizeof(int));
+    Stream.write((char*)&data.nodeflags, sizeof(int));
+
+    Stream.write((char*)&data.entryphase, sizeof(float));
+    Stream.write((char*)&data.exitphase, sizeof(float));
+
+    Stream.write((char*)&data.lastframe, sizeof(float));
+
+    Stream.write((char*)&data.nextseq, sizeof(int));
+    Stream.write((char*)&data.pose, sizeof(int));
+
+    Stream.write((char*)&data.numikrules, sizeof(int));
+
+    Stream.write((char*)&data.numautolayers, sizeof(int));
+    Stream.write((char*)&data.autolayerindex, sizeof(int));
+
+    Stream.write((char*)&data.weightlistindex, sizeof(int));
+
+    Stream.write((char*)&data.posekeyindex, sizeof(int));
+
+    Stream.write((char*)&data.numiklocks, sizeof(int));
+    Stream.write((char*)&data.iklockindex, sizeof(int));
+
+
+    Stream.write((char*)&data.keyvalueindex, sizeof(int));
+    Stream.write((char*)&data.keyvaluesize, sizeof(int));
+
+    Stream.write((char*)&data.cycleposeindex, sizeof(int));
+
+    Stream.write((char*)&data.activitymodifierindex, sizeof(int));
+    Stream.write((char*)&data.numactivitymodifiers, sizeof(int));
+
+    Stream.write((char*)&data.unused, sizeof(int) * 5);
 
 }
 
@@ -4234,18 +5587,18 @@ void BinaryWriter::Write(mstudioseqdescv49_t data)
 
 void BinaryWriter::Write(blendgroup_t_v49 data)
 {
-    Stream.write((char*)&data.blends, sizeof(short) * sizeof(data.blends));
+    for (int i = 0; i < data.blends.size(); i++)
+    {
+        Stream.write((char*)&data.blends[i], sizeof(short));
+    }
 }
 
 void BinaryWriter::Write(posekey_t_v49 data, int groupSize) 
 {
-    if (groupSize == 3)
+    for (int i = 0; i < data.unk.size(); i++)
     {
-        Stream.write((char*)&data.unk, sizeof(float) * 2);
-        Stream.write((char*)&data.unk[0], sizeof(float));
+        Stream.write((char*)&data.unk[i], sizeof(float));
     }
-    else
-    Stream.write((char*)&data.unk, sizeof(float) * groupSize);
 }
 
 void BinaryWriter::Write(mstudioevent_t_v49 data) 
@@ -4423,6 +5776,12 @@ void BinaryWriter::Write(mstudionodename_t_v49 data)
     Stream.write((char*)&data.sznameindex, sizeof(int));
 }
 
+void BinaryWriter::Write(mstudioanimblock_t data)
+{
+    Stream.write((char*)&data.datastart, sizeof(int));
+    Stream.write((char*)&data.dataend, sizeof(int));
+}
+
 void BinaryWriter::Write(pertriheader_t_v49 data) 
 {
     Stream.write((char*)&data.version, sizeof(int));
@@ -4444,7 +5803,7 @@ void BinaryWriter::Write(mstudiokeyvalues_t_v49 data)
     }
 }
 
-void BinaryWriter::Write(mstudiostringtable_t_v49 data)
+void BinaryWriter::Write(mstudiostringtable_t_v49 data, studiohdr_t_v49 hdr)
 {
     int startPos = Position();
 
@@ -4458,7 +5817,7 @@ void BinaryWriter::Write(mstudiostringtable_t_v49 data)
         Stream.write(&data.surfaceprop[i], 1);
     }
 
-    for (int i = 0; i < data.bones.size(); i++)
+    for (int i = 0; i < hdr.numbones; i++)
     {
         for (int j = 0; j < data.bones[i].size(); j++)
         {
@@ -4466,7 +5825,7 @@ void BinaryWriter::Write(mstudiostringtable_t_v49 data)
         }
     }
 
-    for (int i = 0; i < data.attachments.size(); i++)
+    for (int i = 0; i < hdr.numlocalattachments; i++)
     {
         for (int j = 0; j < data.attachments[i].size(); j++)
         {
@@ -4585,16 +5944,16 @@ void BinaryWriter::Write(mstudiostringtable_t_v49 data)
 
     int endPos = Position();
 
-    Logger::Info("Stream Size: %d\n", data.stringtablesize);
-    Logger::Info("String Table StartPos: %d\n", startPos);
-    Logger::Info("String Table EndPos: %d\n", endPos);
-    Logger::Info("String Table Size: %d\n", endPos - startPos);
+    //Logger::Info("Stream Size: %d\n", data.stringtablesize);
+    //Logger::Info("String Table StartPos: %d\n", startPos);
+    //Logger::Info("String Table EndPos: %d\n", endPos);
+    //Logger::Info("String Table Size: %d\n", endPos - startPos);
 
     int stringTableSize = endPos - startPos;
 
 
     int padding = (data.stringtablesize - stringTableSize);
-    Logger::Info("String Table Padding Size: %d\n", padding);
+    //Logger::Info("String Table Padding Size: %d\n", padding);
     Padding(padding);
 
 }
@@ -4767,16 +6126,16 @@ void BinaryWriter::Write(mstudiostringtable_t_v52 data)
 
     int endPos = Position();
 
-    Logger::Info("Stream Size: %d\n", data.stringtablesize);
-    Logger::Info("String Table StartPos: %d\n", startPos);
-    Logger::Info("String Table EndPos: %d\n", endPos);
-    Logger::Info("String Table Size: %d\n", endPos - startPos);
+    //Logger::Info("Stream Size: %d\n", data.stringtablesize);
+    //Logger::Info("String Table StartPos: %d\n", startPos);
+    //Logger::Info("String Table EndPos: %d\n", endPos);
+    //Logger::Info("String Table Size: %d\n", endPos - startPos);
 
     int stringTableSize = endPos - startPos;
 
 
     int padding = (data.stringtablesize - stringTableSize);
-    Logger::Info("String Table Padding Size: %d\n", padding);
+    //Logger::Info("String Table Padding Size: %d\n", padding);
     Padding(padding);
 
 }
@@ -5020,7 +6379,7 @@ void BinaryWriter::Write(mstudioanim_t_v53 data)
 
     if (!hasRawRotFlag)
     {
-        Stream.write((char*)&data.animrot, sizeof(Vector3Short));
+        Stream.write((char*)&data.animrot.offset, sizeof(Vector3Short));
         Stream.write((char*)&data.unused, sizeof(short));
     }
     else
@@ -5030,7 +6389,7 @@ void BinaryWriter::Write(mstudioanim_t_v53 data)
 
     if (!hasRawPosFlag)
     {
-        Stream.write((char*)&data.animpos, sizeof(Vector3Short));
+        Stream.write((char*)&data.animpos.offset, sizeof(Vector3Short));
     }
     else
     {
@@ -5039,7 +6398,7 @@ void BinaryWriter::Write(mstudioanim_t_v53 data)
 
     if (!hasRawScaleFlag)
     {
-        Stream.write((char*)&data.animscale, sizeof(Vector3Short));
+        Stream.write((char*)&data.animscale.offset, sizeof(Vector3Short));
     }
     else
     {

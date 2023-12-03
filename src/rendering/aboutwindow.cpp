@@ -2,7 +2,9 @@
 #include <imgui.h>
 #include <resource.hpp>
 #include <cstdint>
+#include <windows.h>
 #include <GL/gl.h>
+#include <GL/glu.h>
 #include <string>
 #include "stb_image.h"
 
@@ -24,6 +26,21 @@ void OpenLink(const char* site){
 #endif
 }
 
+//const char* GetThing()
+//{
+//#ifdef __MINGW32__
+//    return "MinGW";
+//#elif __GNUC__
+//    return "GCC";
+//#elif __APPLE__
+//    return "";
+//#endif
+//#ifdef _MSC_VER //FUCK YOU MSVC
+//    return "MSVC";
+//#endif
+//
+//    return "";
+//}
 
 void UI::SetupAboutWindow() {
   auto klules = stbi_load_from_memory(Resources::Klules, 4067, &klules_width, &klules_height, 0, 4);
@@ -44,49 +61,41 @@ void UI::SetupAboutWindow() {
 #endif
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, klules_width, klules_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, klules);
 }
-void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
+void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) 
+{
+
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{0,0});
-  if(ImGui::BeginTabBar("AboutTabs",ImGuiTabBarFlags_None)){
-    if(ImGui::BeginTabItem("About")){
+  if(ImGui::BeginTabBar("AboutTabs",ImGuiTabBarFlags_None))
+  {
+
+    if(ImGui::BeginTabItem("About"))
+    {
+
       ImGui::Image((void*)(intptr_t)grunt, {178,178});
       ImGui::SameLine();
       ImGui::BeginGroup();
       ImGui::Text("MDLSHIT");
       ImGui::Text("- Source engine model converter, v49/47 to v53");
       ImGui::Text("By headassbtw and MasterLiberty");
+      ImGui::Text("Eat my entire ass, wanderer");
+
       ImGui::Text("Compiled on %s",__DATE__);
-      ImGui::Text("%s, v%s",
-#ifdef __MINGW32__
-        "MinGW",
-#elif __GNUC__
-        "GCC",
-#elif __APPLE__
-        "",
-#endif
-#if _MSC_VER //FUCK YOU MSVC
-        "MSVC",
-        _MSC_VER
-#else
-        __VERSION__
-#endif
-      );
+
+      ImGui::Text("%s, v%s", &"");
+
       ImGui::Text("OpenGL Version: %s",glGetString(GL_VERSION));
       ImGui::Text("GPU: %s",glGetString(GL_RENDERER));
       ImGui::Text("FPS: %f",ImGui::GetIO().Framerate);
-      if(ImGui::SmallButton("Project GitHub##MDLSHIT_GH")){
-        OpenLink("https://github.com/headassbtw/mdlshit");
-      }
       ImGui::EndGroup();
+
+
 
       ImGui::EndTabItem();
     }
-    if(ImGui::BeginTabItem("Patch Notes")){
-      ImGui::BeginChild("PatchNotes");
+    if(ImGui::BeginTabItem("Patch Notes"))
+    {
 
-      PatchNotesVersionHeader("2.2.0");
-      ImGui::BulletText("Complete backend rewrite");
-      ImGui::BulletText("UI rework, support for more supplemental files");
-      ImGui::BulletText("RUI stitching");
+      ImGui::BeginChild("PatchNotes");
 
       PatchNotesVersionHeader("2.0.1");
       ImGui::BulletText("Fixes IKrules");
@@ -181,6 +190,4 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y) {
     ImGui::EndTabBar();
   }
   ImGui::PopStyleVar();
-
-
 }

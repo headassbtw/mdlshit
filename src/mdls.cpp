@@ -575,54 +575,54 @@ void RUIMeshToSmd(mstudioruimesh_t ruiMesh)
 	}
 
 
-	//for (int i = 0; i < ruiMesh.numfaces; i++)
-	//{
-	//	mstudioruivertmap_t map = ruiMesh.vertexmap[i];
-	//	//Logger::Info("RuiMesh Read: %d  %d\n", ruiMesh.vertexmap[i].vertstartid, ruiMesh.vertexmap[i].vertendid);
-	//	std::vector<short> vertMap = ReadVertMap(map);
-	//	Logger::Info("FACE%d \n", i);
-	//	if (vertMap.size() > 3)
-	//	{
-	//		int v1 = vertMap[0];
-	//		int v2 = vertMap[1];
-	//		int v3 = vertMap[2];
-	//		int v4 = vertMap[3];
-	//		int v5 = vertMap[4];
-	//		int v6 = vertMap[5];
-	//		//Logger::Info("Vert4 Read: %d \n", vertMap[3]);
-	//		//Logger::Info("Vert4 Read: %d \n", v4);
-	//
-	//		mstudioruivert_t vert1 = ruiMesh.vertex[v1];
-	//		mstudioruivert_t vert2 = ruiMesh.vertex[v2];
-	//		mstudioruivert_t vert3 = ruiMesh.vertex[v3];
-	//
-	//		mstudioruivert_t vert4 = ruiMesh.vertex[v4];
-	//		mstudioruivert_t vert5 = ruiMesh.vertex[v5];
-	//		mstudioruivert_t vert6 = ruiMesh.vertex[v6];
-	//
-	//		Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1\n", vert1.vertexpos.x, vert1.vertexpos.y, vert1.vertexpos.z);
-	//		Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1\n", vert2.vertexpos.x, vert2.vertexpos.y, vert2.vertexpos.z);
-	//		Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1\n", vert3.vertexpos.x, vert3.vertexpos.y, vert3.vertexpos.z);
-	//		Logger::Info("FACE%d Quad \n", i);
-	//		Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1\n", vert4.vertexpos.x, vert4.vertexpos.y, vert4.vertexpos.z);
-	//		Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1\n", vert5.vertexpos.x, vert5.vertexpos.y, vert5.vertexpos.z);
-	//		Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1\n", vert6.vertexpos.x, vert6.vertexpos.y, vert6.vertexpos.z);
-	//	}
-	//	else
-	//	{
-	//		int v1 = vertMap[0];
-	//		int v2 = vertMap[1];
-	//		int v3 = vertMap[2];
-	//
-	//		mstudioruivert_t vert1 = ruiMesh.vertex[v1];
-	//		mstudioruivert_t vert2 = ruiMesh.vertex[v2];
-	//		mstudioruivert_t vert3 = ruiMesh.vertex[v3];
-	//
-	//		Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1 //vert: %d\n", vert1.vertexpos.x, vert1.vertexpos.y, vert1.vertexpos.z, v1);
-	//		Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1 //vert: %d\n", vert2.vertexpos.x, vert2.vertexpos.y, vert2.vertexpos.z, v2);
-	//		Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1 //vert: %d\n", vert3.vertexpos.x, vert3.vertexpos.y, vert3.vertexpos.z, v3);
-	//	}
-	//}
+	for (int i = 0; i < ruiMesh.numfaces; i++)
+	{
+		mstudioruivertmap_t map = ruiMesh.vertexmap[i];
+		Logger::Info("RuiMesh Read: %d %d %d\n", ruiMesh.vertexmap[i].vertstartid, ruiMesh.vertexmap[i].vertendid, ruiMesh.vertexmap[i].vertextraid);
+		//std::vector<short> vertMap = ReadVertMap(map);
+		//Logger::Info("FACE%d \n", i);
+		//if (vertMap.size() > 3)
+		//{
+		//	int v1 = vertMap[0];
+		//	int v2 = vertMap[1];
+		//	int v3 = vertMap[2];
+		//	int v4 = vertMap[3];
+		//	int v5 = vertMap[4];
+		//	int v6 = vertMap[5];
+		//	//Logger::Info("Vert4 Read: %d \n", vertMap[3]);
+		//	//Logger::Info("Vert4 Read: %d \n", v4);
+		//
+		//	mstudioruivert_t vert1 = ruiMesh.vertex[v1];
+		//	mstudioruivert_t vert2 = ruiMesh.vertex[v2];
+		//	mstudioruivert_t vert3 = ruiMesh.vertex[v3];
+		//
+		//	mstudioruivert_t vert4 = ruiMesh.vertex[v4];
+		//	mstudioruivert_t vert5 = ruiMesh.vertex[v5];
+		//	mstudioruivert_t vert6 = ruiMesh.vertex[v6];
+		//
+		//	Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1\n", vert1.vertexpos.x, vert1.vertexpos.y, vert1.vertexpos.z);
+		//	Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1\n", vert2.vertexpos.x, vert2.vertexpos.y, vert2.vertexpos.z);
+		//	Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1\n", vert3.vertexpos.x, vert3.vertexpos.y, vert3.vertexpos.z);
+		//	Logger::Info("FACE%d Quad \n", i);
+		//	Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1\n", vert4.vertexpos.x, vert4.vertexpos.y, vert4.vertexpos.z);
+		//	Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1\n", vert5.vertexpos.x, vert5.vertexpos.y, vert5.vertexpos.z);
+		//	Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1\n", vert6.vertexpos.x, vert6.vertexpos.y, vert6.vertexpos.z);
+		//}
+		//else
+		//{
+		//	int v1 = vertMap[0];
+		//	int v2 = vertMap[1];
+		//	int v3 = vertMap[2];
+		//
+		//	mstudioruivert_t vert1 = ruiMesh.vertex[v1];
+		//	mstudioruivert_t vert2 = ruiMesh.vertex[v2];
+		//	mstudioruivert_t vert3 = ruiMesh.vertex[v3];
+		//
+		//	Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1 //vert: %d\n", vert1.vertexpos.x, vert1.vertexpos.y, vert1.vertexpos.z, v1);
+		//	Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1 //vert: %d\n", vert2.vertexpos.x, vert2.vertexpos.y, vert2.vertexpos.z, v2);
+		//	Logger::Info("0 %f %f %f 0.000000 0.000000 0.000000  0.5 1 1 0 1 //vert: %d\n", vert3.vertexpos.x, vert3.vertexpos.y, vert3.vertexpos.z, v3);
+		//}
+	}
 	Logger::Info("end\n");
 
 
@@ -727,13 +727,26 @@ template <typename T> int GetModelCount(T mdl, bool debug)
 	return 0;
 }
 
-void AddDistToAnimData(mstudioanimdata_t_v49 vec, int extra)
-{
-	for (int i = 0; i < extra; i++)
-	{
-		vec.arry.push_back((std::byte)0);
-	}
-}
+//void AddDistToAnimData(mstudioanimdata_t_v49 vec, int extra)
+//{
+//	int arrySize = vec.dataSize + extra;
+//
+//	byte* _temp = new byte[arrySize];
+//
+//	for (int i = 0; i < arrySize; i++)
+//	{
+//		if (i < vec.dataSize)
+//		{
+//			_temp[i] = vec.arry[i];
+//		}
+//		else _temp[i] = (std::byte)0;
+//	}
+//	if (vec.arry != nullptr)
+//	{
+//		delete[] vec.arry;
+//	}
+//	vec.arry = _temp;
+//}
 
 
 MDL::v53Mdl::v53Mdl()
@@ -2044,19 +2057,34 @@ MDL::v52Mdl MDL::v52Mdl::_v52Mdl(BinaryReader* Stream, bool debug)
 
 			mstudiohitboxset_t_v49 hitboxset; Stream->Read(&hitboxset);
 
-			if (hitboxset.numhitboxes > 0) numhitboxes += hitboxset.numhitboxes;
+			mstudiobbox_t_v49* _temp = new mstudiobbox_t_v49[hitboxset.numhitboxes];
 
-			Stream->seek(hitboxsetPos + hitboxset.hitboxindex);
-			for (int j = 0; j < hitboxset.numhitboxes; j++)
+			if (hitboxset.numhitboxes > 0)
 			{
-				int hitboxPos = hitboxsetPos + hitboxset.hitboxindex + 68 * i;
-				Stream->seek(hitboxPos);
-				mstudiobbox_t_v49 hitbox; Stream->Read(&hitbox);
+				numhitboxes += hitboxset.numhitboxes;
 
-				std::string szHitboxName = Stream->ReadNullTermStrTrgt(hitboxPos + hitbox.szhitboxnameindex, false);
-				hitbox.szhitboxname = szHitboxName;
+				Stream->seek(hitboxsetPos + hitboxset.hitboxindex);
+				for (int j = 0; j < hitboxset.numhitboxes; j++)
+				{
+					int hitboxPos = hitboxsetPos + hitboxset.hitboxindex + 68 * i;
+					Stream->seek(hitboxPos);
+					mstudiobbox_t_v49 hitbox; Stream->Read(&hitbox);
 
-				hitboxset.hitboxes.push_back(hitbox);
+					std::string szHitboxName = Stream->ReadNullTermStrTrgt(hitboxPos + hitbox.szhitboxnameindex, false);
+					hitbox.szhitboxname = szHitboxName;
+
+					_temp[j] = hitbox;
+				}
+				if (hitboxset.hitboxes != nullptr)
+				{
+					delete[] hitboxset.hitboxes;
+				}
+				hitboxset.hitboxes = _temp;
+			}
+			else
+			{
+				Stream->seek(hitboxsetPos + hitboxset.hitboxindex);
+				delete[] _temp;
 			}
 
 			std::string szName = Stream->ReadNullTermStrTrgt(hitboxsetPos + hitboxset.sznameindex, false);
@@ -4734,7 +4762,7 @@ std::vector <int> MDL::v49Mdl::GetIKBones()
 		chain.push_back(roots[i]);
 	}
 
-	for (int i = 0; i < bones.size(); i++)
+	for (int i = 0; i < mdlhdr.numbones; i++)
 	{
 		mstudiobone_t_v49 _bone = bones[i];
 
@@ -4785,7 +4813,7 @@ MDL::v49Mdl::v49Mdl()
 
 }
 
-MDL::v49Mdl::v49Mdl(studiohdr_t_v49 _mdlhdr, studiohdr2_t_v49 _mdlsubhdr, std::vector<mstudiobone_t_v49> _bones, std::vector<mstudiojigglebone_t_v49> _jigglebones, std::vector<mstudioboneflexdriver_t_v49>	_boneflexdrivers, std::vector<mstudioattachment_t_v49> _attachments, std::vector<mstudiohitboxset_t_v49> _hitboxsets, std::vector<mstudiobbox_t_v49> _hitboxes, mstudiobonenametable_t_v49 _bonenametable, std::vector<mstudioanimdesc_t_v49> _animdescs, std::vector<mstudioanim_t_v49> _anims, std::vector<sectionindexesindex_t_v49> _sectionindexes, std::vector<mstudioanim_t_v49> _sections, std::vector<mstudioikrule_t_v49> _ikrules, std::vector<mstudiocompressedikerror_t_v49> _compressedikerrors, std::vector<mstudioikerror_t_v49> _ikerrors, std::vector<mstudioikrulezeroframe_t_v49> _ikrulezeroframe, std::vector<mstudioseqdescv49_t> _seqdescs, std::vector<blendgroup_t_v49> _blends, std::vector<posekey_t_v49> _posekeys, std::vector<mstudioevent_t_v49> _events, std::vector<mstudioautolayer_t_v49> _autolayers, std::vector<mstudioactivitymodifier_t_v49> _activitymodifiers, std::vector<seqweightlist_t_v49> _seqweightlist, std::vector<mstudionodename_t_v49> _nodenames, std::vector<mstudionodedata_v49> _nodes, std::vector<mstudiobodyparts_t_v49> _bodyparts, std::vector<mstudiomodel_t_v49>	_models, std::vector<mstudiomesh_t_v49> _meshes, std::vector<mstudioikchain_t_v49> _ikchains, std::vector<mstudioiklink_t_v49> _iklinks, std::vector<mstudioposeparamdesc_t_v49> _poseparamdescs, std::vector<mstudioanimblock_t> _animblocks, std::vector<mstudiomodelgroup_t_v49> _includedmodels, std::vector<mstudiotexturedir_t_v49> _cdtextures, std::vector<mstudiotexture_t_v49> _textures, std::vector<mstudioskingroup_t_v49> _skingroups, mstudiokeyvalues_t_v49 _keyvalues, std::vector<mstudiosrcbonetransform_t_v49> _srcbonetransforms, mstudiolinearbone_t_v49 _linearbone, mstudiolinearbonedata_t_v49 _linearbonedata, mstudiostringtable_t_v49 _stringtable)
+MDL::v49Mdl::v49Mdl(studiohdr_t_v49 _mdlhdr, studiohdr2_t_v49 _mdlsubhdr, mstudiobone_t_v49* _bones, mstudiojigglebone_t_v49* _jigglebones, std::vector<mstudioboneflexdriver_t_v49>	_boneflexdrivers, mstudioattachment_t_v49* _attachments, std::vector<mstudiohitboxset_t_v49> _hitboxsets, std::vector<mstudiobbox_t_v49> _hitboxes, mstudiobonenametable_t_v49 _bonenametable, std::vector<mstudioanimdesc_t_v49> _animdescs, std::vector<mstudioanim_t_v49> _anims, std::vector<sectionindexesindex_t_v49> _sectionindexes, std::vector<mstudioanim_t_v49> _sections, std::vector<mstudioikrule_t_v49> _ikrules, std::vector<mstudiocompressedikerror_t_v49> _compressedikerrors, std::vector<mstudioikerror_t_v49> _ikerrors, std::vector<mstudioikrulezeroframe_t_v49> _ikrulezeroframe, std::vector<mstudioseqdescv49_t> _seqdescs, std::vector<blendgroup_t_v49> _blends, std::vector<posekey_t_v49> _posekeys, std::vector<mstudioevent_t_v49> _events, std::vector<mstudioautolayer_t_v49> _autolayers, std::vector<mstudioactivitymodifier_t_v49> _activitymodifiers, std::vector<seqweightlist_t_v49> _seqweightlist, std::vector<mstudionodename_t_v49> _nodenames, std::vector<mstudionodedata_v49> _nodes, std::vector<mstudiobodyparts_t_v49> _bodyparts, std::vector<mstudiomodel_t_v49>	_models, std::vector<mstudiomesh_t_v49> _meshes, std::vector<mstudioikchain_t_v49> _ikchains, std::vector<mstudioiklink_t_v49> _iklinks, std::vector<mstudioposeparamdesc_t_v49> _poseparamdescs, std::vector<mstudioanimblock_t> _animblocks, std::vector<mstudiomodelgroup_t_v49> _includedmodels, std::vector<mstudiotexturedir_t_v49> _cdtextures, std::vector<mstudiotexture_t_v49> _textures, std::vector<mstudioskingroup_t_v49> _skingroups, mstudiokeyvalues_t_v49 _keyvalues, std::vector<mstudiosrcbonetransform_t_v49> _srcbonetransforms, mstudiolinearbone_t_v49 _linearbone, mstudiolinearbonedata_t_v49 _linearbonedata, mstudiostringtable_t_v49 _stringtable)
 {
 	mdlhdr = _mdlhdr;
 	mdlsubhdr = _mdlsubhdr;
@@ -4837,11 +4865,11 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 #pragma region VARS
 	studiohdr_t_v49	 mdlhdr; Stream->Read(&mdlhdr);
 	studiohdr2_t_v49 mdlsubhdr; Stream->Read(&mdlsubhdr);
-
-	std::vector<mstudiobone_t_v49>						bones;
-	std::vector<mstudiojigglebone_t_v49>				jigglebones;
+	
+	mstudiobone_t_v49*									bones = new mstudiobone_t_v49[mdlhdr.numbones];
+	mstudiojigglebone_t_v49*							jigglebones = {};
 	std::vector<mstudioboneflexdriver_t_v49>			boneflexdrivers;
-	std::vector<mstudioattachment_t_v49>				attachments;
+	mstudioattachment_t_v49*							attachments = new mstudioattachment_t_v49[mdlhdr.numlocalattachments];
 	std::vector<mstudiohitboxset_t_v49>					hitboxsets;
 	std::vector<mstudiobbox_t_v49>						hitboxes;
 	mstudiobonenametable_t_v49							bonenametable;
@@ -4909,7 +4937,8 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 			Stream->seek(bonePos);
 
 			mstudiobone_t_v49 bone; Stream->Read(&bone);
-			bones.push_back(bone);
+			//bones.push_back(bone);
+			bones[i] = bone;
 			if (bone.proctype == 5) numjigglebones++;
 
 			std::string szName = Stream->ReadNullTermStrTrgt(bonePos + bone.sznameindex, false);
@@ -4921,6 +4950,8 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 #pragma region JIGGLEBONES
 	if (numjigglebones > 0)
 	{
+		jigglebones = new mstudiojigglebone_t_v49[numjigglebones];
+
 		int jiggleBonePos = mdlhdr.boneindex + 216 * mdlhdr.numbones;
 
 		Stream->seek(jiggleBonePos);
@@ -4929,7 +4960,7 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 		{
 			mstudiojigglebone_t_v49 jigglebone; Stream->Read(&jigglebone);
 			Logger::Info("JiggleBoneFlags Read: %s\n", Utility::func::ReadJiggleFlags(jigglebone.flags).c_str());
-			jigglebones.push_back(jigglebone);
+			jigglebones[i] = jigglebone; //jigglebones.push_back(jigglebone);
 			Logger::Info("JiggleBone Read: %d\n", i);
 		}
 		//Logger::Info("strPos: %d\n", Stream->Position());
@@ -4949,7 +4980,7 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 			std::string szName = Stream->ReadNullTermStrTrgt(attachmentPos + attachment.sznameindex, false);
 			attachment.szname = szName;
 
-			attachments.push_back(attachment);
+			attachments[i] = attachment;//attachments.push_back(attachment);
 			Logger::Info("Attachment Read: %s : %d\n", attachment.szname.c_str(), i);
 		}
 		//Logger::Info("strPos: %d\n", Stream->Position());
@@ -4958,28 +4989,44 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 #pragma region HITBOXSETS
 	if (mdlhdr.numhitboxsets > 0)
 	{
+		Logger::Info("Made it!\n");
 		Stream->seek(mdlhdr.hitboxsetindex);
+		Logger::Info("Made it!\n");
 		for (int i = 0; i < mdlhdr.numhitboxsets; i++)
 		{
 			int hitboxsetPos = mdlhdr.hitboxsetindex + 12 * i;
 			Stream->seek(hitboxsetPos);
+			Logger::Info("Made it2!\n");
 
 			mstudiohitboxset_t_v49 hitboxset; Stream->Read(&hitboxset);
 
-			if (hitboxset.numhitboxes > 0) numhitboxes += hitboxset.numhitboxes;
+			mstudiobbox_t_v49* _temp = new mstudiobbox_t_v49[hitboxset.numhitboxes];
 
-			Stream->seek(hitboxsetPos + hitboxset.hitboxindex);
-			for (int j = 0; j < hitboxset.numhitboxes; j++)
+			if (hitboxset.numhitboxes > 0)
 			{
-				int hitboxPos = hitboxsetPos + hitboxset.hitboxindex + 68 * i;
-				Stream->seek(hitboxPos);
-				mstudiobbox_t_v49 hitbox; Stream->Read(&hitbox);
+				numhitboxes += hitboxset.numhitboxes;
 
-				std::string szHitboxName = Stream->ReadNullTermStrTrgt(hitboxPos + hitbox.szhitboxnameindex, false);
-				hitbox.szhitboxname = szHitboxName;
+				Stream->seek(hitboxsetPos + hitboxset.hitboxindex);
+				for (int j = 0; j < hitboxset.numhitboxes; j++)
+				{
+					int hitboxPos = hitboxsetPos + hitboxset.hitboxindex + 68 * j;
+					Stream->seek(hitboxPos);
+					mstudiobbox_t_v49 hitbox; Stream->Read(&hitbox);
 
-				hitboxset.hitboxes.push_back(hitbox);
+					std::string szHitboxName = Stream->ReadNullTermStrTrgt(hitboxPos + hitbox.szhitboxnameindex, false);
+					hitbox.szhitboxname = szHitboxName;
+
+					_temp[j] = hitbox;
+				}
+
+				hitboxset.hitboxes = _temp;
 			}
+			else
+			{
+				Stream->seek(hitboxsetPos + hitboxset.hitboxindex);
+				delete[] _temp;
+			}
+
 
 			std::string szName = Stream->ReadNullTermStrTrgt(hitboxsetPos + hitboxset.sznameindex, false);
 			hitboxset.szname = szName;
@@ -5309,6 +5356,7 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 							}
 				#pragma endregion
 				#pragma region EVENTS
+							string* _tempEvents = new string[seqdescs[i].numevents];
 							if (numEvents > 0)
 							{
 								Stream->seek(seqPos + seqdescs[i].eventindex);
@@ -5319,14 +5367,21 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 				
 									std::string szEventName = Stream->ReadNullTermStrTrgt(seqPos + seqdescs[i].eventindex + 80 * j + _event.szeventindex, false);
 									std::string szName = Stream->ReadNullTermStrTrgt(seqPos + seqdescs[i].eventindex + 80 * j + 12, false);
-				
-									seqdescs[i].szeventnames.push_back(szEventName);
+									Logger::Info("Pos: %d\n",Stream->Position());
+									if (szEventName != "")_tempEvents[j] = szEventName;
+									else _tempEvents[j] = (std::string)"Empty";
 									seqdescs[i].events.push_back(eventNum);
 				
-									Logger::Info("Event Read: %s : %s : %d\n", szName.c_str(), szEventName.c_str(), j);
+									Logger::Info("Event Read: %s : %s : %d\n", szName.c_str(), _tempEvents[j].c_str(), j);
 									eventNum++;
 								}
 							}
+							if (seqdescs[i].szeventnames != nullptr)
+							{
+								delete[] seqdescs[i].szeventnames;
+							}
+
+							seqdescs[i].szeventnames = _tempEvents;
 				#pragma endregion
 				#pragma region ACTIVITYMODIFIERS
 							if (numActMods > 0)
@@ -5337,7 +5392,6 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 									mstudioactivitymodifier_t_v49 actmod; Stream->Read(&actmod);
 									
 									std::string szName = Stream->ReadNullTermStrTrgt(seqPos + seqdescs[i].activitymodifierindex + 4 * j + actmod.sznameindex, false);
-				
 									seqdescs[i].szactivitymodifiernames.push_back(szName);
 									actmod.szname = szName;
 									activitymodifiers.push_back(actmod);
@@ -5346,6 +5400,8 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 									actModNum++;
 								}
 							}
+
+
 				#pragma endregion
 			}
 		}
@@ -5359,10 +5415,10 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 		{
 			mstudionodename_t_v49 nodeName; Stream->Read(&nodeName);
 
-			std::string szName = Stream->ReadNullTermStrTrgt(nodeName.sznameindex, false);
-			nodeName.szname = szName;
+			//std::string szName = Stream->ReadNullTermStrTrgt(nodeName.sznameindex, false);
+			//nodeName.szname = szName;
 			nodenames.push_back(nodeName);
-			Logger::Info("NodeName Read: %s : %d\n", nodeName.szname.c_str(), i);
+			//Logger::Info("NodeName Read: %s : %d\n", nodeName.szname.c_str(), i);
 		}
 #pragma endregion
 #pragma region NODEDATA
@@ -5543,9 +5599,9 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 	}
 #pragma endregion
 #pragma region SKINFAMILIES
-	if (mdlhdr.numskinfamilies > 0)
+	if (mdlhdr.numskinfamilies > 0 && mdlhdr.numtextures > 0)
 	{
-		if (mdlhdr.numskinref > 0)
+		if (mdlhdr.numskinref > 0 && mdlhdr.numtextures > 0)
 		{
 			Stream->seek(mdlhdr.skinindex);
 			for (int i = 0; i < mdlhdr.numskinfamilies; i++)
@@ -5598,6 +5654,9 @@ MDL::v49Mdl MDL::v49Mdl::_v49Mdl(BinaryReader* Stream, bool debug)
 #pragma endregion
 
 	MDL::v49Mdl _v49mdl = { mdlhdr, mdlsubhdr, bones, jigglebones, boneflexdrivers, attachments, hitboxsets, hitboxes, bonenametable, animdescs, anims, sectionindexes, sections, ikrules, compressedikerrors, ikerrors, ikrulezeroframe, seqdescs, blends, posekeys, events, autolayers, activitymodifiers, seqweightlist, nodenames, nodes, bodyparts, models, meshes, ikchains, iklinks, poseparamdescs, animBlocks, includedmodels, cdtextures, textures, skingroups, keyvalues, srcbonetransforms, linearbone, linearbonedata, stringTable };
+	_v49mdl.numjigglebones = numjigglebones;
+
+
 	return _v49mdl;
 }
 
@@ -5640,6 +5699,7 @@ int MDL::v49Mdl::ConvertFlag(int flag)
 	{
 		//Logger::Info("Has Flag: %d\n", STUDIO_ANIM_DELTA);
 		test += STUDIO_ANIM_DELTA_53;
+		//test += STUDIO_ANIM_RAWPOS_53;
 	}
 
 	if (flagNum == 1)
@@ -5647,23 +5707,23 @@ int MDL::v49Mdl::ConvertFlag(int flag)
 		if (flag & STUDIO_ANIM_ANIMROT)
 		{
 			//Logger::Info("Has Flag: %d\n", STUDIO_ANIM_ANIMROT);
-			test += STUDIO_ANIM_RAWPOS_53;
+			//test += STUDIO_ANIM_RAWPOS_53;
 		}
 		if (flag & STUDIO_ANIM_ANIMPOS)
 		{
 			//Logger::Info("Has Flag: %d\n", STUDIO_ANIM_ANIMPOS);
-			test += STUDIO_ANIM_RAWROT_53;
+			//test += STUDIO_ANIM_RAWROT_53;
 		}
 
 		if (flag & STUDIO_ANIM_RAWROT)
 		{
 			//Logger::Info("Has Flag: %d\n", STUDIO_ANIM_RAWROT);
-			test += STUDIO_ANIM_RAWPOS_53;
+			//test += STUDIO_ANIM_RAWPOS_53;
 		}
 		if (flag & STUDIO_ANIM_RAWROT2)
 		{
 			//Logger::Info("Has Flag: %d\n", STUDIO_ANIM_RAWROT2);
-			test += STUDIO_ANIM_RAWPOS_53;
+			//test += STUDIO_ANIM_RAWPOS_53;
 		}
 		if (flag & STUDIO_ANIM_RAWPOS)
 		{
@@ -6469,7 +6529,7 @@ int MDL::v49Mdl::v53GetSecHdrBytesAddedIdv(int anim)
 
 			int secDist = startPos + animdescs[i].animindex - (startPos + animdescs[i].sectionindex + (8 * num));
 
-			bytesAdded -= secDist;
+			//bytesAdded -= secDist;
 			for (int j = 0; j < num; j++)
 			{
 				int nextSec = j + 1;
@@ -6483,7 +6543,7 @@ int MDL::v49Mdl::v53GetSecHdrBytesAddedIdv(int anim)
 					bytesAdded += (32 - headerSize);
 					if (sections[k].nextoffset == 0)
 					{
-
+/*
 						if (animdescs[i].numikrules > 0 && j + 1 > num - 1)
 						{
 							int dist = (startPos + animdescs[i].ikruleindex - (pos2 + headerSize));
@@ -6584,6 +6644,7 @@ int MDL::v49Mdl::v53GetSecHdrBytesAddedIdv(int anim)
 							//Logger::Info("secFinalDist:  %d\n", 32 - dist);
 							bytesAdded += 32 - dist;
 						}
+						*/
 						break;
 					}
 				}
@@ -6620,7 +6681,7 @@ std::vector<int> MDL::v49Mdl::v53GetSecBytesAdded(bool zeroFirst)
 
 			int secDist = startPos + animdescs[i].animindex - (startPos + animdescs[i].sectionindex + (8 * num));
 
-			bytesAdded -= secDist;
+			//bytesAdded -= secDist;
 
 			for (int j = 0; j < num; j++)
 			{
@@ -6637,6 +6698,7 @@ std::vector<int> MDL::v49Mdl::v53GetSecBytesAdded(bool zeroFirst)
 					bytesAdded += (32 - headerSize);
 					if (sections[k].nextoffset == 0)
 					{
+						/*
 						if (animdescs[i].numikrules > 0 && j + 1 > num - 1)
 						{
 							int dist = (startPos + animdescs[i].ikruleindex - (pos2 + headerSize));
@@ -6710,7 +6772,7 @@ std::vector<int> MDL::v49Mdl::v53GetSecBytesAdded(bool zeroFirst)
 							//Logger::Info("secFinalDist:  %d\n", 32 - dist);
 							bytesAdded += 32 - dist;
 						}
-
+						*/
 						break;
 					}
 				}
@@ -6796,7 +6858,7 @@ void MDL::v49Mdl::SetMdlInts()
 	bytesAddedToTextures = -20 * mdlhdr.numtextures;
 	bytesAddedToIkChains = 16 * mdlhdr.numikchains;
 	bytesAddedToActMods = 4 * activitymodifiers.size();
-	bytesAddedToLinearBone = -12 * mdlhdr.numbones;
+	mdlsubhdr.linearboneindex > 0 ? bytesAddedToLinearBone = -12 * mdlhdr.numbones : 0;
 	bytesAddedToAABBTree = 60;
 	textureFiller = 0;
 	strFiller = 60;
@@ -6909,13 +6971,15 @@ studiohdr_t_v53 MDL::v49Mdl::ConvertHeader(FileInfo info)
 
 	Logger::Notice("RuiSize %d\n", ruiSize);
 
+	int stringTableSize = mdlhdr.length + allBytesAdded - (mdlhdr.length - (mdlsubhdr.sznameindex + 408));
+
 	int			id;
 	int			version;
 	int			checksum;
 	int			sznameindex = mdlsubhdr.sznameindex + allBytesAdded + 408 + ruiSize + bytesAddedToLinearBone + bytesAddedToAABBTree;
 	char		name[64];
 
-	int			length;
+	int			length = mdlhdr.length + allBytesAdded + phySize + vtxSize + phyBSize + ruiSize + vvdSize + bytesAddedToLinearBone + bytesAddedToAABBTree;
 
 	Vector3		eyeposition;
 
@@ -7027,17 +7091,22 @@ studiohdr_t_v53 MDL::v49Mdl::ConvertHeader(FileInfo info)
 
 	int			illumpositionattachmentindex;
 
-	int			linearboneindex = linearboneindex > 0 || mdlhdr.numbones > 1 ? mdlsubhdr.linearboneindex + allBytesAdded + 408 + ruiSize : 0;
+	int			linearboneindex = mdlsubhdr.linearboneindex > 0 && mdlhdr.numbones > 1 ? mdlsubhdr.linearboneindex + allBytesAdded + 408 + ruiSize : 0;
 
 	int			m_nBoneFlexDriverCount;
 	int			m_nBoneFlexDriverIndex;
 
-	int			aabbindex = mdlsubhdr.sznameindex + allBytesAdded + 408 - 61 + ruiSize + bytesAddedToLinearBone + bytesAddedToAABBTree;
+	Logger::Notice("Sznameindex %d\n", sznameindex);
+	Logger::Notice("size of aabb %d\n", bytesAddedToAABBTree);
+	Logger::Notice("subtract %d\n", sznameindex - bytesAddedToAABBTree);
+	Logger::Notice("mdlsize %d\n", mdlhdr.length + allBytesAdded - (mdlhdr.length - (mdlsubhdr.sznameindex + 407)) );
+
+	int			aabbindex = mdlhdr.length + allBytesAdded - (mdlhdr.length - (mdlsubhdr.sznameindex + 407));//sznameindex - bytesAddedToAABBTree;//mdlsubhdr.sznameindex + allBytesAdded + 408 - 61 + ruiSize + bytesAddedToLinearBone;
 	int			numaabb = 0;
 	int			numaabb1 = 0;
 	int			numaabb2 = 0;
 
-	int			unkstringindex = mdlsubhdr.sznameindex + allBytesAdded + ruiSize + bytesAddedToLinearBone + bytesAddedToAABBTree;
+	int			unkstringindex = mdlhdr.length + allBytesAdded - (mdlhdr.length - (mdlsubhdr.sznameindex + 407)) + aabbSize;//mdlsubhdr.sznameindex + allBytesAdded + ruiSize + bytesAddedToLinearBone + bytesAddedToAABBTree;
 
 	int			vtxindex = vtxSize > 0 ? mdlSize + allBytesAdded + phySize + phyBSize + ruiSize + bytesAddedToLinearBone + bytesAddedToAABBTree : 0; // VTX
 	int			vvdindex = vvdSize > 0 ? mdlSize + allBytesAdded + phySize + vtxSize + phyBSize + ruiSize + bytesAddedToLinearBone + bytesAddedToAABBTree : 0; // VVD / IDSV
@@ -7058,7 +7127,7 @@ studiohdr_t_v53 MDL::v49Mdl::ConvertHeader(FileInfo info)
 
 	int			unused1[60];
 
-	studiohdr_t_v53 v53Hdr = { mdlhdr.id, 53, mdlhdr.checksum, sznameindex, ArrayToVector(mdlhdr.name, 64), mdlhdr.length, mdlhdr.eyeposition, mdlhdr.illumposition, mdlhdr.hull_min, mdlhdr.hull_max, mdlhdr.view_bbmin, mdlhdr.view_bbmax, mdlhdr.flags, mdlhdr.numbones, boneindex, mdlhdr.numbonecontrollers, bonecontrollerindex, mdlhdr.numhitboxsets, hitboxsetindex, mdlhdr.numlocalanim, localanimindex, mdlhdr.numlocalseq, localseqindex, mdlhdr.activitylistversion, mdlhdr.eventsindexed, mdlhdr.numtextures, textureindex, mdlhdr.numcdtextures, cdtextureindex, mdlhdr.numskinref, mdlhdr.numskinfamilies, skinindex, mdlhdr.numbodyparts, bodypartindex, mdlhdr.numlocalattachments, localattachmentindex, mdlhdr.numlocalnodes, localnodeindex, localnodenameindex, mdlhdr.numflexdesc, flexdescindex, mdlhdr.numflexcontrollers, flexcontrollerindex, mdlhdr.numflexrules, flexruleindex, mdlhdr.numikchains, ikchainindex, ruiNum, mouthindex, mdlhdr.numlocalposeparameters, localposeparamindex, surfacepropindex, keyvalueindex, mdlhdr.keyvaluesize, mdlhdr.numlocalikautoplaylocks, localikautoplaylockindex, mdlhdr.mass, mdlhdr.contents, mdlhdr.numincludemodels, includemodelindex, mdlhdr.virtualModel, bonetablebynameindex, mdlhdr.constdirectionallightdot, mdlhdr.rootLOD, mdlhdr.numAllowedRootLODs, mdlhdr.unused, -1.0, mdlhdr.numflexcontrollerui, flexcontrolleruiindex, mdlhdr.pVertexBase, mdlhdr.pIndexBase, mayaindex, mdlsubhdr.numsrcbonetransform, srcbonetransformindex, mdlsubhdr.illumpositionattachmentindex, linearboneindex, mdlsubhdr.m_nBoneFlexDriverCount, mdlsubhdr.m_nBoneFlexDriverIndex, aabbindex, numaabb, numaabb1, numaabb2, unkstringindex, vtxindex, vvdindex, vvcindex, vphyindex, vtxsize, vvdsize, vvcsize, vphysize, unkmemberindex1, numunkmember1, unk, unkindex3, unused1 };
+	studiohdr_t_v53 v53Hdr = { mdlhdr.id, 53, mdlhdr.checksum, sznameindex, ArrayToVector(mdlhdr.name, 64), length, mdlhdr.eyeposition, mdlhdr.illumposition, mdlhdr.hull_min, mdlhdr.hull_max, mdlhdr.view_bbmin, mdlhdr.view_bbmax, mdlhdr.flags, mdlhdr.numbones, boneindex, mdlhdr.numbonecontrollers, bonecontrollerindex, mdlhdr.numhitboxsets, hitboxsetindex, mdlhdr.numlocalanim, localanimindex, mdlhdr.numlocalseq, localseqindex, mdlhdr.activitylistversion, mdlhdr.eventsindexed, mdlhdr.numtextures, textureindex, mdlhdr.numcdtextures, cdtextureindex, mdlhdr.numskinref, mdlhdr.numskinfamilies, skinindex, mdlhdr.numbodyparts, bodypartindex, mdlhdr.numlocalattachments, localattachmentindex, mdlhdr.numlocalnodes, localnodeindex, localnodenameindex, mdlhdr.numflexdesc, flexdescindex, mdlhdr.numflexcontrollers, flexcontrollerindex, mdlhdr.numflexrules, flexruleindex, mdlhdr.numikchains, ikchainindex, ruiNum, mouthindex, mdlhdr.numlocalposeparameters, localposeparamindex, surfacepropindex, keyvalueindex, mdlhdr.keyvaluesize, mdlhdr.numlocalikautoplaylocks, localikautoplaylockindex, mdlhdr.mass, mdlhdr.contents, mdlhdr.numincludemodels, includemodelindex, mdlhdr.virtualModel, bonetablebynameindex, mdlhdr.constdirectionallightdot, mdlhdr.rootLOD, mdlhdr.numAllowedRootLODs, mdlhdr.unused, -1.0, mdlhdr.numflexcontrollerui, flexcontrolleruiindex, mdlhdr.pVertexBase, mdlhdr.pIndexBase, mayaindex, mdlsubhdr.numsrcbonetransform, srcbonetransformindex, mdlsubhdr.illumpositionattachmentindex, linearboneindex, mdlsubhdr.m_nBoneFlexDriverCount, mdlsubhdr.m_nBoneFlexDriverIndex, aabbindex, numaabb, numaabb1, numaabb2, unkstringindex, vtxindex, vvdindex, vvcindex, vphyindex, vtxsize, vvdsize, vvcsize, vphysize, unkmemberindex1, numunkmember1, unk, unkindex3, unused1 };
 
 	return v53Hdr;
 }
@@ -7130,7 +7199,8 @@ std::vector<mstudioanimdesc_t_v53> MDL::v49Mdl::AnimDescConversion()
 		int outPos = animIdx + bytesAddedToHeader + bytesAddedToBones + 92 * i;
 		int pos = animIdx + 100 * i;
 		int stairs = (-((8 * (mdlhdr.numlocalanim - i))) + bytesAddedToSeqs) + bytesAddedToTextures + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + bytesAddedToRuiMesh + bytesAddedToLinearBone + bytesAddedToAABBTree;
-		int steps = -((8 * (mdlhdr.numlocalanim - i))) + hdrBytesAnimDescAdd[i] + secHdrBytesAnimDescAdd[i];
+		int steps = -((8 * (mdlhdr.numlocalanim - i))) + hdrBytesAnimDescAdd[i] + secHdrBytesAnimDescAdd[i] + 4;
+
 
 		int ikStairs = -12 * (ikRuleNum);
 		if (v49AnimDesc.numikrules > 0)
@@ -7142,7 +7212,7 @@ std::vector<mstudioanimdesc_t_v53> MDL::v49Mdl::AnimDescConversion()
 			ikRuleNum += v49AnimDesc.numikrules;
 		}
 		int secStairs = -4 * secNum;
-		if (v49AnimDesc.sectionindex > 0)
+		if (v49AnimDesc.sectionindex > 0 && i != animdescs.size() - 1)
 		{
 			int num = (frames / secFrames) + 2;
 			secNum += num;
@@ -7156,6 +7226,7 @@ std::vector<mstudioanimdesc_t_v53> MDL::v49Mdl::AnimDescConversion()
 		if (v49AnimDesc.zeroframeindex > 0) v49AnimDesc.zeroframeindex += steps + ikStairs + secStairs;
 		if (v49AnimDesc.ikrulezeroframeindex > 0) v49AnimDesc.ikrulezeroframeindex += steps + ikStairs + secStairs;
 		if (v49AnimDesc.sectionindex > 0) v49AnimDesc.sectionindex += steps + ikStairs + secStairs;
+		//Logger::Info("BytesAddedToSectionIdx: %d Anim: %d\n", steps + ikStairs + secStairs, i);
 
 		int compressedIkRuleIdx = 0; //if (v49AnimDesc.numikrules > 0) compressedIkRuleIdx = ( basePtr - ( basePtr - (v49AnimDesc.ikruleindex + 140 * v49AnimDesc.numikrules) ) ) * -1 ;
 
@@ -7171,6 +7242,7 @@ std::vector<mstudioseqdesc_t_v53> MDL::v49Mdl::SeqDescConversion()
 {
 	std::vector<int> hdrBytesAnimDescAdd = v53GetAnimHdrBytesAdded(true);
 	std::vector<int> secHdrBytesAnimDescAdd = v53GetSecHdrBytesAdded(true);
+	//Logger::Debug("Made it!!!\n");
 	std::vector<mstudioseqdesc_t_v53> v53SeqDescs;
 	int ikRuleNum = 0;
 	int seqIdx = mdlhdr.localseqindex;
@@ -7181,8 +7253,9 @@ std::vector<mstudioseqdesc_t_v53> MDL::v49Mdl::SeqDescConversion()
 	int bytesAddedToBones = mdlhdr.numbones * 28;
 	int actModNumber = 0;
 
-	for (int i = 0; i < mdlhdr.numlocalseq; i++)
+	for (int i = 0; i < seqdescs.size(); i++)
 	{
+		//Logger::Debug("Made it!!! TEST0 %d\n", i);
 		//Logger::Info("Test\n");
 		mstudioseqdescv49_t v49SeqDesc = seqdescs[i];
 		int strPos = mdlhdr.localseqindex + 212 * i;
@@ -7191,15 +7264,18 @@ std::vector<mstudioseqdesc_t_v53> MDL::v49Mdl::SeqDescConversion()
 		int steps2 = steps + 4 * actModNumber;
 		int stairs1 = steps + bytesAddedToWeightLists[weightList];//strPos + v49SeqDesc.weightlistindex == weightlistidxs[0] ? 20 * (mdlhdr.numlocalseq - i) : 20 * (mdlhdr.numlocalseq - i) + 4 * actModNumber;
 		int stairs = steps + bytesAddedToTextures + bytesAddedToIkChains + bytesAddedToActMods + textureFiller + bytesAddedToRuiMesh + bytesAddedToLinearBone + bytesAddedToAABBTree;
-
 		int outPos = seqIdx + stairs;
-
-		for (int j = 0; j < v49SeqDesc.numblends; j++)
+		//Logger::Debug("Made it!!! TEST %d\n", i);
+		if (v49SeqDesc.numblends > 0)
 		{
-			int anim = v49SeqDesc.blends.blends[j];
-			if (animdescs[anim].numframes == 1) v49SeqDesc.flags += 0x80000;
+			for (int j = 0; j < v49SeqDesc.numblends; j++)
+			{
+				//int anim = v49SeqDesc.blends.blends[j];
+				////if (animdescs[anim].numframes == 1) v49SeqDesc.flags += 0x80000;
+				//if (v49SeqDesc.flags & STUDIO_DELTA && !(animdescs[anim].flags & STUDIO_DELTA)) animdescs[anim].flags += STUDIO_DELTA;
+			}
 		}
-
+		//Logger::Debug("Made it!!! TEST2 %d\n", i);
 		if (v49SeqDesc.eventindex > 0)				v49SeqDesc.eventindex += steps2;
 		if (v49SeqDesc.animindexindex > 0)			v49SeqDesc.animindexindex += steps2;
 		if (v49SeqDesc.movementindex > 0)			v49SeqDesc.movementindex += steps2;
@@ -7210,6 +7286,7 @@ std::vector<mstudioseqdesc_t_v53> MDL::v49Mdl::SeqDescConversion()
 		if (v49SeqDesc.keyvalueindex > 0)			v49SeqDesc.keyvalueindex += steps2;
 		if (v49SeqDesc.cycleposeindex > 0)			v49SeqDesc.cycleposeindex += steps2;
 		if (v49SeqDesc.activitymodifierindex > 0)	v49SeqDesc.activitymodifierindex += steps2;
+		//Logger::Debug("Made it!!! TEST3 %d\n", i);
 
 		int compressedIkRuleIdx = 0; //if (v49AnimDesc.numikrules > 0) compressedIkRuleIdx = ( basePtr - ( basePtr - (v49AnimDesc.ikruleindex + 140 * v49AnimDesc.numikrules) ) ) * -1 ;
 
@@ -7218,7 +7295,9 @@ std::vector<mstudioseqdesc_t_v53> MDL::v49Mdl::SeqDescConversion()
 
 		v53SeqDescs.push_back(v53SeqDesc);
 		actModNumber += v49SeqDesc.numactivitymodifiers;
+		//Logger::Debug("Made it!!! %d\n", i);
 	}
+	//Logger::Debug("Made it!!!\n");
 	return v53SeqDescs;
 }
 
@@ -7254,12 +7333,12 @@ std::vector<mstudioactivitymodifier_t_v53> MDL::v49Mdl::ActivityModifierConversi
 				{
 					if (j == 0)
 					{
-						activitymodifiers[actModNum].szname.resize(activitymodifiers[actModNum].szname.size() - 1);
+						if(activitymodifiers[actModNum].szname.size() > 0)activitymodifiers[actModNum].szname.resize(activitymodifiers[actModNum].szname.size() - 1);
 						t1 = activitymodifiers[actModNum].szname;
 					}
 					if (j == 1)
 					{
-						activitymodifiers[actModNum].szname.resize(activitymodifiers[actModNum].szname.size() - 1);
+						if (activitymodifiers[actModNum].szname.size() > 0)activitymodifiers[actModNum].szname.resize(activitymodifiers[actModNum].szname.size() - 1);
 						t2 = activitymodifiers[actModNum].szname;
 					}
 
@@ -7409,8 +7488,8 @@ std::vector<mstudioanim_t_v53> MDL::v49Mdl::ConvertAnims()
 		if ((int)anims[i].flags & STUDIO_ANIM_RAWROT2) _rawrot = anims[i].rawrot2;
 
 		if ((int)anims[i].flags & STUDIO_ANIM_RAWPOS) _rawpos = anims[i].rawpos;
-		else
-			_rawpos = { (short)float_to_half(lbd.bonePos[bone].x), (short)float_to_half(lbd.bonePos[bone].y), (short)float_to_half(lbd.bonePos[bone].z) };
+		//else if(anims[i].rawpos.x == 0 && anims[i].rawpos.y == 0 && anims[i].rawpos.z == 0 )
+		//	_rawpos = { (short)float_to_half(lbd.bonePos[bone].x), (short)float_to_half(lbd.bonePos[bone].y), (short)float_to_half(lbd.bonePos[bone].z) };
 
 		mstudioanim_t_v53 v53Anim{ _posscale, _bone, _flags, _unk, _rawrot, _animrot, _unused, _rawpos, _animpos, _rawscale, _animscale, _nextOffset, anims[i].animdata };
 		v53Anims.push_back(v53Anim);
@@ -7446,8 +7525,8 @@ std::vector<sectionindexes_t_v53> MDL::v49Mdl::ConvertSectionIndexes()
 			{
 				int steps = -4 * secSetNum;
 				int offset = sectionindexes[secNum].sectionoffset + stairs + secHdrBytesSecAdd[secNum] + steps;
-
 				sectionindexes_t_v53 v53SectionIndex{ offset };
+				//if (j == 0) Logger::Info("BytesAddedToFirstSecIdx: %d\n", stairs + secHdrBytesSecAdd[secNum] + steps);
 				v53SectionIndexes.push_back(v53SectionIndex);
 				secNum++;
 			}
@@ -7537,8 +7616,8 @@ std::vector<mstudioanim_t_v53> MDL::v49Mdl::ConvertSections()
 		if (hasRawRot2) _rawrot = sections[i].rawrot2;
 
 		if (hasRawPos) _rawpos = sections[i].rawpos;
-		else
-			_rawpos = { (short)float_to_half(lbd.bonePos[bone].x), (short)float_to_half(lbd.bonePos[bone].y), (short)float_to_half(lbd.bonePos[bone].z) };
+		//else
+		//	_rawpos = { (short)float_to_half(lbd.bonePos[bone].x), (short)float_to_half(lbd.bonePos[bone].y), (short)float_to_half(lbd.bonePos[bone].z) };
 
 		mstudioanim_t_v53 v53Anim{ _posscale, _bone, _flags, _unk, _rawrot, _animrot, _unused, _rawpos, _animpos, _rawscale, _animscale, _nextOffset, sections[i].animdata };
 		v53Sections.push_back(v53Anim);
@@ -7575,7 +7654,7 @@ void MDL::v49Mdl::HitboxSetConversion()
 void MDL::v49Mdl::AttachmentConversion()
 {
 	int stairs = bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToIkChains + bytesAddedToTextures + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + bytesAddedToRuiMesh + bytesAddedToLinearBone + bytesAddedToAABBTree;
-	for (int i = 0; i < attachments.size(); i++)
+	for (int i = 0; i < mdlhdr.numlocalattachments; i++)
 	{
 		attachments[i].sznameindex += stairs;
 	}
@@ -7712,7 +7791,7 @@ mstudiolinearbonedata_t_v53 MDL::v49Mdl::ConvertLinearBoneData()
 void MDL::v49Mdl::UpdateMdl()
 {
 	if (hitboxsets.size() > 0) HitboxSetConversion();
-	if (attachments.size() > 0) AttachmentConversion();
+	if (mdlhdr.numlocalattachments > 0) AttachmentConversion();
 	if (events.size() > 0) SeqEventConversion();
 	if (mdlhdr.numlocalnodes > 0) ConvertNodeNames();
 	if (mdlhdr.numbodyparts > 0) ConvertBodyParts();
@@ -7754,3 +7833,3498 @@ MDL::PHY MDL::PHY::_PHY(BinaryReader* Stream, bool debug)
 }
 
 #pragma endregion
+
+
+void MDL::SourceModel49::UpdateMdl()
+{
+	if (mdlhdr.numhitboxsets > 0) HitboxSetConversion();
+	if (mdlhdr.numlocalattachments > 0) AttachmentConversion();
+	if (numEvents > 0) SeqEventConversion();
+	if (mdlhdr.numlocalnodes > 0) ConvertNodeNames();
+	if (mdlhdr.numbodyparts > 0) ConvertBodyParts();
+	if (numModels > 0) ConvertModels();
+	if (numMeshes > 0) ConvertMeshes();
+	if (mdlhdr.numlocalposeparameters > 0) ConvertPoseParamDescs();
+	if (mdlhdr.numincludemodels > 0) ConvertIncludeModel();
+	if (mdlhdr.numcdtextures > 0) ConvertCDTextures();
+	if (mdlsubhdr.numsrcbonetransform > 0) ConvertSrcBoneTransforms();
+	if (mdlhdr.numbones > 0) ConvertLinearBone();
+}
+
+int MDL::SourceModel49::ConvertFlag(int flag)
+{
+	int test = 0;
+	int flagNum = 0;
+
+	if (flag & STUDIO_ANIM_ANIMROT)
+	{
+		//Logger::Info("Has Flag: %d\n", STUDIO_ANIM_ANIMROT);
+		flagNum++;
+	}
+	if (flag & STUDIO_ANIM_ANIMPOS)
+	{
+		//Logger::Info("Has Flag: %d\n", STUDIO_ANIM_ANIMPOS);
+		flagNum++;
+	}
+
+	if (flag & STUDIO_ANIM_RAWROT)
+	{
+		//Logger::Info("Has Flag: %d\n", STUDIO_ANIM_RAWROT);
+		test += STUDIO_ANIM_RAWROT_53;
+		flagNum++;
+	}
+	if (flag & STUDIO_ANIM_RAWROT2)
+	{
+		//Logger::Info("Has Flag: %d\n", STUDIO_ANIM_RAWROT2);
+		test += STUDIO_ANIM_RAWROT_53;
+		flagNum++;
+	}
+	if (flag & STUDIO_ANIM_RAWPOS)
+	{
+		//Logger::Info("Has Flag: %d\n", STUDIO_ANIM_RAWPOS);
+		test += STUDIO_ANIM_RAWPOS_53;
+		flagNum++;
+	}
+
+	if (flag & STUDIO_ANIM_DELTA)
+	{
+		//Logger::Info("Has Flag: %d\n", STUDIO_ANIM_DELTA);
+		test += STUDIO_ANIM_DELTA_53;
+		//test += STUDIO_ANIM_RAWPOS_53;
+	}
+
+	if (flagNum == 1)
+	{
+		if (flag & STUDIO_ANIM_ANIMROT)
+		{
+			//Logger::Info("Has Flag: %d\n", STUDIO_ANIM_ANIMROT);
+			//test += STUDIO_ANIM_RAWPOS_53;
+		}
+		if (flag & STUDIO_ANIM_ANIMPOS)
+		{
+			//Logger::Info("Has Flag: %d\n", STUDIO_ANIM_ANIMPOS);
+			//test += STUDIO_ANIM_RAWROT_53;
+		}
+
+		if (flag & STUDIO_ANIM_RAWROT)
+		{
+			//Logger::Info("Has Flag: %d\n", STUDIO_ANIM_RAWROT);
+			//test += STUDIO_ANIM_RAWPOS_53;
+		}
+		if (flag & STUDIO_ANIM_RAWROT2)
+		{
+			//Logger::Info("Has Flag: %d\n", STUDIO_ANIM_RAWROT2);
+			//test += STUDIO_ANIM_RAWPOS_53;
+		}
+		if (flag & STUDIO_ANIM_RAWPOS)
+		{
+			//Logger::Info("Has Flag: %d\n", STUDIO_ANIM_RAWPOS);
+			test += STUDIO_ANIM_READBONE_53;
+		}
+	}
+
+	test += STUDIO_ANIM_RAWSCALE_53;
+	if (flag == 0)
+	{
+		test = 0;
+	}
+	return test;
+}
+
+std::vector<int> MDL::SourceModel49::GetIkChainBones()
+{
+	std::vector<int> ikChainBones;
+	std::vector<int> ikChainBonesChildren;
+	std::vector<int> ikChainBonesFinal;
+
+	for (int i = 0; i < iklinks.size(); i++)
+	{
+		ikChainBones.push_back(iklinks[i].bone);
+	}
+
+	for (int i = 0; i < mdlhdr.numbones; i++)
+	{
+		mstudiobone_t_v49 bone = bones[i];
+		for (int j = 0; j < ikChainBones.size(); j++)
+		{
+			if (!contains(ikChainBones, i) && !contains(ikChainBonesChildren, ikChainBones[j]) && !contains(ikChainBonesChildren, i) && bone.parent == ikChainBones[j])
+			{
+				ikChainBonesChildren.push_back(i);
+			}
+		}
+	}
+	int size = ikChainBonesChildren.size();
+
+	for (int i = 0; i < mdlhdr.numbones; i++)
+	{
+		mstudiobone_t_v49 bone = bones[i];
+		for (int j = 0; j < size; j++)
+		{
+			if (!contains(ikChainBones, i) && !contains(ikChainBonesChildren, i) && bone.parent == ikChainBonesChildren[j])
+			{
+				ikChainBonesChildren.push_back(i);
+			}
+		}
+	}
+	size = ikChainBonesChildren.size();
+	for (int i = 0; i < mdlhdr.numbones; i++)
+	{
+		mstudiobone_t_v49 bone = bones[i];
+		for (int j = 0; j < size; j++)
+		{
+			if (!contains(ikChainBones, i) && !contains(ikChainBonesChildren, i) && bone.parent == ikChainBonesChildren[j])
+			{
+				ikChainBonesChildren.push_back(i);
+			}
+		}
+	}
+
+	size = ikChainBonesChildren.size();
+	for (int i = 0; i < mdlhdr.numbones; i++)
+	{
+		mstudiobone_t_v49 bone = bones[i];
+		for (int j = 0; j < size; j++)
+		{
+			if (!contains(ikChainBones, i) && !contains(ikChainBonesChildren, i) && bone.parent == ikChainBonesChildren[j])
+			{
+				ikChainBonesChildren.push_back(i);
+			}
+		}
+	}
+
+	size = ikChainBonesChildren.size();
+	for (int i = 0; i < mdlhdr.numbones; i++)
+	{
+		mstudiobone_t_v49 bone = bones[i];
+		for (int j = 0; j < size; j++)
+		{
+			if (!contains(ikChainBones, i) && !contains(ikChainBonesChildren, i) && bone.parent == ikChainBonesChildren[j])
+			{
+				ikChainBonesChildren.push_back(i);
+			}
+		}
+	}
+
+	size = ikChainBonesChildren.size();
+	for (int i = 0; i < mdlhdr.numbones; i++)
+	{
+		mstudiobone_t_v49 bone = bones[i];
+		for (int j = 0; j < size; j++)
+		{
+			if (!contains(ikChainBones, i) && !contains(ikChainBonesChildren, i) && bone.parent == ikChainBonesChildren[j])
+			{
+				ikChainBonesChildren.push_back(i);
+			}
+		}
+	}
+
+	for (int i = 0; i < ikChainBonesChildren.size(); i++)
+	{
+		ikChainBonesFinal.push_back(ikChainBonesChildren[i]);
+	}
+
+	for (int i = 0; i < ikChainBones.size(); i++)
+	{
+		ikChainBonesFinal.push_back(ikChainBones[i]);
+	}
+
+	return ikChainBonesFinal;
+}
+
+std::vector<int> MDL::SourceModel49::v53GetAnimHdrBytesAdded(bool zeroFirst)
+{
+	std::vector<int> animBytesAdded;
+	int bytesAdded = 0;
+	int lastHdr = 0;
+
+	for (int i = 0; i < mdlhdr.numlocalanim; i++)
+	{
+		int next = i + 1;
+		animBytesAdded.push_back(bytesAdded);
+		//Logger::Info("BytesAdded: %d, Anim: %d\n", bytesAdded, i);
+		if (animdescs[i].sectionindex == 0)
+		{
+			for (int j = lastHdr; j < anims.size(); j++)
+			{
+				int headerSize = GetAnimHeaderSize((int)anims[j].flags);
+				lastHdr++;
+				bytesAdded += (32 - headerSize);
+				if (anims[j].nextoffset == 0)
+				{
+
+					//if (animdescs[i].numikrules > 0)
+					//{
+					//	int dist = (((animdescs[next].baseptr - animdescs[next].ikruleindex) * -1) - (anims[j].strPos + headerSize));
+					//
+					//	if (dist > 18 || dist < 0)
+					//	{
+					//		for (int l = 0; l < anims[j].animdata.arry.size(); l++)
+					//		{
+					//			short animValue{ (short)anims[j].animdata.arry[l] };
+					//			if (animValue == 0)
+					//			{
+					//				int newPos = l;
+					//				dist = anims[j].animdata.arry.size() - newPos;
+					//				if (dist <= 18)
+					//				{
+					//					break;
+					//				}
+					//			}
+					//		}
+					//	}
+					//	//AddDistToAnimData(anims[j].animdata, dist);
+					//	bytesAdded += 32 - dist;
+					//}
+					//
+					//if (i + 1 < mdlhdr.numlocalanim && animdescs[next].sectionindex == 0)
+					//{
+					//	int dist = (((animdescs[next].baseptr - animdescs[next].animindex) * -1) - (anims[j].strPos + headerSize));
+					//
+					//	if (dist > 18 || dist < 0)
+					//	{
+					//		for (int l = 0; l < anims[j].animdata.arry.size(); l++)
+					//		{
+					//			short animValue{ (short)anims[j].animdata.arry[l] };
+					//			if (animValue == 0)
+					//			{
+					//				int newPos = l;
+					//				dist = anims[j].animdata.arry.size() - newPos;
+					//				if (dist <= 18)
+					//				{
+					//					break;
+					//				}
+					//			}
+					//		}
+					//	}
+					//	//Logger::Info("dist:  %d\n", dist);
+					//	//Logger::Info("finalDist:  %d\n", 32 - dist);
+					//	//AddDistToAnimData(anims[j].animdata, dist);
+					//	bytesAdded += 32 - dist;
+					//}
+					//
+					//if (i + 1 < mdlhdr.numlocalanim - 1 && animdescs[next].sectionindex > 0)
+					//{
+					//	int dist = (((animdescs[next].baseptr - animdescs[next].sectionindex) * -1) - (anims[j].strPos + headerSize));
+					//
+					//	if (dist > 18 || dist < 0)
+					//	{
+					//		for (int l = 0; l < anims[j].animdata.arry.size(); l++)
+					//		{
+					//			short animValue{ (short)anims[j].animdata.arry[l] };
+					//			if (animValue == 0)
+					//			{
+					//				int newPos = l;
+					//				dist = anims[j].animdata.arry.size() - newPos;
+					//				if (dist <= 18)
+					//				{
+					//					break;
+					//				}
+					//			}
+					//		}
+					//	}
+					//	//Logger::Info("dist:  %d\n", dist);
+					//	//Logger::Info("finalDist:  %d\n", 32 - dist);
+					//	//AddDistToAnimData(anims[j].animdata, dist);
+					//	bytesAdded += 32 - dist;
+					//}
+
+					break;
+				}
+			}
+		}
+		else animBytesAdded[i] = bytesAdded;
+	}
+	return animBytesAdded;
+}
+
+int MDL::SourceModel49::v53GetTotalAnimHdrBytesAdded()
+{
+	int bytesAdded = 0;
+	int lastHdr = 0;
+
+	for (int i = 0; i < mdlhdr.numlocalanim; i++)
+	{
+		int next = i + 1;
+
+		if (animdescs[i].sectionindex > 0)
+		{
+			int frames = animdescs[i].numframes;
+			int secFrames = animdescs[i].sectionframes;
+			int num = (frames / secFrames) + 2;
+
+			bytesAdded += -4 * num;
+
+		}
+
+		if (animdescs[i].sectionindex == 0)
+		{
+			for (int j = lastHdr; j < anims.size(); j++)
+			{
+				int headerSize = GetAnimHeaderSize((int)anims[j].flags);
+				lastHdr++;
+				bytesAdded += (32 - headerSize);
+				if (anims[j].nextoffset == 0)
+				{
+					/*
+					if (animdescs[i].numikrules > 0)
+					{
+						int dist = (((animdescs[next].baseptr - animdescs[next].ikruleindex) * -1) - (anims[j].strPos + headerSize));
+
+						if (dist > 18 || dist < 0)
+						{
+							for (int l = 0; l < anims[j].animdata.arry.size(); l++)
+							{
+								short animValue{ (short)anims[j].animdata.arry[l] };
+								if (animValue == 0)
+								{
+									int newPos = l;
+									dist = anims[j].animdata.arry.size() - newPos;
+									if (dist <= 18)
+									{
+										break;
+									}
+								}
+							}
+						}
+						bytesAdded += 32 - dist;
+					}
+
+					if (i + 1 > mdlhdr.numlocalanim - 1)
+					{
+						int dist = (mdlhdr.localseqindex - (anims[j].strPos + headerSize));
+
+						if (dist > 18 || dist < 0)
+						{
+							for (int l = 0; l < anims[j].animdata.arry.size(); l++)
+							{
+								short animValue{ (short)anims[j].animdata.arry[l] };
+								if (animValue == 0)
+								{
+									int newPos = l;
+									dist = anims[j].animdata.arry.size() - newPos;
+									if (dist <= 18)
+									{
+										break;
+									}
+								}
+							}
+						}
+						//Logger::Info("secDist:  %d\n", dist);
+						//Logger::Info("secFinalDist:  %d\n", 32 - dist);
+						//AddDistToAnimData(anims[j].animdata, dist);
+						bytesAdded += 32 - dist;
+					}
+
+					if (i + 1 < mdlhdr.numlocalanim && animdescs[next].sectionindex == 0)
+					{
+						int dist = (((animdescs[next].baseptr - animdescs[next].animindex) * -1) - (anims[j].strPos + headerSize));
+
+						if (dist > 18 || dist < 0)
+						{
+							for (int l = 0; l < anims[j].animdata.arry.size(); l++)
+							{
+								short animValue{ (short)anims[j].animdata.arry[l] };
+								if (animValue == 0)
+								{
+									int newPos = l;
+									dist = anims[j].animdata.arry.size() - newPos;
+									if (dist <= 18)
+									{
+										break;
+									}
+								}
+							}
+						}
+						bytesAdded += 32 - dist;
+					}
+
+					if (i + 1 < mdlhdr.numlocalanim - 1 && animdescs[next].sectionindex > 0)
+					{
+						int dist = (((animdescs[next].baseptr - animdescs[next].sectionindex) * -1) - (anims[j].strPos + headerSize));
+
+						if (dist > 18 || dist < 0)
+						{
+							for (int l = 0; l < anims[j].animdata.arry.size(); l++)
+							{
+								short animValue{ (short)anims[j].animdata.arry[l] };
+								if (animValue == 0)
+								{
+									int newPos = l;
+									dist = anims[j].animdata.arry.size() - newPos;
+									if (dist <= 18)
+									{
+										break;
+									}
+								}
+							}
+						}
+						//Logger::Info("dist:  %d\n", dist);
+						//Logger::Info("finalDist:  %d\n", 32 - dist);
+						//AddDistToAnimData(anims[j].animdata, dist);
+						bytesAdded += 32 - dist;
+					}
+					*/
+					break;
+				}
+			}
+		}
+	}
+	//Logger::Info("Total BytesAdded: %d\n", bytesAdded);
+	return bytesAdded;
+}
+
+int MDL::SourceModel49::v53GetAnimHdrBytesAddedIdv(int anim)
+{
+	int bytesAdded = 0;
+	int lastHdr = 0;
+
+	for (int i = 0; i < anim + 1; i++)
+	{
+		int next = i + 1;
+		if (animdescs[i].sectionindex == 0)
+		{
+			bytesAdded = 0;
+			for (int j = lastHdr; j < anims.size(); j++)
+			{
+				int headerSize = GetAnimHeaderSize((int)anims[j].flags);
+				lastHdr++;
+				bytesAdded += (32 - headerSize);
+				if (anims[j].nextoffset == 0)
+				{
+					/*
+					if (animdescs[i].numikrules > 0)
+					{
+						int dist = (((animdescs[next].baseptr - animdescs[next].ikruleindex) * -1) - (anims[j].strPos + headerSize));
+
+						if (dist > 18 || dist < 0)
+						{
+							for (int l = 0; l < anims[j].animdata.arry.size(); l++)
+							{
+								short animValue{ (short)anims[j].animdata.arry[l] };
+								if (animValue == 0)
+								{
+									int newPos = l;
+									dist = anims[j].animdata.arry.size() - newPos;
+									if (dist <= 18)
+									{
+										break;
+									}
+								}
+							}
+						}
+						bytesAdded += 32 - dist;
+					}
+
+					if (i + 1 > mdlhdr.numlocalanim - 1)
+					{
+						int dist = (mdlhdr.localseqindex - (anims[j].strPos + headerSize));
+
+						if (dist > 18 || dist < 0)
+						{
+							for (int l = 0; l < anims[j].animdata.arry.size(); l++)
+							{
+								short animValue{ (short)anims[j].animdata.arry[l] };
+								if (animValue == 0)
+								{
+									int newPos = l;
+									dist = anims[j].animdata.arry.size() - newPos;
+									if (dist <= 18)
+									{
+										break;
+									}
+								}
+							}
+						}
+						//Logger::Info("secDist:  %d\n", dist);
+						//Logger::Info("secFinalDist:  %d\n", 32 - dist);
+						bytesAdded += 32 - dist;
+					}
+
+					if (i + 1 < mdlhdr.numlocalanim - 1 && animdescs[next].sectionindex == 0)
+					{
+						int dist = (((animdescs[next].baseptr - animdescs[next].animindex) * -1) - (anims[j].strPos + headerSize));
+
+						if (dist > 18 || dist < 0)
+						{
+							for (int l = 0; l < anims[j].animdata.arry.size(); l++)
+							{
+								short animValue{ (short)anims[j].animdata.arry[l] };
+								if (animValue == 0)
+								{
+									int newPos = l;
+									dist = anims[j].animdata.arry.size() - newPos;
+									if (dist <= 18)
+									{
+										break;
+									}
+								}
+							}
+						}
+						//Logger::Info("dist:  %d\n", dist);
+						//Logger::Info("finalDist:  %d\n", 32 - dist);
+						bytesAdded += 32 - dist;
+					}
+
+					if (i + 1 < mdlhdr.numlocalanim - 1 && animdescs[next].sectionindex > 0)
+					{
+						int dist = (((animdescs[next].baseptr - animdescs[next].sectionindex) * -1) - (anims[j].strPos + headerSize));
+
+						if (dist > 18 || dist < 0)
+						{
+							for (int l = 0; l < anims[j].animdata.arry.size(); l++)
+							{
+								short animValue{ (short)anims[j].animdata.arry[l] };
+								if (animValue == 0)
+								{
+									int newPos = l;
+									dist = anims[j].animdata.arry.size() - newPos;
+									if (dist <= 18)
+									{
+										break;
+									}
+								}
+							}
+						}
+						//Logger::Info("dist:  %d\n", dist);
+						//Logger::Info("finalDist:  %d\n", 32 - dist);
+						//AddDistToAnimData(anims[j].animdata, dist);
+						bytesAdded += 32 - dist;
+					}
+					*/
+					break;
+				}
+			}
+		}
+	}
+	return bytesAdded;
+}
+
+std::vector<int> MDL::SourceModel49::v53GetSecHdrBytesAdded(bool zeroFirst)
+{
+	int bytesAdded = 0;
+	std::vector<int> bytesAddedPerAnim;
+	int secNum = 0;
+	int lastHdr = 0;
+
+	for (int i = 0; i < mdlhdr.numlocalanim; i++)
+	{
+		int nextAnim = i + 1;
+
+		int startPos = mdlhdr.localanimindex + 100 * i;
+		int animIndexPos = startPos + 56;
+		int secIndexPos = startPos + 80;
+		int framePos = startPos + 16;
+		int secFramPos = startPos + 84;
+
+		int frames = animdescs[i].numframes;
+		int secFrames = animdescs[i].sectionframes;
+
+		bytesAddedPerAnim.push_back(bytesAdded);
+		//Logger::Info("BytesAdded: %d, Anim: %d\n", bytesAdded, i);
+		if (animdescs[i].sectionindex > 0)
+		{
+			int num = (frames / secFrames) + 2;
+
+			int secDist = startPos + animdescs[i].animindex - (startPos + animdescs[i].sectionindex + (8 * num));
+
+			//bytesAdded -= secDist;
+
+			for (int j = 0; j < num; j++)
+			{
+				int nextSec = j + 1;
+				int bytesAddedPer = 0;
+				for (int k = lastHdr; k < sections.size(); k++)
+				{
+					int pos2 = sections[k].strPos;
+					int headerSize = GetAnimHeaderSize((int)sections[k].flags);
+					lastHdr++;
+					bytesAddedPer += (32 - headerSize);
+					bytesAdded += (32 - headerSize);
+					if (sections[k].nextoffset == 0)
+					{
+						/*
+						if (animdescs[i].numikrules > 0 && j + 1 > num - 1)
+						{
+							int dist = (startPos + animdescs[i].ikruleindex - (pos2 + headerSize));
+
+							if (dist > 18 || dist < 0)
+							{
+								for (int l = 0; l < sections[j].animdata.arry.size(); l++)
+								{
+									short animValue{ (short)sections[j].animdata.arry[l] };
+									if (animValue == 0)
+									{
+										int newPos = l;
+										dist = sections[j].animdata.arry.size() - newPos;
+										if (dist <= 18)
+										{
+											break;
+										}
+									}
+								}
+							}
+							//AddDistToAnimData(sections[j].animdata, dist);
+							bytesAdded += 32 - dist;
+						}
+
+						if (i + 1 > mdlhdr.numlocalanim - 1 && j + 1 > num - 1)
+						{
+							int dist = (mdlhdr.localseqindex - (pos2 + headerSize));
+
+							if (dist > 18 || dist < 0)
+							{
+								for (int l = 0; l < sections[j].animdata.arry.size(); l++)
+								{
+									short animValue{ (short)sections[j].animdata.arry[l] };
+									if (animValue == 0)
+									{
+										int newPos = l;
+										dist = sections[j].animdata.arry.size() - newPos;
+										if (dist <= 18)
+										{
+											break;
+										}
+									}
+								}
+							}
+							//Logger::Info("secDist:  %d\n", dist);
+							//Logger::Info("secFinalDist:  %d\n", 32 - dist);
+							//AddDistToAnimData(sections[j].animdata, dist);
+							bytesAdded += 32 - dist;
+						}
+
+						if (i + 1 < mdlhdr.numlocalanim - 1 && j + 1 > num - 1)
+						{
+							int dist = animdescs[nextAnim].sectionindex > 0 ? ((startPos + 100 + animdescs[nextAnim].sectionindex) - (pos2 + headerSize)) : ((startPos + 100 + animdescs[nextAnim].animindex) - (pos2 + headerSize));
+							if (dist > 18 || dist < 0)
+							{
+								for (int l = 0; l < sections[j].animdata.arry.size(); l++)
+								{
+									short animValue{ (short)sections[j].animdata.arry[l] };
+									if (animValue == 0)
+									{
+										int newPos = l;
+										dist = sections[j].animdata.arry.size() - newPos;
+										if (dist <= 18)
+										{
+											break;
+										}
+									}
+								}
+							}
+							//Logger::Info("secDist:  %d\n", dist);
+							//Logger::Info("secFinalDist:  %d\n", 32 - dist);
+							//AddDistToAnimData(sections[j].animdata, dist);
+							bytesAdded += 32 - dist;
+						}
+						if (i + 1 < mdlhdr.numlocalanim - 1 && j + 1 < num - 1)
+						{
+							int nextSection = secNum + 1;
+							int dist = ((startPos + sectionindexes[nextSection].sectionoffset) - (pos2 + headerSize));
+							if (dist > 18 || dist < 0)
+							{
+								for (int l = 0; l < sections[j].animdata.arry.size(); l++)
+								{
+									short animValue{ (short)sections[j].animdata.arry[l] };
+									if (animValue == 0)
+									{
+										int newPos = l;
+										dist = sections[j].animdata.arry.size() - newPos;
+										if (dist <= 18)
+										{
+											break;
+										}
+									}
+								}
+							}
+							//Logger::Info("secDist:  %d\n", dist);
+							//Logger::Info("secFinalDist:  %d\n", 32 - dist);
+							//AddDistToAnimData(sections[j].animdata, dist);
+							bytesAdded += 32 - dist;
+						}
+						*/
+						break;
+					}
+				}
+				secNum++;
+			}
+		}
+	}
+	return bytesAddedPerAnim;
+}
+
+int MDL::SourceModel49::v53GetTotalSecHdrBytesAdded()
+{
+	int bytesAdded = 0;
+	int secNum = 0;
+	int lastHdr = 0;
+
+	for (int i = 0; i < mdlhdr.numlocalanim; i++)
+	{
+		int nextAnim = i + 1;
+
+		int startPos = mdlhdr.localanimindex + 100 * i;
+
+		int frames = animdescs[i].numframes;
+		int secFrames = animdescs[i].sectionframes;
+
+		if (animdescs[i].sectionindex > 0)
+		{
+			int num = (frames / secFrames) + 2;
+
+			int secDist = startPos + animdescs[i].animindex - (startPos + animdescs[i].sectionindex + (8 * num));
+
+			//bytesAdded -= secDist;
+
+			for (int j = 0; j < num; j++)
+			{
+				int nextSec = j + 1;
+				int bytesAddedPer = 0;
+				for (int k = lastHdr; k < sections.size(); k++)
+				{
+					int pos2 = sections[k].strPos;
+					int headerSize = GetAnimHeaderSize((int)sections[k].flags);
+					lastHdr++;
+					bytesAddedPer += (32 - headerSize);
+					bytesAdded += (32 - headerSize);
+					if (sections[k].nextoffset == 0)
+					{
+						/*
+						if (animdescs[i].numikrules > 0 && j + 1 > num - 1)
+						{
+							int dist = (startPos + animdescs[i].ikruleindex - (pos2 + headerSize));
+
+							if (dist > 18 || dist < 0)
+							{
+								for (int l = 0; l < sections[j].animdata.arry.size(); l++)
+								{
+									short animValue{ (short)sections[j].animdata.arry[l] };
+									if (animValue == 0)
+									{
+										int newPos = l;
+										dist = sections[j].animdata.arry.size() - newPos;
+										if (dist <= 18)
+										{
+											break;
+										}
+									}
+								}
+							}
+							bytesAdded += 32 - dist;
+						}
+
+						if (i + 1 > mdlhdr.numlocalanim - 1 && j + 1 > num - 1)
+						{
+							int dist = (mdlhdr.localseqindex - (pos2 + headerSize));
+
+							if (dist > 18 || dist < 0)
+							{
+								for (int l = 0; l < sections[j].animdata.arry.size(); l++)
+								{
+									short animValue{ (short)sections[j].animdata.arry[l] };
+									if (animValue == 0)
+									{
+										int newPos = l;
+										dist = sections[j].animdata.arry.size() - newPos;
+										if (dist <= 18)
+										{
+											break;
+										}
+									}
+								}
+							}
+							//Logger::Info("secDist:  %d\n", dist);
+							//Logger::Info("secFinalDist:  %d\n", 32 - dist);
+							bytesAdded += 32 - dist;
+						}
+
+						if (i + 1 < mdlhdr.numlocalanim - 1 && j + 1 > num - 1)
+						{
+							int dist = animdescs[nextAnim].sectionindex > 0 ? ((startPos + 100 + animdescs[nextAnim].sectionindex) - (pos2 + headerSize)) : ((startPos + 100 + animdescs[nextAnim].animindex) - (pos2 + headerSize));
+
+							if (dist > 18 || dist < 0)
+							{
+								for (int l = 0; l < sections[j].animdata.arry.size(); l++)
+								{
+									short animValue{ (short)sections[j].animdata.arry[l] };
+									if (animValue == 0)
+									{
+										int newPos = l;
+										dist = sections[j].animdata.arry.size() - newPos;
+										if (dist <= 18)
+										{
+											break;
+										}
+									}
+								}
+							}
+							bytesAdded += 32 - dist;
+						}
+
+						if (j + 1 < num - 1)
+						{
+							int nextSection = secNum + 1;
+							int dist = ((startPos + sectionindexes[nextSection].sectionoffset) - (pos2 + headerSize));
+
+							if (dist > 18 || dist < 0)
+							{
+								for (int l = 0; l < sections[j].animdata.arry.size(); l++)
+								{
+									short animValue{ (short)sections[j].animdata.arry[l] };
+									if (animValue == 0)
+									{
+										int newPos = l;
+										dist = sections[j].animdata.arry.size() - newPos;
+										if (dist <= 18)
+										{
+											break;
+										}
+									}
+								}
+							}
+							bytesAdded += 32 - dist;
+						}
+						*/
+						break;
+					}
+				}
+				secNum++;
+			}
+		}
+	}
+	//Logger::Info("Total BytesAdded: %d\n", bytesAdded);
+	return bytesAdded;
+}
+
+int MDL::SourceModel49::v53GetSecHdrBytesAddedIdv(int anim)
+{
+	int bytesAdded = 0;
+	int secNum = 0;
+	int lastHdr = 0;
+
+	for (int i = 0; i < anim + 1; i++)
+	{
+		int nextAnim = i + 1;
+
+		int startPos = mdlhdr.localanimindex + 100 * i;
+		int animIndexPos = startPos + 56;
+		int secIndexPos = startPos + 80;
+		int framePos = startPos + 16;
+		int secFramPos = startPos + 84;
+
+		int frames = animdescs[i].numframes;
+		int secFrames = animdescs[i].sectionframes;
+
+		//bytesAddedPerAnim.push_back(bytesAdded);
+		//Logger::Info("BytesAdded: %d, Anim: %d\n", bytesAdded, i);
+		if (animdescs[i].sectionindex > 0)
+		{
+			int num = (frames / secFrames) + 2;
+
+			int secDist = startPos + animdescs[i].animindex - (startPos + animdescs[i].sectionindex + (8 * num));
+
+			//bytesAdded -= secDist;
+			for (int j = 0; j < num; j++)
+			{
+				int nextSec = j + 1;
+				int bytesAddedPer = 0;
+				for (int k = lastHdr; k < sections.size(); k++)
+				{
+					int pos2 = sections[k].strPos;
+					int headerSize = GetAnimHeaderSize((int)sections[k].flags);
+					lastHdr++;
+					bytesAddedPer += (32 - headerSize);
+					bytesAdded += (32 - headerSize);
+					if (sections[k].nextoffset == 0)
+					{
+						/*
+						if (animdescs[i].numikrules > 0 && j + 1 > num - 1)
+						{
+							int dist = (startPos + animdescs[i].ikruleindex - (pos2 + headerSize));
+
+							if (dist > 18 || dist < 0)
+							{
+								for (int l = 0; l < sections[j].animdata.arry.size(); l++)
+								{
+									short animValue{ (short)sections[j].animdata.arry[l] };
+									if (animValue == 0)
+									{
+										int newPos = l;
+										dist = sections[j].animdata.arry.size() - newPos;
+										if (dist <= 18)
+										{
+											break;
+										}
+									}
+								}
+							}
+							//Logger::Info("secDist:  %d\n", dist);
+							//Logger::Info("secFinalDist:  %d\n", 32 - dist);
+							bytesAdded += 32 - dist;
+						}
+
+						if (i + 1 > mdlhdr.numlocalanim - 1 && j + 1 > num - 1)
+						{
+							int dist = (mdlhdr.localseqindex - (pos2 + headerSize));
+
+							if (dist > 18 || dist < 0)
+							{
+								for (int l = 0; l < sections[j].animdata.arry.size(); l++)
+								{
+									short animValue{ (short)sections[j].animdata.arry[l] };
+									if (animValue == 0)
+									{
+										int newPos = l;
+										dist = sections[j].animdata.arry.size() - newPos;
+										if (dist <= 18)
+										{
+											break;
+										}
+									}
+								}
+							}
+							//Logger::Info("secDist:  %d\n", dist);
+							//Logger::Info("secFinalDist:  %d\n", 32 - dist);
+							bytesAdded += 32 - dist;
+						}
+
+						if (i + 1 < mdlhdr.numlocalanim - 1 && j + 1 > num - 1)
+						{
+							int dist = animdescs[nextAnim].sectionindex > 0 ? ((startPos + 100 + animdescs[nextAnim].sectionindex) - (pos2 + headerSize)) : ((startPos + 100 + animdescs[nextAnim].animindex) - (pos2 + headerSize));
+
+							if (dist > 18 || dist < 0)
+							{
+								for (int l = 0; l < sections[j].animdata.arry.size(); l++)
+								{
+									short animValue{ (short)sections[j].animdata.arry[l] };
+									if (animValue == 0)
+									{
+										int newPos = l;
+										dist = sections[j].animdata.arry.size() - newPos;
+										if (dist <= 18)
+										{
+											break;
+										}
+									}
+								}
+							}
+							//Logger::Info("secDist:  %d\n", dist);
+							//Logger::Info("secFinalDist:  %d\n", 32 - dist);
+							bytesAdded += 32 - dist;
+						}
+
+						if (j + 1 < num - 1)
+						{
+							int nextSection = secNum + 1;
+							int dist = ((startPos + sectionindexes[nextSection].sectionoffset) - (pos2 + headerSize));
+
+							if (dist > 18 || dist < 0)
+							{
+								for (int l = 0; l < sections[j].animdata.arry.size(); l++)
+								{
+									short animValue{ (short)sections[j].animdata.arry[l] };
+									if (animValue == 0)
+									{
+										int newPos = l;
+										dist = sections[j].animdata.arry.size() - newPos;
+										if (dist <= 18)
+										{
+											break;
+										}
+									}
+								}
+							}
+							//Logger::Info("secDist:  %d\n", dist);
+							//Logger::Info("secFinalDist:  %d\n", 32 - dist);
+							bytesAdded += 32 - dist;
+						}
+						*/
+						break;
+					}
+				}
+				secNum++;
+			}
+		}
+	}
+	return bytesAdded;
+}
+
+std::vector<int> MDL::SourceModel49::v53GetSecBytesAdded(bool zeroFirst)
+{
+	int bytesAdded = 0;
+	std::vector<int> bytesAddedPerSec;
+	int secNum = 0;
+	int lastHdr = 0;
+
+	for (int i = 0; i < mdlhdr.numlocalanim; i++)
+	{
+		int nextAnim = i + 1;
+
+		int startPos = mdlhdr.localanimindex + 100 * i;
+		int animIndexPos = startPos + 56;
+		int secIndexPos = startPos + 80;
+		int framePos = startPos + 16;
+		int secFramPos = startPos + 84;
+
+		int frames = animdescs[i].numframes;
+		int secFrames = animdescs[i].sectionframes;
+
+		if (animdescs[i].sectionindex > 0)
+		{
+			int num = (frames / secFrames) + 2;
+
+			int secDist = startPos + animdescs[i].animindex - (startPos + animdescs[i].sectionindex + (8 * num));
+
+			//bytesAdded -= secDist;
+
+			for (int j = 0; j < num; j++)
+			{
+				int nextSec = j + 1;
+				int bytesAddedPer = 0;
+				bytesAddedPerSec.push_back(bytesAdded);
+				//Logger::Info("secBytesAdded: %d, Anim: %d\n", bytesAdded, i);
+				for (int k = lastHdr; k < sections.size(); k++)
+				{
+					int pos2 = sections[k].strPos;
+					int headerSize = GetAnimHeaderSize((int)sections[k].flags);
+					lastHdr++;
+					bytesAddedPer += (32 - headerSize);
+					bytesAdded += (32 - headerSize);
+					if (sections[k].nextoffset == 0)
+					{
+						/*
+						if (animdescs[i].numikrules > 0 && j + 1 > num - 1)
+						{
+							int dist = (startPos + animdescs[i].ikruleindex - (pos2 + headerSize));
+
+							if (dist > 18 || dist < 0)
+							{
+								for (int l = 0; l < sections[j].animdata.arry.size(); l++)
+								{
+									short animValue{ (short)sections[j].animdata.arry[l] };
+									if (animValue == 0)
+									{
+										int newPos = l;
+										dist = sections[j].animdata.arry.size() - newPos;
+										if (dist <= 18)
+										{
+											break;
+										}
+									}
+								}
+							}
+							bytesAdded += 32 - dist;
+						}
+
+						if (i + 1 < mdlhdr.numlocalanim - 1 && j + 1 > num - 1)
+						{
+							int dist = animdescs[nextAnim].sectionindex > 0 ? ((startPos + 100 + animdescs[nextAnim].sectionindex) - (pos2 + headerSize)) : ((startPos + 100 + animdescs[nextAnim].animindex) - (pos2 + headerSize));
+
+							if (dist > 18 || dist < 0)
+							{
+								for (int l = 0; l < sections[j].animdata.arry.size(); l++)
+								{
+									short animValue{ (short)sections[j].animdata.arry[l] };
+									if (animValue == 0)
+									{
+										int newPos = l;
+										dist = sections[j].animdata.arry.size() - newPos;
+										if (dist <= 18)
+										{
+											break;
+										}
+									}
+								}
+							}
+							//Logger::Info("secDist:  %d\n", dist);
+							//Logger::Info("secFinalDist:  %d\n", 32 - dist);
+							bytesAdded += 32 - dist;
+						}
+
+						if (j + 1 < num - 1)
+						{
+							int nextSection = secNum + 1;
+							int dist = ((startPos + sectionindexes[nextSection].sectionoffset) - (pos2 + headerSize));
+
+							if (dist > 18 || dist < 0)
+							{
+								for (int l = 0; l < sections[j].animdata.arry.size(); l++)
+								{
+									short animValue{ (short)sections[j].animdata.arry[l] };
+									if (animValue == 0)
+									{
+										int newPos = l;
+										dist = sections[j].animdata.arry.size() - newPos;
+										if (dist <= 18)
+										{
+											break;
+										}
+									}
+								}
+							}
+							//Logger::Info("secDist:  %d\n", dist);
+							//Logger::Info("secFinalDist:  %d\n", 32 - dist);
+							bytesAdded += 32 - dist;
+						}
+						*/
+						break;
+					}
+				}
+				secNum++;
+			}
+		}
+	}
+	return bytesAddedPerSec;
+}
+
+std::vector<int> MDL::SourceModel49::v53IkRuleStairsPerAnim()
+{
+	std::vector<int> ikRuleStairsPerAnim;
+	int ikRuleNum = 0;
+	for (int i = 0; i < mdlhdr.numlocalanim; i++)
+	{
+		mstudioanimdesc_t_v49 v49AnimDesc = animdescs[i];
+		int ikStairs = -12 * (ikRuleNum);
+
+		ikRuleStairsPerAnim.push_back(ikStairs);
+		if (v49AnimDesc.numikrules > 0)
+		{
+			ikRuleNum += v49AnimDesc.numikrules;
+		}
+
+	}
+	return ikRuleStairsPerAnim;
+}
+
+std::vector<int> MDL::SourceModel49::v53GetBytesAddedToWeightLists()
+{
+	std::vector<int> hdrBytesAnimDescAdd = v53GetAnimHdrBytesAdded(true);
+	std::vector<int> secHdrBytesAnimDescAdd = v53GetSecHdrBytesAdded(true);
+	std::vector<int> bytesAddedToWeightLists;
+	int ikRuleNum = 0;
+	int seqIdx = mdlhdr.localseqindex;
+	//Logger::Info("animIdx: %d\n", seqIdx);
+	//Logger::Info("Hdr BytesAdded: %d\n", bytesAddedToHeader);
+	//Logger::Info("Bone BytesAdded: %d\n", bytesAddedToBones);
+	int bytesAddedToHeader = 52;
+	int bytesAddedToBones = mdlhdr.numbones * 28;
+	int actModNumber = 0;
+	int bytesAdded = 0;
+
+	for (int i = 0; i < mdlhdr.numlocalseq; i++)
+	{
+		//Logger::Info("Test\n");
+		mstudioseqdesc_t_v49 v49SeqDesc = seqdescs[i];
+		int strPos = mdlhdr.localseqindex + 212 * i;
+
+		if (!contains(weightlistidxs, strPos + seqdescs[i].weightlistindex))
+		{
+			weightlistidxs.push_back(strPos + seqdescs[i].weightlistindex);
+			bytesAdded = (4 * actModNumber);
+			bytesAddedToWeightLists.push_back(bytesAdded);
+		}
+		//		Logger::Info("Bytes Added: %d \n", bytesAdded);
+		actModNumber += v49SeqDesc.numactivitymodifiers;
+	}
+	return bytesAddedToWeightLists;
+}
+
+void MDL::SourceModel49::SetMdlInts()
+{
+	ikRuleStairsPerAnim = v53IkRuleStairsPerAnim();
+	hdrBytesAnimDescAdd = v53GetAnimHdrBytesAdded(true);
+	secHdrBytesAnimDescAdd = v53GetSecHdrBytesAdded(true);
+	secHdrBytesSecAdd = v53GetSecBytesAdded(true);
+
+	animByteAddedTotal = v53GetTotalAnimHdrBytesAdded();
+	animSecByteAddedTotal = v53GetTotalSecHdrBytesAdded();
+	bytesAddedToWeightLists = v53GetBytesAddedToWeightLists();
+
+	animBytesAdded = animByteAddedTotal + animSecByteAddedTotal;
+	bytesAddedToRuiMesh = 0;
+	bytesAddedToIkRules = -12 * ikrules.size();
+	bytesAddedToHeader = 52;
+	bytesAddedToBones = mdlhdr.numbones * 28;
+	bytesAddedToAnims = -8 * mdlhdr.numlocalanim;
+	bytesAddedToAnimData = mdlhdr.numlocalanim > 0 ? animByteAddedTotal + animSecByteAddedTotal + bytesAddedToIkRules + bytesAddedToSections : 0;
+	bytesAddedToSections = -4 * secHdrBytesSecAdd.size();
+	bytesAddedToSeqs = 20 * mdlhdr.numlocalseq;
+	bytesAddedToTextures = -20 * mdlhdr.numtextures;
+	bytesAddedToIkChains = 16 * mdlhdr.numikchains;
+	bytesAddedToActMods = 4 * activitymodifiers.size();
+	mdlsubhdr.linearboneindex > 0 ? bytesAddedToLinearBone = -12 * mdlhdr.numbones : 0;
+	bytesAddedToAABBTree = 60;
+	textureFiller = 0;
+	strFiller = 60;
+	allBytesAdded = bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToTextures + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + bytesAddedToRuiMesh;
+	numOfLinks = 0;
+}
+
+void MDL::SourceModel49::Init(BinaryReader* Stream)
+{
+	Stream->seek(0);
+	mdlhdr = {};
+	mdlsubhdr = {};
+	Stream->Read(&mdlhdr);
+	Stream->Read(&mdlsubhdr);
+
+	bones = new mstudiobone_t_v49[mdlhdr.numbones];
+	jigglebones = {};
+	boneflexdrivers = new mstudioboneflexdriver_t_v49[mdlsubhdr.m_nBoneFlexDriverCount];
+	attachments = new mstudioattachment_t_v49[mdlhdr.numlocalattachments];
+	hitboxsets = new mstudiohitboxset_t_v49[mdlhdr.numhitboxsets];
+	hitboxes = {};//Add function for getting number of hitboxes from hitbox sets. - Liberty
+	bonenametable = new unsigned char[mdlhdr.numbones]; //Replace with unsigned list instead of struct by itself. - Liberty
+	animdescs = new mstudioanimdesc_t_v49[mdlhdr.numlocalanim];
+	anims = {}; //Add function for gathering anims. - Liberty
+	sectionindexes = {}; //Add function for gathering anims. - Liberty
+	sections = {}; //Add function for gathering anims. - Liberty
+	ikrules = {}; //Add function for gathering anims. - Liberty
+	compressedikerrors; //Add function for gathering anims. - Liberty
+	ikerrors; //Add function for gathering anims. - Liberty
+	ikrulezeroframe; //Add function for gathering anims. - Liberty
+	seqdescs = {};// = new mstudioseqdesc_t_v49[mdlhdr.numlocalseq];
+	blends = {}; //Add function to get seq data - Liberty
+	posekeys = {}; //Add function to get seq data - Liberty
+	events = {}; //Add function to get seq data - Liberty
+	autolayers = {}; //Add function to get seq data - Liberty
+	activitymodifiers = {}; //Add function to get seq data - Liberty
+	seqweightlist = {}; //Add function to get seq data - Liberty
+	nodenames = new mstudionodename_t_v49[mdlhdr.numlocalnodes];
+	nodes = new mstudionodedata_v49[mdlhdr.numlocalnodes];
+	bodyparts = new mstudiobodyparts_t_v49[mdlhdr.numbodyparts];
+	models = {}; //Make function to get model data - Liberty
+	meshes = {}; //Make function to get model data - Liberty
+	ikchains = new mstudioikchain_t_v49[mdlhdr.numikchains];
+	iklinks = {}; //Make function to get ikchain data - Liberty
+	poseparamdescs = new mstudioposeparamdesc_t_v49[mdlhdr.numlocalposeparameters];
+	animBlocks = new mstudioanimblock_t[mdlhdr.numanimblocks];
+	includedmodels = new mstudiomodelgroup_t_v49[mdlhdr.numincludemodels];
+	cdtextures = new mstudiotexturedir_t_v49[mdlhdr.numcdtextures];
+	textures = new mstudiotexture_t_v49[mdlhdr.numtextures];
+	skingroups = new mstudioskingroup_t_v49[mdlhdr.numskinfamilies];
+	keyvalues = {};
+	srcbonetransforms = new mstudiosrcbonetransform_t_v49[mdlsubhdr.numsrcbonetransform];
+	linearbone = {};
+	linearbonedata = {};
+
+	//Non stored values -Liberty
+	numJiggleBones = 0;
+	numIkRules = 0;
+	numIkLinks = 0;
+	numModels = 0;
+	numMeshes = 0;
+	numHitboxes = 0;
+
+	//Minor values -Liberty
+	numBlends = 0;
+	numPoseKeys = 0;
+	numEvents = 0;
+	numAutoLayers = 0;
+	numActMods;
+	numWeightLists = 0;
+
+	//Conversion values - Liberty
+	animByteAddedTotal = 0;
+	animSecByteAddedTotal = 0;
+
+	numjigglebones = 0;
+	weightListPos = 0;
+	animBytesAdded = 0;
+	bytesAddedToRuiMesh = 0;
+	bytesAddedToIkRules = 0;
+	bytesAddedToHeader = 52;
+	bytesAddedToBones = 0;
+	bytesAddedToAnims = 0;
+	bytesAddedToAnimData = 0;
+	bytesAddedToSections = 0;
+	bytesAddedToSeqs = 0;
+	bytesAddedToTextures = 0;
+	bytesAddedToIkChains = 0;
+	bytesAddedToActMods = 0;
+	bytesAddedToSectionIdxs = 0;
+	bytesAddedToLinearBone = 0;
+	bytesAddedToAABBTree = 0;
+	textureFiller = 0;
+	strFiller = 60;
+	allBytesAdded = 0;
+	numOfLinks = 0;
+	ruiPadding = 0;
+
+
+}
+
+void MDL::SourceModel49::Read(BinaryReader* Stream)
+{
+	Stream->seek(0);
+	Stream->Read(&mdlhdr);
+	Stream->Read(&mdlsubhdr);
+	ReadBones(Stream);
+	ReadJiggleBones(Stream);
+	ReadAttachments(Stream);
+	ReadHitboxSets(Stream);
+	ReadHitBoxes(Stream);
+	ReadBoneNameTable(Stream);
+	ReadAnimDescs(Stream);
+	ReadAnims(Stream);
+	ReadIKRules(Stream);
+	ReadIKCompressedErrors(Stream);
+	ReadSeqDescs(Stream);
+	ReadNodeNames(Stream);
+	ReadNodes(Stream);
+	ReadBodyParts(Stream);
+	ReadModels(Stream);
+	ReadIKChains(Stream);
+	ReadIKLinks(Stream);
+	ReadPoseParamDescs(Stream);
+	ReadAnimBlocks(Stream);
+	ReadMeshes(Stream);
+	ReadIncludeModels(Stream);
+	ReadTextures(Stream);
+	ReadCDTextures(Stream);
+	ReadSkinFamilies(Stream);
+	ReadKeyValues(Stream);
+	ReadSrcBoneTransforms(Stream);
+	ReadLinearBone(Stream);
+	ReadStringTable(Stream);
+}
+
+void MDL::SourceModel49::Debug()
+{
+
+}
+
+void MDL::SourceModel49::ReadBones(BinaryReader * Stream)
+{
+	Stream->seek(0); //Just in case of wonky bs with seeking. - Liberty
+
+	//studiohdr_t_v49	 mdlhdr; Stream->Read(&mdlhdr);
+	//studiohdr2_t_v49 mdlsubhdr; Stream->Read(&mdlsubhdr);
+	//mstudiobone_t_v49* bones = new mstudiobone_t_v49[mdlhdr.numbones];
+
+	if (mdlhdr.numbones > 0)
+	{
+		Stream->seek(mdlhdr.boneindex);
+		for (int i = 0; i < mdlhdr.numbones; i++)
+		{
+			int bonePos = mdlhdr.boneindex + 216 * i;
+			Stream->seek(bonePos);
+
+			mstudiobone_t_v49 bone; Stream->Read(&bone);
+			if (bone.proctype == 5) numJiggleBones++;
+
+			std::string szName = Stream->ReadNullTermStrTrgt(bonePos + bone.sznameindex, false);
+
+			if (DEBUG)
+			{
+				std::string surfacePropName = Stream->ReadNullTermStrTrgt(bonePos + bone.surfacepropLookup, false);
+				std::string surfacePropIdxName = Stream->ReadNullTermStrTrgt(bonePos + bone.surfacepropidx, false);
+
+				Logger::Debug(":----------- DUMPING BONE DATA #%d -----------: \n", i);
+				Logger::Info(":--------------------------------: \n");
+				Logger::Notice(":----------- DATA START -----------: \n");
+				Logger::Info("BONE[ %d ].sznameindex: %d StrNamePos: %d | %s\n", i, bone.sznameindex, bonePos + bone.sznameindex, szName != "" ? szName.c_str() : "Empty");
+				Logger::Info("BONE[ %d ].parent: %d  \n", i, bone.parent);
+				Logger::Info("BONE[ %d ].bonecontroller: int[%d]  \n", i, 6);
+				Logger::Info("BONE[ %d ].pos: < x: %f, y: %f, z: %f >  \n", i, bone.pos.x, bone.pos.y, bone.pos.z);
+				Logger::Info("BONE[ %d ].quat: < i: %f, j: %f, k: %f, one: %f >  \n", i, bone.quat.i, bone.quat.j, bone.quat.k, bone.quat.one);
+				Logger::Info("BONE[ %d ].rot: < x: %f, y: %f, z: %f >  \n", i, bone.pos.x, bone.pos.y, bone.pos.z);
+				Logger::Info("BONE[ %d ].posscale: < x: %f, y: %f, z: %f >  \n", i, bone.pos.x, bone.pos.y, bone.pos.z);
+				Logger::Info("BONE[ %d ].rotscale: < x: %f, y: %f, z: %f >  \n", i, bone.pos.x, bone.pos.y, bone.pos.z);
+				Logger::Info("BONE[ %d ].poseToBoneR1: < i: %f, j: %f, k: %f, one: %f >  \n", i, bone.poseToBone.c0r0, bone.poseToBone.c1r0, bone.poseToBone.c2r0, bone.poseToBone.c3r0);
+				Logger::Info("BONE[ %d ].poseToBoneR2: < i: %f, j: %f, k: %f, one: %f >  \n", i, bone.poseToBone.c0r1, bone.poseToBone.c1r1, bone.poseToBone.c2r1, bone.poseToBone.c3r1);
+				Logger::Info("BONE[ %d ].poseToBoneR3: < i: %f, j: %f, k: %f, one: %f >  \n", i, bone.poseToBone.c0r2, bone.poseToBone.c1r2, bone.poseToBone.c2r2, bone.poseToBone.c3r2);
+				Logger::Info("BONE[ %d ].qAlignment: < i: %f, j: %f, k: %f, one: %f >  \n", i, bone.qAlignment.i, bone.qAlignment.j, bone.qAlignment.k, bone.qAlignment.one);
+				Logger::Info("BONE[ %d ].flags: %d | %s  \n", i, bone.flags, Utility::func::ReadBoneFlags(bone.flags).c_str());
+				Logger::Info("BONE[ %d ].proctype: %d | %s  \n", i, bone.proctype, Utility::func::ReadProcFlags(bone.proctype).c_str());
+				Logger::Info("BONE[ %d ].procindex: %d  \n", i, bone.procindex);
+				Logger::Info("BONE[ %d ].physicsbone: %d  \n", i, bone.physicsbone);
+				Logger::Info("BONE[ %d ].surfacepropidx: %d | StrPropIdxNamePos: %d | %s\n", i, bone.surfacepropidx, bonePos + bone.surfacepropidx, surfacePropIdxName != "" && bone.surfacepropidx > 0 ? surfacePropIdxName.c_str() : "Empty");
+				Logger::Info("BONE[ %d ].contents: %d | %s  \n", i, bone.contents, Utility::func::ReadContents(bone.contents).c_str());
+				Logger::Info("BONE[ %d ].surfacepropLookup: %d StrPropNamePos: %d | %s\n", i, bone.surfacepropLookup, bone.surfacepropLookup > 0 ? bonePos + bone.surfacepropLookup : -1, surfacePropName != "" && bone.surfacepropLookup > 0 ? surfacePropName.c_str() : "Empty");
+				Logger::Info("BONE[ %d ].Unused: int[%d]  \n", i, 7);
+				Logger::Notice(":----------- DATA END -----------: \n");
+				Logger::Info(":--------------------------------: \n");
+			}
+			bones[i] = bone;
+			Logger::Info("Bone Read: %s : %d\n", szName.c_str(), i);
+		}
+		if (DEBUG)
+		{
+			Logger::Info("JIGGLEBONE AMOUNT: %d  \n", numJiggleBones);
+		}
+	}
+	else
+	{
+		Logger::Info("No bones to read!\n");
+	}
+}
+
+void MDL::SourceModel49::ReadJiggleBones(BinaryReader* Stream)
+{
+	if (numJiggleBones > 0)
+	{
+		jigglebones = new mstudiojigglebone_t_v49[numJiggleBones];
+
+		int jiggleBonePos = mdlhdr.boneindex + 216 * mdlhdr.numbones;
+
+		Stream->seek(jiggleBonePos);
+
+		for (int i = 0; i < numJiggleBones; i++)
+		{
+			mstudiojigglebone_t_v49 jigglebone; Stream->Read(&jigglebone);
+			//Logger::Info("JiggleBoneFlags Read: %s\n", Utility::func::ReadJiggleFlags(jigglebone.flags).c_str());
+			//Logger::Info("JiggleBone Read: %d\n", i);
+			 //jigglebones.push_back(jigglebone);
+			jigglebones[i] = jigglebone;
+
+
+			if (DEBUG)
+			{
+				Logger::Debug(":----------- DUMPING JIGGLEBONE DATA #%d -----------: \n", i);
+				Logger::Info(":--------------------------------: \n");
+				Logger::Notice(":----------- DATA START -----------: \n");
+
+				Logger::Debug(":----------- GENERAL PARAMS ---------------: \n");
+				Logger::Info("JIGGLEBONE[ %d ].flags: %d | %s\n", i, jigglebone.flags, Utility::func::ReadJiggleFlags(jigglebone.flags).c_str());
+				Logger::Info("JIGGLEBONE[ %d ].length: %f					\n", i, jigglebone.length);
+				Logger::Info("JIGGLEBONE[ %d ].tipMass: %f					\n", i, jigglebone.tipMass);
+
+				Logger::Debug(":----------- FLEXIBLE PARAMS ---------------: \n");
+				Logger::Info("JIGGLEBONE[ %d ].yawStiffness: %f				\n", i, jigglebone.yawStiffness);
+				Logger::Info("JIGGLEBONE[ %d ].yawDamping: %f				\n", i, jigglebone.yawDamping);
+				Logger::Info("JIGGLEBONE[ %d ].pitchStiffness: %f			\n", i, jigglebone.pitchStiffness);
+				Logger::Info("JIGGLEBONE[ %d ].pitchDamping: %f				\n", i, jigglebone.pitchDamping);
+				Logger::Info("JIGGLEBONE[ %d ].alongStiffness: %f			\n", i, jigglebone.alongStiffness);
+				Logger::Info("JIGGLEBONE[ %d ].alongDamping: %f				\n", i, jigglebone.alongDamping);
+
+				Logger::Debug(":----------- ANGLE CONSTRAINT ---------------: \n");
+				Logger::Info("JIGGLEBONE[ %d ].angleLimit: %f				\n", i, jigglebone.angleLimit);
+
+				Logger::Debug(":----------- YAW CONSTRAINT ---------------: \n");
+				Logger::Info("JIGGLEBONE[ %d ].minYaw: %f					\n", i, jigglebone.minYaw);
+				Logger::Info("JIGGLEBONE[ %d ].maxYaw: %f					\n", i, jigglebone.maxYaw);
+				Logger::Info("JIGGLEBONE[ %d ].yawFriction: %f				\n", i, jigglebone.yawFriction);
+				Logger::Info("JIGGLEBONE[ %d ].yawBounce: %f				\n", i, jigglebone.yawBounce);
+
+
+
+				Logger::Debug(":----------- PITCH CONSTRAINT ---------------: \n");
+				Logger::Info("JIGGLEBONE[ %d ].minPitch: %f					\n", i, jigglebone.minPitch);
+				Logger::Info("JIGGLEBONE[ %d ].maxPitch: %f					\n", i, jigglebone.maxPitch);
+				Logger::Info("JIGGLEBONE[ %d ].pitchFriction: %f			\n", i, jigglebone.pitchFriction);
+				Logger::Info("JIGGLEBONE[ %d ].pitchBounce: %f				\n", i, jigglebone.pitchBounce);
+
+				Logger::Debug(":----------- BASE SPRING PARAMS ---------------: \n");
+				Logger::Info("JIGGLEBONE[ %d ].baseMass: %f					\n", i, jigglebone.baseMass);
+				Logger::Info("JIGGLEBONE[ %d ].baseStiffness: %f			\n", i, jigglebone.baseStiffness);
+				Logger::Info("JIGGLEBONE[ %d ].baseDamping: %f				\n", i, jigglebone.baseDamping);
+				Logger::Info("JIGGLEBONE[ %d ].baseMinLeft: %f				\n", i, jigglebone.baseMinLeft);
+				Logger::Info("JIGGLEBONE[ %d ].baseMaxLeft: %f				\n", i, jigglebone.baseMaxLeft);
+				Logger::Info("JIGGLEBONE[ %d ].baseLeftFriction: %f			\n", i, jigglebone.baseLeftFriction);
+				Logger::Info("JIGGLEBONE[ %d ].baseMinUp: %f				\n", i, jigglebone.baseMinUp);
+				Logger::Info("JIGGLEBONE[ %d ].baseMaxUp: %f				\n", i, jigglebone.baseMaxUp);
+				Logger::Info("JIGGLEBONE[ %d ].baseUpFriction: %f			\n", i, jigglebone.baseUpFriction);
+				Logger::Info("JIGGLEBONE[ %d ].baseMinForward: %f			\n", i, jigglebone.baseMinForward);
+				Logger::Info("JIGGLEBONE[ %d ].baseMaxForward: %f			\n", i, jigglebone.baseMaxForward);
+				Logger::Info("JIGGLEBONE[ %d ].baseForwardFriction: %f		\n", i, jigglebone.baseForwardFriction);
+				Logger::Notice(":----------- DATA END -----------: \n");
+				Logger::Info(":--------------------------------: \n");
+			}
+			Logger::Info("JiggleBone Read: %d\n", i);
+		}
+		//Logger::Info("strPos: %d\n", Stream->Position());
+	}
+}
+
+void MDL::SourceModel49::ReadAttachments(BinaryReader* Stream)
+{
+	if (mdlhdr.numlocalattachments > 0)
+	{
+		Stream->seek(mdlhdr.localattachmentindex);
+		for (int i = 0; i < mdlhdr.numlocalattachments; i++)
+		{
+			int attachmentPos = mdlhdr.localattachmentindex + 92 * i;
+			Stream->seek(attachmentPos);
+
+			mstudioattachment_t_v49 attachment; Stream->Read(&attachment);
+
+			std::string szName = Stream->ReadNullTermStrTrgt(attachmentPos + attachment.sznameindex, false);
+			attachment.szname = szName;
+
+			attachments[i] = attachment;//attachments.push_back(attachment);
+
+			if (DEBUG)
+			{
+				int bonePos = mdlhdr.boneindex + 216 * attachment.localbone;
+				std::string boneName = Stream->ReadNullTermStrTrgt(bonePos + bones[attachment.localbone].sznameindex, false);
+
+				Logger::Debug(":----------- DUMPING ATTACHMENT DATA #%d -----------: \n", i);
+				Logger::Info(":--------------------------------: \n");
+				Logger::Notice(":----------- DATA START -----------: \n");
+				Logger::Info("ATTACHMENT[ %d ].sznameindex: %d StrNamePos: %d | %s\n", i, attachment.sznameindex, attachmentPos + attachment.sznameindex, szName != "" ? szName.c_str() : "Empty");
+				Logger::Info("ATTACHMENT[ %d ].flags: %d  \n", i, attachment.flags);
+				Logger::Info("ATTACHMENT[ %d ].localbone: %d | %s \n", i, attachment.localbone, boneName != "" ? boneName.c_str() : "Empty");
+				Logger::Info("ATTACHMENT[ %d ].localmatrixR1: < i: %f, j: %f, k: %f, one: %f >  \n", i, attachment.localmatrix.c0r0, attachment.localmatrix.c1r0, attachment.localmatrix.c2r0, attachment.localmatrix.c3r0);
+				Logger::Info("ATTACHMENT[ %d ].localmatrixR2: < i: %f, j: %f, k: %f, one: %f >  \n", i, attachment.localmatrix.c0r1, attachment.localmatrix.c1r1, attachment.localmatrix.c2r1, attachment.localmatrix.c3r1);
+				Logger::Info("ATTACHMENT[ %d ].localmatrixR3: < i: %f, j: %f, k: %f, one: %f >  \n", i, attachment.localmatrix.c0r2, attachment.localmatrix.c1r2, attachment.localmatrix.c2r2, attachment.localmatrix.c3r2);
+				Logger::Info("ATTACHMENT[ %d ].Unused: int[%d]  \n", i, 8);
+				Logger::Notice(":----------- DATA END -----------: \n");
+				Logger::Info(":--------------------------------: \n");
+			}
+
+			Logger::Info("Attachment Read: %s : %d\n", attachment.szname.c_str(), i);
+		}
+		//Logger::Info("strPos: %d\n", Stream->Position());
+	}
+}
+
+void MDL::SourceModel49::ReadHitboxSets(BinaryReader* Stream)
+{
+	Stream->seek(mdlhdr.hitboxsetindex);
+	if (mdlhdr.numhitboxsets > 0)
+	{
+		for (int i = 0; i < mdlhdr.numhitboxsets; i++)
+		{
+			int hitboxSetPos = mdlhdr.hitboxsetindex + (12 * i);
+			Stream->seek(hitboxSetPos);
+			mstudiohitboxset_t_v49 hboxSet; Stream->Read(&hboxSet);
+
+			std::string szName = Stream->ReadNullTermStrTrgt(hitboxSetPos + hboxSet.sznameindex, false);
+			mstudiobbox_t_v49* _hitboxes = new mstudiobbox_t_v49[hboxSet.numhitboxes];
+
+			Stream->seek(hitboxSetPos + hboxSet.hitboxindex);
+
+			if (hboxSet.numhitboxes > 0)
+			{
+				numHitboxes += hboxSet.numhitboxes;
+
+				Stream->seek(hitboxSetPos + hboxSet.hitboxindex);
+				for (int j = 0; j < hboxSet.numhitboxes; j++)
+				{
+					int hitboxPos = hitboxSetPos + hboxSet.hitboxindex + 68 * j;
+					Stream->seek(hitboxPos);
+					mstudiobbox_t_v49 hitbox; Stream->Read(&hitbox);
+
+					std::string szHitboxName = Stream->ReadNullTermStrTrgt(hitboxPos + hitbox.szhitboxnameindex, false);
+					hitbox.szhitboxname = szHitboxName;
+
+					_hitboxes[j] = hitbox;
+				}
+
+				hboxSet.hitboxes = _hitboxes;
+			}
+
+			hboxSet.hitboxes = _hitboxes;
+			hboxSet.szname = szName;
+
+			hitboxsets[i] = hboxSet;
+
+			if (DEBUG)
+			{
+				Logger::Debug(":----------- DUMPING HITBOXSET DATA #%d -----------: \n", i);
+				Logger::Info(":--------------------------------: \n");
+				Logger::Notice(":----------- DATA START -----------: \n");
+				Logger::Info("HITBOXSET[ %d ].sznameindex: %d | StrNamePos: %d | %s  \n", i, hboxSet.sznameindex, hitboxSetPos + hboxSet.sznameindex, szName != "" ? szName.c_str() : "Empty");
+				Logger::Info("HITBOXSET[ %d ].numhitboxes: %d  \n", i, hboxSet.numhitboxes);
+				Logger::Info("HITBOXSET[ %d ].hitboxindex: %d | StrHitboxPos: %d  \n", i, hboxSet.hitboxindex, hitboxSetPos + hboxSet.hitboxindex);
+				Logger::Notice(":----------- DATA END -----------: \n");
+				Logger::Info(":--------------------------------: \n");
+			}
+		}
+	}
+}
+
+void MDL::SourceModel49::ReadHitBoxes(BinaryReader* Stream)
+{
+	int hitBoxesIndex = mdlhdr.hitboxsetindex + (12 * mdlhdr.numhitboxsets);
+	Stream->seek(hitBoxesIndex);
+	if (numHitboxes > 0)
+	{
+		hitboxes = new mstudiobbox_t_v49[numHitboxes];
+
+		for (int i = 0; i < numHitboxes; i++)
+		{
+			int hitboxPos = hitBoxesIndex + (68 * i);
+			mstudiobbox_t_v49 hbox; Stream->Read(&hbox);
+			hitboxes[i] = hbox;
+
+			if (DEBUG)
+			{
+
+				Logger::Debug(":----------- DUMPING HITBOX DATA #%d -----------: \n", i);
+				Logger::Info(":--------------------------------: \n");
+				Logger::Notice(":----------- DATA START -----------: \n");
+				Logger::Info("HITBOX[ %d ].bone: %d  \n", i, hbox.bone);
+				Logger::Info("HITBOX[ %d ].group: %d  \n", i, hbox.group);
+				Logger::Info("HITBOX[ %d ].bbmin: < x: %f, y: %f, z: %f >  \n", i, hbox.bbmin.x, hbox.bbmin.y, hbox.bbmin.z);
+				Logger::Info("HITBOX[ %d ].bbmax: < x: %f, y: %f, z: %f >  \n", i, hbox.bbmax.x, hbox.bbmax.y, hbox.bbmax.z);
+				Logger::Info("HITBOX[ %d ].szhitboxnameindex: %d StrNamePos: %d | %s\n", i, hbox.szhitboxnameindex, hitboxPos + hbox.szhitboxnameindex, hbox.szhitboxname != "" ? hbox.szhitboxname.c_str() : "Empty");
+				Logger::Info("HITBOX[ %d ].Unused: int[%d]  \n", i, 8);
+				Logger::Notice(":----------- DATA END -----------: \n");
+				Logger::Info(":--------------------------------: \n");
+			}
+		}
+	}
+}
+
+void MDL::SourceModel49::ReadBoneNameTable(BinaryReader* Stream)
+{
+	Stream->seek(0); //Just in case of wonky bs with seeking. - Liberty
+
+	//studiohdr_t_v49	 mdlhdr; Stream->Read(&mdlhdr);
+	//studiohdr2_t_v49 mdlsubhdr; Stream->Read(&mdlsubhdr);
+	//mstudiobone_t_v49* bones = new mstudiobone_t_v49[mdlhdr.numbones];
+
+	if (mdlhdr.numbones > 0)
+	{
+		bonenametable = new unsigned char[mdlhdr.numbones];
+
+		Stream->seek(mdlhdr.bonetablebynameindex);
+		if (DEBUG)
+		{
+			Logger::Debug(":----------- DUMPING BONE NAME TABLE DATA -----------: \n");
+			Logger::Info(":--------------------------------: \n");
+			Logger::Notice(":----------- DATA START -----------: \n");
+		}
+
+		for (int i = 0; i < mdlhdr.numbones; i++)
+		{
+			Stream->seek(mdlhdr.bonetablebynameindex + i);
+			unsigned char bone; Stream->read((char*)&bone, sizeof(byte));
+
+			int bonePos = mdlhdr.boneindex + 216 * (int)bone;
+
+			std::string szName = Stream->ReadNullTermStrTrgt(bonePos + bones[(int)bone].sznameindex, false);
+
+			if (DEBUG)
+			{
+				Logger::Info("BONENAME[ %d ].bone: %d StrNamePos: %d | %s\n", i, (int)bone, bonePos + bones[(int)bone].sznameindex, szName != "" ? szName.c_str() : "Empty");
+			}
+			bonenametable[i] = bone;
+		}
+
+		if (DEBUG)
+		{
+			Logger::Notice(":----------- DATA END -----------: \n");
+			Logger::Info(":--------------------------------: \n");
+		}
+	}
+	else
+	{
+		Logger::Info("No bones to read!\n");
+	}
+}\
+
+void MDL::SourceModel49::ReadAnimDescs(BinaryReader* Stream)
+{
+	if (mdlhdr.numlocalanim > 0)
+	{
+		Stream->seek(mdlhdr.localanimindex);
+		for (int i = 0; i < mdlhdr.numlocalanim; i++)
+		{
+			int animDescPos = mdlhdr.localanimindex + 100 * i;
+			Stream->seek(animDescPos);
+
+			mstudioanimdesc_t_v49 animdesc; Stream->Read(&animdesc);
+			numIkRules += animdesc.numikrules;
+
+
+			std::string szName = Stream->ReadNullTermStrTrgt(animDescPos + animdesc.sznameindex, false);
+			animdesc.szname = szName;
+
+			//animdescs.push_back(animdesc);
+			animdescs[i] = animdesc;
+
+			if (DEBUG)
+			{
+				Logger::Debug(":----------- DUMPING ANIMDESC DATA #%d -----------: \n", i);
+				Logger::Info(":--------------------------------: \n");
+				Logger::Notice(":----------- DATA START -----------: \n");
+				Logger::Info("ANIMDESC[ %d ].baseptr: %d  \n", i, animdesc.baseptr);
+				Logger::Info("ANIMDESC[ %d ].sznameindex: %d StrNamePos: %d | %s\n", i, animdesc.sznameindex, animDescPos + animdesc.sznameindex, szName != "" ? szName.c_str() : "Empty");
+
+				Logger::Info("ANIMDESC[ %d ].fps: %f  \n", i, animdesc.fps);
+
+				Logger::Info("ANIMDESC[ %d ].flags: %s  \n", i, Utility::func::ReadAnimDescFlags(animdesc.flags));
+				Logger::Info("ANIMDESC[ %d ].numframes: %d  \n", i, animdesc.numframes);
+
+				Logger::Info("ANIMDESC[ %d ].nummovements: %d  \n", i, animdesc.nummovements);
+				Logger::Info("ANIMDESC[ %d ].movementindex: %d  \n", i, animdesc.movementindex);
+
+				Logger::Info("ANIMDESC[ %d ].ikrulezeroframeindex: %d  \n", i, animdesc.ikrulezeroframeindex);
+
+				Logger::Info("ANIMDESC[ %d ].Unused: int[%d]  \n", i, 5);
+
+				Logger::Info("ANIMDESC[ %d ].animblock: %d  \n", i, animdesc.animblock);
+				Logger::Info("ANIMDESC[ %d ].animindex: %d  \n", i, animdesc.animindex);
+
+				Logger::Info("ANIMDESC[ %d ].numikrules: %d  \n", i, animdesc.numikrules);
+				Logger::Info("ANIMDESC[ %d ].ikruleindex: %d  \n", i, animdesc.ikruleindex);
+				Logger::Info("ANIMDESC[ %d ].animblockikruleindex: %d  \n", i, animdesc.animblockikruleindex);
+
+				Logger::Info("ANIMDESC[ %d ].numlocalhierarchy: %d  \n", i, animdesc.numlocalhierarchy);
+				Logger::Info("ANIMDESC[ %d ].localhierarchyindex: %d  \n", i, animdesc.localhierarchyindex);
+
+				Logger::Info("ANIMDESC[ %d ].sectionindex: %d  \n", i, animdesc.sectionindex);
+				Logger::Info("ANIMDESC[ %d ].sectionframes: %d  \n", i, animdesc.sectionframes);
+
+				Logger::Info("ANIMDESC[ %d ].zeroframespan: %d  \n", i, animdesc.zeroframespan);
+				Logger::Info("ANIMDESC[ %d ].zeroframecount: %d  \n", i, animdesc.zeroframecount);
+				Logger::Info("ANIMDESC[ %d ].zeroframeindex: %d  \n", i, animdesc.zeroframeindex);
+
+				Logger::Info("ANIMDESC[ %d ].zeroframestalltime: %f  \n", i, animdesc.zeroframestalltime);
+				Logger::Notice(":----------- DATA END -----------: \n");
+				Logger::Info(":--------------------------------: \n");
+			}
+
+
+			Logger::Info("AnimDesc Read: %s : %d\n", szName.c_str(), i);
+			//Logger::Info("strPos: %d\n", Stream->Position());
+		}
+	}
+}
+
+void MDL::SourceModel49::CheckNextAnimValue(int hdrEndPos, int anim, int numAnims)
+{
+	int animDescPos = mdlhdr.localanimindex + 100 * anim;
+	mstudioanimdesc_t_v49 animDesc = animdescs[anim];
+
+
+	if (anim + 1 < numAnims)
+	{
+		int nextAnim = anim + 1;
+		mstudioanimdesc_t_v49 nextAnimDesc = animdescs[nextAnim];
+
+		int animDescPos = mdlhdr.localanimindex + 100 * nextAnim;
+		int animPos = animDescPos + nextAnimDesc.animindex;
+
+
+
+	}
+	else
+	{
+
+	}
+}
+
+void MDL::SourceModel49::ReadAnims(BinaryReader* Stream)
+{
+	for (int i = 0; i < mdlhdr.numlocalanim; i++)
+	{
+		int boneHeaderNum = 0;
+		int animDescPos = mdlhdr.localanimindex + 100 * i;
+		int animPos = animDescPos + animdescs[i].animindex;
+		Logger::Info("Anim: %d\n", i);
+
+		if (animdescs[i].sectionindex == 0)
+		{
+			Stream->seek(animPos);
+			for (int j = 0; j < mdlhdr.numbones; j++)
+			{
+				int dist = 0;
+				int nextAnim = i + 1;
+				int hdrStartPos = Stream->Position();
+
+				mstudioanim_t_v49 anim; Stream->Read(&anim);
+				mstudioanimdata_t_v49 animData;
+				mstudioanimvalues_t_v49 animValues; Stream->Read(&animValues, &anim, animdescs[i].numframes);
+				//ReadValuePtr(Stream, anim.animrot, animdescs[i].numframes, &anim, &animValues.rot);
+				//ReadValuePtr(Stream, anim.animpos, animdescs[i].numframes, &anim, &animValues.pos);
+				anim.animvalues = animValues;
+				anims.push_back(anim);
+
+				//Logger::Info("HdrNum: %d\n", j);
+				//Logger::Info("Bone: %d\n", anim.bone);
+				//Logger::Info("Flags Read: %d\n", anim.flags);
+				//Logger::Info("NextOffset Read: %d\n", anim.nextoffset);
+				//Logger::Info("RawRot Read: One: %d I: %d J: %d K: %d\n", anim.rawrot.one, anim.rawrot.i, anim.rawrot.j, anim.rawrot.k);
+				//Logger::Info("RawRot2 Read: X: %d Y: %d Z: %d W: %d\n", anim.rawrot2.x, anim.rawrot2.y, anim.rawrot2.z, anim.rawrot2.wneg);
+				//Logger::Info("RawPos Read: X: %d Y: %d Z: %d\n", anim.rawpos.x, anim.rawpos.y, anim.rawpos.z);
+				//Logger::Info("RotPtr Read: X: %d Y: %d Z: %d\n", anim.animrot.offset.x, anim.animrot.offset.y, anim.animrot.offset.z);
+				//Logger::Info("PosPtr Read: X: %d Y: %d Z: %d\n", anim.animpos.offset.x, anim.animpos.offset.y, anim.animpos.offset.z);
+
+				if (anim.nextoffset == 0)
+				{
+					break;
+				}
+				Stream->seek(hdrStartPos + anim.nextoffset);
+
+			}
+
+		}
+		if (animdescs[i].sectionindex > 0)
+		{
+			int secBoneHeaderNum = 0;
+			int animDescPos = mdlhdr.localanimindex + 100 * i;
+			int animPos = animDescPos + animdescs[i].animindex;
+			int secPos = animDescPos + animdescs[i].sectionindex;
+			int frames = animdescs[i].numframes;
+			int secFrames = animdescs[i].sectionframes;
+			std::vector<sectionindexesindex_t_v49> idxs;
+
+			int secNumber = (frames / secFrames) + 2;
+
+			Stream->seek(secPos);
+
+			for (int j = 0; j < secNumber; j++)
+			{
+
+				sectionindexesindex_t_v49 sectionIdx; Stream->Read(&sectionIdx);
+				idxs.push_back(sectionIdx);
+				sectionindexes.push_back(sectionIdx);
+			}
+
+			for (int j = 0; j < secNumber; j++)
+			{
+				sectionindexesindex_t_v49 sectionIdx = idxs[j];
+				int nextSection = j + 1;
+				Stream->seek(animDescPos + sectionIdx.sectionoffset);
+
+
+				for (int k = 0; k < mdlhdr.numbones; k++)
+				{
+					int hdrSize = 0;
+					int animValuesSize = 0;
+					int nextOffsetPos = 0;
+
+
+					int hdrStartPos = Stream->Position();
+					mstudioanim_t_v49 anim; Stream->Read(&anim);
+					int hdrEndPos = Stream->Position();
+
+					hdrSize = hdrStartPos - hdrEndPos;
+					nextOffsetPos = hdrStartPos + anim.nextoffset;
+					animValuesSize = nextOffsetPos - hdrEndPos;
+
+
+					//Logger::Info("AnimValues: %d\n", animValuesSize);
+					//if (animValuesSize < 0)
+					//{
+					//	Logger::Info("Error In value size check: %d\n", hdrStartPos);
+					//	Logger::Info("HdrStartPos %d\n", hdrStartPos);
+					//	Logger::Info("HdrEndPos %d\n", hdrEndPos);
+					//	Logger::Info("NextOffsetPos %d\n", nextOffsetPos);
+					//	Logger::Info("Dist %d\n", nextOffsetPos - hdrEndPos);
+					//}
+
+					mstudioanimvalues_t_v49 animValues; Stream->Read(&animValues, &anim, animdescs[i].sectionframes + 1);
+					//ReadValuePtr(Stream, anim.animrot, animdescs[i].sectionframes + 1, &anim, &animValues.rot);
+					//ReadValuePtr(Stream, anim.animpos, animdescs[i].sectionframes + 1, &anim, &animValues.pos);
+					anim.animvalues = animValues;
+					sections.push_back(anim);
+
+					//Logger::Info("SecHdrNum: %d\n", j);
+					//Logger::Info("SecBone: %d\n", anim.bone);
+					//Logger::Info("SecFlags Read: %d\n", anim.flags);
+					//Logger::Info("SecNextOffset Read: %d\n", anim.nextoffset);
+					//Logger::Info("SecRawRot Read: One: %d I: %d J: %d K: %d\n", anim.rawrot.one, anim.rawrot.i, anim.rawrot.j, anim.rawrot.k);
+					//Logger::Info("SecRawRot2 Read: X: %d Y: %d Z: %d W: %d\n", anim.rawrot2.x, anim.rawrot2.y, anim.rawrot2.z, anim.rawrot2.wneg);
+					//Logger::Info("SecRawPos Read: X: %d Y: %d Z: %d\n", anim.rawpos.x, anim.rawpos.y, anim.rawpos.z);
+					//Logger::Info("SecRotPtr Read: X: %d Y: %d Z: %d\n", anim.animrot.offset.x, anim.animrot.offset.y, anim.animrot.offset.z);
+					//Logger::Info("SecPosPtr Read: X: %d Y: %d Z: %d\n", anim.animpos.offset.x, anim.animpos.offset.y, anim.animpos.offset.z);
+
+					if (anim.nextoffset == 0)
+					{
+						break;
+					}
+					Stream->seek(hdrStartPos + anim.nextoffset);
+				}
+
+			}
+		}
+	}
+}
+
+void MDL::SourceModel49::ReadSections(BinaryReader* Stream)
+{
+
+}
+
+void MDL::SourceModel49::ReadIKRules(BinaryReader* Stream)
+{
+	int ikRuleNum = 0;
+	for (int i = 0; i < mdlhdr.numlocalanim; i++)
+	{
+		int animDescPos = mdlhdr.localanimindex + 100 * i;
+		mstudioanimdesc_t_v49 animDesc = animdescs[i];
+		for (int j = 0; j < animDesc.numikrules; j++)
+		{
+			Stream->seek(animDescPos + animDesc.ikruleindex + (152 * j));
+			mstudioikrule_t_v49 ikrule; Stream->Read(&ikrule);
+			if (ikrule.compressedikerrorindex > 0) numCompressedIkErrors++;
+			ikrules.push_back(ikrule);
+			ikRuleNum++;
+		}
+	}
+}
+
+void MDL::SourceModel49::ReadIKCompressedErrors(BinaryReader* Stream)
+{
+	int ikErrorNum = 0;
+	int ikRuleNum = 0;
+	for (int i = 0; i < mdlhdr.numlocalanim; i++)
+	{
+		int animDescPos = mdlhdr.localanimindex + 100 * i;
+		mstudioanimdesc_t_v49 animDesc = animdescs[i];
+		for (int j = 0; j < animDesc.numikrules; j++)
+		{
+			if (ikrules[ikRuleNum].compressedikerrorindex > 0)
+			{
+				Stream->seek(animDescPos + animDesc.ikruleindex + (152 * j) + ikrules[ikRuleNum].compressedikerrorindex);
+				mstudiocompressedikerror_t_v49 ikError; Stream->Read(&ikError, animDesc.numframes);
+				compressedikerrors.push_back(ikError);
+				ikErrorNum++;
+				ikRuleNum++;
+			}
+			else continue;
+		}
+	}
+}
+
+void MDL::SourceModel49::ReadSeqDescs(BinaryReader* Stream)
+{
+	if (mdlhdr.numlocalseq > 0)
+	{
+		int actModNum = 0;
+		int eventNum = 0;
+		//seqdescs = new mstudioseqdesc_t_v49[mdlhdr.numlocalseq];
+
+		Stream->seek(mdlhdr.localseqindex);
+		for (int i = 0; i < mdlhdr.numlocalseq; i++)
+		{
+			int seqPos = mdlhdr.localseqindex + 212 * i;
+			Logger::Info("Seq: %d\n", i);
+
+			Stream->seek(seqPos);
+			mstudioseqdesc_t_v49 seqDesc; Stream->Read(&seqDesc);
+			//seqDesc.seqdata = {};
+
+			int numBlends = seqDesc.groupsize[0] * seqDesc.groupsize[1];
+			int posekeySize = seqDesc.groupsize[0] + seqDesc.groupsize[1];
+			int numAutolayers = seqDesc.numautolayers;
+			int numActMods = seqDesc.numactivitymodifiers;
+			int numEvents = seqDesc.numevents;
+
+			if (seqDesc.weightlistindex > 0)
+			{
+				Stream->seek(seqPos + seqDesc.weightlistindex);
+				seqweightlist_t_v49 weightlist; Stream->Read(&weightlist, mdlhdr.numbones);
+				//seqweightlist.push_back(weightlist);
+				seqDesc.seqdata.weightlist = weightlist;
+			}
+
+			if (seqDesc.animindexindex > 0 && seqDesc.numblends > 0)
+			{
+				Stream->seek(seqPos + seqDesc.animindexindex);
+				blendgroup_t_v49 blendgroup; Stream->Read(&blendgroup, seqDesc.groupsize[0] * seqDesc.groupsize[1]);
+				//blends.push_back(blendgroup);
+				seqDesc.seqdata.blendgroup = blendgroup;
+			}
+
+			if (seqDesc.posekeyindex > 0)
+			{
+				Stream->seek(seqPos + seqDesc.posekeyindex);
+				posekey_t_v49 posekey; Stream->Read(&posekey, posekeySize);
+				//if (posekeySize == 3)posekey.unk[2] == 0.0;
+				seqDesc.seqdata.posekey = posekey;
+			}
+
+			if (seqDesc.numautolayers > 0)
+			{
+				Stream->seek(seqPos + seqDesc.autolayerindex);
+				for (int j = 0; j < seqDesc.numautolayers; j++)
+				{
+					Stream->seek(seqPos + seqDesc.autolayerindex + (24 * j));
+					mstudioautolayer_t_v49 autolayer; Stream->Read(&autolayer);
+					seqDesc.seqdata.autolayers.push_back(autolayer);
+				}
+			}
+
+			if (seqDesc.numevents > 0)
+			{
+				Stream->seek(seqPos + seqDesc.eventindex);
+				for (int j = 0; j < seqDesc.numevents; j++)
+				{
+					Stream->seek(seqPos + seqDesc.eventindex + (80 * j));
+					mstudioevent_t_v49 _event; Stream->Read(&_event);
+					seqDesc.seqdata.events.push_back(_event);
+
+					std::string szEventName = Stream->ReadNullTermStrTrgt(seqPos + seqDesc.eventindex + 80 * j + _event.szeventindex, false);
+					std::string szName = Stream->ReadNullTermStrTrgt(seqPos + seqDesc.eventindex + 80 * j + 12, false);
+					eventNum++;
+				}
+			}
+
+			if (seqDesc.numactivitymodifiers > 0)
+			{
+				Stream->seek(seqPos + seqDesc.activitymodifierindex);
+				for (int j = 0; j < seqDesc.numactivitymodifiers; j++)
+				{
+					Stream->seek(seqPos + seqDesc.activitymodifierindex + 4 * j);
+					mstudioactivitymodifier_t_v49 actmod; Stream->Read(&actmod);
+					seqDesc.seqdata.actmods.push_back(actmod);
+					std::string szName = Stream->ReadNullTermStrTrgt(seqPos + seqDesc.activitymodifierindex + 4 * j + actmod.sznameindex, false);
+					//actmod.szname = szName;
+					//activitymodifiers.push_back(actmod);
+					actModNum++;
+				}
+			}
+
+			seqdescs.push_back(seqDesc);//seqdescs[i] = seqDesc;
+		}
+
+		//for (int i = 0; i < mdlhdr.numlocalseq; i++)
+		//{
+		//
+		//	int seqPos = mdlhdr.localseqindex + 212 * i;
+		//	int numBlends = seqdescs[i].groupsize[0] * seqdescs[i].groupsize[1];
+		//	int posekeySize = seqdescs[i].groupsize[0] + seqdescs[i].groupsize[1];
+		//	int numAutolayers = seqdescs[i].numautolayers;
+		//	int numActMods = seqdescs[i].numactivitymodifiers;
+		//	int numEvents = seqdescs[i].numevents;
+		//
+		//	if (seqdescs[i].weightlistindex > 0)
+		//	{
+		//		Stream->seek(seqPos + seqdescs[i].weightlistindex);
+		//		seqweightlist_t_v49 weightlist; Stream->Read(&weightlist, mdlhdr.numbones);
+		//		seqweightlist.push_back(weightlist);
+		//		//Logger::Info("Weightlist Read: %d\n", i);
+		//	}
+		//
+		//	if (seqdescs[i].animindexindex > 0)
+		//	{
+		//		Stream->seek(seqPos + seqdescs[i].animindexindex);
+		//		blendgroup_t_v49 blendgroup; Stream->Read(&blendgroup, numBlends);
+		//		blends.push_back(blendgroup);
+		//		seqdescs[i].seqdata.blendgroups = &blendgroup;
+		//		//Logger::Info("BlendGroup Read: %d\n", i);
+		//	}
+		//
+		//	if (seqdescs[i].posekeyindex > 0)
+		//	{
+		//		Stream->seek(seqPos + seqdescs[i].posekeyindex);
+		//		posekey_t_v49 posekey; Stream->Read(&posekey, posekeySize);
+		//		if (posekeySize == 3)posekey.unk[2] == 0.0;
+		//		//				Logger::Info("PosekeyF Read: %f\n", posekey.unk[2]);
+		//		seqdescs[i].seqdata.posekey = posekey;//.push_back(posekey);
+		//		//Logger::Info("Posekey Read: %d\n", i);
+		//	}
+		//
+		//	if (numAutolayers > 0)
+		//	{
+		//		Stream->seek(seqPos + seqdescs[i].autolayerindex);
+		//		for (int j = 0; j < numAutolayers; j++)
+		//		{
+		//			mstudioautolayer_t_v49 autolayer; Stream->Read(&autolayer);
+		//			seqdescs[i].seqdata.autolayers[i] = autolayer; //.push_back(autolayer);
+		//			//Logger::Info("Autolayer Read: %d\n", j);
+		//		}
+		//	}
+		//
+		//	//string* _tempEvents = new string[seqdescs[i].numevents];
+		//	if (numEvents > 0)
+		//	{
+		//		Stream->seek(seqPos + seqdescs[i].eventindex);
+		//		for (int j = 0; j < seqdescs[i].numevents; j++)
+		//		{
+		//			mstudioevent_t_v49 _event; Stream->Read(&_event);
+		//			seqdescs[i].seqdata.events[i] = _event;//.push_back(_event);
+		//
+		//			std::string szEventName = Stream->ReadNullTermStrTrgt(seqPos + seqdescs[i].eventindex + 80 * j + _event.szeventindex, false);
+		//			std::string szName = Stream->ReadNullTermStrTrgt(seqPos + seqdescs[i].eventindex + 80 * j + 12, false);
+		//			//Logger::Info("Pos: %d\n", Stream->Position());
+		//			//if (szEventName != "")_tempEvents[j] = szEventName;
+		//			//else _tempEvents[j] = (std::string)"Empty";
+		//
+		//			//Logger::Info("Event Read: %s : %s : %d\n", szName.c_str(), _tempEvents[j].c_str(), j);
+		//			eventNum++;
+		//		}
+		//	}
+		//
+		//	if (numActMods > 0)
+		//	{
+		//		Stream->seek(seqPos + seqdescs[i].activitymodifierindex);
+		//		for (int j = 0; j < seqdescs[i].numactivitymodifiers; j++)
+		//		{
+		//			mstudioactivitymodifier_t_v49 actmod; Stream->Read(&actmod);
+		//
+		//			std::string szName = Stream->ReadNullTermStrTrgt(seqPos + seqdescs[i].activitymodifierindex + 4 * j + actmod.sznameindex, false);
+		//			actmod.szname = szName;
+		//			activitymodifiers.push_back(actmod);
+		//			actModNum++;
+		//		}
+		//	}
+		//}
+	}
+}
+
+void MDL::SourceModel49::ReadNodeNames(BinaryReader* Stream)
+{
+	if (mdlhdr.numlocalnodes > 0)
+	{
+		Stream->seek(mdlhdr.localnodenameindex);
+		for (int i = 0; i < mdlhdr.numlocalnodes; i++)
+		{
+			mstudionodename_t_v49 nodeName; Stream->Read(&nodeName);
+
+			std::string szName = Stream->ReadNullTermStrTrgt(nodeName.sznameindex, false);
+			nodeName.szname = szName;
+			nodenames[i] = nodeName;
+			//Logger::Info("NodeName Read: %s : %d\n", nodeName.szname.c_str(), i);
+		}
+	}
+}
+
+void MDL::SourceModel49::ReadNodes(BinaryReader* Stream)
+{
+	if (mdlhdr.numlocalnodes > 0)
+	{
+		Stream->seek(mdlhdr.localnodeindex);
+		for (int i = 0; i < mdlhdr.numlocalnodes; i++)
+		{
+			mstudionodedata_v49 node; Stream->Read(&node, mdlhdr.numlocalnodes * mdlhdr.numlocalnodes);
+			nodes[i] = node;
+			Logger::Info("Node Read: %d\n", i);
+		}
+	}
+}
+
+void MDL::SourceModel49::ReadBodyParts(BinaryReader* Stream)
+{
+	if (mdlhdr.numbodyparts > 0)
+	{
+		Stream->seek(mdlhdr.bodypartindex);
+		for (int i = 0; i < mdlhdr.numbodyparts; i++)
+		{
+			mstudiobodyparts_t_v49 bodyPart; Stream->Read(&bodyPart);
+			if (bodyPart.nummodels > 0) numModels += bodyPart.nummodels;
+
+			std::string szName = Stream->ReadNullTermStrTrgt(mdlhdr.bodypartindex + 16 * i + bodyPart.sznameindex, false);
+			bodyPart.szname = szName;
+
+			bodyparts[i] = bodyPart;//bodyparts.push_back(bodyPart);
+			Logger::Info("Bodypart Read: %s : %d\n", bodyPart.szname.c_str(), i);
+		}
+	}
+}
+
+void MDL::SourceModel49::ReadModels(BinaryReader* Stream)
+{
+	if (numModels > 0)
+	{
+		Stream->seek(mdlhdr.bodypartindex + 16 * mdlhdr.numbodyparts);
+		for (int i = 0; i < numModels; i++)
+		{
+			mstudiomodel_t_v49 model; Stream->Read(&model);
+			if (model.nummeshes > 0) numMeshes += model.nummeshes;
+			models.push_back(model);
+			int modelPos = mdlhdr.bodypartindex + 16 * mdlhdr.numbodyparts + 148 * i;
+
+			std::string szName = Stream->ReadNullTermStrTrgt(modelPos, false);
+
+			Logger::Info("Model Read: %s : %d\n", szName.c_str(), i);
+		}
+
+	}
+}
+
+void MDL::SourceModel49::ReadIKChains(BinaryReader* Stream)
+{
+	if (mdlhdr.numikchains > 0)
+	{
+		std::vector <int> ikRoots;
+		Stream->seek(mdlhdr.ikchainindex);
+		for (int i = 0; i < mdlhdr.numikchains; i++)
+		{
+			mstudioikchain_t_v49 ikchain; Stream->Read(&ikchain);
+			if (ikchain.numlinks > 0) numIkLinks += ikchain.numlinks;
+
+			int ikChainPos = mdlhdr.ikchainindex + 16 * i;
+
+			std::string szName = Stream->ReadNullTermStrTrgt(ikChainPos + ikchain.sznameindex, false);
+			ikchain.szname = szName;
+
+			ikchains[i] = ikchain;//ikchains.push_back(ikchain);
+			Logger::Info("IkChain Read: %s : %d\n", szName.c_str(), i);
+		}
+	}
+}
+
+void MDL::SourceModel49::ReadIKLinks(BinaryReader* Stream)
+{
+	if (mdlhdr.numikchains > 0 && numIkLinks > 0)
+	{
+		for (int i = 0; i < numIkLinks; i++)
+		{
+			int ikLinkPos = (mdlhdr.ikchainindex + 16 * mdlhdr.numikchains) + 28 * i;
+			Stream->seek(ikLinkPos);
+			mstudioiklink_t_v49 iklink; Stream->Read(&iklink);
+			iklinks.push_back(iklink);
+			Logger::Info("IkLink Read: %d\n", i);
+		}
+	}
+}
+
+void MDL::SourceModel49::ReadPoseParamDescs(BinaryReader* Stream)
+{
+	if (mdlhdr.localposeparamindex > 0)
+	{
+		Stream->seek(mdlhdr.localposeparamindex);
+		for (int i = 0; i < mdlhdr.numlocalposeparameters; i++)
+		{
+			mstudioposeparamdesc_t_v49 poseparamdesc; Stream->Read(&poseparamdesc);
+			int poseParamPos = mdlhdr.localposeparamindex + 20 * i;
+
+			std::string szName = Stream->ReadNullTermStrTrgt(poseParamPos + poseparamdesc.sznameindex, false);
+			poseparamdesc.szname = szName;
+
+			poseparamdescs[i] = poseparamdesc;//poseparamdescs.push_back(poseparamdesc);
+			Logger::Info("PoseParamDesc Read: %s : %d\n", szName.c_str(), i);
+		}
+	}
+}
+
+void MDL::SourceModel49::ReadAnimBlocks(BinaryReader* Stream)
+{
+	if (mdlhdr.numanimblocks > 0)
+	{
+		Stream->seek(mdlhdr.localnodeindex);
+		for (int i = 0; i < mdlhdr.numanimblocks; i++)
+		{
+			mstudioanimblock_t animBlock; Stream->Read(&animBlock);
+			animBlocks[i] = animBlock;//animblocks.push_back(animBlock);
+			Logger::Info("AnimBlock Read: %d\n", i);
+		}
+	}
+}
+
+void MDL::SourceModel49::ReadMeshes(BinaryReader* Stream)
+{
+	if (numMeshes > 0)
+	{
+		for (int i = 0; i < numMeshes; i++)
+		{
+			int modelPos = mdlhdr.bodypartindex + 16 * mdlhdr.numbodyparts;
+			int meshPos = (modelPos + 148 * numModels) + (20 * mdlhdr.numlocalposeparameters) + (16 * mdlhdr.numikchains + 28 * numIkLinks) + 116 * i;
+			Stream->seek(meshPos);
+			mstudiomesh_t_v49 mesh; Stream->Read(&mesh);
+			meshes.push_back(mesh);
+
+			int texturePos = mdlhdr.textureindex + (64 * (int)mesh.material);
+			Stream->seek(texturePos);
+			mstudiotexture_t_v53 texture; Stream->Read(&texture);
+
+			std::string szName = Stream->ReadNullTermStrTrgt(texturePos + texture.sznameindex, false);
+
+			Logger::Info("MeshMat Read: %s : %d\n", szName.c_str(), i);
+			Logger::Info("Mesh Read: %d\n", i);
+		}
+	}
+}
+
+void MDL::SourceModel49::ReadIncludeModels(BinaryReader* Stream)
+{
+	if (mdlhdr.numincludemodels > 0)
+	{
+		Stream->seek(mdlhdr.includemodelindex);
+		for (int i = 0; i < mdlhdr.numincludemodels; i++)
+		{
+			mstudiomodelgroup_t_v49 includemodel; Stream->Read(&includemodel);
+			int includeModelPos = mdlhdr.includemodelindex + 8 * i;
+
+			std::string szName = Stream->ReadNullTermStrTrgt(includeModelPos + includemodel.sznameindex, false);
+			includemodel.szname = szName;
+
+			includedmodels[i] = includemodel;//includedmodels.push_back(includemodel);
+			Logger::Info("IncludedModel Read: %s : %d\n", szName.c_str(), i);
+		}
+	}
+}
+
+void MDL::SourceModel49::ReadTextures(BinaryReader* Stream)
+{
+	if (mdlhdr.numtextures > 0)
+	{
+		Stream->seek(mdlhdr.textureindex);
+		for (int i = 0; i < mdlhdr.numtextures; i++)
+		{
+			mstudiotexture_t_v49 texture; Stream->Read(&texture);
+			int texturePos = mdlhdr.textureindex + 64 * i;
+
+			std::string szName = Stream->ReadNullTermStrTrgt(texturePos + texture.sznameindex, false);
+			texture.szname = szName;
+
+			textures[i] = texture;//textures.push_back(texture);
+
+			Logger::Info("Texture Read: %s : %d\n", szName.c_str(), i);
+		}
+	}
+}
+
+void MDL::SourceModel49::ReadCDTextures(BinaryReader* Stream)
+{
+	if (mdlhdr.numcdtextures > 0)
+	{
+		Stream->seek(mdlhdr.cdtextureindex);
+		for (int i = 0; i < mdlhdr.numcdtextures; i++)
+		{
+			mstudiotexturedir_t_v49 cdtexture; Stream->Read(&cdtexture);
+
+			std::string szName = Stream->ReadNullTermStrTrgt(cdtexture.sznameindex, false);
+			cdtexture.szname = szName;
+
+			cdtextures[i] = cdtexture;//cdtextures.push_back(cdtexture);
+			Logger::Info("CdTexture Read: %s : %d\n", szName.c_str(), i);
+		}
+	}
+}
+
+void MDL::SourceModel49::ReadSkinFamilies(BinaryReader* Stream)
+{
+	if (mdlhdr.numskinfamilies > 0 && mdlhdr.numtextures > 0)
+	{
+		if (mdlhdr.numskinref > 0 && mdlhdr.numtextures > 0)
+		{
+			Stream->seek(mdlhdr.skinindex);
+			for (int i = 0; i < mdlhdr.numskinfamilies; i++)
+			{
+				mstudioskingroup_t_v49 skingroup; Stream->Read(&skingroup, mdlhdr.numskinref);
+				skingroups[i] = skingroup;//skingroups.push_back(skingroup);
+				Logger::Info("SkinGroup Read: %d\n", i);
+			}
+		}
+	}
+}
+
+void MDL::SourceModel49::ReadKeyValues(BinaryReader* Stream)
+{
+	if (mdlhdr.keyvaluesize > 0)
+	{
+		Stream->seek(mdlhdr.keyvalueindex);
+		Stream->Read(&keyvalues, mdlhdr.keyvaluesize);
+		Logger::Info("Keyvalues Read: %d\n", mdlhdr.keyvaluesize);
+	}
+}
+
+void MDL::SourceModel49::ReadSrcBoneTransforms(BinaryReader* Stream)
+{
+	if (mdlsubhdr.numsrcbonetransform > 0)
+	{
+		Stream->seek(mdlsubhdr.srcbonetransformindex);
+		for (int i = 0; i < mdlsubhdr.numsrcbonetransform; i++)
+		{
+			mstudiosrcbonetransform_t_v49 srcbonetransform; Stream->Read(&srcbonetransform);
+			int srcBonePos = mdlsubhdr.srcbonetransformindex + 100 * i;
+
+			std::string szName = Stream->ReadNullTermStrTrgt(srcBonePos + srcbonetransform.sznameindex, false);
+
+			srcbonetransforms[i] = srcbonetransform;//srcbonetransforms.push_back(srcbonetransform);
+			Logger::Info("SrcBoneTransform Read: %s : %d\n", szName.c_str(), i);
+		}
+	}
+}
+
+void MDL::SourceModel49::ReadLinearBone(BinaryReader* Stream)
+{
+	if (mdlhdr.numbones > 0)
+	{
+		Stream->seek(mdlsubhdr.linearboneindex + 408);
+		Stream->Read(&linearbone);
+		Stream->Read(&linearbonedata, mdlhdr.numbones);
+		Logger::Info("LinearBone Read: %d\n", mdlhdr.numbones);
+	}
+}
+
+void MDL::SourceModel49::ReadStringTable(BinaryReader* Stream)
+{
+	Stream->seek(mdlsubhdr.sznameindex + 408);
+	mstudiostringtable_t_v49 _stringTable; Stream->Read(&_stringTable, mdlhdr, seqdescs, hitboxsets, attachments, nodenames, bodyparts, ikchains, animdescs, textures, includedmodels, cdtextures, poseparamdescs, srcbonetransforms);
+	stringTable = _stringTable;
+	//mstudiostringtable_t_v49 stringTable; Stream->Read(&stringTable, &mdl);//, mdlhdr, seqdescs, hitboxsets, attachments, nodenames, bodyparts, ikchains, animdescs, textures, includedmodels, cdtextures, poseparamdescs, srcbonetransforms);
+}
+//Me trying to adapt Rika's template code to c++ and format it how I want it to be. I ended up getting angry at it and hit it with a shovel and then when it worked from me setting it up the same way Rika did I knew it was my mission to make it work with the way I set it up initially. - Liberty
+// 
+// 
+//bool TestCheck(BinaryReader* Stream, int pCurrentPos, int target)
+//{
+//	unsigned char test;
+//	Stream->seek(pCurrentPos);
+//	Stream->read((char*)&test, sizeof(byte));
+//	return test <= target;
+//}
+//
+//void GenerateAnimValues(BinaryReader* Stream, int pAnimValue, int maxFrames, mstudioanim_t_v49* hdr, vector<mstudioanimvalue_t>* dataArray)
+//{
+//	int k = maxFrames;
+//	int pCurrentPos = pAnimValue;
+//	Stream->seek(pCurrentPos);
+//	unsigned char test; Stream->read((char*)&test, sizeof(byte));
+//	mstudioanimvalue_t data;
+//
+//	//Printf("remaining frames %i\n", k);
+//
+//	while (TestCheck(Stream, pCurrentPos, k))
+//	{
+//		Stream->seek(pCurrentPos + 1);
+//		unsigned char test2; Stream->read((char*)&test2, sizeof(byte));
+//
+//		if (test2 == 0)
+//			return;
+//
+//		Stream->seek(pCurrentPos);
+//		Stream->read((char*)&data.num.valid, sizeof(byte));
+//		Stream->read((char*)&data.num.total, sizeof(byte));
+//		for (int i = 0; i < data.num.valid; i++)
+//		{
+//            short value{};
+//            Stream->read((char*)&value, sizeof(short));
+//			data.value.push_back(value);
+//		}
+//
+//		pCurrentPos += (data.num.valid + 1) * 2;
+//		k -= data.num.total;
+//
+//		//Printf("remaining frames %i\n", k);
+//		dataArray->push_back(data);
+//	}
+//}
+//
+//void ReadValuePtr(BinaryReader* Stream, mstudioanim_valueptr_t_v49& valueptr, int maxFrames, mstudioanim_t_v49* hdr, vector<mstudioanimvalue_t>* dataArray)
+//{
+//	for (int g = 0; g < 3; g++)
+//	{
+//		if (valueptr.offset[g])
+//			GenerateAnimValues(Stream, valueptr.ptrPos + valueptr.offset[g], maxFrames, hdr, dataArray);
+//	}
+//}
+
+mstudiobone_t_v49* MDL::SourceModel49::GetBones(BinaryReader* Stream) //Grabbing an array of bones from a v49 mdl. -Liberty
+{
+	Stream->seek(0); //Just in case of wonky bs with seeking. - Liberty
+
+	studiohdr_t_v49	 mdlhdr; Stream->Read(&mdlhdr);
+	studiohdr2_t_v49 mdlsubhdr; Stream->Read(&mdlsubhdr);
+	mstudiobone_t_v49* bones = new mstudiobone_t_v49[mdlhdr.numbones];
+
+	if (mdlhdr.numbones > 0)
+	{
+		Stream->seek(mdlhdr.boneindex);
+		for (int i = 0; i < mdlhdr.numbones; i++)
+		{
+			int bonePos = mdlhdr.boneindex + 216 * i;
+			Stream->seek(bonePos);
+
+			mstudiobone_t_v49 bone; Stream->Read(&bone);
+			bones[i] = bone;
+
+			std::string szName = Stream->ReadNullTermStrTrgt(bonePos + bone.sznameindex, false);
+
+			if (DEBUG)
+			{
+				std::string surfacePropName = Stream->ReadNullTermStrTrgt(bonePos + bone.surfacepropLookup, false);
+
+				Logger::Debug(":----------- DUMPING BONE DATA #%d -----------: \n", i);
+				Logger::Info(":--------------------------------: \n");
+				Logger::Notice(":----------- DATA START -----------: \n");
+				Logger::Info("BONE[ %d ].sznameindex: %d StrNamePos: %d\n", i, bone.sznameindex, bonePos + bone.sznameindex);
+				Logger::Info("BONE[ %d ].parent: %d  \n", i, bone.parent);
+				Logger::Info("BONE[ %d ].bonecontroller: int[%d]  \n", i, 6);
+				Logger::Info("BONE[ %d ].pos: < x: %f, y: %f, z: %f >  \n", i, bone.pos.x, bone.pos.y, bone.pos.z);
+				Logger::Info("BONE[ %d ].quat: < i: %f, j: %f, k: %f, one: %f >  \n", i, bone.quat.i, bone.quat.j, bone.quat.k, bone.quat.one);
+				Logger::Info("BONE[ %d ].rot: < x: %f, y: %f, z: %f >  \n", i, bone.pos.x, bone.pos.y, bone.pos.z);
+				Logger::Info("BONE[ %d ].posscale: < x: %f, y: %f, z: %f >  \n", i, bone.pos.x, bone.pos.y, bone.pos.z);
+				Logger::Info("BONE[ %d ].rotscale: < x: %f, y: %f, z: %f >  \n", i, bone.pos.x, bone.pos.y, bone.pos.z);
+				Logger::Info("BONE[ %d ].poseToBoneR1: < i: %f, j: %f, k: %f, one: %f >  \n", i, bone.poseToBone.c0r0, bone.poseToBone.c1r0, bone.poseToBone.c2r0, bone.poseToBone.c3r0);
+				Logger::Info("BONE[ %d ].poseToBoneR2: < i: %f, j: %f, k: %f, one: %f >  \n", i, bone.poseToBone.c0r1, bone.poseToBone.c1r1, bone.poseToBone.c2r1, bone.poseToBone.c3r1);
+				Logger::Info("BONE[ %d ].poseToBoneR3: < i: %f, j: %f, k: %f, one: %f >  \n", i, bone.poseToBone.c0r2, bone.poseToBone.c1r2, bone.poseToBone.c2r2, bone.poseToBone.c3r2);
+				Logger::Info("BONE[ %d ].qAlignment: < i: %f, j: %f, k: %f, one: %f >  \n", i, bone.qAlignment.i, bone.qAlignment.j, bone.qAlignment.k, bone.qAlignment.one);
+				Logger::Info("BONE[ %d ].flags: %s  \n", i, Utility::func::ReadBoneFlags(bone.flags).c_str());
+				Logger::Info("BONE[ %d ].proctype: %d | %s  \n", i, bone.proctype, Utility::func::ReadProcFlags(bone.proctype).c_str());
+				Logger::Info("BONE[ %d ].procindex: %d  \n", i, bone.procindex);
+				Logger::Info("BONE[ %d ].physicsbone: %d  \n", i, bone.physicsbone);
+				Logger::Info("BONE[ %d ].surfacepropidx: %d  \n", i, bone.surfacepropidx);
+				Logger::Info("BONE[ %d ].contents: %d | %s  \n", i, bone.contents, Utility::func::ReadContents(bone.contents).c_str());
+				Logger::Info("BONE[ %d ].surfacepropLookup: %d StrPropNamePos: %d\n", i, bone.surfacepropLookup, bonePos + bone.surfacepropLookup);
+				Logger::Info("BONE[ %d ].Unused: int[%d]  \n", i, 7);
+				Logger::Info("BONE[ %d ].surfaceprop: %s  \n", i, surfacePropName != "" ? surfacePropName.c_str() : "Empty");
+				Logger::Info("BONE[ %d ].szname: %s  \n", i, szName != "" ? szName.c_str() : "Empty");
+				Logger::Notice(":----------- DATA END -----------: \n");
+				Logger::Info(":--------------------------------: \n");
+			}
+
+			Logger::Info("Bone Read: %s : %d\n", szName.c_str(), i);
+		}
+	}
+	else
+	{
+		Logger::Info("No bones to read!\n");
+	}
+}
+
+void MDL::SourceModel49::ConvertToV53()
+{
+
+}
+
+studiohdr_t_v53 MDL::SourceModel49::ConvertHeader(FileInfo info)
+{
+
+	int ruiNum = 0;
+	int mdlSize = 0;
+	int phySize = 0;
+	int phyBSize = 0;
+	int vtxSize = 0;
+	int vvdSize = 0;
+	int vvcSize = 0;
+	int ruiSize = 0;
+	int aabbSize = 0;
+
+	if (info.rui.has_value()) //This is a temp for rui testing. -Liberty
+	{
+		BinaryReader RUIStream = BinaryReader(info.rui.value().c_str());
+		bytesAddedToRuiMesh = RUIStream.size;
+		ruiSize = RUIStream.size;
+		bytesAddedToRuiMesh = ruiSize;
+		mstudiorruiheader_t ruiHeader;
+		mstudioruimesh_t ruiMesh;
+		int meshIndex = 0;
+		RUIStream.Read(&ruiHeader);
+		RUIStream.seek(ruiHeader.ruimeshindex);
+		//		Logger::Info("Index:  %d\n", RUIStream.size);
+
+		for (int i = 0; i < 64; i++)
+		{
+			//RUIStream.Read(&ruiHeader);
+			//if (i == 0)meshIndex = ruiHeader.ruimeshindex;
+			//if (i == 0)RUIStream.seek(ruiHeader.ruimeshindex);
+			RUIStream.Read(&ruiMesh);
+			ruiNum++;
+			//			Logger::Info("Pos:  %d Num: %d\n", RUIStream.Position(), i);
+
+
+			if (RUIStream.Position() >= RUIStream.size)
+			{
+				break;
+			}
+		}
+		RUIStream.seek(0);
+		RUIStream.Read(&ruiHeader);
+		int ruiPos = mdlhdr.includemodelindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods + 8 * mdlhdr.numincludemodels;
+		int dist = ruiHeader.ruimeshindex - 8 * ruiNum;
+		//		Logger::Info("Index:  %d\n", ruiHeader.ruimeshindex);
+		double ruiAlignment = (ruiPos + 8 * ruiNum) / (double)16;
+		//		Logger::Info("Alignment:  %f\n", ruiAlignment);
+		if (!IsWhole(ruiAlignment))
+		{
+			int ruiAlignment2 = 16 * ((int)ruiAlignment + 1);
+			int paddingFix = ruiAlignment2 - ruiPos;
+			//			Logger::Info("Padding:  %d\n", paddingFix - 8 * ruiNum);
+			//			Logger::Info("Padding2:  %d\n", ruiAlignment2);
+			//			Logger::Info("Padding3:  %d\n", ruiPos);
+			ruiPadding = paddingFix - 8 * ruiNum;
+			ruiSize += paddingFix - 8 * ruiNum;
+			bytesAddedToRuiMesh = ruiSize;
+		}
+	}
+
+
+	if (info.mdl.has_value())
+	{
+		BinaryReader MdlStream = BinaryReader(info.mdl.value().c_str());
+		mdlSize = MdlStream.size;
+	}
+	if (info.phy.has_value())
+	{
+		BinaryReader PhyStream = BinaryReader(info.phy.value().c_str());
+		phySize = PhyStream.size;
+	}
+	if (info.pfb.has_value())
+	{
+		BinaryReader PhyBStream = BinaryReader(info.pfb.value().c_str());
+		phyBSize = PhyBStream.size;
+	}
+	if (info.vtx.has_value())
+	{
+		BinaryReader VtxStream = BinaryReader(info.vtx.value().c_str());
+		vtxSize = VtxStream.size;
+	}
+	if (info.vvd.has_value())
+	{
+		BinaryReader VvdStream = BinaryReader(info.vvd.value().c_str());
+		vvdSize = VvdStream.size;
+	}
+
+	if (info.vvc.has_value())
+	{
+		BinaryReader VvcStream = BinaryReader(info.vvc.value().c_str());
+		vvcSize = VvcStream.size;
+	}
+
+	if (info.aabb.has_value())
+	{
+		BinaryReader AABBStream = BinaryReader(info.aabb.value().c_str());
+		aabbSize = AABBStream.size;
+		bytesAddedToAABBTree = aabbSize;
+	}
+	else
+		bytesAddedToAABBTree = 60;
+
+	//Logger::Notice("RuiSize %d\n", ruiSize);
+
+	int stringTableSize = mdlhdr.length + allBytesAdded - (mdlhdr.length - (mdlsubhdr.sznameindex + 408));
+
+	int			id;
+	int			version;
+	int			checksum;
+	int			sznameindex = mdlsubhdr.sznameindex + allBytesAdded + 408 + ruiSize + bytesAddedToLinearBone + bytesAddedToAABBTree;
+	char		name[64];
+
+	int			length = mdlhdr.length + allBytesAdded + phySize + vtxSize + phyBSize + ruiSize + vvdSize + bytesAddedToLinearBone + bytesAddedToAABBTree;
+
+	Vector3		eyeposition;
+
+	Vector3		illumposition;
+
+	Vector3		hull_min;
+	Vector3		hull_max;
+
+	Vector3		view_bbmin;
+	Vector3		view_bbmax;
+
+	mdlflags_t	flags;
+
+	int			numbones;
+	int			boneindex = mdlhdr.boneindex + bytesAddedToHeader;
+
+	int			numbonecontrollers;
+	int			bonecontrollerindex = mdlhdr.bonecontrollerindex + bytesAddedToHeader + bytesAddedToBones;
+
+	int			numhitboxsets;
+	int			hitboxsetindex = mdlhdr.hitboxsetindex + bytesAddedToHeader + bytesAddedToBones;
+
+	int			numlocalanim;
+	int			localanimindex = mdlhdr.localanimindex + bytesAddedToHeader + bytesAddedToBones;
+
+	int			numlocalseq;
+	int			localseqindex = mdlhdr.localseqindex + bytesAddedToAnims + bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnimData;
+
+	int			activitylistversion;
+	int			eventsindexed;
+
+	int			numtextures;
+	int			textureindex = mdlhdr.textureindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + ruiSize;
+
+	int			numcdtextures;
+	int			cdtextureindex = mdlhdr.cdtextureindex + allBytesAdded + ruiSize;
+
+	int			numskinref;
+	int			numskinfamilies;
+	int			skinindex = mdlhdr.skinindex + allBytesAdded + ruiSize;
+
+	int			numbodyparts;
+	int			bodypartindex = mdlhdr.bodypartindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnimData + bytesAddedToActMods;
+
+	int			numlocalattachments;
+	int			localattachmentindex = mdlhdr.localattachmentindex + bytesAddedToHeader + bytesAddedToBones;
+
+	int			numlocalnodes;
+	int			localnodeindex = mdlhdr.localnodeindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnimData + bytesAddedToActMods;
+	int			localnodenameindex = mdlhdr.localnodenameindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnimData + bytesAddedToActMods;
+
+	int			numflexdesc;
+	int			flexdescindex = mdlhdr.flexdescindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods;
+
+	int			numflexcontrollers;
+	int			flexcontrollerindex = mdlhdr.flexcontrollerindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods;
+
+	int			numflexrules;
+	int			flexruleindex = mdlhdr.flexruleindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods;
+
+	int			numikchains;
+	int			ikchainindex = mdlhdr.ikchainindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToAnimData + bytesAddedToActMods;
+
+	int			nummouths = ruiNum;
+	int			mouthindex = mdlhdr.includemodelindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods + 8 * mdlhdr.numincludemodels;
+
+	int			numlocalposeparameters;
+	int			localposeparamindex = mdlhdr.localposeparamindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods;
+
+	int			surfacepropindex = mdlhdr.surfacepropindex + allBytesAdded + ruiSize + bytesAddedToLinearBone + bytesAddedToAABBTree;
+
+	int			keyvalueindex = mdlhdr.keyvalueindex + allBytesAdded + ruiSize;
+	int			keyvaluesize;
+
+	int			numlocalikautoplaylocks;
+	int			localikautoplaylockindex = mdlhdr.localikautoplaylockindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods;
+
+
+	float		mass;
+	int			contents;
+
+	int			numincludemodels;
+	int			includemodelindex = mdlhdr.includemodelindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods;
+
+	uint32_t	virtualModel;
+
+	int			bonetablebynameindex = mdlhdr.bonetablebynameindex + bytesAddedToHeader + bytesAddedToBones;
+
+	std::byte	constdirectionallightdot;
+
+	std::byte	rootLOD;
+
+	std::byte	numAllowedRootLODs;
+
+	std::byte	unused;
+
+	float		fadedistance;
+
+	int			numflexcontrollerui;
+	int			flexcontrolleruiindex = mdlhdr.flexcontrolleruiindex + bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToHeader + bytesAddedToBones + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods;
+
+	uint32_t	pVertexBase;
+	uint32_t	pIndexBase;
+
+	int			mayaindex = 0;
+
+	int			numsrcbonetransform;
+	int			srcbonetransformindex = mdlsubhdr.srcbonetransformindex + allBytesAdded + ruiSize;
+
+	int			illumpositionattachmentindex;
+
+	int			linearboneindex = mdlsubhdr.linearboneindex > 0 && mdlhdr.numbones > 1 ? mdlsubhdr.linearboneindex + allBytesAdded + 408 + ruiSize : 0;
+
+	int			m_nBoneFlexDriverCount;
+	int			m_nBoneFlexDriverIndex;
+
+	//Logger::Notice("Sznameindex %d\n", sznameindex);
+	//Logger::Notice("size of aabb %d\n", bytesAddedToAABBTree);
+	//Logger::Notice("subtract %d\n", sznameindex - bytesAddedToAABBTree);
+	//Logger::Notice("mdlsize %d\n", mdlhdr.length + allBytesAdded - (mdlhdr.length - (mdlsubhdr.sznameindex + 407)));
+
+	int			aabbindex = sznameindex - bytesAddedToAABBTree - 1; //mdlhdr.length + allBytesAdded - (mdlhdr.length - (mdlsubhdr.sznameindex + 407));//sznameindex - bytesAddedToAABBTree;//mdlsubhdr.sznameindex + allBytesAdded + 408 - 61 + ruiSize + bytesAddedToLinearBone;
+	int			numaabb = 0;
+	int			numaabb1 = 0;
+	int			numaabb2 = 0;
+
+	int			unkstringindex = mdlsubhdr.sznameindex + allBytesAdded + 408 + ruiSize + bytesAddedToLinearBone + bytesAddedToAABBTree;//mdlhdr.length + allBytesAdded - (mdlhdr.length - (mdlsubhdr.sznameindex + 407)) + aabbSize;//mdlsubhdr.sznameindex + allBytesAdded + ruiSize + bytesAddedToLinearBone + bytesAddedToAABBTree;
+
+	int			vtxindex = vtxSize > 0 ? mdlSize + allBytesAdded + phySize + phyBSize + ruiSize + bytesAddedToLinearBone + bytesAddedToAABBTree : 0; // VTX
+	int			vvdindex = vvdSize > 0 ? mdlSize + allBytesAdded + phySize + vtxSize + phyBSize + ruiSize + bytesAddedToLinearBone + bytesAddedToAABBTree : 0; // VVD / IDSV
+	int			vvcindex = vvcSize > 0 ? mdlSize + allBytesAdded + phySize + vtxSize + phyBSize + ruiSize + vvdSize + bytesAddedToLinearBone + bytesAddedToAABBTree : 0; // VVC / IDCV 
+	int			vphyindex = phySize > 0 ? mdlSize + allBytesAdded + ruiSize + bytesAddedToLinearBone + bytesAddedToAABBTree : 0; // VPHY / IVPS
+
+	int			vtxsize = vtxSize; // VTX
+	int			vvdsize = vvdSize; // VVD / IDSV
+	int			vvcsize = vvcSize; // VVC / IDCV 
+	int			vphysize = phySize; // VPHY / IVPS
+
+	int			unkmemberindex1 = mdlSize + allBytesAdded + phySize + ruiSize + bytesAddedToLinearBone + bytesAddedToAABBTree;
+	int			numunkmember1 = phyBSize > 0 ? 0 : 0;
+
+	int			unk = 0;
+
+	int			unkindex3 = mdlSize + allBytesAdded + phySize + ruiSize + bytesAddedToLinearBone + bytesAddedToAABBTree;
+
+	int			unused1[60];
+
+	studiohdr_t_v53 v53Hdr = { mdlhdr.id, 53, mdlhdr.checksum, sznameindex, ArrayToVector(mdlhdr.name, 64), length, mdlhdr.eyeposition, mdlhdr.illumposition, mdlhdr.hull_min, mdlhdr.hull_max, mdlhdr.view_bbmin, mdlhdr.view_bbmax, mdlhdr.flags, mdlhdr.numbones, boneindex, mdlhdr.numbonecontrollers, bonecontrollerindex, mdlhdr.numhitboxsets, hitboxsetindex, mdlhdr.numlocalanim, localanimindex, mdlhdr.numlocalseq, localseqindex, mdlhdr.activitylistversion, mdlhdr.eventsindexed, mdlhdr.numtextures, textureindex, mdlhdr.numcdtextures, cdtextureindex, mdlhdr.numskinref, mdlhdr.numskinfamilies, skinindex, mdlhdr.numbodyparts, bodypartindex, mdlhdr.numlocalattachments, localattachmentindex, mdlhdr.numlocalnodes, localnodeindex, localnodenameindex, mdlhdr.numflexdesc, flexdescindex, mdlhdr.numflexcontrollers, flexcontrollerindex, mdlhdr.numflexrules, flexruleindex, mdlhdr.numikchains, ikchainindex, ruiNum, mouthindex, mdlhdr.numlocalposeparameters, localposeparamindex, surfacepropindex, keyvalueindex, mdlhdr.keyvaluesize, mdlhdr.numlocalikautoplaylocks, localikautoplaylockindex, mdlhdr.mass, mdlhdr.contents, mdlhdr.numincludemodels, includemodelindex, mdlhdr.virtualModel, bonetablebynameindex, mdlhdr.constdirectionallightdot, mdlhdr.rootLOD, mdlhdr.numAllowedRootLODs, mdlhdr.unused, -1.0, mdlhdr.numflexcontrollerui, flexcontrolleruiindex, mdlhdr.pVertexBase, mdlhdr.pIndexBase, mayaindex, mdlsubhdr.numsrcbonetransform, srcbonetransformindex, mdlsubhdr.illumpositionattachmentindex, linearboneindex, mdlsubhdr.m_nBoneFlexDriverCount, mdlsubhdr.m_nBoneFlexDriverIndex, aabbindex, numaabb, numaabb1, numaabb2, unkstringindex, vtxindex, vvdindex, vvcindex, vphyindex, vtxsize, vvdsize, vvcsize, vphysize, unkmemberindex1, numunkmember1, unk, unkindex3, unused1 };
+
+	return v53Hdr;
+}
+
+std::vector<mstudiobone_t_v53> MDL::SourceModel49::BoneConversion()
+{
+	std::vector<mstudiobone_t_v53> v53Bones;
+	for (int i = 0; i < mdlhdr.numbones; i++)
+	{
+		int stairs = bytesAddedToAnims + bytesAddedToSeqs + (28 * mdlhdr.numbones) - (28 * i) + bytesAddedToTextures + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + bytesAddedToRuiMesh + bytesAddedToLinearBone + bytesAddedToAABBTree;
+
+		//Logger::Info("Stairs: %d\n", stairs);
+
+		mstudiobone_t_v49 v49Bone = bones[i];
+
+		Vector3 unkvector{ 1,1,1 };
+
+		Vector3 unkvector1{ 0.0004882813 ,0.0004882813 ,0.0004882813 };
+
+		int unkindex = 0;
+
+		Vector3 posscale{ 0,0,0 };
+
+		if (v49Bone.procindex > 0) v49Bone.procindex += ((28 * mdlhdr.numbones) - (28 * i));
+		if (v49Bone.surfacepropidx > 0) v49Bone.surfacepropidx += stairs;
+		if (v49Bone.surfacepropLookup > 0) v49Bone.surfacepropLookup += stairs;
+
+		mstudiobone_t_v53 bone{ v49Bone.sznameindex + stairs, v49Bone.parent, -1,-1,-1,-1,-1,-1, v49Bone.pos, v49Bone.quat, v49Bone.rot, unkvector, posscale, v49Bone.rotscale, unkvector1, v49Bone.poseToBone, v49Bone.qAlignment, v49Bone.flags, v49Bone.proctype, v49Bone.procindex, v49Bone.physicsbone, v49Bone.surfacepropidx, v49Bone.contents, v49Bone.surfacepropLookup, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+		v53Bones.push_back(bone);
+	}
+	return v53Bones;
+}
+
+std::vector<mstudiobbox_t_v53> MDL::SourceModel49::HitboxConversion()
+{
+	std::vector<mstudiobbox_t_v53> v53Hitboxes;
+	int stairs = bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToIkChains + bytesAddedToTextures + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + bytesAddedToRuiMesh + bytesAddedToLinearBone + bytesAddedToAABBTree;
+	for (int i = 0; i < numHitboxes; i++)
+	{
+		mstudiobbox_t_v49 v49Hitbox = hitboxes[i];
+
+		mstudiobbox_t_v53 hitbox{ v49Hitbox.bone, v49Hitbox.group, v49Hitbox.bbmin, v49Hitbox.bbmax, v49Hitbox.szhitboxnameindex + stairs, 0, v49Hitbox.szhitboxnameindex + stairs, 0,0,0,0,0,0 };
+
+		v53Hitboxes.push_back(hitbox);
+	}
+
+	return v53Hitboxes;
+}
+
+std::vector<mstudioanimdesc_t_v53> MDL::SourceModel49::AnimDescConversion()
+{
+	std::vector<int> hdrBytesAnimDescAdd = v53GetAnimHdrBytesAdded(true);
+	std::vector<int> secHdrBytesAnimDescAdd = v53GetSecHdrBytesAdded(true);
+	std::vector<mstudioanimdesc_t_v53> v53AnimDescs;
+	int ikRuleNum = 0;
+	int animIdx = mdlhdr.localanimindex;
+	//Logger::Info("animIdx: %d\n", animIdx);
+	//Logger::Info("Hdr BytesAdded: %d\n", bytesAddedToHeader);
+	//Logger::Info("Bone BytesAdded: %d\n", bytesAddedToBones);
+	int bytesAddedToHeader = 52;
+	int bytesAddedToBones = mdlhdr.numbones * 28;
+	int secNum = 0;
+	int secNum2 = 0;
+	for (int i = 0; i < mdlhdr.numlocalanim; i++)
+	{
+		//Logger::Info("Test\n");
+		mstudioanimdesc_t_v49 v49AnimDesc = animdescs[i];
+
+		int frames = v49AnimDesc.numframes;
+		int secFrames = v49AnimDesc.sectionframes;
+		int outPos = animIdx + bytesAddedToHeader + bytesAddedToBones + 92 * i;
+		int pos = animIdx + 100 * i;
+		int stairs = (-((8 * (mdlhdr.numlocalanim - i))) + bytesAddedToSeqs) + bytesAddedToTextures + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + bytesAddedToRuiMesh + bytesAddedToLinearBone + bytesAddedToAABBTree;
+		int steps = -((8 * (mdlhdr.numlocalanim - i))) + hdrBytesAnimDescAdd[i] + secHdrBytesAnimDescAdd[i];
+
+
+		int ikStairs = -12 * (ikRuleNum);
+		int secStairs = -4 * secNum;
+		if (v49AnimDesc.numikrules > 0)
+		{
+			int localSteps = -((8 * (mdlhdr.numlocalanim - i)));
+			int stairs = v53GetAnimHdrBytesAddedIdv(i);
+			int stairs2 = 0;
+			if (v49AnimDesc.sectionindex > 0)
+			{
+				int num = (frames / secFrames) + 2;
+				secNum2 += num;
+				int secStairs2 = -4 * secNum2;
+				stairs2 = v53GetSecHdrBytesAddedIdv(i);
+				v49AnimDesc.ikruleindex += stairs2 + (localSteps + ikStairs + secStairs2) + hdrBytesAnimDescAdd[i];
+			}
+			else
+			{
+				v49AnimDesc.ikruleindex += stairs;
+			}
+
+			//v49AnimDesc.ikruleindex += stairs + stairs2;
+			//Logger::Info("SecAddedIdv: %d AnimAddedIdv: %d | Final %d | Anim: %d\n", stairs2, stairs, v49AnimDesc.ikruleindex + stairs + stairs2 + (steps + ikStairs + secStairs), i);
+			//Logger::Info("SecAddedTotal: %d AnimAddedTotal: %d | Start %d | Anim: %d\n", secHdrBytesAnimDescAdd[i], hdrBytesAnimDescAdd[i], v49AnimDesc.ikruleindex, i);
+			//Logger::Info("steps: %d secSteps: %d Ikstairs: %d | sum %d | Anim: %d\n", steps, secStairs, ikStairs, v49AnimDesc.ikruleindex +(steps + ikStairs + secStairs), i);
+			ikRuleNum += v49AnimDesc.numikrules;
+		}
+
+		if (v49AnimDesc.sectionindex > 0 && i != mdlhdr.numlocalseq - 1)
+		{
+			int num = (frames / secFrames) + 2;
+			secNum += num;
+			int dist = (((pos + animdescs[i].sectionindex) + (8 * num)) - (pos + animdescs[i].animindex)) * -1;
+		}
+		int secStairs2 = -4 * secNum;
+
+		if (v49AnimDesc.animindex > 0) v49AnimDesc.animindex += (steps + ikStairs + secStairs2);
+		if (v49AnimDesc.movementindex > 0) v49AnimDesc.movementindex += (steps + ikStairs + secStairs);
+		if (v49AnimDesc.ikruleindex > 0 && v49AnimDesc.sectionindex == 0) v49AnimDesc.ikruleindex += (steps + ikStairs + secStairs);
+		if (v49AnimDesc.localhierarchyindex > 0) v49AnimDesc.localhierarchyindex += (steps + ikStairs + secStairs);
+		if (v49AnimDesc.zeroframeindex > 0) v49AnimDesc.zeroframeindex += (steps + ikStairs + secStairs);
+		if (v49AnimDesc.ikrulezeroframeindex > 0) v49AnimDesc.ikrulezeroframeindex += (steps + ikStairs + secStairs);
+		if (v49AnimDesc.sectionindex > 0) v49AnimDesc.sectionindex += (steps + ikStairs + secStairs);
+		//Logger::Info("BytesAddedToSectionIdx: %d Anim: %d\n", steps + ikStairs + secStairs, i);
+
+		int compressedIkRuleIdx = 0; //if (v49AnimDesc.numikrules > 0) compressedIkRuleIdx = ( basePtr - ( basePtr - (v49AnimDesc.ikruleindex + 140 * v49AnimDesc.numikrules) ) ) * -1 ;
+
+
+		mstudioanimdesc_t_v53 animDesc = { -outPos, v49AnimDesc.sznameindex + stairs, v49AnimDesc.fps, v49AnimDesc.flags, v49AnimDesc.numframes, v49AnimDesc.nummovements, v49AnimDesc.movementindex, compressedIkRuleIdx * -1, v49AnimDesc.animindex, v49AnimDesc.numikrules, v49AnimDesc.ikruleindex, v49AnimDesc.numlocalhierarchy, v49AnimDesc.localhierarchyindex, v49AnimDesc.sectionindex, v49AnimDesc.sectionframes, v49AnimDesc.zeroframespan, v49AnimDesc.zeroframecount, v49AnimDesc.zeroframeindex, v49AnimDesc.zeroframestalltime, 0, 0, 0, 0, 0 };
+
+		v53AnimDescs.push_back(animDesc);
+	}
+	return v53AnimDescs;
+}
+
+std::vector<mstudioseqdesc_t_v53> MDL::SourceModel49::SeqDescConversion()
+{
+	//std::vector<int> weightlistidxs;
+	//std::vector<int> bytesAddedToWeightLists = v53GetBytesAddedToWeightLists();
+	std::vector<int> hdrBytesAnimDescAdd = v53GetAnimHdrBytesAdded(true);
+	std::vector<int> secHdrBytesAnimDescAdd = v53GetSecHdrBytesAdded(true);
+//	Logger::Debug("Made it!!!\n");
+	std::vector<mstudioseqdesc_t_v53> v53SeqDescs;
+	int ikRuleNum = 0;
+	int seqIdx = mdlhdr.localseqindex;
+	//Logger::Info("animIdx: %d\n", seqIdx);
+	//Logger::Info("Hdr BytesAdded: %d\n", bytesAddedToHeader);
+	//Logger::Info("Bone BytesAdded: %d\n", bytesAddedToBones);
+	int bytesAddedToHeader = 52;
+	int bytesAddedToBones = mdlhdr.numbones * 28;
+	int actModNumber = 0;
+
+	for (int i = 0; i < seqdescs.size(); i++)
+	{
+		//Logger::Debug("Made it!!! TEST0 %d\n", i);
+		//Logger::Info("Test\n");
+		mstudioseqdesc_t_v49 v49SeqDesc = seqdescs[i];
+		int strPos = mdlhdr.localseqindex + 212 * i;
+		//Logger::Debug("Made it!!! TEST1 %d\n", i);
+		int weightList = GetTrgtPosInArry(weightlistidxs, strPos + seqdescs[i].weightlistindex);
+		//Logger::Debug("Made it!!! TEST2 %d\n", i);
+		int steps = 20 * (mdlhdr.numlocalseq - i);
+		//Logger::Debug("Made it!!! TEST3 %d\n", i);
+		int steps2 = steps + 4 * actModNumber;
+		//Logger::Debug("Made it!!! TEST4 %d\n", i);
+		int stairs1 = steps + bytesAddedToWeightLists[weightList];//strPos + v49SeqDesc.weightlistindex == weightlistidxs[0] ? 20 * (mdlhdr.numlocalseq - i) : 20 * (mdlhdr.numlocalseq - i) + 4 * actModNumber;
+		//Logger::Debug("Made it!!! TEST5 %d\n", i);
+		int stairs = steps + bytesAddedToTextures + bytesAddedToIkChains + bytesAddedToActMods + textureFiller + bytesAddedToRuiMesh + bytesAddedToLinearBone + bytesAddedToAABBTree;
+		int outPos = seqIdx + stairs;
+		//Logger::Debug("Made it!!! TEST %d\n", i);
+		if (v49SeqDesc.numblends > 0)
+		{
+			for (int j = 0; j < v49SeqDesc.numblends; j++)
+			{
+				//int anim = v49SeqDesc.blends.blends[j];
+				////if (animdescs[anim].numframes == 1) v49SeqDesc.flags += 0x80000;
+				//if (v49SeqDesc.flags & STUDIO_DELTA && !(animdescs[anim].flags & STUDIO_DELTA)) animdescs[anim].flags += STUDIO_DELTA;
+			}
+		}
+		//Logger::Debug("Made it!!! TEST2 %d\n", i);
+		if (v49SeqDesc.eventindex > 0)				v49SeqDesc.eventindex += steps2;
+		if (v49SeqDesc.animindexindex > 0)			v49SeqDesc.animindexindex += steps2;
+		if (v49SeqDesc.movementindex > 0)			v49SeqDesc.movementindex += steps2;
+		if (v49SeqDesc.autolayerindex > 0)			v49SeqDesc.autolayerindex += steps2;
+		if (v49SeqDesc.weightlistindex > 0)			v49SeqDesc.weightlistindex += stairs1;
+		if (v49SeqDesc.posekeyindex > 0)			v49SeqDesc.posekeyindex += steps2;
+		if (v49SeqDesc.iklockindex > 0)				v49SeqDesc.iklockindex += steps2;
+		if (v49SeqDesc.keyvalueindex > 0)			v49SeqDesc.keyvalueindex += steps2;
+		if (v49SeqDesc.cycleposeindex > 0)			v49SeqDesc.cycleposeindex += steps2;
+		if (v49SeqDesc.activitymodifierindex > 0)	v49SeqDesc.activitymodifierindex += steps2;
+		//Logger::Debug("Made it!!! TEST3 %d\n", i);
+
+		int compressedIkRuleIdx = 0; //if (v49AnimDesc.numikrules > 0) compressedIkRuleIdx = ( basePtr - ( basePtr - (v49AnimDesc.ikruleindex + 140 * v49AnimDesc.numikrules) ) ) * -1 ;
+
+
+		mstudioseqdesc_t_v53 v53SeqDesc{ -outPos, v49SeqDesc.szlabelindex + stairs, v49SeqDesc.szactivitynameindex + stairs, v49SeqDesc.flags, v49SeqDesc.activity, v49SeqDesc.actweight, v49SeqDesc.numevents, v49SeqDesc.eventindex, v49SeqDesc.bbmin, v49SeqDesc.bbmax, v49SeqDesc.numblends, v49SeqDesc.animindexindex, v49SeqDesc.movementindex, v49SeqDesc.groupsize[0], v49SeqDesc.groupsize[1], v49SeqDesc.paramindex[0], v49SeqDesc.paramindex[1], v49SeqDesc.paramstart[0], v49SeqDesc.paramstart[1], v49SeqDesc.paramend[0] , v49SeqDesc.paramend[1], v49SeqDesc.paramparent, v49SeqDesc.fadeintime, v49SeqDesc.fadeouttime, v49SeqDesc.localentrynode, v49SeqDesc.localexitnode, v49SeqDesc.nodeflags, v49SeqDesc.entryphase, v49SeqDesc.exitphase, v49SeqDesc.lastframe, v49SeqDesc.nextseq, v49SeqDesc.pose, v49SeqDesc.numikrules, v49SeqDesc.numautolayers, v49SeqDesc.autolayerindex, v49SeqDesc.weightlistindex, v49SeqDesc.posekeyindex, v49SeqDesc.numiklocks, v49SeqDesc.iklockindex, v49SeqDesc.keyvalueindex, v49SeqDesc.keyvaluesize, v49SeqDesc.cycleposeindex, v49SeqDesc.activitymodifierindex, v49SeqDesc.numactivitymodifiers, 0,0,0,0,0,0,0,0,0,0 };
+
+		v53SeqDescs.push_back(v53SeqDesc);
+		actModNumber += v49SeqDesc.numactivitymodifiers;
+		//Logger::Debug("Made it!!! %d\n", i);
+	}
+	//Logger::Debug("Made it!!!\n");
+	return v53SeqDescs;
+}
+
+std::vector<mstudioactivitymodifier_t_v53> MDL::SourceModel49::ActivityModifierConversion()
+{
+	std::vector<mstudioactivitymodifier_t_v53>	v53ActivityModifiers;
+	std::vector<std::string> sznames;
+	int actModNum = 0;
+	for (int i = 0; i < mdlhdr.numlocalseq; i++)
+	{
+		//Logger::Info("ActName: %s\n", stringtable.seqs[i].activity.c_str());
+		//for (int j = 0; j < seqdescs[i].numactivitymodifiers; j++)
+		//{
+		//	//Logger::Info("ActModNameSize: %d\n", 0);
+		//	Logger::Info("ActModName: %s\n", stringtable.seqs[i].activitymodifier[j].c_str());
+		//	actModNum++;
+		//}
+		std::string t1;
+		std::string t2;
+		if (seqdescs[i].numactivitymodifiers > 0)
+		{
+			for (int j = 0; j < seqdescs[i].numactivitymodifiers; j++)
+			{
+				int prevActMod = actModNum - 1;
+				int nextActMod = actModNum + 1;
+				bool isTransgender = seqdescs[i].numactivitymodifiers == 2;
+				bool shouldTransition = false;
+				std::pair<std::string, std::string> actModPair;
+
+				int unk = 0;
+
+				if (isTransgender)
+				{
+					if (j == 0)
+					{
+						if (seqdescs[i].seqdata.actmods[j].szname.size() > 0) seqdescs[i].seqdata.actmods[j].szname.resize(seqdescs[i].seqdata.actmods[j].szname.size() - 1);
+						t1 = seqdescs[i].seqdata.actmods[j].szname;
+					}
+					if (j == 1)
+					{
+						if (seqdescs[i].seqdata.actmods[j].szname.size() > 0)seqdescs[i].seqdata.actmods[j].szname.resize(seqdescs[i].seqdata.actmods[j].szname.size() - 1);
+						t2 = seqdescs[i].seqdata.actmods[j].szname;
+					}
+
+					if (j == 1)
+					{
+						actModPair = { t1, t2 };
+						unk = 1;
+
+						if (actModPair.first == "sliding" && actModPair.second == "air" || actModPair.first == "air" && actModPair.second == "sliding")
+						{
+							unk = 0;
+						}
+					}
+				}
+
+				int stairs = 4 * (numActMods - actModNum) + bytesAddedToRuiMesh + bytesAddedToTextures + bytesAddedToIkChains + textureFiller + bytesAddedToLinearBone + bytesAddedToAABBTree;
+				if (seqdescs[i].seqdata.actmods[j].sznameindex > 0) seqdescs[i].seqdata.actmods[j].sznameindex += stairs;
+
+				//if(isTransgender)Logger::Info("ActModConv Read: %s\n", activitymodifiers[actModNum].szname.c_str());
+
+				mstudioactivitymodifier_t_v53 activityModifier = { seqdescs[i].seqdata.actmods[j].sznameindex, unk, seqdescs[i].seqdata.actmods[j].szname };
+				v53ActivityModifiers.push_back(activityModifier);
+				actModNum++;
+			}
+		}
+
+	}
+	//for (int i = 0; i < activitymodifiers.size(); i++)
+	//{
+	//	int unk = 0;
+	//	int stairs = 4 * (activitymodifiers.size() - i) + bytesAddedToRuiMesh + bytesAddedToTextures + bytesAddedToIkChains + textureFiller + strFiller;
+	//	if (activitymodifiers[i].sznameindex > 0) activitymodifiers[i].sznameindex += stairs;
+	//
+	//	mstudioactivitymodifier_t_v53 activityModifier = { activitymodifiers[i].sznameindex, unk, activitymodifiers[i].szname };
+	//	v53ActivityModifiers.push_back(activityModifier);
+	//}
+	return v53ActivityModifiers;
+}
+
+std::vector<mstudioikrule_t_v53> MDL::SourceModel49::IkRuleConversion()
+{
+	std::vector<mstudioikrule_t_v53> v53IkRules;
+	int numIkRules = 0;
+	for (int i = 0; i < mdlhdr.numlocalanim; i++)
+	{
+		mstudioanimdesc_t_v49 v49AnimDesc = animdescs[i];
+		if (v49AnimDesc.numikrules > 0)
+		{
+			for (int j = 0; j < v49AnimDesc.numikrules; j++)
+			{
+				int ikStairs = -12 * (v49AnimDesc.numikrules - j);
+
+				mstudioikrule_t_v49 v49IkRule = ikrules[numIkRules];
+				numIkRules++;
+
+				if (v49IkRule.compressedikerrorindex > 0) v49IkRule.compressedikerrorindex += ikStairs;
+				if (v49IkRule.ikerrorindex > 0) v49IkRule.ikerrorindex += ikStairs;
+				if (v49IkRule.szattachmentindex > 0) v49IkRule.szattachmentindex += ikStairs;
+
+				mstudioikrule_t_v53 ikRule = { v49IkRule.index, ikruletype(v49IkRule.type), v49IkRule.chain, v49IkRule.bone, v49IkRule.slot, v49IkRule.height, v49IkRule.radius, v49IkRule.floor, v49IkRule.pos, v49IkRule.q.one, v49IkRule.q.i, v49IkRule.q.j, v49IkRule.q.k, v49IkRule.compressedikerrorindex, v49IkRule.iStart, v49IkRule.ikerrorindex, v49IkRule.start, v49IkRule.peak, v49IkRule.tail, v49IkRule.end, v49IkRule.contact, v49IkRule.drop, v49IkRule.top, v49IkRule.szattachmentindex, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+				v53IkRules.push_back(ikRule);
+			}
+		}
+	}
+	return v53IkRules;
+}
+
+std::vector<mstudioanim_t_v53> MDL::SourceModel49::ConvertAnims()
+{
+	std::vector<mstudioanim_t_v49> _anims = anims;
+	std::vector<mstudioanim_t_v53> v53Anims;
+	mstudiolinearbonedata_t_v49 lbd = linearbonedata;
+
+	for (int i = 0; i < anims.size(); i++)
+	{
+
+		bool hasAnimPosPtr = (int)anims[i].flags & STUDIO_ANIM_ANIMPOS;
+		bool hasAnimRotPtr = (int)anims[i].flags & STUDIO_ANIM_ANIMROT;
+		bool hasRawPos = (int)anims[i].flags & STUDIO_ANIM_RAWPOS;
+		bool hasRawRot = (int)anims[i].flags & STUDIO_ANIM_RAWROT;
+		bool hasRawRot2 = (int)anims[i].flags & STUDIO_ANIM_RAWROT2;
+
+
+		float _posscale = 0; // does what posscale is used for
+
+		std::byte _bone; // unsigned byte, bone limit exceeds 128 so has to be. also means max bones is 255.
+		std::byte _flags;
+
+		int16_t _unk = 0; // normally null data
+
+
+		QuaternionShort _rawrot = { 0,0,0, 0 }; // pQuat64
+
+		mstudioanim_valueptr_t_v49 _animrot = { 0,0,0 }; // pRotV
+		int16_t _unused = 0; // pretty sure
+
+
+		Vector3Short _rawpos = { 0,0,0 }; // pPos
+		mstudioanim_valueptr_t_v49 _animpos = { 0,0,0 }; // pPosV
+
+		Vector3Short _rawscale = { 15360, 15360, 15360 }; // new in v53
+		mstudioanim_valueptr_t_v49 _animscale = { 0,0,0 };
+
+		int _nextOffset = (int)anims[i].nextoffset > 0 ? (int)anims[i].nextoffset + (32 - GetAnimHeaderSize((int)anims[i].flags)) : 0;
+
+		int bone = (int)anims[i].bone;
+		_bone = anims[i].bone;
+		_flags = (std::byte)ConvertFlag((int)anims[i].flags);
+
+		if (hasAnimPosPtr && hasAnimRotPtr) _posscale = GetLargestNumber(lbd.posScale[bone].x, lbd.posScale[bone].y, lbd.posScale[bone].z);
+		if ((int)anims[i].flags & STUDIO_ANIM_ANIMROT)
+		{
+			Vector3Short rotPtr = anims[i].animrot.offset;
+			if (!hasAnimPosPtr)
+			{
+				rotPtr.x > 0 ? rotPtr.x += 18 : rotPtr.x = 0; rotPtr.y > 0 ? rotPtr.y += 18 : rotPtr.y = 0; rotPtr.z > 0 ? rotPtr.z += 18 : rotPtr.z = 0;
+				anims[i].animrot.offset = rotPtr;
+			}
+			else
+			{
+				rotPtr.x > 0 ? rotPtr.x += 12 : rotPtr.x = 0; rotPtr.y > 0 ? rotPtr.y += 12 : rotPtr.y = 0; rotPtr.z > 0 ? rotPtr.z += 12 : rotPtr.z = 0;
+				anims[i].animrot.offset = rotPtr;
+			}
+			_animrot = anims[i].animrot;
+
+		}
+
+		if ((int)anims[i].flags & STUDIO_ANIM_ANIMPOS)
+		{
+			Vector3Short posPtr = anims[i].animpos.offset;
+			if (!hasAnimRotPtr)
+			{
+				posPtr.x > 0 ? posPtr.x += 0 : posPtr.x = 0; posPtr.y > 0 ? posPtr.y += 0 : posPtr.y = 0; posPtr.z > 0 ? posPtr.z += 0 : posPtr.z = 0;
+				anims[i].animpos.offset = posPtr;
+			}
+			else
+			{
+				//posPtr.x > 0 ? posPtr.x += 10 : posPtr.x = 0; posPtr.y > 0 ? posPtr.y += 10 : posPtr.y = 0; posPtr.z > 0 ? posPtr.z += 10 : posPtr.z = 0;
+				for (int j = 0; j < 3; j++)
+				{
+					if (anims[i].animpos.offset[j])
+					{
+						anims[i].animpos.offset[j] += 10;
+					}
+				}
+				//anims[i].animpos.offset = posPtr;
+			}
+			_animpos = anims[i].animpos;
+		}
+
+		if ((int)anims[i].flags & STUDIO_ANIM_RAWROT) _rawrot = anims[i].rawrot;
+
+		if ((int)anims[i].flags & STUDIO_ANIM_RAWROT2) _rawrot = anims[i].rawrot2;
+
+		if ((int)anims[i].flags & STUDIO_ANIM_RAWPOS) _rawpos = anims[i].rawpos;
+		//else if(anims[i].rawpos.x == 0 && anims[i].rawpos.y == 0 && anims[i].rawpos.z == 0 )
+		//	_rawpos = { (short)float_to_half(lbd.bonePos[bone].x), (short)float_to_half(lbd.bonePos[bone].y), (short)float_to_half(lbd.bonePos[bone].z) };
+
+		mstudioanim_t_v53 v53Anim{ _posscale, _bone, _flags, _unk, _rawrot, _animrot, _unused, _rawpos, _animpos, _rawscale, _animscale, _nextOffset, anims[i].animdata };
+		v53Anims.push_back(v53Anim);
+	}
+	return v53Anims;
+}
+
+std::vector<sectionindexes_t_v53> MDL::SourceModel49::ConvertSectionIndexes()
+{
+	std::vector<int> hdrBytesAnimDescAdd = v53GetAnimHdrBytesAdded(true);
+	std::vector<int> secHdrBytesSecAdd = v53GetSecBytesAdded(true);
+	std::vector<sectionindexesindex_t_v49> _sectionIndexes = sectionindexes;
+	std::vector<sectionindexes_t_v53> v53SectionIndexes;
+	int secNum = 0;
+	int secSetNum = 0;
+	int ikRuleNum = 0;
+	for (int i = 0; i < mdlhdr.numlocalanim; i++)
+	{
+		int ikRuleStairs = ikRuleNum * -12;
+		int pos = mdlhdr.localanimindex + 100 * i;
+		int stairs = -((8 * (mdlhdr.numlocalanim - i))) + hdrBytesAnimDescAdd[i];
+
+		int frames = animdescs[i].numframes;
+		int secFrames = animdescs[i].sectionframes;
+
+		if (animdescs[i].sectionindex > 0)
+		{
+			int num = (frames / secFrames) + 2;
+			secSetNum += num;
+
+			int dist = pos + animdescs[i].animindex - (pos + animdescs[i].sectionindex + (8 * num));
+			//Logger::Info("DistStr: %d\n", pos + animdescs[i].sectionindex + (8 * num) );
+			//Logger::Info("DistEnd: %d\n", pos + animdescs[i].animindex);
+			//Logger::Info("Dist: %d\n", dist);
+
+			for (int j = 0; j < num; j++)
+			{
+				int steps = -4 * secSetNum;
+				int offset = sectionindexes[secNum].sectionoffset + stairs + secHdrBytesSecAdd[secNum] + steps + ikRuleStairs;
+				sectionindexes_t_v53 v53SectionIndex{ offset };
+				//if (j == 0) Logger::Info("BytesAddedToFirstSecIdx: %d\n", stairs + secHdrBytesSecAdd[secNum] + steps);
+				v53SectionIndexes.push_back(v53SectionIndex);
+				secNum++;
+			}
+		}
+		ikRuleNum += animdescs[i].numikrules;
+	}
+	return v53SectionIndexes;
+}
+
+std::vector<mstudioanim_t_v53> MDL::SourceModel49::ConvertSections()
+{
+	std::vector<mstudioanim_t_v49> _sections = sections;
+	std::vector<mstudioanim_t_v53> v53Sections;
+	mstudiolinearbonedata_t_v49 lbd = linearbonedata;
+
+	for (int i = 0; i < sections.size(); i++)
+	{
+
+
+		bool hasAnimPosPtr = (int)sections[i].flags & STUDIO_ANIM_ANIMPOS;
+		bool hasAnimRotPtr = (int)sections[i].flags & STUDIO_ANIM_ANIMROT;
+		bool hasRawPos = (int)sections[i].flags & STUDIO_ANIM_RAWPOS;
+		bool hasRawRot = (int)sections[i].flags & STUDIO_ANIM_RAWROT;
+		bool hasRawRot2 = (int)sections[i].flags & STUDIO_ANIM_RAWROT2;
+
+		float _posscale = 0; // does what posscale is used for
+
+		std::byte _bone; // unsigned byte, bone limit exceeds 128 so has to be. also means max bones is 255.
+		std::byte _flags;
+
+		int16_t _unk = 0; // normally null data
+
+
+		QuaternionShort _rawrot = { 0,0,0, 0 }; // pQuat64
+
+		mstudioanim_valueptr_t_v49 _animrot = { 0,0,0 }; // pRotV
+		int16_t _unused = 0; // pretty sure
+
+
+		Vector3Short _rawpos = { 0,0,0 }; // pPos
+		mstudioanim_valueptr_t_v49 _animpos = { 0,0,0 }; // pPosV
+
+		Vector3Short _rawscale = { 15360, 15360, 15360 }; // new in v53
+		mstudioanim_valueptr_t_v49 _animscale = { 0,0,0 };
+
+		int _nextOffset = (int)sections[i].nextoffset > 0 ? (int)sections[i].nextoffset + (32 - GetAnimHeaderSize((int)sections[i].flags)) : 0;
+
+		int bone = (int)sections[i].bone;
+		_bone = sections[i].bone;
+		_flags = (std::byte)ConvertFlag((int)sections[i].flags);
+
+		if ((int)sections[i].flags == 12) _posscale = GetLargestNumber(lbd.posScale[bone].x, lbd.posScale[bone].y, lbd.posScale[bone].z);
+		if ((int)sections[i].flags & STUDIO_ANIM_ANIMROT)
+		{
+			Vector3Short rotPtr = sections[i].animrot.offset;
+			if (!hasAnimPosPtr)
+			{
+				rotPtr.x > 0 ? rotPtr.x += 18 : rotPtr.x = 0; rotPtr.y > 0 ? rotPtr.y += 18 : rotPtr.y = 0; rotPtr.z > 0 ? rotPtr.z += 18 : rotPtr.z = 0;
+				sections[i].animrot.offset = rotPtr;
+			}
+			else
+			{
+				rotPtr.x > 0 ? rotPtr.x += 12 : rotPtr.x = 0; rotPtr.y > 0 ? rotPtr.y += 12 : rotPtr.y = 0; rotPtr.z > 0 ? rotPtr.z += 12 : rotPtr.z = 0;
+				sections[i].animrot.offset = rotPtr;
+			}
+			_animrot = sections[i].animrot;
+
+		}
+
+		if ((int)sections[i].flags & STUDIO_ANIM_ANIMPOS)
+		{
+			Vector3Short posPtr = sections[i].animpos.offset;
+			if (!hasAnimRotPtr)
+			{
+				posPtr.x > 0 ? posPtr.x += 18 : posPtr.x = 0; posPtr.y > 0 ? posPtr.y += 18 : posPtr.y = 0; posPtr.z > 0 ? posPtr.z += 18 : posPtr.z = 0;
+				sections[i].animpos.offset = posPtr;
+			}
+			else
+			{
+				posPtr.x > 0 ? posPtr.x += 10 : posPtr.x = 0; posPtr.y > 0 ? posPtr.y += 10 : posPtr.y = 0; posPtr.z > 0 ? posPtr.z += 10 : posPtr.z = 0;
+				sections[i].animpos.offset = posPtr;
+			}
+			_animpos = sections[i].animpos;
+		}
+
+		if (hasRawRot) _rawrot = sections[i].rawrot;
+
+		if (hasRawRot2) _rawrot = sections[i].rawrot2;
+
+		if (hasRawPos) _rawpos = sections[i].rawpos;
+		//else
+		//	_rawpos = { (short)float_to_half(lbd.bonePos[bone].x), (short)float_to_half(lbd.bonePos[bone].y), (short)float_to_half(lbd.bonePos[bone].z) };
+
+		mstudioanim_t_v53 v53Anim{ _posscale, _bone, _flags, _unk, _rawrot, _animrot, _unused, _rawpos, _animpos, _rawscale, _animscale, _nextOffset, sections[i].animdata };
+		v53Sections.push_back(v53Anim);
+	}
+	return v53Sections;
+}
+
+std::vector<mstudioikchain_t_v53> MDL::SourceModel49::IkChainConversion()
+{
+	std::vector<mstudioikchain_t_v53> v53IkChains;
+	for (int i = 0; i < mdlhdr.numikchains; i++)
+	{
+		int stairs = 16 * (mdlhdr.numikchains - i);
+		int offset = bytesAddedToTextures + textureFiller + strFiller + stairs + bytesAddedToRuiMesh + bytesAddedToLinearBone;
+		float unk = (float)0.707;
+		if (ikchains[i].sznameindex > 0) ikchains[i].sznameindex += offset;
+		if (ikchains[i].linkindex > 0) ikchains[i].linkindex += stairs;
+
+		mstudioikchain_t_v53 ikChain = { ikchains[i].sznameindex, ikchains[i].linktype, ikchains[i].numlinks, ikchains[i].linkindex, unk, 0, 0, 0 };
+		v53IkChains.push_back(ikChain);
+	}
+	return v53IkChains;
+}
+
+void MDL::SourceModel49::HitboxSetConversion()
+{
+	int stairs = bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToIkChains + bytesAddedToTextures + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + bytesAddedToRuiMesh + bytesAddedToLinearBone + bytesAddedToAABBTree;
+	for (int i = 0; i < mdlhdr.numhitboxsets; i++)
+	{
+		hitboxsets[i].sznameindex += stairs;
+	}
+}
+
+void MDL::SourceModel49::AttachmentConversion()
+{
+	int stairs = bytesAddedToAnims + bytesAddedToSeqs + bytesAddedToIkChains + bytesAddedToTextures + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + bytesAddedToRuiMesh + bytesAddedToLinearBone + bytesAddedToAABBTree;
+	for (int i = 0; i < mdlhdr.numlocalattachments; i++)
+	{
+		attachments[i].sznameindex += stairs;
+	}
+}
+
+void MDL::SourceModel49::SeqEventConversion()
+{
+	int actModNum = 0;
+	int eventNum = 0;
+	for (int i = 0; i < seqdescs.size(); i++)
+	{
+		for (int j = 0; j < seqdescs[i].numevents; j++)
+		{
+			int stairs = 4 * (numActMods - actModNum) + bytesAddedToRuiMesh + bytesAddedToTextures + bytesAddedToIkChains + textureFiller + bytesAddedToLinearBone + bytesAddedToAABBTree;
+			if (seqdescs[i].seqdata.events[j].szeventindex > 0) seqdescs[i].seqdata.events[j].szeventindex += stairs; //events[eventNum].szeventindex += stairs;
+			eventNum++;
+		}
+		if (seqdescs[i].numactivitymodifiers > 0) actModNum += seqdescs[i].numactivitymodifiers;
+	}
+}
+
+void MDL::SourceModel49::ConvertNodeNames()
+{
+	for (int i = 0; i < mdlhdr.numlocalnodes; i++)
+	{
+		if (nodenames[i].sznameindex > 0) nodenames[i].sznameindex += allBytesAdded + bytesAddedToRuiMesh + bytesAddedToLinearBone + bytesAddedToAABBTree;
+	}
+}
+
+void MDL::SourceModel49::ConvertBodyParts()
+{
+	int stairs = bytesAddedToTextures + bytesAddedToIkChains + textureFiller + bytesAddedToRuiMesh + bytesAddedToLinearBone + bytesAddedToAABBTree;
+	for (int i = 0; i < mdlhdr.numbodyparts; i++)
+	{
+		if (bodyparts[i].sznameindex > 0) bodyparts[i].sznameindex += stairs;
+	}
+}
+
+void MDL::SourceModel49::ConvertModels()
+{
+	for (int i = 0; i < models.size(); i++)
+	{
+		models[i].eyeballindex = 0;
+		models[i].unused[0] = 0;
+		models[i].unused[1] = 0;
+		if (mdlhdr.numikchains > 0)
+		{
+			if (models[i].meshindex > 0) models[i].meshindex += bytesAddedToIkChains;
+			if (models[i].attachmentindex > 0) models[i].attachmentindex += bytesAddedToIkChains;
+		}
+	}
+}
+
+void MDL::SourceModel49::ConvertMeshes()
+{
+	for (int i = 0; i < meshes.size(); i++)
+	{
+		if (mdlhdr.numikchains > 0)meshes[i].modelindex -= bytesAddedToIkChains;
+		else break;
+	}
+}
+
+void MDL::SourceModel49::ConvertPoseParamDescs()
+{
+	int stairs = bytesAddedToTextures + textureFiller + bytesAddedToRuiMesh + bytesAddedToLinearBone + bytesAddedToAABBTree;
+	for (int i = 0; i < mdlhdr.numlocalposeparameters; i++)
+	{
+		if (poseparamdescs[i].sznameindex > 0) poseparamdescs[i].sznameindex += stairs;
+	}
+}
+
+void MDL::SourceModel49::ConvertIncludeModel()
+{
+	int stairs = bytesAddedToTextures + textureFiller + bytesAddedToRuiMesh + bytesAddedToLinearBone + bytesAddedToAABBTree;
+	for (int i = 0; i < mdlhdr.numincludemodels; i++)
+	{
+		if (includedmodels[i].sznameindex > 0) includedmodels[i].sznameindex += stairs;
+	}
+}
+
+std::vector<mstudiotexture_t_v53> MDL::SourceModel49::ConvertTextures()
+{
+	std::vector<mstudiotexture_t_v53> v53Textures;
+
+	for (int i = 0; i < mdlhdr.numtextures; i++)
+	{
+		int stairs = -((20) * (mdlhdr.numtextures - i));
+		textures[i].sznameindex += stairs + bytesAddedToLinearBone + bytesAddedToAABBTree;
+
+		mstudiotexture_t_v53 texture = { textures[i].sznameindex, textures[i].flags, textures[i].used, textures[i].unused1, 0,0,0,0,0,0,0 };
+		v53Textures.push_back(texture);
+	}
+
+	return v53Textures;
+}
+
+void MDL::SourceModel49::ConvertCDTextures()
+{
+	for (int i = 0; i < mdlhdr.numcdtextures; i++)
+	{
+		cdtextures[i].sznameindex += allBytesAdded + bytesAddedToRuiMesh + bytesAddedToLinearBone + bytesAddedToAABBTree;
+	}
+}
+
+void MDL::SourceModel49::ConvertSrcBoneTransforms()
+{
+	for (int i = 0; i < mdlsubhdr.numsrcbonetransform; i++)
+	{
+		srcbonetransforms[i].sznameindex += bytesAddedToLinearBone + bytesAddedToAABBTree;
+	}
+}
+
+void MDL::SourceModel49::ConvertLinearBone()
+{
+	linearbone.posscaleindex = 0;
+	linearbone.rotscaleindex += bytesAddedToLinearBone;
+	linearbone.qalignmentindex += bytesAddedToLinearBone;
+}
+
+mstudiolinearbonedata_t_v53 MDL::SourceModel49::ConvertLinearBoneData()
+{
+	mstudiolinearbonedata_t_v53 linearBoneData{};
+	memcpy(linearBoneData.flags, linearbonedata.flags, sizeof(uint32_t) * mdlhdr.numbones);
+	memcpy(linearBoneData.parents, linearbonedata.parents, sizeof(uint32_t) * mdlhdr.numbones);
+	memcpy(linearBoneData.bonePos, linearbonedata.bonePos, sizeof(Vector3) * mdlhdr.numbones);
+	memcpy(linearBoneData.boneQuat, linearbonedata.boneQuat, sizeof(Quaternion) * mdlhdr.numbones);
+	memcpy(linearBoneData.boneRot, linearbonedata.boneRot, sizeof(RadianEuler) * mdlhdr.numbones);
+	memcpy(linearBoneData.poseToBone, linearbonedata.poseToBone, sizeof(matrix3x4_t) * mdlhdr.numbones);
+	memcpy(linearBoneData.rotScale, linearbonedata.rotScale, sizeof(Vector3) * mdlhdr.numbones);
+	memcpy(linearBoneData.boneAlignment, linearbonedata.boneAlignment, sizeof(Quaternion) * mdlhdr.numbones);
+	return linearBoneData;
+}

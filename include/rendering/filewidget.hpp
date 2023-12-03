@@ -28,5 +28,6 @@ namespace Widgets{
         void UI(float win_width);
         void TestFileDrop(double xpos, double ypos, const char* path);
         File(std::string Name, bool canDisable, const char* ext);
+        void Clear();
     };
 }

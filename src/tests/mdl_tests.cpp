@@ -16,30 +16,35 @@ std::vector<Error> Tests::TestMDL(std::string path){
 
       char magic[4];
       test.read(magic, 4);
-      if(strcmp(magic,"IDST") >= 0){
-        rtn.push_back({ErrorType::Success,std::string("Valid MDL file")});
+      if (std::string(magic) == std::string("IDST") || std::strcmp("IDST", magic))
+      {
+          rtn.push_back({ ErrorType::Success,std::string("Valid MDL file") });
 
-        char ver[1];
-        test.read(ver, 1);
-        if((int)ver[0] == 49){
-          rtn.push_back({ErrorType::Success,std::string("Version 49")});
-        }
-        else if ((int)ver[0] == 52) {
-            rtn.push_back({ ErrorType::Success,std::string("Version 52") });
-        }
-        else if((int)ver[0] == 48){
-          rtn.push_back({ErrorType::Warning,std::string("Version 48")});
-        }
-        else{
-          std::string err = std::string("Version ") + std::to_string((int)ver[0]);
-          rtn.push_back({ErrorType::Blocking,err});
-          Logger::Critical("%s\n",err.c_str());
-        }
+          char ver[1];
+          test.read(ver, 1);
+
+          switch ((int)ver[0])
+          {
+          case 49: rtn.push_back({ ErrorType::Success,std::string("Version 49") });
+              break;
+          case 52: rtn.push_back({ ErrorType::Success,std::string("Version 52") });
+              break;
+          case 48: rtn.push_back({ ErrorType::Warning,std::string("Version 48") });
+              break;
+
+          default:
+            {
+                std::string err = std::string("Version ") + std::to_string((int)ver[0]);
+                rtn.push_back({ ErrorType::Blocking,err });
+                Logger::Critical("%s\n", err.c_str());
+                break;
+            }
+          }
       }
-      else{
-        std::string err = std::string("Invalid MDL file; magic was \"") + std::string(magic) + "\"";
-        rtn.push_back({ErrorType::Blocking,err});
-        Logger::Critical("%s\n",err.c_str());
+      else {
+          std::string err = std::string("Invalid MDL file; magic was \"") + std::string(magic) + "\"";
+          rtn.push_back({ ErrorType::Blocking,err });
+          Logger::Critical("%s\n", err.c_str());
       }
       test.close();
     }

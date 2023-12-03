@@ -5,7 +5,18 @@ namespace Utility
 {
 	namespace debug
 	{
+		//int GetAnimHeaderSize(int flag);
 
+		//bool IsWhole(double n);
+
+		//bool contains(std::vector<int> arry, int trgt)
+		//{
+		//	for (int i = 0; i < arry.size(); i++)
+		//	{
+		//		if (trgt == arry[i]) return true;
+		//	}
+		//	return false;
+		//}
 	}
 
 	namespace check
@@ -15,7 +26,7 @@ namespace Utility
 
 	namespace func
 	{
-		template <typename T> std::vector<T> ArrayToVector(T* arry, int size);
+		//template <typename T> std::vector<T> ArrayToVector(T* arry, int size);
 
 		float GetSecondLargest(float n1, float n2, float n3);
 
@@ -23,7 +34,17 @@ namespace Utility
 
 		int GetAttachedJiggleBone(int version, int boneIdx, int bone, int jBoneIdx, int maxBones);
 
+		std::string ReadProcFlags(unsigned int flags);
+
+		std::string ReadContents(int flags);
+
+		std::string ReadBoneFlags(int flags);
+
 		std::string ReadJiggleFlags(int flags);
+
+		std::string ReadAnimDescFlags(int flags);
+
+		//template <typename T> int GetTrgtPosInArry(std::vector<T> arry, T trgt);
 	}
 
 	namespace math

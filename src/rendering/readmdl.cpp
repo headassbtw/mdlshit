@@ -1,18 +1,23 @@
  
 
-#include "glm/ext/vector_float3.hpp"
+//#include "glm/ext/vector_float3.hpp"
 #include "structs.hpp"
+//#include <rendering/shaders.hpp>
 #include <rendering/render.hpp>
 #include <imgui.h>
 #include <rendering/filewidget.hpp>
 #include <binarystream.hpp>
 #include <mdls.hpp>
 #include <MLUtil.h>
-#include <GL/glew.h>
 #include <rendering/shaders.hpp>
+#include "glm/ext/vector_float3.hpp"
+#include <GL/glew.h>
+#include <GL/gl.h>
+//#include <gl.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
+
 
 Widgets::File* _mdl;
 std::optional<MDL::v49Mdl> _opt_v49;
@@ -43,6 +48,70 @@ std::vector<vec3> normals;
 std::vector<vec3> colors;
 std::vector<float> faceids;
 
+GLuint common_get_shader_program(
+) {
+  GLint log_length, success;
+  GLuint fragment_shader, program, vertex_shader;
+
+  /* Vertex shader */
+  vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+  glShaderSource(vertex_shader, 1, &Resources::Shaders::VertexShader, NULL);
+  glCompileShader(vertex_shader);
+  glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
+  glGetShaderiv(vertex_shader, GL_INFO_LOG_LENGTH, &log_length);
+  if (log_length > 0) {
+    Logger::Error("Vertex shader compile error:\n");
+    std::vector<char> VertError(log_length+1);
+    glGetShaderInfoLog(vertex_shader, log_length, NULL, &VertError[0]);
+    Logger::Error("%s\n", &VertError[0]);
+  }
+  if (!success) {
+    printf("vertex shader compile error\n");
+    exit(EXIT_FAILURE);
+  }
+
+  /* Fragment shader */
+  fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(fragment_shader, 1, &Resources::Shaders::FragmentShader, NULL);
+  glCompileShader(fragment_shader);
+  glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
+  glGetShaderiv(fragment_shader, GL_INFO_LOG_LENGTH, &log_length);
+  if (log_length > 0) {
+    Logger::Error("Fragment shader compile error:\n");
+    std::vector<char> FragError(log_length+1);
+    glGetShaderInfoLog(fragment_shader, log_length, NULL, &FragError[0]);
+    Logger::Error("%s\n", &FragError[0]);
+  }
+  if (!success) {
+    Logger::Critical("fragment shader compile error\n");
+    exit(EXIT_FAILURE);
+  }
+
+  /* Link shaders */
+  program = glCreateProgram();
+  glAttachShader(program, vertex_shader);
+  glAttachShader(program, fragment_shader);
+  glLinkProgram(program);
+  glGetProgramiv(program, GL_LINK_STATUS, &success);
+  glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_length);
+  if (log_length > 0) {
+    Logger::Error("Shader linking error:\n");
+    std::vector<char> ProgError(log_length+1);
+    glGetProgramInfoLog(program, log_length, NULL, &ProgError[0]);
+    Logger::Error("%s\n", &ProgError[0]);
+  }
+  if (!success) {
+    printf("shader link error");
+    exit(EXIT_FAILURE);
+  }
+  else{}
+  Logger::Info("[readmdl shaders] linked program\n");
+
+  /* Cleanup. */
+  glDeleteShader(vertex_shader);
+  glDeleteShader(fragment_shader);
+  return program;
+}
 GLuint vbo[5] = {0,0,0,0,0};
 GLuint vao = 0;
 GLuint Shader;
@@ -61,6 +130,8 @@ GLuint SetupRuiMeshRenderPipeline(){
   glGenRenderbuffers(1, &FramebufferDepth);
   glBindRenderbuffer(GL_RENDERBUFFER, FramebufferDepth);
   glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, subRendererResolution, subRendererResolution);
+
+
   glGenFramebuffers(1,&Framebuffer);
   glBindFramebuffer(GL_FRAMEBUFFER,Framebuffer);
   glGenTextures(1, &Texture);
@@ -83,7 +154,7 @@ GLuint SetupRuiMeshRenderPipeline(){
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 
-  Shader = Resources::Shaders::CompileShaders(Resources::Shaders::VertexShader, Resources::Shaders::FragmentShader);
+  Shader = common_get_shader_program();
   glBindFramebuffer(GL_FRAMEBUFFER,0);
 
 
@@ -296,10 +367,10 @@ void AddMainMdlTrees()
 
             ImGui::Text("Name: %s", mdl->stringtable.mdlname.c_str());
             ImGui::Text("Version: %d", mdl->mdlhdr.version);
-            if (ImGui::TreeNode((void*)(intptr_t)0, "Bones (%zu)", mdl->bones.size()))
+            if (ImGui::TreeNode((void*)(intptr_t)0, "Bones (%zu)", mdl->mdlhdr.numbones))
             {
                 ImGui::Text("IkBones: %d", mdl->ikchainbones.size());
-                for (int i = 0; i < mdl->bones.size(); i++)
+                for (int i = 0; i < mdl->mdlhdr.numbones; i++)
                 {
 
                     if (ImGui::TreeNode((void*)(intptr_t)i, "%s", mdl->stringtable.bones[i].c_str()))
@@ -339,9 +410,9 @@ void AddMainMdlTrees()
             //    ImGui::TreePop();
             //}
 
-            if (ImGui::TreeNode((void*)(intptr_t)2, "Attachments (%zu)", mdl->attachments.size()))
+            if (ImGui::TreeNode((void*)(intptr_t)2, "Attachments (%zu)", mdl->mdlhdr.numlocalattachments))
             {
-                for (int i = 0; i < mdl->attachments.size(); i++)
+                for (int i = 0; i < mdl->mdlhdr.numlocalattachments; i++)
                 {
                     if (ImGui::TreeNode((void*)(intptr_t)i, "%s", mdl->attachments[i].szname.c_str()))
                     {
@@ -407,9 +478,9 @@ void AddMainMdlTrees()
 
                         if (mdl->seqdescs[i].numactivitymodifiers > 0 && ImGui::TreeNode((void*)(intptr_t)7, "ActMods (%zu)", mdl->seqdescs[i].numactivitymodifiers))
                         {
-                            if (mdl->seqdescs[i].szactivitymodifiernames.size() > 0)
+                            if (mdl->seqdescs[i].numactivitymodifiers)
                             {
-                                for (int j = 0; j < mdl->seqdescs[i].szactivitymodifiernames.size(); j++)
+                                for (int j = 0; j < mdl->seqdescs[i].numactivitymodifiers; j++)
                                 {
                                     ImGui::Text("ActMod: %s : %d", mdl->seqdescs[i].szactivitymodifiernames[j].c_str(), j);
                                 }
@@ -510,7 +581,10 @@ void AddMainMdlTrees()
                             {
                                 for (int j = 0; j < mdl->seqdescs[i].szactivitymodifiernames.size(); j++)
                                 {
-                                    ImGui::Text("ActMod: %s : %d", mdl->seqdescs[i].szactivitymodifiernames[j].c_str(), j);
+                                    if (!mdl->seqdescs[i].szactivitymodifiernames[j].empty())
+                                    {
+                                        ImGui::Text("ActMod: %s : %d", mdl->seqdescs[i].szactivitymodifiernames[j].c_str(), j);
+                                    }
                                 }
                             }
                             ImGui::TreePop();
@@ -603,6 +677,7 @@ void AddMainMdlTrees()
                             }
                             ImGui::TreePop();
                         }
+                        int actModNum = 0;
 
                         if (mdl->seqdescs[i].numactivitymodifiers > 0 && ImGui::TreeNode((void*)(intptr_t)5, "ActMods (%zu)", mdl->seqdescs[i].numactivitymodifiers))
                         {
@@ -610,8 +685,9 @@ void AddMainMdlTrees()
                             {
                                 for (int j = 0; j < mdl->seqdescs[i].szactivitymodifiernames.size(); j++)
                                 {
-                                    int actModNum = mdl->seqdescs[i].actmods[j];
+                                    //int actModNum = mdl->seqdescs[i].actmods[j];
                                     ImGui::Text("ActMod: %s : %d | Negated: %d", mdl->seqdescs[i].szactivitymodifiernames[j].c_str(), j, mdl->activitymodifiers[actModNum].unk);
+                                    actModNum++;
                                 }
                             }
                             ImGui::TreePop();
@@ -631,18 +707,19 @@ void AddMainMdlTrees()
                       SelectedMesh = i+1;
                     }
                     
-                    if (ImGui::TreeNode((void*)(intptr_t)i+1, "Faces (%zu)", mdl->ruimeshes[i].numfaces))
+                    if (ImGui::TreeNode((void*)(intptr_t)(i+1), "Faces (%zu)", mdl->ruimeshes[i].numfaces))
                     {
                       for (int m = 0; m < mdl->ruimeshes[i].numfaces; m++){
                         ImGui::Text("UV: [Min: (%f, %f) Max: (%f, %f)]",mdl->ruimeshes[i].facedata[m].faceuvmin.x,mdl->ruimeshes[i].facedata[m].faceuvmin.y,mdl->ruimeshes[i].facedata[m].faceuvmax.x,mdl->ruimeshes[i].facedata[m].faceuvmax.y);
                       }
                       ImGui::TreePop();
                     }
-                    if (ImGui::TreeNode((void*)(intptr_t)i+2, "Vertices (%zu)", mdl->ruimeshes[i].numvertices))
+                    if (ImGui::TreeNode((void*)(intptr_t)(i+2), "Vertices (%zu)", mdl->ruimeshes[i].numvertices))
                     {
                       for (int m = 0; m < mdl->ruimeshes[i].numvertices; m++){
                         ImGui::Text("Pos: (%f, %f, %f) Parent: %i",mdl->ruimeshes[i].vertex[m].vertexpos.x, mdl->ruimeshes[i].vertex[m].vertexpos.y, mdl->ruimeshes[i].vertex[m].vertexpos.z,mdl->ruimeshes[i].vertex[m].parent);
                       }
+
                       ImGui::TreePop();
                     }
                     ImGui::TreePop();

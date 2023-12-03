@@ -4,7 +4,6 @@
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
 #include "imgui_internal.h"
-#include "rendering/shaders.hpp"
 #include "resource.hpp"
 #include <cstring>
 #include <glm/common.hpp>
@@ -28,6 +27,7 @@
 #ifdef WIN32
 #include <windows.h>
 #include <shellapi.h>
+#include <rpcndr.h>
 #endif
 //#define _GLFW_USE_MENUBAR
 #define STB_IMAGE_IMPLEMENTATION
@@ -87,27 +87,65 @@ bool showAbout, readMdl, conv;
 
 void drop_callback(GLFWwindow* window, int count, const char** paths)
 {
+  //Logger::Debug("File count %d\n", files.size());
+  //Logger::Debug("drop count %d\n", count);
   double xpos, ypos;
   glfwGetCursorPos(window, &xpos, &ypos);
+  std::ifstream test;
+  const char* exts[9] = {".mdl",".dx90.vtx",".vvd",".vvc",".phy",".pfb",".str",".aabb",".rui"};
 
-  if(readMdl){
-    UI::SetReadMdlFile(paths[0]);
-    return;
-  }
-  for (int i = 0;  i < count;  i++){
-    for(int j = 0; j < files.size();j++){
-      if(
-        files[j]->bounds.x <= xpos &&
-        files[j]->bounds.z >= xpos &&
-        files[j]->bounds.y <= ypos &&
-        files[j]->bounds.w >= ypos
-        ){
-          strcpy(files[j]->BoxBuffer, paths[i]);
-          blocked = true;
-          for(auto f : files)
-            f->errors.clear();
-        }
-    }
+  std::string mdlPath = paths[0];
+  std::string ext = mdlPath.substr(mdlPath.length() - 4);
+  std::string mdlBase = mdlPath.substr(0, mdlPath.length() - 4);
+
+  if (ext == ".mdl")
+  {
+      for (int i = 0; i < files.size(); i++)
+      {
+          std::string path = mdlBase + exts[i];
+          test.open(path);
+          if (test)
+          {
+              if (files[i]->isEnabled == false)files[i]->isEnabled = true;
+              strcpy(files[i]->BoxBuffer, path.c_str());
+              blocked = true;
+              for (auto f : files)
+                  f->errors.clear();
+          }
+          else
+          {
+              files[i]->isEnabled = false;
+              files[i]->Clear();
+              test.close();
+              continue;
+          }
+          test.close();
+      }
+
+      if (readMdl) {
+          UI::SetReadMdlFile(paths[0]);
+          return;
+      }
+
+
+      //for (int i = 0; i < count; i++)
+      //{
+      //    for (int j = 0; j < files.size(); j++) {
+      //        if
+      //            (
+      //                files[j]->bounds.x <= xpos &&
+      //                files[j]->bounds.z >= xpos &&
+      //                files[j]->bounds.y <= ypos &&
+      //                files[j]->bounds.w >= ypos
+      //                )
+      //        {
+      //            strcpy(files[j]->BoxBuffer, paths[i]);
+      //            blocked = true;
+      //            for (auto f : files)
+      //                f->errors.clear();
+      //        }
+      //    }
+      //}
   }
 }
 float conv_demo_prog;
@@ -154,13 +192,10 @@ void depth_border(){
 void RenderConversionPanel(){
   ImGui::BeginGroup();
 
-    int w = ImGui::GetContentRegionAvail().x*0.75;
-    float sidebarWidth = viewport_width - (w + 4);
-
-    files[0]->UI(w);
-    files[1]->UI(w);
-    files[2]->UI(w);
-    files[3]->UI(w);
+    files[0]->UI(viewport_width-204);
+    files[1]->UI(viewport_width-204);
+    files[2]->UI(viewport_width-204);
+    files[3]->UI(viewport_width-204);
     
     if(ImGui::IsItemHovered()){
       ImGui::BeginTooltip();
@@ -169,9 +204,9 @@ void RenderConversionPanel(){
       ImGui::PopTextWrapPos();
       ImGui::EndTooltip();
     }
-    files[4]->UI(w);
+    files[4]->UI(viewport_width-204);
     static int message_count = 0;
-    ImGui::BeginChild("Logger",{(float)w-16,0},false,ImGuiWindowFlags_AlwaysUseWindowPadding);
+    ImGui::BeginChild("Logger",{viewport_width-220,0},false,ImGuiWindowFlags_AlwaysUseWindowPadding);
     depth_border();
     //ImFont* monospace = ImGui::GetIO().Fonts->Fonts[2];
 
@@ -215,19 +250,14 @@ void RenderConversionPanel(){
     
   const ImU32 w_bg_col = ImGui::GetColorU32(ImGuiCol_WindowBg);
     
-    
-    if(ImGui::Button("Clear File Paths##SidebarResetButton",{sidebarWidth,22})){
-      for(auto file:files){
-        memset(file->BoxBuffer, '\0', 256);
-      }
-    }
 
-    ImGui::BeginChild("OptionsBox",{sidebarWidth, ((viewport_height-(99+26)) / 2.0f)},false,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysUseWindowPadding);
+  
+
+    ImGui::BeginChild("OptionsBox",{200, ((viewport_height-99) / 2.0f)},false,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysUseWindowPadding);
     depth_border();
     ImGui::PushStyleColor(ImGuiCol_WindowBg,ImVec4(0.0f,0.0f,0.0f,0.0f));
-    //taking this out for now, because there's nothing there anymore besides the files
-    //ImGui::Text("Advanced Options");
-    //ImGui::Separator();
+    ImGui::Text("Advanced Options");
+    ImGui::Separator();
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{0.0f,0.0f});
     ImGui::BeginChild("##ConvertSmol", {0,0},false);
     ImGui::Text("Extra Files");
@@ -239,7 +269,7 @@ void RenderConversionPanel(){
       ImGui::EndTooltip();
     }
     ImGui::Separator();
-    files[5]->UI(sidebarWidth);
+    files[5]->UI(196);
     if(ImGui::IsItemHovered()){
       ImGui::BeginTooltip();
       ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
@@ -247,9 +277,9 @@ void RenderConversionPanel(){
       ImGui::PopTextWrapPos();
       ImGui::EndTooltip();
     }
-    files[6]->UI(sidebarWidth);
-    files[7]->UI(sidebarWidth);
-    files[8]->UI(sidebarWidth);
+    files[6]->UI(196);
+    files[7]->UI(196);
+    files[8]->UI(196);
 
     ImGui::EndChild(); //ConvertSmol
     ImGui::PopStyleVar(1);
@@ -257,7 +287,7 @@ void RenderConversionPanel(){
     ImGui::EndChild();//OptionsBox
 
     ImGui::BeginGroup();
-    ImGui::BeginChild("ConvertBox",{(0),((viewport_height-(99+26)) / 2.0f)},false,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysUseWindowPadding);
+    ImGui::BeginChild("ConvertBox",{(200),((viewport_height-99) / 2.0f)},false,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysUseWindowPadding);
     depth_border();
     ImGui::Text("Problems");
     ImGui::Separator();
@@ -295,7 +325,7 @@ void RenderConversionPanel(){
     
     
     ImGui::EndChild();
-    if(ImGui::Button("Check",{sidebarWidth,24})){
+    if(ImGui::Button("Check",{200,24})){
       int total = 0;
       int bad = 0;
       int good = 0;
@@ -337,24 +367,30 @@ void RenderConversionPanel(){
       ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.0f, 0.7f));
       ImGui::PushStyleColor(ImGuiCol_ButtonActive,  (ImVec4)ImColor::HSV(0.0f, 0.0f, 0.8f));
     }
-    if(ImGui::Button("Convert",{sidebarWidth,24})){
-        Logger::Debug("Starting conversion\n");
-                                fileinfo.mdl  = files[0]->BoxBuffer;
-        if(files[1]->isEnabled) fileinfo.vtx  = files[1]->BoxBuffer;
-        if(files[2]->isEnabled) fileinfo.vvd  = files[2]->BoxBuffer;
-        if(files[3]->isEnabled) fileinfo.vvc  = files[3]->BoxBuffer;
-        if(files[4]->isEnabled) fileinfo.phy  = files[4]->BoxBuffer;
-        if(files[5]->isEnabled) fileinfo.pfb  = files[5]->BoxBuffer;
-        if(files[6]->isEnabled) fileinfo.str  = files[6]->BoxBuffer;
-        if(files[7]->isEnabled) fileinfo.aabb = files[7]->BoxBuffer;
-        if(files[8]->isEnabled) fileinfo.rui  = files[8]->BoxBuffer;
-        fileinfo.out = rn(files[0]->BoxBuffer,"conv");
+    if(ImGui::Button("Convert",{200,24})){
+        std::string t = files[0]->BoxBuffer;
+        if (!t.empty())
+        {
+            Logger::Debug("Mdl path %s\n", t.c_str());
+            Logger::Debug("Starting conversion\n");
 
-        ImGui::OpenPopup("Status##ConvertModal");
-        Logger::Debug("Spinning up conversion thread\n");
-        std::thread fp(Convert,0);
-        fp.detach();
-        Logger::Debug("Conversion thread detached\n");
+            fileinfo.mdl = files[0]->BoxBuffer;
+            if (files[1]->isEnabled) fileinfo.vtx = files[1]->BoxBuffer;
+            if (files[2]->isEnabled) fileinfo.vvd = files[2]->BoxBuffer;
+            if (files[3]->isEnabled) fileinfo.vvc = files[3]->BoxBuffer;
+            if (files[4]->isEnabled) fileinfo.phy = files[4]->BoxBuffer;
+            if (files[5]->isEnabled) fileinfo.pfb = files[5]->BoxBuffer;
+            if (files[6]->isEnabled) fileinfo.str = files[6]->BoxBuffer;
+            if (files[7]->isEnabled) fileinfo.aabb = files[7]->BoxBuffer;
+            if (files[8]->isEnabled) fileinfo.rui = files[8]->BoxBuffer;
+            fileinfo.out = rn(files[0]->BoxBuffer, "conv");
+
+            ImGui::OpenPopup("Status##ConvertModal");
+            Logger::Debug("Spinning up conversion thread\n");
+            std::thread fp(Convert, 0);
+            fp.detach();
+            Logger::Debug("Conversion thread detached\n");
+        }
     }
     if(!blocked) ImGui::PopStyleColor(3);
     ImGui::EndGroup();
@@ -406,7 +442,7 @@ void RenderGUI(){
     ImGui::SetNextWindowSize({MainViewport->Size.x/2,21});
     ImGui::SetNextWindowPos({MainViewport->Pos.x,MainViewport->Pos.y});
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize,0.0f);
-    if(ImGui::Begin("MenuBarContainer", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoNav)){
+    if(ImGui::Begin("MenuBarContainer", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoResize)){
       if(ImGui::BeginMenuBar()){
           if (ImGui::BeginMenu("File"))
         {
@@ -438,9 +474,9 @@ void RenderGUI(){
       ImGui::End();
     }
     ImGui::SetNextWindowSize({MainViewport->Size.x/2,23-16});
-    ImGui::SetNextWindowPos({MainViewport->Pos.x+((MainViewport->Size.x*0.75f)-16),MainViewport->Pos.y});
+    ImGui::SetNextWindowPos({MainViewport->Pos.x+(MainViewport->Size.x/2),MainViewport->Pos.y});
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{0.0f,0.0f});
-    if(ImGui::Begin("MainWindowSwapButtons", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoNav)){
+    if(ImGui::Begin("MainWindowSwapButtons", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoResize)){
       if(ImGui::BeginTabBar("MainWindowSwapBar", ImGuiTabBarFlags_FittingPolicyMask_)){
         
         if(ImGui::BeginTabItem("Convert")){
@@ -458,7 +494,7 @@ void RenderGUI(){
       std::string version = "v2.3.0 beta";
       float text_width = ImGui::CalcTextSize(version.c_str()).x;
 
-      ImGui::SameLine(((MainViewport->Size.x*0.25f)+16)-(text_width+10));
+      ImGui::SameLine((MainViewport->Size.x/2)-(text_width+10));
       ImGui::Text("%s",version.c_str());
       ImGui::End();
     }
@@ -476,7 +512,7 @@ void RenderGUI(){
 
     ImGui::SetNextWindowSize({viewport_width,viewport_height-23});
     ImGui::SetNextWindowBgAlpha(0.2);
-    ImGui::Begin("Box", NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNav);
+    ImGui::Begin("Box", NULL, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings);
     
     if(conv) RenderConversionPanel();
 
@@ -484,8 +520,10 @@ void RenderGUI(){
     
 
     ImGui::End();
-    if(showAbout){
-      if(ImGui::Begin("About", &showAbout,ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollWithMouse)){
+    if(showAbout)
+    {
+      if(ImGui::Begin("About", &showAbout,ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollWithMouse))
+      {
         UI::RenderAboutWindow(GRUNT_POG,pog_size.x,pog_size.y);
         auto sz = ImGui::GetWindowSize();
 
@@ -505,6 +543,7 @@ void callback_name(GLFWwindow* window, int xpos, int ypos){
     viewport_height = ypos;  
     viewport_width = xpos;
 }
+
 
 int UI::Run(){
     glewExperimental = true;
@@ -665,7 +704,7 @@ for(int i = 0; i < files.size();i++){
     files[i]->CheckErrors();
 }
 hasBrowser = true;  
-    double lastTime;
+    double lastTime = {};
     double currentTime;
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);

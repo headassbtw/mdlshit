@@ -137,55 +137,85 @@ void help(const char* p, va_list args){
   printf(p,args);
 }
 
-
-void CommonLog(LogType type, const char *fmt, va_list args1){
-  LogType _type = (LogType)type;
-  LoggerPrefix(_type);
-  va_list args2;
-  va_copy(args2, args1);
+//these need to be this way.
+//the above function did not work.
+void Logger::Notice(const char* msg...){
+  LoggerPrefix(LogType::Notice);
+  va_list args;
   char ass[2048];
-  vsprintf(ass,fmt,args2);
-  AddToInAppLogger(ass, _type);
-  va_end(args2);
-  va_copy(args2,args1);
-  vfprintf(stdout,fmt,args2);
-  va_end(args2);
-  if(LogEnabled){
-    va_copy(args2,args1);
-    vfprintf(LogStream,fmt,args2);
-    va_end(args2);
-  }
+  va_start(args, msg);
+  vsprintf(ass,msg,args);
+  va_end(args);
+  va_start(args, msg); // THIS FUCKING WORKS?????????????
+  vfprintf(stdout,msg,args);
+  va_end(args);
+  va_start(args, msg); // WHY??
+  if(LogEnabled) vfprintf(LogStream,msg,args);
+  AddToInAppLogger(ass, LogType::Notice);
+  va_end(args);
   SetConsoleColor(Reset);
 }
-
-void Logger::Notice(const char* msg...){
-  va_list args;
-  va_start(args, msg);
-  CommonLog(LogType::Notice, msg,args);
-  va_end(args);
-  
-}
 void Logger::Info(const char* msg...){
+  LoggerPrefix(LogType::Info);
   va_list args;
+  char ass[2048];
   va_start(args, msg);
-  CommonLog(LogType::Info, msg,args);
+  vsprintf(ass,msg,args);
   va_end(args);
+  va_start(args, msg);
+  vfprintf(stdout,msg,args);
+  va_end(args);
+  va_start(args, msg);
+  if(LogEnabled) vfprintf(LogStream,msg,args);
+  AddToInAppLogger(ass, LogType::Info);
+  va_end(args);
+  SetConsoleColor(Reset);
 }
 void Logger::Error(const char* msg...){
+  LoggerPrefix(LogType::Error);
   va_list args;
+  char ass[2048];
   va_start(args, msg);
-  CommonLog(LogType::Error, msg,args);
+  vsprintf(ass,msg,args);
   va_end(args);
+  va_start(args, msg);
+  vfprintf(stdout,msg,args);
+  va_end(args);
+  va_start(args, msg);
+  if(LogEnabled) vfprintf(LogStream,msg,args);
+  AddToInAppLogger(ass, LogType::Error);
+  va_end(args);
+  SetConsoleColor(Reset);
 }
 void Logger::Critical(const char* msg...){
+  LoggerPrefix(LogType::Critical);
   va_list args;
+  char ass[2048];
   va_start(args, msg);
-  CommonLog(LogType::Critical, msg,args);
+  vsprintf(ass,msg,args);
   va_end(args);
+  va_start(args, msg);
+  vfprintf(stdout,msg,args);
+  va_end(args);
+  va_start(args, msg);
+  if(LogEnabled) vfprintf(LogStream,msg,args);
+  AddToInAppLogger(ass, LogType::Critical);
+  va_end(args);
+  SetConsoleColor(Reset);
 }
 void Logger::Debug(const char* msg...){
+  LoggerPrefix(LogType::Debug);
   va_list args;
+  char ass[2048];
   va_start(args, msg);
-  CommonLog(LogType::Debug, msg,args);
+  vsprintf(ass,msg,args);
   va_end(args);
+  va_start(args, msg);
+  vfprintf(stdout,msg,args);
+  va_end(args);
+  va_start(args, msg);
+  if(LogEnabled) vfprintf(LogStream,msg,args);
+  AddToInAppLogger(ass, LogType::Debug);
+  va_end(args);
+  SetConsoleColor(Reset);
 }

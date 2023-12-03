@@ -3,7 +3,6 @@
 #include <rapidjson/istreamwrapper.h>
 #include <structs.hpp>
 #include <binarystream.hpp>
-#include <structs.hpp>
 #include <argtools.hpp>
 #include <iostream>
 #include <string>
@@ -263,10 +262,10 @@ namespace MDL
 	public:
 		studiohdr_t_v49										mdlhdr;
 		studiohdr2_t_v49									mdlsubhdr;
-		std::vector<mstudiobone_t_v49>						bones;
-		std::vector<mstudiojigglebone_t_v49>				jigglebones;
+		mstudiobone_t_v49*									bones;
+		mstudiojigglebone_t_v49*							jigglebones;
 		std::vector<mstudioboneflexdriver_t_v49>			boneflexdrivers;
-		std::vector<mstudioattachment_t_v49>				attachments;
+		mstudioattachment_t_v49*								attachments;
 		std::vector<mstudiohitboxset_t_v49>					hitboxsets;
 		std::vector<mstudiobbox_t_v49>						hitboxes;
 		mstudiobonenametable_t_v49							bonenametable;
@@ -316,7 +315,7 @@ namespace MDL
 		int animByteAddedTotal = 0;
 		int animSecByteAddedTotal = 0;
 
-
+		int numjigglebones = 0;
 		int weightListPos = 0;
 		int animBytesAdded = 0;
 		int bytesAddedToRuiMesh = 0;
@@ -339,30 +338,34 @@ namespace MDL
 		int numOfLinks = 0;
 		int ruiPadding = 0;
 
+		void ReadMdl(BinaryReader* Stream);
+
+		mstudiobbox_t_v49* GetHitboxes(BinaryReader* Stream);
+
 		void SetMdlInts();
-
+		
 		int ConvertFlag(int flag);
-
+		
 		std::vector<int> GetIkChainBones();
-
+		
 		std::vector<int> GetIKBones();
-
+		
 		std::vector<int> v53GetAnimHdrBytesAdded(bool zeroFirst);
-
+		
 		int v53GetTotalAnimHdrBytesAdded();
-
+		
 		int v53GetAnimHdrBytesAddedIdv(int anim);
-
+		
 		std::vector<int> v53GetSecHdrBytesAdded(bool zeroFirst);
-
+		
 		int v53GetTotalSecHdrBytesAdded();
-
+		
 		int v53GetSecHdrBytesAddedIdv(int anim);
-
+		
 		std::vector<int> v53GetSecBytesAdded(bool zeroFirst);
-
+		
 		std::vector<int> v53IkRuleStairsPerAnim();
-
+		
 		std::vector<int> v53GetBytesAddedToWeightLists();
 
 		studiohdr_t_v53 ConvertHeader(FileInfo info);
@@ -421,7 +424,7 @@ namespace MDL
 
 		v49Mdl();
 
-		v49Mdl(studiohdr_t_v49 _mdlhdr, studiohdr2_t_v49 _mdlsubhdr, std::vector<mstudiobone_t_v49> _bones, std::vector<mstudiojigglebone_t_v49> _jigglebones, std::vector<mstudioboneflexdriver_t_v49>	_boneflexdrivers, std::vector<mstudioattachment_t_v49> _attachments, std::vector<mstudiohitboxset_t_v49> _hitboxsets, std::vector<mstudiobbox_t_v49> _hitboxes, mstudiobonenametable_t_v49 _bonenametable, std::vector<mstudioanimdesc_t_v49> _animdescs, std::vector<mstudioanim_t_v49> _anims, std::vector<sectionindexesindex_t_v49> _sectionindexes, std::vector<mstudioanim_t_v49> _sections, std::vector<mstudioikrule_t_v49> _ikrules, std::vector<mstudiocompressedikerror_t_v49> _compressedikerrors, std::vector<mstudioikerror_t_v49> _ikerrors, std::vector<mstudioikrulezeroframe_t_v49> _ikrulezeroframe, std::vector<mstudioseqdescv49_t> _seqdescs, std::vector<blendgroup_t_v49> _blends, std::vector<posekey_t_v49> _posekeys, std::vector<mstudioevent_t_v49> _events, std::vector<mstudioautolayer_t_v49> _autolayers, std::vector<mstudioactivitymodifier_t_v49> _activitymodifiers, std::vector<seqweightlist_t_v49> _seqweightlist, std::vector<mstudionodename_t_v49> _nodenames, std::vector<mstudionodedata_v49> _nodes, std::vector<mstudiobodyparts_t_v49> _bodyparts, std::vector<mstudiomodel_t_v49>	_models, std::vector<mstudiomesh_t_v49> _meshes, std::vector<mstudioikchain_t_v49> _ikchains, std::vector<mstudioiklink_t_v49> _iklinks, std::vector<mstudioposeparamdesc_t_v49> _poseparamdescs, std::vector<mstudioanimblock_t> _animblocks, std::vector<mstudiomodelgroup_t_v49> _includedmodels, std::vector<mstudiotexturedir_t_v49> _cdtextures, std::vector<mstudiotexture_t_v49> _textures, std::vector<mstudioskingroup_t_v49> _skingroups, mstudiokeyvalues_t_v49 _keyvalues, std::vector<mstudiosrcbonetransform_t_v49> _srcbonetransforms, mstudiolinearbone_t_v49 _linearbone, mstudiolinearbonedata_t_v49 _linearbonedata, mstudiostringtable_t_v49 _stringtable);
+		v49Mdl(studiohdr_t_v49 _mdlhdr, studiohdr2_t_v49 _mdlsubhdr, mstudiobone_t_v49* _bones, mstudiojigglebone_t_v49* _jigglebones, std::vector<mstudioboneflexdriver_t_v49>	_boneflexdrivers, mstudioattachment_t_v49* _attachments, std::vector<mstudiohitboxset_t_v49> _hitboxsets, std::vector<mstudiobbox_t_v49> _hitboxes, mstudiobonenametable_t_v49 _bonenametable, std::vector<mstudioanimdesc_t_v49> _animdescs, std::vector<mstudioanim_t_v49> _anims, std::vector<sectionindexesindex_t_v49> _sectionindexes, std::vector<mstudioanim_t_v49> _sections, std::vector<mstudioikrule_t_v49> _ikrules, std::vector<mstudiocompressedikerror_t_v49> _compressedikerrors, std::vector<mstudioikerror_t_v49> _ikerrors, std::vector<mstudioikrulezeroframe_t_v49> _ikrulezeroframe, std::vector<mstudioseqdescv49_t> _seqdescs, std::vector<blendgroup_t_v49> _blends, std::vector<posekey_t_v49> _posekeys, std::vector<mstudioevent_t_v49> _events, std::vector<mstudioautolayer_t_v49> _autolayers, std::vector<mstudioactivitymodifier_t_v49> _activitymodifiers, std::vector<seqweightlist_t_v49> _seqweightlist, std::vector<mstudionodename_t_v49> _nodenames, std::vector<mstudionodedata_v49> _nodes, std::vector<mstudiobodyparts_t_v49> _bodyparts, std::vector<mstudiomodel_t_v49>	_models, std::vector<mstudiomesh_t_v49> _meshes, std::vector<mstudioikchain_t_v49> _ikchains, std::vector<mstudioiklink_t_v49> _iklinks, std::vector<mstudioposeparamdesc_t_v49> _poseparamdescs, std::vector<mstudioanimblock_t> _animblocks, std::vector<mstudiomodelgroup_t_v49> _includedmodels, std::vector<mstudiotexturedir_t_v49> _cdtextures, std::vector<mstudiotexture_t_v49> _textures, std::vector<mstudioskingroup_t_v49> _skingroups, mstudiokeyvalues_t_v49 _keyvalues, std::vector<mstudiosrcbonetransform_t_v49> _srcbonetransforms, mstudiolinearbone_t_v49 _linearbone, mstudiolinearbonedata_t_v49 _linearbonedata, mstudiostringtable_t_v49 _stringtable);
 
 		v49Mdl _v49Mdl(BinaryReader* Stream, bool debug);
 	};
@@ -445,6 +448,314 @@ namespace MDL
 				phyHdr = {};
 				phySecs = {};
 			}
+	};
+
+	class SourceModel49
+	{
+		public:
+
+		studiohdr_t_v49										mdlhdr;
+		studiohdr2_t_v49									mdlsubhdr;
+
+		mstudiobone_t_v49*									bones = new mstudiobone_t_v49[mdlhdr.numbones];
+		mstudiojigglebone_t_v49*							jigglebones = {};
+		mstudioboneflexdriver_t_v49*						boneflexdrivers = new mstudioboneflexdriver_t_v49[mdlsubhdr.m_nBoneFlexDriverCount];
+		mstudioattachment_t_v49*							attachments = new mstudioattachment_t_v49[mdlhdr.numlocalattachments];
+		mstudiohitboxset_t_v49*								hitboxsets = new mstudiohitboxset_t_v49[mdlhdr.numhitboxsets];
+		mstudiobbox_t_v49*									hitboxes; //Add function for getting number of hitboxes from hitbox sets. - Liberty
+		unsigned char*										bonenametable = new unsigned char[mdlhdr.numbones]; //Replace with unsigned list instead of struct by itself. - Liberty
+		mstudioanimdesc_t_v49*								animdescs = new mstudioanimdesc_t_v49[mdlhdr.numlocalanim];
+		std::vector<mstudioanim_t_v49>						anims; //Add function for gathering anims. - Liberty
+		std::vector<sectionindexesindex_t_v49>				sectionindexes; //Add function for gathering anims. - Liberty
+		std::vector<mstudioanim_t_v49>						sections; //Add function for gathering anims. - Liberty
+		std::vector<mstudioikrule_t_v49>					ikrules; //Add function for gathering anims. - Liberty
+		std::vector<mstudiocompressedikerror_t_v49>			compressedikerrors; //Add function for gathering anims. - Liberty
+		std::vector<mstudioikerror_t_v49>					ikerrors; //Add function for gathering anims. - Liberty
+		std::vector<mstudioikrulezeroframe_t_v49>			ikrulezeroframe; //Add function for gathering anims. - Liberty
+		std::vector<mstudioseqdesc_t_v49>					seqdescs;// = new mstudioseqdesc_t_v49[mdlhdr.numlocalseq];
+		std::vector<blendgroup_t_v49>						blends; //Add function to get seq data - Liberty
+		std::vector<posekey_t_v49>							posekeys; //Add function to get seq data - Liberty
+		std::vector<mstudioevent_t_v49>						events; //Add function to get seq data - Liberty
+		std::vector<mstudioautolayer_t_v49>					autolayers; //Add function to get seq data - Liberty
+		std::vector<mstudioactivitymodifier_t_v49>			activitymodifiers; //Add function to get seq data - Liberty
+		std::vector<seqweightlist_t_v49>					seqweightlist; //Add function to get seq data - Liberty
+		mstudionodename_t_v49*								nodenames = new mstudionodename_t_v49[mdlhdr.numlocalnodes];
+		mstudionodedata_v49*								nodes = new mstudionodedata_v49[mdlhdr.numlocalnodes];
+		mstudiobodyparts_t_v49*								bodyparts = new mstudiobodyparts_t_v49[mdlhdr.numbodyparts];
+		std::vector<mstudiomodel_t_v49>						models; //Make function to get model data - Liberty
+		std::vector<mstudiomesh_t_v49>						meshes; //Make function to get model data - Liberty
+		mstudioikchain_t_v49*								ikchains = new mstudioikchain_t_v49[mdlhdr.numikchains];
+		std::vector<mstudioiklink_t_v49>					iklinks; //Make function to get ikchain data - Liberty
+		mstudioposeparamdesc_t_v49*							poseparamdescs = new mstudioposeparamdesc_t_v49[mdlhdr.numlocalposeparameters];
+		mstudioanimblock_t*									animBlocks = new mstudioanimblock_t[mdlhdr.numanimblocks];
+		mstudiomodelgroup_t_v49*							includedmodels = new mstudiomodelgroup_t_v49[mdlhdr.numincludemodels];
+		mstudiotexturedir_t_v49*							cdtextures = new mstudiotexturedir_t_v49[mdlhdr.numcdtextures];
+		mstudiotexture_t_v49*								textures = new mstudiotexture_t_v49[mdlhdr.numtextures];
+		mstudioskingroup_t_v49*								skingroups = new mstudioskingroup_t_v49[mdlhdr.numskinfamilies];
+		mstudiokeyvalues_t_v49								keyvalues;
+		mstudiosrcbonetransform_t_v49*						srcbonetransforms = new mstudiosrcbonetransform_t_v49[mdlsubhdr.numsrcbonetransform];
+		mstudiolinearbone_t_v49								linearbone;
+		mstudiolinearbonedata_t_v49							linearbonedata;
+		mstudiostringtable_t_v49							stringTable;
+
+		std::vector<int> ikRuleStairsPerAnim;
+		std::vector<int> hdrBytesAnimDescAdd;
+		std::vector<int> secHdrBytesAnimDescAdd;
+		std::vector<int> secHdrBytesSecAdd;
+		std::vector<int> weightlistidxs;
+		std::vector<int> bytesAddedToWeightLists;
+		std::vector<int> ikchainbones;
+		std::vector<int> ikRoots;
+
+		//Non stored values -Liberty
+		int numJiggleBones;
+		int numIkRules;
+		int numCompressedIkErrors;
+		int numIkLinks;
+		int numModels;
+		int numMeshes;
+		int numHitboxes;
+
+		//Minor values
+		int numBlends;
+		int numPoseKeys;
+		int numEvents;
+		int numAutoLayers;
+		int numActMods;
+		int numWeightLists;
+
+		//Conversion values - Liberty
+		int animByteAddedTotal = 0;
+		int animSecByteAddedTotal = 0;
+
+		int numjigglebones = 0;
+		int weightListPos = 0;
+		int animBytesAdded = 0;
+		int bytesAddedToRuiMesh = 0;
+		int bytesAddedToIkRules = 0;
+		int bytesAddedToHeader = 52;
+		int bytesAddedToBones = 0;
+		int bytesAddedToAnims = 0;
+		int bytesAddedToAnimData = 0;
+		int bytesAddedToSections = 0;
+		int bytesAddedToSeqs = 0;
+		int bytesAddedToTextures = 0;
+		int bytesAddedToIkChains = 0;
+		int bytesAddedToActMods = 0;
+		int bytesAddedToSectionIdxs = 0;
+		int bytesAddedToLinearBone = 0;
+		int bytesAddedToAABBTree = 0;
+		int textureFiller = 0;
+		int strFiller = 60;
+		int allBytesAdded = 0;
+		int numOfLinks = 0;
+		int ruiPadding = 0;
+
+
+		
+		void UpdateMdl();
+
+		void Init(BinaryReader* Stream);
+
+		void Read(BinaryReader* Stream);
+
+		void Debug();
+
+		void ReadBones(BinaryReader* Stream);
+
+		void ReadJiggleBones(BinaryReader* Stream);
+
+		void ReadAttachments(BinaryReader* Stream);
+
+		void ReadHitboxSets(BinaryReader* Stream);
+
+		void ReadHitBoxes(BinaryReader* Stream);
+
+		void ReadBoneNameTable(BinaryReader* Stream);
+
+		void ReadAnimDescs(BinaryReader* Stream);
+
+		void CheckNextAnimValue(int hdrEndPos, int anim, int numAnims);
+
+		void ReadAnims(BinaryReader* Stream);
+
+		void ReadSections(BinaryReader* Stream);
+
+		void ReadIKRules(BinaryReader* Stream);
+
+		void ReadIKCompressedErrors(BinaryReader* Stream);
+
+		void ReadSeqDescs(BinaryReader* Stream);
+
+		void ReadNodeNames(BinaryReader* Stream);
+
+		void ReadNodes(BinaryReader* Stream);
+
+		void ReadBodyParts(BinaryReader* Stream);
+
+		void ReadModels(BinaryReader* Stream);
+
+		void ReadIKChains(BinaryReader* Stream);
+
+		void ReadIKLinks(BinaryReader* Stream);
+
+		void ReadPoseParamDescs(BinaryReader* Stream);
+
+		void ReadAnimBlocks(BinaryReader* Stream);
+
+		void ReadMeshes(BinaryReader* Stream);
+
+		void ReadIncludeModels(BinaryReader* Stream);
+
+		void ReadTextures(BinaryReader* Stream);
+
+		void ReadCDTextures(BinaryReader* Stream);
+
+		void ReadSkinFamilies(BinaryReader* Stream);
+
+		void ReadKeyValues(BinaryReader* Stream);
+
+		void ReadSrcBoneTransforms(BinaryReader* Stream);
+
+		void ReadLinearBone(BinaryReader* Stream);
+
+		void ReadStringTable(BinaryReader* Stream);
+		//Me trying to adapt Rika's template code to c++ and format it how I want it to be. I ended up getting angry at it and hit it with a shovel and then when it worked from me setting it up the same way Rika did I knew it was my mission to make it work with the way I set it up initially. - Liberty
+		// 
+		// 
+		//bool TestCheck(BinaryReader* Stream, int pCurrentPos, int target)
+		//{
+		//	unsigned char test;
+		//	Stream->seek(pCurrentPos);
+		//	Stream->read((char*)&test, sizeof(byte));
+		//	return test <= target;
+		//}
+		//
+		//void GenerateAnimValues(BinaryReader* Stream, int pAnimValue, int maxFrames, mstudioanim_t_v49* hdr, vector<mstudioanimvalue_t>* dataArray)
+		//{
+		//	int k = maxFrames;
+		//	int pCurrentPos = pAnimValue;
+		//	Stream->seek(pCurrentPos);
+		//	unsigned char test; Stream->read((char*)&test, sizeof(byte));
+		//	mstudioanimvalue_t data;
+		//
+		//	//Printf("remaining frames %i\n", k);
+		//
+		//	while (TestCheck(Stream, pCurrentPos, k))
+		//	{
+		//		Stream->seek(pCurrentPos + 1);
+		//		unsigned char test2; Stream->read((char*)&test2, sizeof(byte));
+		//
+		//		if (test2 == 0)
+		//			return;
+		//
+		//		Stream->seek(pCurrentPos);
+		//		Stream->read((char*)&data.num.valid, sizeof(byte));
+		//		Stream->read((char*)&data.num.total, sizeof(byte));
+		//		for (int i = 0; i < data.num.valid; i++)
+		//		{
+        //            short value{};
+        //            Stream->read((char*)&value, sizeof(short));
+		//			data.value.push_back(value);
+		//		}
+		//
+		//		pCurrentPos += (data.num.valid + 1) * 2;
+		//		k -= data.num.total;
+		//
+		//		//Printf("remaining frames %i\n", k);
+		//		dataArray->push_back(data);
+		//	}
+		//}
+		//
+		//void ReadValuePtr(BinaryReader* Stream, mstudioanim_valueptr_t_v49& valueptr, int maxFrames, mstudioanim_t_v49* hdr, vector<mstudioanimvalue_t>* dataArray)
+		//{
+		//	for (int g = 0; g < 3; g++)
+		//	{
+		//		if (valueptr.offset[g])
+		//			GenerateAnimValues(Stream, valueptr.ptrPos + valueptr.offset[g], maxFrames, hdr, dataArray);
+		//	}
+		//}
+
+		mstudiobone_t_v49* GetBones(BinaryReader* Stream);
+
+		void SetMdlInts();
+
+		int ConvertFlag(int flag);
+
+		std::vector<int> GetIkChainBones();
+
+		//std::vector<int> GetIKBones();
+
+		std::vector<int> v53GetAnimHdrBytesAdded(bool zeroFirst);
+
+		int v53GetTotalAnimHdrBytesAdded();
+
+		int v53GetAnimHdrBytesAddedIdv(int anim);
+
+		std::vector<int> v53GetSecHdrBytesAdded(bool zeroFirst);
+
+		int v53GetTotalSecHdrBytesAdded();
+
+		int v53GetSecHdrBytesAddedIdv(int anim);
+
+		std::vector<int> v53GetSecBytesAdded(bool zeroFirst);
+
+		std::vector<int> v53IkRuleStairsPerAnim();
+
+		std::vector<int> v53GetBytesAddedToWeightLists();
+
+		void ConvertToV53();
+
+		studiohdr_t_v53 ConvertHeader(FileInfo info);
+
+		std::vector<mstudiobone_t_v53> BoneConversion();
+
+		std::vector<mstudiobbox_t_v53> HitboxConversion();
+
+		std::vector<mstudioanimdesc_t_v53> AnimDescConversion();
+
+		std::vector<mstudioseqdesc_t_v53> SeqDescConversion();
+
+		std::vector<mstudioactivitymodifier_t_v53> ActivityModifierConversion();
+
+		std::vector<mstudioikrule_t_v53> IkRuleConversion();
+
+		std::vector<mstudioanim_t_v53> ConvertAnims();
+
+		std::vector<sectionindexes_t_v53> ConvertSectionIndexes();
+
+		std::vector<mstudioanim_t_v53> ConvertSections();
+
+		std::vector<mstudioikchain_t_v53> IkChainConversion();
+
+		void HitboxSetConversion();
+
+		void AttachmentConversion();
+
+		void SeqEventConversion();
+
+		void ConvertNodeNames();
+
+		void ConvertBodyParts();
+
+		void ConvertModels();
+
+		void ConvertMeshes();
+
+		void ConvertPoseParamDescs();
+
+		void ConvertIncludeModel();
+
+		std::vector<mstudiotexture_t_v53> ConvertTextures();
+
+		void ConvertCDTextures();
+
+		void ConvertSrcBoneTransforms();
+
+		void ConvertLinearBone();
+
+		mstudiolinearbonedata_t_v53 ConvertLinearBoneData();
+
 	};
 
 }

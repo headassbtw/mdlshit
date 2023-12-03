@@ -5,8 +5,12 @@
 #include <vector>
 #include <utility>
 
+using std::byte;
+using std::string;
+
 #define MAX_NUM_LODS 8
 #define MAX_NUM_BONES_PER_VERT 3
+#define DEBUG false
 
 struct FileInfo {
 	std::optional<std::string> mdl; //main mdl file
@@ -35,11 +39,11 @@ struct sizes
 	int v53_Texture = 44;
 };
 
-struct Vector48 //Not correct. -Liberty
+struct vector48_t //Not correct. -Liberty Edit: Correct. I think. -Liberty
 {
-	float x;
-	float y;
-	float z;
+	int16_t x;
+	int16_t y;
+	int16_t z;
 };
 
 struct Quaternion64
@@ -67,6 +71,29 @@ struct Vector2
 struct Vector3Short //What I like to use. -Liberty
 {
 	short x, y, z;
+
+	short& operator[](int index) {
+		switch (index)
+		{
+			case 0:
+			{
+				return x;
+			}
+			case 1:
+			{
+				return y;
+			}
+			case 2:
+			{
+				return z;
+			}
+			default:
+			{
+				return x;
+
+			}
+		}
+	}
 };
 
 struct Vector3
@@ -375,6 +402,7 @@ enum hboxgroup
 
 
 #define STUDIO_ANIMDESC_53_UNK1 0x80000 // cherry blossom v53, levi in v54
+#define STUDIO_FRAMEMOVEMENT    0x40000 // framemovements are only read if this flag is present
 
 #pragma region ANIMFLAGS
 // v48/49/52 flags
@@ -415,6 +443,55 @@ enum ikruletype
 #pragma endregion
 
 #pragma region V49
+//struct studioMdl_t_v49
+//{
+//	studiohdr_t_v49	 mdlhdr;
+//	studiohdr2_t_v49 mdlsubhdr;
+//
+//	mstudiobone_t_v49*						bones;
+//	mstudiojigglebone_t_v49*				jigglebones;
+//	mstudioboneflexdriver_t_v49*			boneflexdrivers;
+//	mstudioattachment_t_v49*				attachments;
+//	mstudiohitboxset_t_v49*					hitboxsets;
+//	mstudiobbox_t_v49*						hitboxes;
+//	mstudiobonenametable_t_v49				bonenametable;
+//	mstudioanimdesc_t_v49*					animdescs;
+//	mstudioanim_t_v49*						anims;
+//	sectionindexesindex_t_v49*				sectionindexes;
+//	mstudioanim_t_v49*						sections;
+//	mstudioikrule_t_v49*					ikrules;
+//	mstudiocompressedikerror_t_v49*			compressedikerrors;
+//	mstudioikerror_t_v49*					ikerrors;
+//	mstudioikrulezeroframe_t_v49*			ikrulezeroframe;
+//	mstudioseqdescv49_t*					seqdescs;
+//	blendgroup_t_v49*						blends;
+//	posekey_t_v49*							posekeys;
+//	mstudioevent_t_v49*						events;
+//	mstudioautolayer_t_v49*					autolayers;
+//	mstudioactivitymodifier_t_v49*			activitymodifiers;
+//	seqweightlist_t_v49*					seqweightlist;
+//	mstudionodename_t_v49*					nodenames;
+//	mstudionodedata_v49*					nodes;
+//	mstudiobodyparts_t_v49*					bodyparts;
+//	mstudiomodel_t_v49*						models;
+//	mstudiomesh_t_v49*						meshes;
+//	mstudioikchain_t_v49*					ikchains;
+//	mstudioiklink_t_v49*					iklinks;
+//	mstudioposeparamdesc_t_v49*				poseparamdescs;
+//	mstudioanimblock_t*						animBlocks;
+//	mstudiomodelgroup_t_v49*				includedmodels;
+//	mstudiotexturedir_t_v49*				cdtextures;
+//	mstudiotexture_t_v49*					textures;
+//	mstudioskingroup_t_v49*					skingroups;
+//	mstudiokeyvalues_t_v49					keyvalues;
+//	mstudiosrcbonetransform_t_v49*			srcbonetransforms;
+//	mstudiolinearbone_t_v49					linearbone;
+//	mstudiolinearbonedata_t_v49				linearbonedata;
+//
+//};
+
+
+
 struct studiohdr_t_v49
 {
 	int id; // Model format ID, such as "IDST" (0x49 0x44 0x53 0x54)
@@ -528,20 +605,20 @@ struct studiohdr_t_v49
 	// if STUDIOHDR_FLAGS_CONSTANT_DIRECTIONAL_LIGHT_DOT is set,
 	// this value is used to calculate directional components of lighting 
 	// on static props
-	std::byte constdirectionallightdot;
+	byte constdirectionallightdot;
 
 	// set during load of mdl data to track *desired* lod configuration (not actual)
 	// the *actual* clamped root lod is found in studiohwdata
 	// this is stored here as a global store to ensure the staged loading matches the rendering
-	std::byte rootLOD;
+	byte rootLOD;
 
 	// set in the mdl data to specify that lod configuration should only allow first numAllowRootLODs
 	// to be set as root LOD:
 	//	numAllowedRootLODs = 0	means no restriction, any lod can be set as root lod.
 	//	numAllowedRootLODs = N	means that lod0 - lod(N-1) can be set as root lod, but not lodN or lower.
-	std::byte numAllowedRootLODs;
+	byte numAllowedRootLODs;
 
-	std::byte unused;
+	byte unused;
 
 	int unused4; // zero out if version < 47
 
@@ -687,8 +764,8 @@ struct mstudioattachment_t_v49
 
 struct mstudiobonenametable_t_v49
 {
-	std::byte bone;
-	std::vector<std::byte> bones;
+	byte bone;
+	byte* bones;
 };
 
 struct mstudioikchain_t_v49
@@ -803,7 +880,7 @@ struct mstudiohitboxset_t_v49
 
 	std::string szname;
 
-	std::vector<mstudiobbox_t_v49> hitboxes;
+	mstudiobbox_t_v49* hitboxes = nullptr;
 };
 
 struct mstudioanimdesc_t_v49
@@ -862,26 +939,49 @@ struct mstudioanimblock_t
 
 struct mstudioanim_valueptr_t_v49
 {
+	int ptrPos = 0;
 	Vector3Short offset = {0,0,0};
 };
 
 struct mstudioanimdata_t_v49
 {
-	std::byte value;
-	std::vector<std::byte> arry;
+	int dataSize;
+	std::vector<byte> arry;
 };
 
 struct mstudiofiller_t_v49
 {
-	std::vector<std::byte> arry;
+	std::vector<byte> arry;
+};
+
+struct mstudioanimvalue_t
+{
+	struct
+	{
+		// unsigned because it is in some places
+		unsigned char	valid; // number of valid frames, or how many frames of data this value has
+		unsigned char	total; // total number of frames, aka "values"
+	} num;
+	std::vector<short> value; // actual value, value*posscale
+};
+
+struct mstudioanimvalues_t_v49
+{
+	std::vector<mstudioanimvalue_t> rot;
+	std::vector<mstudioanimvalue_t> pos;
+};
+
+struct mstudioanimvaluedata_t_v49
+{
+	std::vector<mstudioanimvalue_t> animData;
 };
 
 struct mstudioanim_t_v49
 {
 	int strPos = 0;
 
-	std::byte bone; // alien swarm/csgo says this is a signed int but that doesn't work well for our purposes.
-	std::byte flags;		// weighing options
+	byte bone; // alien swarm/csgo says this is a signed int but that doesn't work well for our purposes.
+	byte flags;		// weighing options
 
     int16_t nextoffset;
 
@@ -902,6 +1002,8 @@ struct mstudioanim_t_v49
 
 	mstudioanimdata_t_v49 animdata;
 	mstudiofiller_t_v49 filler;
+
+	mstudioanimvalues_t_v49 animvalues;
 };
 
 struct mstudio_frame_anim_t
@@ -964,6 +1066,7 @@ struct mstudiocompressedikerror_t_v49
 {
 	float scale[6];
 	int16_t index[6]; //offset
+	std::vector<mstudioanimvalue_t> animvalues;
 	mstudioanimdata_t_v49 animdata;
 	mstudiofiller_t_v49 filler;
 };
@@ -986,7 +1089,7 @@ struct mstudioikrulezeroframe_t_v49
 
 struct blendgroup_t_v49
 {
-	int16_t blends[8];
+	std::vector<short> blends;
 };
 
 struct mstudioseqdescv49_t
@@ -1060,7 +1163,7 @@ struct mstudioseqdescv49_t
 
 	std::string szlabel;
 	std::string szactivityname;
-	std::vector<std::string> szeventnames;
+	std::string* szeventnames = nullptr;
 	std::vector<std::string> szactivitymodifiernames;
 
 	std::vector<int> actmods;
@@ -1071,7 +1174,7 @@ struct mstudioseqdescv49_t
 
 struct posekey_t_v49
 {
-	float unk[4];
+	std::vector<float> unk;
 };
 
 struct mstudioevent_t_v49
@@ -1113,6 +1216,94 @@ struct seqweightlist_t_v49
 	std::vector<float> boneweight;
 };
 
+struct mstudioseqdescdata_t_v49
+{
+	posekey_t_v49 posekey = {}; //posekey[seqdesc.groupsize[0] + seqdesc.groupsize[1]
+	std::vector<mstudioevent_t_v49> events; //seqdesc.numevents
+	std::vector<mstudioautolayer_t_v49> autolayers; //seqdesc.numautolayers
+	seqweightlist_t_v49 weightlist; //mdlhdr.numbones
+	//iklocks						//seqdesc.numiklocks
+	blendgroup_t_v49 blendgroup; //blendgroup[seqdesc.groupsize[0] * seqdesc.groupsize[1]]
+	std::vector<mstudioactivitymodifier_t_v49> actmods; //seqdesc.numactivitymodifiers;
+
+};
+
+struct mstudioseqdesc_t_v49
+{
+	int baseptr;
+
+	int	szlabelindex;
+
+	int szactivitynameindex;
+
+	int flags;					// looping/non-looping flags
+
+	int activity;				// initialized at loadtime to game DLL values
+	int actweight;
+
+	int numevents;
+	int eventindex;
+
+	Vector3 bbmin;				// per sequence bounding box
+	Vector3 bbmax;
+
+	int numblends;
+
+	// Index into array of shorts which is groupsize[0] x groupsize[1groupsize[1] in length
+	int animindexindex;
+
+	int movementindex;		// [blend] float array for blended movement
+	int groupsize[2];
+	int paramindex[2];		// X, Y, Z, XR, YR, ZR
+	float paramstart[2];	// local (0..1) starting value
+	float paramend[2];		// local (0..1) ending value
+	int paramparent;
+
+	float fadeintime;		// ideal cross fate in time (0.2 default)
+	float fadeouttime;		// ideal cross fade out time (0.2 default)
+
+	int localentrynode;		// transition node at entry
+	int localexitnode;		// transition node at exit
+	int nodeflags;			// transition rules
+
+	float entryphase;		// used to match entry gait
+	float exitphase;		// used to match exit gait
+
+	float lastframe;		// frame that should generation EndOfSequence
+
+	int nextseq;			// auto advancing sequences
+	int pose;				// index of delta animation between end and nextseq
+
+	int numikrules;
+
+	int numautolayers;
+	int autolayerindex;
+
+	int weightlistindex;
+
+	int posekeyindex;
+
+	int numiklocks;
+	int iklockindex;
+
+	// Key values
+	int	keyvalueindex;
+	int keyvaluesize;
+
+	int cycleposeindex;		// index of pose parameter to use as cycle index
+
+	int activitymodifierindex;
+	int numactivitymodifiers;
+
+	int unused[5];
+
+	mstudioseqdescdata_t_v49 seqdata;
+};
+
+//struct blendgroup_t_v49
+//{
+//	int16_t blends[8];
+//};
 struct mstudiomodelgroup_t_v49
 {
 	int szlabelindex;	// textual name
@@ -1201,7 +1392,7 @@ struct mstudioboneweight_t_v49
 {
 	float		weight[MAX_NUM_BONES_PER_VERT];
 	char		bone[MAX_NUM_BONES_PER_VERT];
-	std::byte	numbones;
+	byte	numbones;
 };
 
 struct mstudiovertex_t_v49
@@ -1279,8 +1470,8 @@ struct mstudiostringtable_t_v49
 
 	std::string mdlname;
 	std::string surfaceprop;
-	std::vector<std::string> bones;
-	std::vector<std::string> attachments;
+	std::string* bones;
+	std::string* attachments;
 	std::vector<std::string> hitboxsets;
 	std::vector<std::string> hitboxes;
 	std::vector<std::string> anims;
@@ -1410,20 +1601,20 @@ struct studiohdr_t_v52
 	// if STUDIOHDR_FLAGS_CONSTANT_DIRECTIONAL_LIGHT_DOT is set,
 	// this value is used to calculate directional components of lighting 
 	// on static props
-	std::byte constdirectionallightdot;
+	byte constdirectionallightdot;
 
 	// set during load of mdl data to track *desired* lod configuration (not actual)
 	// the *actual* clamped root lod is found in studiohwdata
 	// this is stored here as a global store to ensure the staged loading matches the rendering
-	std::byte rootLOD;
+	byte rootLOD;
 
 	// set in the mdl data to specify that lod configuration should only allow first numAllowRootLODs
 	// to be set as root LOD:
 	//	numAllowedRootLODs = 0	means no restriction, any lod can be set as root lod.
 	//	numAllowedRootLODs = N	means that lod0 - lod(N-1) can be set as root lod, but not lodN or lower.
-	std::byte numAllowedRootLODs;
+	byte numAllowedRootLODs;
 
-	std::byte unused;
+	byte unused;
 
 	float fadedistance;
 
@@ -1855,20 +2046,20 @@ struct studiohdr_t_v53
 	// if STUDIOHDR_FLAGS_CONSTANT_DIRECTIONAL_LIGHT_DOT is set,
 	// this value is used to calculate directional components of lighting 
 	// on static props
-	std::byte constdirectionallightdot;
+	byte constdirectionallightdot;
 
 	// set during load of mdl data to track *desired* lod configuration (not actual)
 	// the *actual* clamped root lod is found in studiohwdata
 	// this is stored here as a global store to ensure the staged loading matches the rendering
-	std::byte rootLOD;
+	byte rootLOD;
 
 	// set in the mdl data to specify that lod configuration should only allow first numAllowRootLODs
 	// to be set as root LOD:
 	//	numAllowedRootLODs = 0	means no restriction, any lod can be set as root lod.
 	//	numAllowedRootLODs = N	means that lod0 - lod(N-1) can be set as root lod, but not lodN or lower.
-	std::byte numAllowedRootLODs;
+	byte numAllowedRootLODs;
 
-	std::byte unused;
+	byte unused;
 
 	float fadedistance; // set to -1 to never fade. set above 0 if you want it to fade out, distance is in feet.
 						// player/titan models seem to inherit this value from the first model loaded in menus.
@@ -2086,8 +2277,8 @@ struct mstudioanim_t_v53
 {
 	float posscale = 0; // does what posscale is used for
 
-	std::byte bone; // unsigned byte, bone limit exceeds 128 so has to be. also means max bones is 255.
-	std::byte flags;
+	byte bone; // unsigned byte, bone limit exceeds 128 so has to be. also means max bones is 255.
+	byte flags;
 
 	int16_t unk = 0; // normally null data
 
@@ -2273,7 +2464,7 @@ struct mstudiostringtable_t_v53
 
 struct mstudiorruiheader_t
 {
-	std::byte	ruiunk[4]; // unsure, it doesn't line up
+	byte	ruiunk[4]; // unsure, it doesn't line up
 	int			ruimeshindex;
 };
 
@@ -2331,7 +2522,7 @@ struct mstudioruimesh_t
 	int											vertmapindex; // offsets into a vertex map for each quad
 	int											facedataindex; // offset into uv section
 
-	std::byte									unk[4]; // zero sometimes, others not. has to do with face clipping.
+	byte									unk[4]; // zero sometimes, others not. has to do with face clipping.
 
 	char*										szruimeshname[255]; // have to subtract header to get actual size (padding included)
 
@@ -2358,7 +2549,7 @@ struct mstudioruimesh_t_json
 	int											vertmapindex; // offsets into a vertex map for each quad
 	int											facedataindex; // offset into uv section
 
-	std::byte									unk[4]; // zero sometimes, others not. has to do with face clipping.
+	byte									unk[4]; // zero sometimes, others not. has to do with face clipping.
 
 	std::string									szruimeshname; // have to subtract header to get actual size (padding included)
 
@@ -2454,17 +2645,17 @@ struct trianglefaceheader_t_v53
 
 struct trianglevertmap_t
 {
-	std::byte faceindex;
-	std::byte unkdata[3];
+	byte faceindex;
+	byte unkdata[3];
 
 	int16_t vertid;
-	std::byte unkdata1[2];
+	byte unkdata1[2];
 
 	int16_t vertid1;
-	std::byte unkdata2[2];
+	byte unkdata2[2];
 
 	int16_t vertid2;
-	std::byte unkdata3[2];
+	byte unkdata3[2];
 };
 
 struct phyvertex_t
