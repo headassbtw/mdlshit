@@ -1077,9 +1077,9 @@ int ConvertV49(FileInfo info)
                 for (int j = 0; j < secNumber; j++)
                 {
                     OutStream.seek(v53Hdr.localanimindex + (92 * i) + animdescs[i].sectionindex + (4 * j));
-                    if (j > 0) OutStream.Write(sectionIndexes[sectionIdxNumber]);
-                    else OutStream.Write(animdescs[i].animindex);
-                    //OutStream.Write(sectionIndexes[sectionIdxNumber]);
+                    //if (j > 0) OutStream.Write(sectionIndexes[sectionIdxNumber]);
+                    //else OutStream.Write(animdescs[i].animindex);
+                    OutStream.Write(sectionIndexes[sectionIdxNumber]);
 
                     sectionIdxNumber++;
                 }
@@ -1087,8 +1087,8 @@ int ConvertV49(FileInfo info)
                 for (int j = 0; j < secNumber; j++)
                 {
                     OutStream.seek(v53Hdr.localanimindex + (92 * i) + sectionIndexes[sectionNumber].sectionoffsets);
-                    if (j > 0)OutStream.seek(v53Hdr.localanimindex + (92 * i) + sectionIndexes[sectionNumber].sectionoffsets);
-                    else OutStream.seek(v53Hdr.localanimindex + (92 * i) + animdescs[i].animindex);
+                    //if (j > 0)OutStream.seek(v53Hdr.localanimindex + (92 * i) + sectionIndexes[sectionNumber].sectionoffsets);
+                    //else OutStream.seek(v53Hdr.localanimindex + (92 * i) + animdescs[i].animindex);
 
 
                     for (int k = 0; k < mdl.mdlhdr.numbones; k++)
@@ -1137,9 +1137,9 @@ int ConvertV49(FileInfo info)
                 for (int k = 0; k < animdescs[i].numikrules; k++)
                 {
                     OutStream.seek(v53Hdr.localanimindex + (92 * i) + animdescs[i].ikruleindex + (140 * k));
-                    Logger::Info("StartPos: %d\n", v53Hdr.localanimindex + (92 * i));
-                    Logger::Info("Index: %d\n", animdescs[i].ikruleindex);
-                    Logger::Info("Pos: %d\n", OutStream.Position());
+                    //Logger::Info("StartPos: %d\n", v53Hdr.localanimindex + (92 * i));
+                    //Logger::Info("Index: %d\n", animdescs[i].ikruleindex);
+                    //Logger::Info("Pos: %d\n", OutStream.Position());
                     //ikRules[ikRuleNum].compressedikerrorindex;
                     OutStream.Write(ikRules[ikRuleNum]);
 
@@ -1209,6 +1209,7 @@ int ConvertV49(FileInfo info)
                     OutStream.seek(seqPos + seqDesc.eventindex);
                     for (int j = 0; j < seqDesc.numevents; j++)
                     {
+                        OutStream.seek(seqPos + seqDesc.eventindex + 80 * j);
                         mstudioevent_t_v49 _event = seqDescOld.seqdata.events[j];
                         OutStream.Write(_event);
                         eventNum++;

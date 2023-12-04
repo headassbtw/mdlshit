@@ -9198,10 +9198,6 @@ void MDL::SourceModel49::ReadBones(BinaryReader * Stream)
 {
 	Stream->seek(0); //Just in case of wonky bs with seeking. - Liberty
 
-	//studiohdr_t_v49	 mdlhdr; Stream->Read(&mdlhdr);
-	//studiohdr2_t_v49 mdlsubhdr; Stream->Read(&mdlsubhdr);
-	//mstudiobone_t_v49* bones = new mstudiobone_t_v49[mdlhdr.numbones];
-
 	if (mdlhdr.numbones > 0)
 	{
 		Stream->seek(mdlhdr.boneindex);
@@ -9273,9 +9269,6 @@ void MDL::SourceModel49::ReadJiggleBones(BinaryReader* Stream)
 		for (int i = 0; i < numJiggleBones; i++)
 		{
 			mstudiojigglebone_t_v49 jigglebone; Stream->Read(&jigglebone);
-			//Logger::Info("JiggleBoneFlags Read: %s\n", Utility::func::ReadJiggleFlags(jigglebone.flags).c_str());
-			//Logger::Info("JiggleBone Read: %d\n", i);
-			 //jigglebones.push_back(jigglebone);
 			jigglebones[i] = jigglebone;
 
 
@@ -9333,7 +9326,6 @@ void MDL::SourceModel49::ReadJiggleBones(BinaryReader* Stream)
 			}
 			Logger::Info("JiggleBone Read: %d\n", i);
 		}
-		//Logger::Info("strPos: %d\n", Stream->Position());
 	}
 }
 
@@ -9375,7 +9367,6 @@ void MDL::SourceModel49::ReadAttachments(BinaryReader* Stream)
 
 			Logger::Info("Attachment Read: %s : %d\n", attachment.szname.c_str(), i);
 		}
-		//Logger::Info("strPos: %d\n", Stream->Position());
 	}
 }
 
@@ -9472,10 +9463,6 @@ void MDL::SourceModel49::ReadBoneNameTable(BinaryReader* Stream)
 {
 	Stream->seek(0); //Just in case of wonky bs with seeking. - Liberty
 
-	//studiohdr_t_v49	 mdlhdr; Stream->Read(&mdlhdr);
-	//studiohdr2_t_v49 mdlsubhdr; Stream->Read(&mdlsubhdr);
-	//mstudiobone_t_v49* bones = new mstudiobone_t_v49[mdlhdr.numbones];
-
 	if (mdlhdr.numbones > 0)
 	{
 		bonenametable = new unsigned char[mdlhdr.numbones];
@@ -9533,7 +9520,6 @@ void MDL::SourceModel49::ReadAnimDescs(BinaryReader* Stream)
 			std::string szName = Stream->ReadNullTermStrTrgt(animDescPos + animdesc.sznameindex, false);
 			animdesc.szname = szName;
 
-			//animdescs.push_back(animdesc);
 			animdescs[i] = animdesc;
 
 			if (DEBUG)
@@ -9580,7 +9566,6 @@ void MDL::SourceModel49::ReadAnimDescs(BinaryReader* Stream)
 
 
 			Logger::Info("AnimDesc Read: %s : %d\n", szName.c_str(), i);
-			//Logger::Info("strPos: %d\n", Stream->Position());
 		}
 	}
 }
@@ -9629,8 +9614,6 @@ void MDL::SourceModel49::ReadAnims(BinaryReader* Stream)
 				mstudioanim_t_v49 anim; Stream->Read(&anim);
 				mstudioanimdata_t_v49 animData;
 				mstudioanimvalues_t_v49 animValues; Stream->Read(&animValues, &anim, animdescs[i].numframes);
-				//ReadValuePtr(Stream, anim.animrot, animdescs[i].numframes, &anim, &animValues.rot);
-				//ReadValuePtr(Stream, anim.animpos, animdescs[i].numframes, &anim, &animValues.pos);
 				anim.animvalues = animValues;
 				anims.push_back(anim);
 
@@ -9709,8 +9692,6 @@ void MDL::SourceModel49::ReadAnims(BinaryReader* Stream)
 					//}
 
 					mstudioanimvalues_t_v49 animValues; Stream->Read(&animValues, &anim, animdescs[i].sectionframes + 1);
-					//ReadValuePtr(Stream, anim.animrot, animdescs[i].sectionframes + 1, &anim, &animValues.rot);
-					//ReadValuePtr(Stream, anim.animpos, animdescs[i].sectionframes + 1, &anim, &animValues.pos);
 					anim.animvalues = animValues;
 					sections.push_back(anim);
 
@@ -9788,7 +9769,6 @@ void MDL::SourceModel49::ReadSeqDescs(BinaryReader* Stream)
 	{
 		int actModNum = 0;
 		int eventNum = 0;
-		//seqdescs = new mstudioseqdesc_t_v49[mdlhdr.numlocalseq];
 
 		Stream->seek(mdlhdr.localseqindex);
 		for (int i = 0; i < mdlhdr.numlocalseq; i++)
@@ -9798,19 +9778,17 @@ void MDL::SourceModel49::ReadSeqDescs(BinaryReader* Stream)
 
 			Stream->seek(seqPos);
 			mstudioseqdesc_t_v49 seqDesc; Stream->Read(&seqDesc);
-			//seqDesc.seqdata = {};
 
 			int numBlends = seqDesc.groupsize[0] * seqDesc.groupsize[1];
 			int posekeySize = seqDesc.groupsize[0] + seqDesc.groupsize[1];
 			int numAutolayers = seqDesc.numautolayers;
 			int numActMods = seqDesc.numactivitymodifiers;
-			int numEvents = seqDesc.numevents;
+			//int numEvents = seqDesc.numevents;
 
 			if (seqDesc.weightlistindex > 0)
 			{
 				Stream->seek(seqPos + seqDesc.weightlistindex);
 				seqweightlist_t_v49 weightlist; Stream->Read(&weightlist, mdlhdr.numbones);
-				//seqweightlist.push_back(weightlist);
 				seqDesc.seqdata.weightlist = weightlist;
 			}
 
@@ -9818,7 +9796,6 @@ void MDL::SourceModel49::ReadSeqDescs(BinaryReader* Stream)
 			{
 				Stream->seek(seqPos + seqDesc.animindexindex);
 				blendgroup_t_v49 blendgroup; Stream->Read(&blendgroup, seqDesc.groupsize[0] * seqDesc.groupsize[1]);
-				//blends.push_back(blendgroup);
 				seqDesc.seqdata.blendgroup = blendgroup;
 			}
 
@@ -9855,6 +9832,7 @@ void MDL::SourceModel49::ReadSeqDescs(BinaryReader* Stream)
 					eventNum++;
 				}
 			}
+			numEvents += seqDesc.numevents;
 
 			if (seqDesc.numactivitymodifiers > 0)
 			{
@@ -9866,96 +9844,12 @@ void MDL::SourceModel49::ReadSeqDescs(BinaryReader* Stream)
 					seqDesc.seqdata.actmods.push_back(actmod);
 					std::string szName = Stream->ReadNullTermStrTrgt(seqPos + seqDesc.activitymodifierindex + 4 * j + actmod.sznameindex, false);
 					//actmod.szname = szName;
-					//activitymodifiers.push_back(actmod);
 					actModNum++;
 				}
 			}
 
-			seqdescs.push_back(seqDesc);//seqdescs[i] = seqDesc;
+			seqdescs.push_back(seqDesc);
 		}
-
-		//for (int i = 0; i < mdlhdr.numlocalseq; i++)
-		//{
-		//
-		//	int seqPos = mdlhdr.localseqindex + 212 * i;
-		//	int numBlends = seqdescs[i].groupsize[0] * seqdescs[i].groupsize[1];
-		//	int posekeySize = seqdescs[i].groupsize[0] + seqdescs[i].groupsize[1];
-		//	int numAutolayers = seqdescs[i].numautolayers;
-		//	int numActMods = seqdescs[i].numactivitymodifiers;
-		//	int numEvents = seqdescs[i].numevents;
-		//
-		//	if (seqdescs[i].weightlistindex > 0)
-		//	{
-		//		Stream->seek(seqPos + seqdescs[i].weightlistindex);
-		//		seqweightlist_t_v49 weightlist; Stream->Read(&weightlist, mdlhdr.numbones);
-		//		seqweightlist.push_back(weightlist);
-		//		//Logger::Info("Weightlist Read: %d\n", i);
-		//	}
-		//
-		//	if (seqdescs[i].animindexindex > 0)
-		//	{
-		//		Stream->seek(seqPos + seqdescs[i].animindexindex);
-		//		blendgroup_t_v49 blendgroup; Stream->Read(&blendgroup, numBlends);
-		//		blends.push_back(blendgroup);
-		//		seqdescs[i].seqdata.blendgroups = &blendgroup;
-		//		//Logger::Info("BlendGroup Read: %d\n", i);
-		//	}
-		//
-		//	if (seqdescs[i].posekeyindex > 0)
-		//	{
-		//		Stream->seek(seqPos + seqdescs[i].posekeyindex);
-		//		posekey_t_v49 posekey; Stream->Read(&posekey, posekeySize);
-		//		if (posekeySize == 3)posekey.unk[2] == 0.0;
-		//		//				Logger::Info("PosekeyF Read: %f\n", posekey.unk[2]);
-		//		seqdescs[i].seqdata.posekey = posekey;//.push_back(posekey);
-		//		//Logger::Info("Posekey Read: %d\n", i);
-		//	}
-		//
-		//	if (numAutolayers > 0)
-		//	{
-		//		Stream->seek(seqPos + seqdescs[i].autolayerindex);
-		//		for (int j = 0; j < numAutolayers; j++)
-		//		{
-		//			mstudioautolayer_t_v49 autolayer; Stream->Read(&autolayer);
-		//			seqdescs[i].seqdata.autolayers[i] = autolayer; //.push_back(autolayer);
-		//			//Logger::Info("Autolayer Read: %d\n", j);
-		//		}
-		//	}
-		//
-		//	//string* _tempEvents = new string[seqdescs[i].numevents];
-		//	if (numEvents > 0)
-		//	{
-		//		Stream->seek(seqPos + seqdescs[i].eventindex);
-		//		for (int j = 0; j < seqdescs[i].numevents; j++)
-		//		{
-		//			mstudioevent_t_v49 _event; Stream->Read(&_event);
-		//			seqdescs[i].seqdata.events[i] = _event;//.push_back(_event);
-		//
-		//			std::string szEventName = Stream->ReadNullTermStrTrgt(seqPos + seqdescs[i].eventindex + 80 * j + _event.szeventindex, false);
-		//			std::string szName = Stream->ReadNullTermStrTrgt(seqPos + seqdescs[i].eventindex + 80 * j + 12, false);
-		//			//Logger::Info("Pos: %d\n", Stream->Position());
-		//			//if (szEventName != "")_tempEvents[j] = szEventName;
-		//			//else _tempEvents[j] = (std::string)"Empty";
-		//
-		//			//Logger::Info("Event Read: %s : %s : %d\n", szName.c_str(), _tempEvents[j].c_str(), j);
-		//			eventNum++;
-		//		}
-		//	}
-		//
-		//	if (numActMods > 0)
-		//	{
-		//		Stream->seek(seqPos + seqdescs[i].activitymodifierindex);
-		//		for (int j = 0; j < seqdescs[i].numactivitymodifiers; j++)
-		//		{
-		//			mstudioactivitymodifier_t_v49 actmod; Stream->Read(&actmod);
-		//
-		//			std::string szName = Stream->ReadNullTermStrTrgt(seqPos + seqdescs[i].activitymodifierindex + 4 * j + actmod.sznameindex, false);
-		//			actmod.szname = szName;
-		//			activitymodifiers.push_back(actmod);
-		//			actModNum++;
-		//		}
-		//	}
-		//}
 	}
 }
 
@@ -10003,7 +9897,7 @@ void MDL::SourceModel49::ReadBodyParts(BinaryReader* Stream)
 			std::string szName = Stream->ReadNullTermStrTrgt(mdlhdr.bodypartindex + 16 * i + bodyPart.sznameindex, false);
 			bodyPart.szname = szName;
 
-			bodyparts[i] = bodyPart;//bodyparts.push_back(bodyPart);
+			bodyparts[i] = bodyPart;
 			Logger::Info("Bodypart Read: %s : %d\n", bodyPart.szname.c_str(), i);
 		}
 	}
@@ -10045,7 +9939,7 @@ void MDL::SourceModel49::ReadIKChains(BinaryReader* Stream)
 			std::string szName = Stream->ReadNullTermStrTrgt(ikChainPos + ikchain.sznameindex, false);
 			ikchain.szname = szName;
 
-			ikchains[i] = ikchain;//ikchains.push_back(ikchain);
+			ikchains[i] = ikchain;
 			Logger::Info("IkChain Read: %s : %d\n", szName.c_str(), i);
 		}
 	}
@@ -10079,7 +9973,7 @@ void MDL::SourceModel49::ReadPoseParamDescs(BinaryReader* Stream)
 			std::string szName = Stream->ReadNullTermStrTrgt(poseParamPos + poseparamdesc.sznameindex, false);
 			poseparamdesc.szname = szName;
 
-			poseparamdescs[i] = poseparamdesc;//poseparamdescs.push_back(poseparamdesc);
+			poseparamdescs[i] = poseparamdesc;
 			Logger::Info("PoseParamDesc Read: %s : %d\n", szName.c_str(), i);
 		}
 	}
@@ -10093,7 +9987,7 @@ void MDL::SourceModel49::ReadAnimBlocks(BinaryReader* Stream)
 		for (int i = 0; i < mdlhdr.numanimblocks; i++)
 		{
 			mstudioanimblock_t animBlock; Stream->Read(&animBlock);
-			animBlocks[i] = animBlock;//animblocks.push_back(animBlock);
+			animBlocks[i] = animBlock;
 			Logger::Info("AnimBlock Read: %d\n", i);
 		}
 	}
@@ -10136,7 +10030,7 @@ void MDL::SourceModel49::ReadIncludeModels(BinaryReader* Stream)
 			std::string szName = Stream->ReadNullTermStrTrgt(includeModelPos + includemodel.sznameindex, false);
 			includemodel.szname = szName;
 
-			includedmodels[i] = includemodel;//includedmodels.push_back(includemodel);
+			includedmodels[i] = includemodel;
 			Logger::Info("IncludedModel Read: %s : %d\n", szName.c_str(), i);
 		}
 	}
@@ -10155,7 +10049,7 @@ void MDL::SourceModel49::ReadTextures(BinaryReader* Stream)
 			std::string szName = Stream->ReadNullTermStrTrgt(texturePos + texture.sznameindex, false);
 			texture.szname = szName;
 
-			textures[i] = texture;//textures.push_back(texture);
+			textures[i] = texture;
 
 			Logger::Info("Texture Read: %s : %d\n", szName.c_str(), i);
 		}
@@ -10174,7 +10068,7 @@ void MDL::SourceModel49::ReadCDTextures(BinaryReader* Stream)
 			std::string szName = Stream->ReadNullTermStrTrgt(cdtexture.sznameindex, false);
 			cdtexture.szname = szName;
 
-			cdtextures[i] = cdtexture;//cdtextures.push_back(cdtexture);
+			cdtextures[i] = cdtexture;
 			Logger::Info("CdTexture Read: %s : %d\n", szName.c_str(), i);
 		}
 	}
@@ -10190,7 +10084,7 @@ void MDL::SourceModel49::ReadSkinFamilies(BinaryReader* Stream)
 			for (int i = 0; i < mdlhdr.numskinfamilies; i++)
 			{
 				mstudioskingroup_t_v49 skingroup; Stream->Read(&skingroup, mdlhdr.numskinref);
-				skingroups[i] = skingroup;//skingroups.push_back(skingroup);
+				skingroups[i] = skingroup;
 				Logger::Info("SkinGroup Read: %d\n", i);
 			}
 		}
@@ -10219,7 +10113,7 @@ void MDL::SourceModel49::ReadSrcBoneTransforms(BinaryReader* Stream)
 
 			std::string szName = Stream->ReadNullTermStrTrgt(srcBonePos + srcbonetransform.sznameindex, false);
 
-			srcbonetransforms[i] = srcbonetransform;//srcbonetransforms.push_back(srcbonetransform);
+			srcbonetransforms[i] = srcbonetransform;
 			Logger::Info("SrcBoneTransform Read: %s : %d\n", szName.c_str(), i);
 		}
 	}
@@ -10241,7 +10135,6 @@ void MDL::SourceModel49::ReadStringTable(BinaryReader* Stream)
 	Stream->seek(mdlsubhdr.sznameindex + 408);
 	mstudiostringtable_t_v49 _stringTable; Stream->Read(&_stringTable, mdlhdr, seqdescs, hitboxsets, attachments, nodenames, bodyparts, ikchains, animdescs, textures, includedmodels, cdtextures, poseparamdescs, srcbonetransforms);
 	stringTable = _stringTable;
-	//mstudiostringtable_t_v49 stringTable; Stream->Read(&stringTable, &mdl);//, mdlhdr, seqdescs, hitboxsets, attachments, nodenames, bodyparts, ikchains, animdescs, textures, includedmodels, cdtextures, poseparamdescs, srcbonetransforms);
 }
 //Me trying to adapt Rika's template code to c++ and format it how I want it to be. I ended up getting angry at it and hit it with a shovel and then when it worked from me setting it up the same way Rika did I knew it was my mission to make it work with the way I set it up initially. - Liberty
 // 
@@ -10640,8 +10533,6 @@ std::vector<mstudiobone_t_v53> MDL::SourceModel49::BoneConversion()
 	{
 		int stairs = bytesAddedToAnims + bytesAddedToSeqs + (28 * mdlhdr.numbones) - (28 * i) + bytesAddedToTextures + bytesAddedToIkChains + bytesAddedToAnimData + bytesAddedToActMods + textureFiller + bytesAddedToRuiMesh + bytesAddedToLinearBone + bytesAddedToAABBTree;
 
-		//Logger::Info("Stairs: %d\n", stairs);
-
 		mstudiobone_t_v49 v49Bone = bones[i];
 
 		Vector3 unkvector{ 1,1,1 };
@@ -10686,16 +10577,13 @@ std::vector<mstudioanimdesc_t_v53> MDL::SourceModel49::AnimDescConversion()
 	std::vector<mstudioanimdesc_t_v53> v53AnimDescs;
 	int ikRuleNum = 0;
 	int animIdx = mdlhdr.localanimindex;
-	//Logger::Info("animIdx: %d\n", animIdx);
-	//Logger::Info("Hdr BytesAdded: %d\n", bytesAddedToHeader);
-	//Logger::Info("Bone BytesAdded: %d\n", bytesAddedToBones);
+
 	int bytesAddedToHeader = 52;
 	int bytesAddedToBones = mdlhdr.numbones * 28;
 	int secNum = 0;
 	int secNum2 = 0;
 	for (int i = 0; i < mdlhdr.numlocalanim; i++)
 	{
-		//Logger::Info("Test\n");
 		mstudioanimdesc_t_v49 v49AnimDesc = animdescs[i];
 
 		int frames = v49AnimDesc.numframes;
@@ -10708,7 +10596,7 @@ std::vector<mstudioanimdesc_t_v53> MDL::SourceModel49::AnimDescConversion()
 
 		int ikStairs = -12 * (ikRuleNum);
 		int secStairs = -4 * secNum;
-		if (v49AnimDesc.numikrules > 0)
+		if (v49AnimDesc.numikrules > 0) //Nobody touch this or I will beat you up. It may not look pretty but it works atm. - Liberty
 		{
 			int localSteps = -((8 * (mdlhdr.numlocalanim - i)));
 			int stairs = v53GetAnimHdrBytesAddedIdv(i);
@@ -10725,11 +10613,6 @@ std::vector<mstudioanimdesc_t_v53> MDL::SourceModel49::AnimDescConversion()
 			{
 				v49AnimDesc.ikruleindex += stairs;
 			}
-
-			//v49AnimDesc.ikruleindex += stairs + stairs2;
-			//Logger::Info("SecAddedIdv: %d AnimAddedIdv: %d | Final %d | Anim: %d\n", stairs2, stairs, v49AnimDesc.ikruleindex + stairs + stairs2 + (steps + ikStairs + secStairs), i);
-			//Logger::Info("SecAddedTotal: %d AnimAddedTotal: %d | Start %d | Anim: %d\n", secHdrBytesAnimDescAdd[i], hdrBytesAnimDescAdd[i], v49AnimDesc.ikruleindex, i);
-			//Logger::Info("steps: %d secSteps: %d Ikstairs: %d | sum %d | Anim: %d\n", steps, secStairs, ikStairs, v49AnimDesc.ikruleindex +(steps + ikStairs + secStairs), i);
 			ikRuleNum += v49AnimDesc.numikrules;
 		}
 
@@ -10748,9 +10631,8 @@ std::vector<mstudioanimdesc_t_v53> MDL::SourceModel49::AnimDescConversion()
 		if (v49AnimDesc.zeroframeindex > 0) v49AnimDesc.zeroframeindex += (steps + ikStairs + secStairs);
 		if (v49AnimDesc.ikrulezeroframeindex > 0) v49AnimDesc.ikrulezeroframeindex += (steps + ikStairs + secStairs);
 		if (v49AnimDesc.sectionindex > 0) v49AnimDesc.sectionindex += (steps + ikStairs + secStairs);
-		//Logger::Info("BytesAddedToSectionIdx: %d Anim: %d\n", steps + ikStairs + secStairs, i);
 
-		int compressedIkRuleIdx = 0; //if (v49AnimDesc.numikrules > 0) compressedIkRuleIdx = ( basePtr - ( basePtr - (v49AnimDesc.ikruleindex + 140 * v49AnimDesc.numikrules) ) ) * -1 ;
+		int compressedIkRuleIdx = 0;
 
 
 		mstudioanimdesc_t_v53 animDesc = { -outPos, v49AnimDesc.sznameindex + stairs, v49AnimDesc.fps, v49AnimDesc.flags, v49AnimDesc.numframes, v49AnimDesc.nummovements, v49AnimDesc.movementindex, compressedIkRuleIdx * -1, v49AnimDesc.animindex, v49AnimDesc.numikrules, v49AnimDesc.ikruleindex, v49AnimDesc.numlocalhierarchy, v49AnimDesc.localhierarchyindex, v49AnimDesc.sectionindex, v49AnimDesc.sectionframes, v49AnimDesc.zeroframespan, v49AnimDesc.zeroframecount, v49AnimDesc.zeroframeindex, v49AnimDesc.zeroframestalltime, 0, 0, 0, 0, 0 };
@@ -10762,39 +10644,31 @@ std::vector<mstudioanimdesc_t_v53> MDL::SourceModel49::AnimDescConversion()
 
 std::vector<mstudioseqdesc_t_v53> MDL::SourceModel49::SeqDescConversion()
 {
-	//std::vector<int> weightlistidxs;
-	//std::vector<int> bytesAddedToWeightLists = v53GetBytesAddedToWeightLists();
 	std::vector<int> hdrBytesAnimDescAdd = v53GetAnimHdrBytesAdded(true);
 	std::vector<int> secHdrBytesAnimDescAdd = v53GetSecHdrBytesAdded(true);
-//	Logger::Debug("Made it!!!\n");
 	std::vector<mstudioseqdesc_t_v53> v53SeqDescs;
 	int ikRuleNum = 0;
 	int seqIdx = mdlhdr.localseqindex;
-	//Logger::Info("animIdx: %d\n", seqIdx);
-	//Logger::Info("Hdr BytesAdded: %d\n", bytesAddedToHeader);
-	//Logger::Info("Bone BytesAdded: %d\n", bytesAddedToBones);
 	int bytesAddedToHeader = 52;
 	int bytesAddedToBones = mdlhdr.numbones * 28;
 	int actModNumber = 0;
 
 	for (int i = 0; i < seqdescs.size(); i++)
 	{
-		//Logger::Debug("Made it!!! TEST0 %d\n", i);
-		//Logger::Info("Test\n");
 		mstudioseqdesc_t_v49 v49SeqDesc = seqdescs[i];
 		int strPos = mdlhdr.localseqindex + 212 * i;
-		//Logger::Debug("Made it!!! TEST1 %d\n", i);
+
 		int weightList = GetTrgtPosInArry(weightlistidxs, strPos + seqdescs[i].weightlistindex);
-		//Logger::Debug("Made it!!! TEST2 %d\n", i);
+
 		int steps = 20 * (mdlhdr.numlocalseq - i);
-		//Logger::Debug("Made it!!! TEST3 %d\n", i);
+
 		int steps2 = steps + 4 * actModNumber;
-		//Logger::Debug("Made it!!! TEST4 %d\n", i);
-		int stairs1 = steps + bytesAddedToWeightLists[weightList];//strPos + v49SeqDesc.weightlistindex == weightlistidxs[0] ? 20 * (mdlhdr.numlocalseq - i) : 20 * (mdlhdr.numlocalseq - i) + 4 * actModNumber;
-		//Logger::Debug("Made it!!! TEST5 %d\n", i);
+
+		int stairs1 = steps + bytesAddedToWeightLists[weightList];
+
 		int stairs = steps + bytesAddedToTextures + bytesAddedToIkChains + bytesAddedToActMods + textureFiller + bytesAddedToRuiMesh + bytesAddedToLinearBone + bytesAddedToAABBTree;
 		int outPos = seqIdx + stairs;
-		//Logger::Debug("Made it!!! TEST %d\n", i);
+
 		if (v49SeqDesc.numblends > 0)
 		{
 			for (int j = 0; j < v49SeqDesc.numblends; j++)
@@ -10804,7 +10678,7 @@ std::vector<mstudioseqdesc_t_v53> MDL::SourceModel49::SeqDescConversion()
 				//if (v49SeqDesc.flags & STUDIO_DELTA && !(animdescs[anim].flags & STUDIO_DELTA)) animdescs[anim].flags += STUDIO_DELTA;
 			}
 		}
-		//Logger::Debug("Made it!!! TEST2 %d\n", i);
+
 		if (v49SeqDesc.eventindex > 0)				v49SeqDesc.eventindex += steps2;
 		if (v49SeqDesc.animindexindex > 0)			v49SeqDesc.animindexindex += steps2;
 		if (v49SeqDesc.movementindex > 0)			v49SeqDesc.movementindex += steps2;
@@ -10815,18 +10689,16 @@ std::vector<mstudioseqdesc_t_v53> MDL::SourceModel49::SeqDescConversion()
 		if (v49SeqDesc.keyvalueindex > 0)			v49SeqDesc.keyvalueindex += steps2;
 		if (v49SeqDesc.cycleposeindex > 0)			v49SeqDesc.cycleposeindex += steps2;
 		if (v49SeqDesc.activitymodifierindex > 0)	v49SeqDesc.activitymodifierindex += steps2;
-		//Logger::Debug("Made it!!! TEST3 %d\n", i);
 
-		int compressedIkRuleIdx = 0; //if (v49AnimDesc.numikrules > 0) compressedIkRuleIdx = ( basePtr - ( basePtr - (v49AnimDesc.ikruleindex + 140 * v49AnimDesc.numikrules) ) ) * -1 ;
+
+		int compressedIkRuleIdx = 0;
 
 
 		mstudioseqdesc_t_v53 v53SeqDesc{ -outPos, v49SeqDesc.szlabelindex + stairs, v49SeqDesc.szactivitynameindex + stairs, v49SeqDesc.flags, v49SeqDesc.activity, v49SeqDesc.actweight, v49SeqDesc.numevents, v49SeqDesc.eventindex, v49SeqDesc.bbmin, v49SeqDesc.bbmax, v49SeqDesc.numblends, v49SeqDesc.animindexindex, v49SeqDesc.movementindex, v49SeqDesc.groupsize[0], v49SeqDesc.groupsize[1], v49SeqDesc.paramindex[0], v49SeqDesc.paramindex[1], v49SeqDesc.paramstart[0], v49SeqDesc.paramstart[1], v49SeqDesc.paramend[0] , v49SeqDesc.paramend[1], v49SeqDesc.paramparent, v49SeqDesc.fadeintime, v49SeqDesc.fadeouttime, v49SeqDesc.localentrynode, v49SeqDesc.localexitnode, v49SeqDesc.nodeflags, v49SeqDesc.entryphase, v49SeqDesc.exitphase, v49SeqDesc.lastframe, v49SeqDesc.nextseq, v49SeqDesc.pose, v49SeqDesc.numikrules, v49SeqDesc.numautolayers, v49SeqDesc.autolayerindex, v49SeqDesc.weightlistindex, v49SeqDesc.posekeyindex, v49SeqDesc.numiklocks, v49SeqDesc.iklockindex, v49SeqDesc.keyvalueindex, v49SeqDesc.keyvaluesize, v49SeqDesc.cycleposeindex, v49SeqDesc.activitymodifierindex, v49SeqDesc.numactivitymodifiers, 0,0,0,0,0,0,0,0,0,0 };
 
 		v53SeqDescs.push_back(v53SeqDesc);
 		actModNumber += v49SeqDesc.numactivitymodifiers;
-		//Logger::Debug("Made it!!! %d\n", i);
 	}
-	//Logger::Debug("Made it!!!\n");
 	return v53SeqDescs;
 }
 
@@ -10837,13 +10709,6 @@ std::vector<mstudioactivitymodifier_t_v53> MDL::SourceModel49::ActivityModifierC
 	int actModNum = 0;
 	for (int i = 0; i < mdlhdr.numlocalseq; i++)
 	{
-		//Logger::Info("ActName: %s\n", stringtable.seqs[i].activity.c_str());
-		//for (int j = 0; j < seqdescs[i].numactivitymodifiers; j++)
-		//{
-		//	//Logger::Info("ActModNameSize: %d\n", 0);
-		//	Logger::Info("ActModName: %s\n", stringtable.seqs[i].activitymodifier[j].c_str());
-		//	actModNum++;
-		//}
 		std::string t1;
 		std::string t2;
 		if (seqdescs[i].numactivitymodifiers > 0)
@@ -10886,8 +10751,6 @@ std::vector<mstudioactivitymodifier_t_v53> MDL::SourceModel49::ActivityModifierC
 				int stairs = 4 * (numActMods - actModNum) + bytesAddedToRuiMesh + bytesAddedToTextures + bytesAddedToIkChains + textureFiller + bytesAddedToLinearBone + bytesAddedToAABBTree;
 				if (seqdescs[i].seqdata.actmods[j].sznameindex > 0) seqdescs[i].seqdata.actmods[j].sznameindex += stairs;
 
-				//if(isTransgender)Logger::Info("ActModConv Read: %s\n", activitymodifiers[actModNum].szname.c_str());
-
 				mstudioactivitymodifier_t_v53 activityModifier = { seqdescs[i].seqdata.actmods[j].sznameindex, unk, seqdescs[i].seqdata.actmods[j].szname };
 				v53ActivityModifiers.push_back(activityModifier);
 				actModNum++;
@@ -10895,15 +10758,6 @@ std::vector<mstudioactivitymodifier_t_v53> MDL::SourceModel49::ActivityModifierC
 		}
 
 	}
-	//for (int i = 0; i < activitymodifiers.size(); i++)
-	//{
-	//	int unk = 0;
-	//	int stairs = 4 * (activitymodifiers.size() - i) + bytesAddedToRuiMesh + bytesAddedToTextures + bytesAddedToIkChains + textureFiller + strFiller;
-	//	if (activitymodifiers[i].sznameindex > 0) activitymodifiers[i].sznameindex += stairs;
-	//
-	//	mstudioactivitymodifier_t_v53 activityModifier = { activitymodifiers[i].sznameindex, unk, activitymodifiers[i].szname };
-	//	v53ActivityModifiers.push_back(activityModifier);
-	//}
 	return v53ActivityModifiers;
 }
 
@@ -11006,7 +10860,6 @@ std::vector<mstudioanim_t_v53> MDL::SourceModel49::ConvertAnims()
 			}
 			else
 			{
-				//posPtr.x > 0 ? posPtr.x += 10 : posPtr.x = 0; posPtr.y > 0 ? posPtr.y += 10 : posPtr.y = 0; posPtr.z > 0 ? posPtr.z += 10 : posPtr.z = 0;
 				for (int j = 0; j < 3; j++)
 				{
 					if (anims[i].animpos.offset[j])
@@ -11014,7 +10867,6 @@ std::vector<mstudioanim_t_v53> MDL::SourceModel49::ConvertAnims()
 						anims[i].animpos.offset[j] += 10;
 					}
 				}
-				//anims[i].animpos.offset = posPtr;
 			}
 			_animpos = anims[i].animpos;
 		}
@@ -11024,8 +10876,6 @@ std::vector<mstudioanim_t_v53> MDL::SourceModel49::ConvertAnims()
 		if ((int)anims[i].flags & STUDIO_ANIM_RAWROT2) _rawrot = anims[i].rawrot2;
 
 		if ((int)anims[i].flags & STUDIO_ANIM_RAWPOS) _rawpos = anims[i].rawpos;
-		//else if(anims[i].rawpos.x == 0 && anims[i].rawpos.y == 0 && anims[i].rawpos.z == 0 )
-		//	_rawpos = { (short)float_to_half(lbd.bonePos[bone].x), (short)float_to_half(lbd.bonePos[bone].y), (short)float_to_half(lbd.bonePos[bone].z) };
 
 		mstudioanim_t_v53 v53Anim{ _posscale, _bone, _flags, _unk, _rawrot, _animrot, _unused, _rawpos, _animpos, _rawscale, _animscale, _nextOffset, anims[i].animdata };
 		v53Anims.push_back(v53Anim);
@@ -11057,16 +10907,12 @@ std::vector<sectionindexes_t_v53> MDL::SourceModel49::ConvertSectionIndexes()
 			secSetNum += num;
 
 			int dist = pos + animdescs[i].animindex - (pos + animdescs[i].sectionindex + (8 * num));
-			//Logger::Info("DistStr: %d\n", pos + animdescs[i].sectionindex + (8 * num) );
-			//Logger::Info("DistEnd: %d\n", pos + animdescs[i].animindex);
-			//Logger::Info("Dist: %d\n", dist);
 
 			for (int j = 0; j < num; j++)
 			{
 				int steps = -4 * secSetNum;
 				int offset = sectionindexes[secNum].sectionoffset + stairs + secHdrBytesSecAdd[secNum] + steps + ikRuleStairs;
 				sectionindexes_t_v53 v53SectionIndex{ offset };
-				//if (j == 0) Logger::Info("BytesAddedToFirstSecIdx: %d\n", stairs + secHdrBytesSecAdd[secNum] + steps);
 				v53SectionIndexes.push_back(v53SectionIndex);
 				secNum++;
 			}
@@ -11157,8 +11003,6 @@ std::vector<mstudioanim_t_v53> MDL::SourceModel49::ConvertSections()
 		if (hasRawRot2) _rawrot = sections[i].rawrot2;
 
 		if (hasRawPos) _rawpos = sections[i].rawpos;
-		//else
-		//	_rawpos = { (short)float_to_half(lbd.bonePos[bone].x), (short)float_to_half(lbd.bonePos[bone].y), (short)float_to_half(lbd.bonePos[bone].z) };
 
 		mstudioanim_t_v53 v53Anim{ _posscale, _bone, _flags, _unk, _rawrot, _animrot, _unused, _rawpos, _animpos, _rawscale, _animscale, _nextOffset, sections[i].animdata };
 		v53Sections.push_back(v53Anim);
@@ -11205,12 +11049,12 @@ void MDL::SourceModel49::SeqEventConversion()
 {
 	int actModNum = 0;
 	int eventNum = 0;
-	for (int i = 0; i < seqdescs.size(); i++)
+	for (int i = 0; i < mdlhdr.numlocalseq; i++)
 	{
 		for (int j = 0; j < seqdescs[i].numevents; j++)
 		{
 			int stairs = 4 * (numActMods - actModNum) + bytesAddedToRuiMesh + bytesAddedToTextures + bytesAddedToIkChains + textureFiller + bytesAddedToLinearBone + bytesAddedToAABBTree;
-			if (seqdescs[i].seqdata.events[j].szeventindex > 0) seqdescs[i].seqdata.events[j].szeventindex += stairs; //events[eventNum].szeventindex += stairs;
+			if (seqdescs[i].seqdata.events[j].szeventindex > 0) seqdescs[i].seqdata.events[j].szeventindex += stairs;
 			eventNum++;
 		}
 		if (seqdescs[i].numactivitymodifiers > 0) actModNum += seqdescs[i].numactivitymodifiers;
