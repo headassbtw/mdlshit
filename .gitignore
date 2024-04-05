@@ -4,9 +4,8 @@
 .DS_Store
 bin/
 build/
-winbuild/
-wbuild/
-macbuild/
+build-linux/
+build-windows/
 *.mdl
 *.vtx
 *.vvd

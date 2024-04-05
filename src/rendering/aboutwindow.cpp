@@ -25,22 +25,6 @@ void OpenLink(const char* site){
 #endif
 }
 
-//const char* GetThing()
-//{
-//#ifdef __MINGW32__
-//    return "MinGW";
-//#elif __GNUC__
-//    return "GCC";
-//#elif __APPLE__
-//    return "";
-//#endif
-//#ifdef _MSC_VER //FUCK YOU MSVC
-//    return "MSVC";
-//#endif
-//
-//    return "";
-//}
-
 void UI::SetupAboutWindow() {
   auto klules = stbi_load_from_memory(Resources::Klules, 4067, &klules_width, &klules_height, 0, 4);
 
@@ -80,7 +64,21 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y)
 
       ImGui::Text("Compiled on %s",__DATE__);
 
-      ImGui::Text("%s, v%s", &"");
+      ImGui::Text("%s v%s\n",
+      #ifdef __MINGW32__
+      "MinGW",
+      #elif __GNUC__
+      "GCC",
+      #else
+      "Other",
+      #endif
+      #if _MSC_VER
+      "MSVC",
+      _MSC_VER
+      #else
+      __VERSION__
+      #endif
+      );
 
       ImGui::Text("OpenGL Version: %s",glGetString(GL_VERSION));
       ImGui::Text("GPU: %s",glGetString(GL_RENDERER));
