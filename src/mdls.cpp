@@ -835,7 +835,7 @@ void MDL::v53Mdl::v53ExtractRUIMesh(BinaryReader* Stream) //There is a much much
 		}
 		std::string fileName = Stream->_filename;
 		fileName.resize(fileName.size() - 4);
-		fileName.insert(fileName.size(), ".rui");
+		fileName.insert(fileName.size(), ".ruimesh");
 		int ruiEnd = Stream->Position();
 		Stream->seek(mdlhdr.ruimeshindex);
 		BinaryWriter Bing = BinaryWriter(fileName.c_str());
