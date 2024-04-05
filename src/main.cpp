@@ -5,10 +5,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <argtools.hpp>
-#include <iostream>
 #include <string>
-#include <utility>
-#include <vector>
 #include <rendering/render.hpp>
 using namespace std;
 
@@ -21,13 +18,13 @@ bool IgnoreOtherFiles = false; //ignores if the other 3 files exist, mcor_pilot_
 
 
 
-string hh(const char* file, const char* ext){
-  string yo = string(file);
-  auto dot = yo.find_last_of('.');
-  yo.resize(dot);
-  yo.append(".");
-  yo.append(ext);
-  return yo;
+string ChangeFileExtension(const char* file, const char* ext){
+  string workingString = string(file);
+  size_t dot = workingString.find_last_of('.');
+  workingString.resize(dot);
+  workingString.append(".");
+  workingString.append(ext);
+  return workingString;
 }
 
 
@@ -61,11 +58,7 @@ int main(int argc, char *argv[]) {
 
   if(cmdOptionExists(argv,argv+argc,"--help")){
     Logger::Info("mdlshit:\n");
-    Logger::Info("Usage: %s [--noui] <mdl file> [OPTIONS]\n", argv[0]);
-    Logger::Info("---------------------------------------------------\n");
-    Logger::Notice("3 other files with names EXACTLY THE SAME NAME except for extension, must exist in the same folder as the .mdl file,\n");
-    Logger::Notice("with extensions of vtx, vvd, and phy\n");
-    Logger::Info("---------------------------------------------------\n");
+    Logger::Info("Usage: %s [--noui] <mdl file> <vtx file> <vvd file> [phy file] [ruimesh file] [OPTIONS]\n", argv[0]);
     Logger::Info("args:\n");
     Logger::Info("\"--help\": Shows this\n");
     Logger::Info("\"--noui\": Disables the UI\n");
@@ -75,23 +68,56 @@ int main(int argc, char *argv[]) {
   
   
   if(cmdOptionExists(argv,argv+argc,"--noui")){
+    FileInfo inf;
 
-    if (argc < 2) {
-      Logger::Critical("Invalid arguments\n");
-      Logger::Info("Usage: %s <mdl file> [OPTIONS]\n", argv[0]);
+    for(int i = 1; i < argc; i++) {
+      std::string arg_str = std::string(argv[i]);
+
+      size_t dot_pos = arg_str.find_last_of(".");
+      if (dot_pos != std::string::npos) { // is a file
+        if (arg_str.substr(dot_pos+1).compare("mdl") == 0) {
+          if (inf.mdl->empty()) {
+            inf.mdl = arg_str;
+          } else {
+            inf.out = arg_str;
+          }
+        } else if (arg_str.substr(dot_pos+1).compare("vtx") == 0) {
+          inf.vtx = arg_str;
+        } else if (arg_str.substr(dot_pos+1).compare("vvd") == 0) {
+          inf.vvd = arg_str;
+        } else if (arg_str.substr(dot_pos+1).compare("vvc") == 0) {
+          inf.vvc = arg_str;
+        } else if (arg_str.substr(dot_pos+1).compare("phy") == 0) {
+          inf.phy = arg_str;
+        } else if (arg_str.substr(dot_pos+1).compare("ruimesh") == 0) {
+          inf.rui = arg_str;
+        }
+      }
+    }
+    if (inf.vtx->empty()) {
+      Logger::Critical(".vtx file missing!\n");
       return 1;
     }
-    FileInfo inf;
-    inf.mdl = argv[2];
-    inf.vtx = hh(argv[2],"vtx");
-    inf.vvd = hh(argv[2],"vvd");
-    inf.phy = hh(argv[2],"phy");
-    string yo = string(argv[2]);
-    auto dot = yo.find_last_of('.');
-    yo.resize(dot);
-    yo.append("_conv.mdl");
-    inf.out = yo;
 
+    if (inf.vvd->empty()) {
+      Logger::Critical(".vvd file missing!\n");
+      return 1;
+    }
+
+    if (inf.out->empty()) {
+      string out_name = string(inf.mdl->c_str());
+      auto dot = out_name.find_last_of('.');
+      out_name.resize(dot);
+      out_name.append("_conv.mdl");
+      inf.out = out_name;
+    }
+
+    Logger::Info("mdl: %s\n", inf.mdl->c_str());
+    Logger::Info("vtx: %s\n", inf.vtx->c_str());
+    Logger::Info("vvd: %s\n", inf.vvd->c_str());
+    Logger::Info("phy: %s\n", inf.phy->c_str());
+    Logger::Info("rui: %s\n", inf.rui->c_str());
+    Logger::Info("out: %s\n", inf.out->c_str());
 
     return Conversion::ReadHeader(inf);
   }

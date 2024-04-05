@@ -491,7 +491,7 @@ void RenderGUI(){
         }
         ImGui::EndTabBar();
       }
-      std::string version = "v2.3.0 beta";
+      std::string version = "v3.0.0";
       float text_width = ImGui::CalcTextSize(version.c_str()).x;
 
       ImGui::SameLine((MainViewport->Size.x/2)-(text_width+10));

@@ -2,7 +2,6 @@
 #include <imgui.h>
 #include <resource.hpp>
 #include <cstdint>
-#include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <string>
@@ -96,6 +95,12 @@ void UI::RenderAboutWindow(int grunt, float grunt_x, float grunt_y)
     {
 
       ImGui::BeginChild("PatchNotes");
+
+      PatchNotesVersionHeader("3.0.0");
+      ImGui::BulletText("WIP do not ship");
+      // TODO FIX PATCH NOTES
+      // if your IDE does stuff differently, i included both TODOs
+      //TODO FIX PATCH NOTES
 
       PatchNotesVersionHeader("2.0.1");
       ImGui::BulletText("Fixes IKrules");

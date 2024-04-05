@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <cstdint> // for uint*_t
 namespace Utility
 {
 	namespace debug

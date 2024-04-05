@@ -4,7 +4,7 @@
 #include <optional>
 #include <vector>
 #include <utility>
-
+#include <cstdint> // for uint*_t
 using std::byte;
 using std::string;
 

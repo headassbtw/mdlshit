@@ -6,7 +6,6 @@
 #include <windows.h>
 #include <OpenGL/gl.h>
 #else
-#include <windows.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 //#include "f:\OpenGL\glut.h"

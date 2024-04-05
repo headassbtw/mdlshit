@@ -208,15 +208,6 @@ namespace Resources{
     141,178,55,246,154,255,3,132,241,31,2,203,73,29,198,0,0,0,0,73,69,78,
     68,174,66,96,130
   };;
-  extern const unsigned char Klules2[];
-  extern const unsigned int SegoeUI_compressed_size;
-  extern const unsigned int SegoeUI_compressed[676400/4];
-  extern const unsigned int Impact_compressed_size;
-  extern const unsigned int Impact_compressed[98948/4];
-  extern const unsigned int Menlo_compressed_size;
-  extern const unsigned int Menlo_compressed[288192/4];
-  extern const unsigned int ComicSans_compressed_size;
-  extern const unsigned int ComicSans_compressed[53556/4];
   extern const unsigned int OpenSans_compressed_size;
   extern const unsigned int OpenSans_compressed[99344 / 4];
   extern const unsigned int NvidiaSans_compressed_size;

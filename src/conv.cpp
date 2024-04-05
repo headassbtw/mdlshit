@@ -2676,26 +2676,21 @@ int Conversion::ReadHeader(FileInfo info)
 
   if (strcmp(magic, "IDST") >= 0) 
   {
-      if (version == 52)
-      {
+      if (version == 52) {
           Logger::Debug("MDL Version: %d\n", version);
           ConvertV52(info);
           return 0;
-      }
-      else if (version == 49)
-      {
+      } else if (version == 49) {
           Logger::Debug("MDL Version: %d\n", version);
           ConvertV49(info);
           return 0;
-      }
-      else if (version == 48)
-      {
+      } else if (version == 48) {
           Logger::Debug("MDL Version: %d\n", version);
           return 0;
+      } else {
+        Logger::Error("Unsupported MDL version (%d)\n", version);
       }
-  }
-  else
-        return 0;
+  } else return 0;
 }
 
 #pragma clang diagnostic pop
