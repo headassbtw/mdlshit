@@ -92,7 +92,7 @@ void drop_callback(GLFWwindow* window, int count, const char** paths)
   double xpos, ypos;
   glfwGetCursorPos(window, &xpos, &ypos);
   std::ifstream test;
-  const char* exts[9] = {".mdl",".dx90.vtx",".vvd",".vvc",".phy",".pfb",".str",".aabb",".rui"};
+  const char* exts[9] = {".mdl",".dx90.vtx",".vvd",".vvc",".phy",".pfb",".str",".aabb",".ruimesh"};
 
   std::string mdlPath = paths[0];
   std::string ext = mdlPath.substr(mdlPath.length() - 4);
@@ -677,7 +677,7 @@ const char* vvds = "*.vvd";
 const char* vvcs = "*.vvc";
 const char* phys = "*.phy";
 const char* pfbs = "*.bin";
-const char* ruis = "*.rui";
+const char* ruis = "*.ruimesh";
 const char* json = "*.json";
 
 files.push_back(new Widgets::File("MDL",false,mdls));

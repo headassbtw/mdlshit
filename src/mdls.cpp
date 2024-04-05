@@ -1783,7 +1783,7 @@ MDL::v53Mdl MDL::v53Mdl::_v53Mdl(BinaryReader* Stream, bool debug)
 //		Logger::Info("RuiMesh5 Read: %s\n", Stream->_filename);
 //		std::string fileName = Stream->_filename;
 //		fileName.resize(fileName.size() - 4);
-//		fileName.insert(fileName.size(), ".rui");
+//		fileName.insert(fileName.size(), ".ruimesh");
 //		int ruiEnd = Stream->Position();
 //		Stream->seek(mdlhdr.ruimeshindex);
 //		BinaryWriter Bing = BinaryWriter(fileName.c_str());
